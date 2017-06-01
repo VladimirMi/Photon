@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Starter</string>
+
+    <string name="message.wait">Пожлуйста, подождите</string>
+
+    <string name="login.submit">login</string>
+    <string name="login.username.hint">Username</string>
+    <string name="login.password.hint">Password</string>
+</resources>
