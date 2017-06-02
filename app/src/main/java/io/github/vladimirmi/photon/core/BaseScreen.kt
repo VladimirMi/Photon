@@ -1,7 +1,6 @@
 package io.github.vladimirmi.photon.core
 
 import android.support.annotation.LayoutRes
-
 import flow.ClassKey
 
 /**

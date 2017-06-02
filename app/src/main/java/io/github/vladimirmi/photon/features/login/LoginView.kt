@@ -2,7 +2,6 @@ package io.github.vladimirmi.photon.features.login
 
 import android.content.Context
 import android.util.AttributeSet
-import flow.Flow
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.LoginDto
 import io.github.vladimirmi.photon.di.DaggerService
@@ -14,18 +13,15 @@ import kotlinx.android.synthetic.main.screen_login.view.*
  */
 
 class LoginView(context: Context, attrs: AttributeSet) :
-        BaseView<ILoginView, LoginPresenter>(context, attrs), ILoginView {
+        BaseView<LoginPresenter, LoginView>(context, attrs), ILoginView {
 
     override fun initDagger(context: Context) {
         val component = DaggerService.getComponent<LoginScreen.Component>(context)
         component.inject(this)
     }
 
-    private val loginDto = Flow.getKey<LoginScreen>(this)?.loginDto as LoginDto
-
     override fun initView() {
-        username.setText(loginDto.username)
-        password.setText(loginDto.password)
+        // do something
     }
 
     override fun onViewRestored() {
@@ -43,5 +39,13 @@ class LoginView(context: Context, attrs: AttributeSet) :
 
     override fun onBackPressed(): Boolean {
         return false
+    }
+
+    private lateinit var loginDto: LoginDto
+
+    fun setup(loginDto: LoginDto) {
+        this.loginDto = loginDto
+        username.setText(loginDto.username)
+        password.setText(loginDto.password)
     }
 }

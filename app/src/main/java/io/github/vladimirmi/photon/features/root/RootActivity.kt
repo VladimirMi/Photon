@@ -31,18 +31,15 @@ class RootActivity : FlowActivity(), IRootView {
 
         initToolbar()
         initDagger()
-        presenter.takeView(this)
     }
 
     override fun onStart() {
-        if (!presenter.hasView()) {
-            presenter.takeView(this)
-        }
+        presenter.takeView(this)
         super.onStart()
     }
 
     override fun onStop() {
-        presenter.dropView()
+        presenter.dropView(this)
         super.onStop()
     }
 

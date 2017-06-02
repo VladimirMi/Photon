@@ -11,9 +11,11 @@ import com.transitionseverywhere.Slide
 import com.transitionseverywhere.TransitionManager
 import com.transitionseverywhere.TransitionSet
 import flow.Direction
+import flow.Flow
 import flow.Traversal
 import flow.TraversalCallback
 import io.github.vladimirmi.photon.core.BaseScreen
+import mortar.MortarScope
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -31,8 +33,12 @@ class FlowDispatcher(baseContext: Context) : BaseDispatcher(baseContext) {
 
         val newKey: BaseScreen<*> = getNewKey(traversal)
         @LayoutRes val newScreenLayout = newKey.layoutResId
+
         val flowContext = traversal.createContext(newKey, baseContext)
-        val layoutInflater = LayoutInflater.from(flowContext)
+        val mortarScope = Flow.getService<Any>(newKey.scopeName, flowContext) as MortarScope
+        val mortarContext = mortarScope.createContext(flowContext)
+
+        val layoutInflater = LayoutInflater.from(mortarContext)
 
         val previousView = getActiveView()
         val newView = layoutInflater.inflate(newScreenLayout, viewContainer, false)

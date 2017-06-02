@@ -11,7 +11,7 @@ import javax.inject.Inject
  * Developer Vladimir Mikhalev, 30.05.117
  */
 
-abstract class BaseView<V : IView, P : BasePresenter<V, *>>
+abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
 (context: Context, attrs: AttributeSet) :
         FrameLayout(context, attrs),
         IView, FlowLifecycles.BackPressListener, FlowLifecycles.ViewLifecycleListener {
@@ -42,7 +42,8 @@ abstract class BaseView<V : IView, P : BasePresenter<V, *>>
     }
 
     override fun onViewDestroyed(removedByFlow: Boolean) {
-        presenter.dropView()
+        @Suppress("UNCHECKED_CAST")
+        presenter.dropView(this as V)
         Timber.tag(javaClass.simpleName)
         Timber.d("onViewDestroyed")
     }

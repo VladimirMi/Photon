@@ -1,36 +1,41 @@
 package io.github.vladimirmi.photon.core
 
+import android.os.Bundle
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.reactivex.disposables.CompositeDisposable
+import mortar.MortarScope
+import mortar.ViewPresenter
 import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 30.05.2017
  */
 
+abstract class BasePresenter<V : BaseView<*, V>, M : IModel>
+(protected var model: M, protected var rootPresenter: RootPresenter)
+    : ViewPresenter<V>() {
 
-abstract class BasePresenter<V : IView, M : IModel>
-(protected var model: M, protected var rootPresenter: RootPresenter? = null)
-    : IPresenter<V> {
+    protected lateinit var compDisp: CompositeDisposable
 
-    protected var compDisp = CompositeDisposable()
-    var view: V? = null
-        private set
-
-    fun hasView(): Boolean = view != null
-
-    override fun takeView(v: V) {
+    override fun onEnterScope(scope: MortarScope?) {
+        super.onEnterScope(scope)
         Timber.tag(javaClass.simpleName)
-        Timber.d("takeView")
-        view = v
-        initView(v)
+        Timber.d("onEnterScope: ${scope?.name}")
     }
 
-    override fun dropView() {
+    override fun onLoad(savedInstanceState: Bundle?) {
+        super.onLoad(savedInstanceState)
+        compDisp = CompositeDisposable()
+        initView(view)
+        Timber.tag(javaClass.simpleName)
+        Timber.d("onLoad")
+    }
+
+    override fun dropView(view: V) {
+        super.dropView(view)
+        if (!compDisp.isDisposed) compDisp.dispose()
         Timber.tag(javaClass.simpleName)
         Timber.d("dropView")
-        if (!compDisp.isDisposed) compDisp.dispose()
-        view = null
     }
 
     protected abstract fun initView(view: V)

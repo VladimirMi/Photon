@@ -2,9 +2,12 @@ package io.github.vladimirmi.photon.flow
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import flow.Flow
+import io.github.vladimirmi.photon.di.DaggerService
+import mortar.bundler.BundleServiceRunner
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -31,9 +34,23 @@ abstract class FlowActivity : AppCompatActivity() {
         dispatcher.viewContainer = viewContainer
     }
 
-    override fun onStop() {
-        dispatcher.onViewDestroyed(false)
-        super.onStop()
+    override fun getSystemService(name: String): Any {
+        val rootActivityScope = DaggerService.rootActivityScope
+        if (rootActivityScope.hasService(name)) {
+            return rootActivityScope.getService<Any>(name)
+        } else {
+            return super.getSystemService(name)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        BundleServiceRunner.getBundleServiceRunner(this).onCreate(savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        BundleServiceRunner.getBundleServiceRunner(this).onSaveInstanceState(outState)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {

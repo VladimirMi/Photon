@@ -40,6 +40,7 @@ dependencies {
     compile "com.android.support:design:$SUPPORT_LIBRARY_VERSION"
 
     compile "com.squareup.flow:flow:1.0.0-alpha3"
+    compile 'com.squareup.mortar:mortar:0.20'
     // DI
     compile "com.google.dagger:dagger:$DAGGER_VERSION"
     kapt "com.google.dagger:dagger-compiler:$DAGGER_VERSION"

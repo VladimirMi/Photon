@@ -1,6 +1,8 @@
 package io.github.vladimirmi.photon.features.login
 
+import flow.Flow
 import io.github.vladimirmi.photon.core.BasePresenter
+import io.github.vladimirmi.photon.data.models.LoginDto
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import timber.log.Timber
 
@@ -9,18 +11,21 @@ import timber.log.Timber
  */
 
 class LoginPresenter(model: ILoginModel, rootPresenter: RootPresenter) :
-        BasePresenter<ILoginView, ILoginModel>(model, rootPresenter) {
+        BasePresenter<LoginView, ILoginModel>(model, rootPresenter) {
 
-    override fun initView(view: ILoginView) {
-        // do something
+    private lateinit var loginDto: LoginDto
+
+    override fun initView(view: LoginView) {
+        loginDto = Flow.getKey<LoginScreen>(view)?.loginDto as LoginDto
+        view.setup(loginDto)
     }
 
     fun updateUsername(string: String) {
-        Timber.d("username update")
+        Timber.d("username update with $string")
     }
 
-    fun updatePassword(toString: String) {
-        Timber.d("password update")
+    fun updatePassword(string: String) {
+        Timber.d("password update with $string")
     }
 
     fun login() {

@@ -17,13 +17,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/spacing_big"
+            android:hint="@string/login.username.hint"
             >
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/login.username.hint"
                 android:inputType="text"
                 />
         </android.support.design.widget.TextInputLayout>
@@ -32,13 +32,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="@dimen/spacing_big"
+            android:hint="@string/login.password.hint"
             >
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/login.password.hint"
                 android:inputType="textPassword"
                 />
 
