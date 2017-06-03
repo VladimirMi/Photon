@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_bottom_main"
+        android:title="Главная"
+        android:icon="@drawable/ic_bottom_bar_main"/>
+    <item
+        android:id="@+id/nav_bottom_profile"
+        android:title="Профиль"
+        android:icon="@drawable/ic_bottom_bar_profile"/>
+    <item
+        android:id="@+id/nav_bottom_load"
+        android:title="Загрузить"
+        android:icon="@drawable/ic_bottom_bar_load"/>
+
+</menu>

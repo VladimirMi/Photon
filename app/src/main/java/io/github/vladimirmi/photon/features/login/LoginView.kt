@@ -16,8 +16,7 @@ class LoginView(context: Context, attrs: AttributeSet) :
         BaseView<LoginPresenter, LoginView>(context, attrs), ILoginView {
 
     override fun initDagger(context: Context) {
-        val component = DaggerService.getComponent<LoginScreen.Component>(context)
-        component.inject(this)
+        DaggerService.getComponent<LoginScreen.Component>(context).inject(this)
     }
 
     override fun initView() {

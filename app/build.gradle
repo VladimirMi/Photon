@@ -13,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -38,6 +39,7 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:design:$SUPPORT_LIBRARY_VERSION"
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     compile "com.squareup.flow:flow:1.0.0-alpha3"
     compile 'com.squareup.mortar:mortar:0.20'
@@ -46,7 +48,7 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$DAGGER_VERSION"
     // networking
     compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
-    compile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
+    compile "com.squareup.retrofit2:converter-moshi:$RETROFIT_VERSION"
     compile "com.squareup.okhttp3:okhttp:$OKHTTP_VERSION"
     compile "com.squareup.okhttp3:logging-interceptor:$OKHTTP_VERSION"
     // rx
