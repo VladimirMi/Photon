@@ -8,7 +8,7 @@ import android.view.View
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.features.login.LoginScreen
+import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.flow.FlowActivity
 import kotlinx.android.synthetic.main.activity_root.*
 import javax.inject.Inject
@@ -54,7 +54,7 @@ class RootActivity : FlowActivity(), IRootView {
     }
 
     override val defaultKey: BaseScreen<*>
-        get() = LoginScreen()
+        get() = MainScreen()
 
     //region =============== IRootView ==============
 

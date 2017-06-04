@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 25
@@ -59,6 +60,10 @@ dependencies {
     compile "com.jakewharton.timber:timber:4.5.1"
     compile "com.facebook.stetho:stetho:1.5.0"
     compile "com.facebook.stetho:stetho-okhttp3:1.5.0"
+    compile 'com.uphyca:stetho_realm:2.0.0'
+    // image loading
+    compile 'com.github.bumptech.glide:okhttp3-integration:1.5.0@aar'
+    compile 'com.github.bumptech.glide:glide:3.8.0'
     // animation
     compile 'com.andkulikov:transitionseverywhere:1.7.3'
 

@@ -6,7 +6,7 @@ package io.github.vladimirmi.photon.utils
 
 interface AppConfig {
     companion object {
-        val BASE_URL = "http://api/"
+        val BASE_URL = "https://private-003526-photonapp.apiary-mock.com/"
         val CONNECT_TIMEOUT = 5000
         val READ_TIMEOUT = 5000
         val WRITE_TIMEOUT = 5000
