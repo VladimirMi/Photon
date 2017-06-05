@@ -1,12 +1,12 @@
-package io.github.vladimirmi.photon.features.login
+package io.github.vladimirmi.photon.features.splash
 
 import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.LoginDto
 import io.github.vladimirmi.photon.di.DaggerScope
+import io.github.vladimirmi.photon.features.root.IRootModel
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
 
@@ -14,17 +14,15 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-class LoginScreen : BaseScreen<RootActivityComponent>() {
-
-    var loginDto: LoginDto = LoginDto()
+class SplashScreen : BaseScreen<RootActivityComponent>() {
 
     override val layoutResId: Int
-        get() = R.layout.screen_login
+        get() = R.layout.screen_splash
 
     //region =============== DI ==============
 
     override fun createScreenComponent(parentComponent: RootActivityComponent): Any {
-        return parentComponent.loginComponentBuilder()
+        return parentComponent.splashComponentBuilder()
                 .module(Module())
                 .build()
     }
@@ -32,19 +30,19 @@ class LoginScreen : BaseScreen<RootActivityComponent>() {
     @dagger.Module
     class Module {
         @Provides
-        @DaggerScope(LoginScreen::class)
-        internal fun provideLoginModel(dataManager: DataManager): ILoginModel {
-            return LoginModel(dataManager)
+        @DaggerScope(SplashScreen::class)
+        internal fun provideSplashModel(dataManager: DataManager, rootModel: IRootModel): ISplashModel {
+            return SplashModel(dataManager, rootModel)
         }
 
         @Provides
-        @DaggerScope(LoginScreen::class)
-        internal fun provideLoginPresenter(model: ILoginModel, rootPresenter: RootPresenter): LoginPresenter {
-            return LoginPresenter(model, rootPresenter)
+        @DaggerScope(SplashScreen::class)
+        internal fun provideSplashPresenter(model: ISplashModel, rootPresenter: RootPresenter): SplashPresenter {
+            return SplashPresenter(model, rootPresenter)
         }
     }
 
-    @DaggerScope(LoginScreen::class)
+    @DaggerScope(SplashScreen::class)
     @dagger.Subcomponent(modules = arrayOf(Module::class))
     interface Component {
         @Subcomponent.Builder
@@ -53,7 +51,7 @@ class LoginScreen : BaseScreen<RootActivityComponent>() {
             fun build(): Component
         }
 
-        fun inject(loginView: LoginView)
+        fun inject(splashView: SplashView)
     }
 
     //endregion

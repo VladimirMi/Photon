@@ -15,7 +15,7 @@ class RealmListJsonAdapter<T : RealmModel>
 
     companion object {
 
-        val FACTORY: Factory = Factory { type, annotations, moshi ->
+        val FACTORY: Factory = Factory { type, _, moshi ->
             val rawType: Class<*> = Types.getRawType(type)
 
             if (rawType == RealmList::class.java) {

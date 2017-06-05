@@ -12,12 +12,6 @@ class MainModel(private val dataManager: DataManager) : IMainModel {
 
 
     override fun getPhotoCards(): Observable<List<Photocard>> {
-        return dataManager.getPhotocardsFromNet()
-                .doOnSuccess {
-                    it.forEach {
-                        dataManager.saveToDB(it)
-                    }
-                }
-                .toObservable()
+        return dataManager.getFromDb(Photocard::class.java)
     }
 }

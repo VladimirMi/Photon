@@ -2,8 +2,8 @@ package io.github.vladimirmi.photon.features.root
 
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.di.DaggerScope
-import io.github.vladimirmi.photon.features.login.LoginScreen
 import io.github.vladimirmi.photon.features.main.MainScreen
+import io.github.vladimirmi.photon.features.splash.SplashScreen
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -19,7 +19,7 @@ interface RootActivityComponent {
         fun build(): RootActivityComponent
     }
 
-    fun loginComponentBuilder(): LoginScreen.Component.Builder
+    fun splashComponentBuilder(): SplashScreen.Component.Builder
     fun mainComponentBuilder(): MainScreen.Component.Builder
 
     fun inject(view: RootActivity)

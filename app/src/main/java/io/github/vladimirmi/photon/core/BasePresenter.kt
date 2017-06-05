@@ -38,5 +38,11 @@ abstract class BasePresenter<V : BaseView<*, V>, M : IModel>
         Timber.d("dropView")
     }
 
+    override fun onExitScope() {
+        super.onExitScope()
+        Timber.tag(javaClass.simpleName)
+        Timber.d("onExitScope")
+    }
+
     protected abstract fun initView(view: V)
 }

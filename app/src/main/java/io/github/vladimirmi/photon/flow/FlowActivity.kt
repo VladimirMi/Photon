@@ -53,6 +53,11 @@ abstract class FlowActivity : AppCompatActivity() {
         BundleServiceRunner.getBundleServiceRunner(this).onSaveInstanceState(outState)
     }
 
+    override fun onStop() {
+        dispatcher.onViewDestroyed(false)
+        super.onStop()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
         dispatcher.onActivityResult(requestCode, resultCode, data)

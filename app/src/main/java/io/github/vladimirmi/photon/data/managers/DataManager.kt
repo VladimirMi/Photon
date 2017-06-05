@@ -6,6 +6,7 @@ import io.github.vladimirmi.photon.data.network.RestLastModifiedTransformer
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.data.network.models.Photocard
 import io.github.vladimirmi.photon.di.DaggerScope
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.realm.RealmObject
 import javax.inject.Inject
@@ -23,8 +24,8 @@ constructor(private val restService: RestService,
 
     //region =============== Network ==============
 
-    fun getPhotocardsFromNet(): Single<List<Photocard>> {
-        return restService.getPhotocards(getLastUpdate(), 10, 0)
+    fun getPhotocardsFromNet(limit: Int, offset: Int): Single<List<Photocard>> {
+        return restService.getPhotocards(getLastUpdate(), limit, offset)
                 .compose(RestLastModifiedTransformer())
                 .compose(RestErrorTransformer())
     }
@@ -34,7 +35,11 @@ constructor(private val restService: RestService,
     //region =============== DataBase ==============
 
     fun saveToDB(realmObject: RealmObject) {
-        realmManager.saveToDB(realmObject)
+        realmManager.save(realmObject)
+    }
+
+    fun <T : RealmObject> getFromDb(clazz: Class<T>): Observable<List<T>> {
+        return realmManager.get(clazz)
     }
 
     //endregion
