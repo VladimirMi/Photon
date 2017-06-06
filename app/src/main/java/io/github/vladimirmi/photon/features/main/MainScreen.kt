@@ -2,12 +2,12 @@ package io.github.vladimirmi.photon.features.main
 
 import dagger.Provides
 import dagger.Subcomponent
-import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
+import io.github.vladimirmi.photon.features.search.SearchScreen
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -52,6 +52,8 @@ class MainScreen : BaseScreen<RootActivityComponent>() {
         }
 
         fun inject(mainView: MainView)
+
+        fun searchComponentBuilder(): SearchScreen.Component.Builder
     }
 
     //endregion
