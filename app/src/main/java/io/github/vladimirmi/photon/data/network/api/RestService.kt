@@ -1,7 +1,9 @@
 package io.github.vladimirmi.photon.data.network.api
 
 import io.github.vladimirmi.photon.data.network.models.Photocard
-import io.reactivex.Single
+import io.github.vladimirmi.photon.data.network.models.Tag
+import io.github.vladimirmi.photon.utils.Constants.HEADER_IF_MODIFIED_SINCE
+import io.reactivex.Observable
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -13,14 +15,11 @@ import retrofit2.http.Query
 
 interface RestService {
 
-    companion object {
-        const val IF_MODIFIED_SINCE = "If-Modified-Since"
-        const val LAST_MODIFIED = "Last-Modified"
-    }
-
     @GET("photocard/list")
-    fun getPhotocards(@Header(IF_MODIFIED_SINCE) lastUpdate: String,
+    fun getPhotocards(@Header(HEADER_IF_MODIFIED_SINCE) lastUpdate: String,
                       @Query("limit") limit: Int,
-                      @Query("offset") offset: Int): Single<Response<List<Photocard>>>
+                      @Query("offset") offset: Int): Observable<Response<List<Photocard>>>
 
+    @GET("photocard/tags")
+    fun getTags(@Header(HEADER_IF_MODIFIED_SINCE) lastUpdate: String): Observable<Response<List<Tag>>>
 }

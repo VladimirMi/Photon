@@ -20,7 +20,6 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
 //                .flatMap { save(it) }
 //                .share()
         val updateObs = dataManager.getPhotocardsFromNet(limit = 60, offset = 0)
-                .toObservable()
                 .flatMap { save(it) }
                 .share()
         updateObs.subscribe()

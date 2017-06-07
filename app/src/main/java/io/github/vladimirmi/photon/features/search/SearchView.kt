@@ -23,6 +23,11 @@ class SearchView(context: Context, attrs: AttributeSet)
         search_pager.adapter = SearchAdapter(tabTitles)
     }
 
+    override fun onViewDestroyed(removedByFlow: Boolean) {
+        super.onViewDestroyed(removedByFlow)
+        search_pager.adapter = null
+    }
+
     override fun onBackPressed(): Boolean {
         return false
     }

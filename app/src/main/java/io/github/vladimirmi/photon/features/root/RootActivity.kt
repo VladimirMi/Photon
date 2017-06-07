@@ -112,11 +112,8 @@ class RootActivity : FlowActivity(), IRootView {
     }
 
     override fun enableTabs(tabsEnabled: Boolean) {
-        if (tabsEnabled) {
-            setTabLayout()
-        } else {
-            removeTabLayout()
-        }
+        removeTabLayout()
+        if (tabsEnabled) setTabLayout()
     }
 
     private fun setTabLayout() {

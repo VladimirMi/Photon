@@ -40,7 +40,7 @@ class NetworkModule {
 
     private fun createClient(): OkHttpClient {
         return OkHttpClient.Builder()
-                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
+                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                 .addNetworkInterceptor(StethoInterceptor())
                 .connectTimeout(AppConfig.CONNECT_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
                 .readTimeout(AppConfig.READ_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)

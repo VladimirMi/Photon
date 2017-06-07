@@ -101,33 +101,6 @@
                 android:textSize="16sp"
                 />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:background="@drawable/btn_tag"
-                android:padding="4dp"
-                android:text="#Tag"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:background="@drawable/btn_tag"
-                android:padding="4dp"
-                android:text="Est placidus elevatus, cesaris."
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:background="@drawable/btn_tag"
-                android:padding="4dp"
-                android:text="Est placidus elevatus, cesaris."
-                />
-
         </com.google.android.flexbox.FlexboxLayout>
 
 

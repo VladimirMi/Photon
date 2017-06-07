@@ -1,22 +1,25 @@
 package io.github.vladimirmi.photon.data.network
 
-import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerService
-import io.reactivex.Single
-import io.reactivex.SingleSource
-import io.reactivex.SingleTransformer
+import io.github.vladimirmi.photon.utils.AppConfig
+import io.github.vladimirmi.photon.utils.Constants.HEADER_LAST_MODIFIED
+import io.reactivex.Observable
+import io.reactivex.ObservableSource
+import io.reactivex.ObservableTransformer
+import io.reactivex.functions.BiFunction
 import retrofit2.Response
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
  */
 
-class RestLastModifiedTransformer<T> : SingleTransformer<Response<T>, Response<T>> {
+class RestLastModifiedTransformer<T> : ObservableTransformer<Response<T>, Response<T>> {
 
-    override fun apply(upstream: Single<Response<T>>): SingleSource<Response<T>> {
+    override fun apply(upstream: Observable<Response<T>>): ObservableSource<Response<T>> {
         return upstream.map {
             if (it.code() == 200) {
-                val lastModified = it.headers().get(RestService.LAST_MODIFIED)
+                val lastModified = it.headers().get(HEADER_LAST_MODIFIED)
                 if (lastModified != null) {
                     DaggerService.appComponent.dataManager().saveLastUpdate(lastModified)
                 }
@@ -26,15 +29,36 @@ class RestLastModifiedTransformer<T> : SingleTransformer<Response<T>, Response<T
     }
 }
 
-class RestErrorTransformer<T> : SingleTransformer<Response<T>, T> {
+class RestErrorTransformer<T> : ObservableTransformer<Response<T>, T> {
 
-    override fun apply(upstream: Single<Response<T>>): SingleSource<T> {
+    override fun apply(upstream: Observable<Response<T>>): ObservableSource<T> {
         return upstream.flatMap {
-            if (it.code() == 200) {
-                Single.just<T>(it.body())
-            } else {
-                Single.error(ApiError(it.message(), it.code()))
+            when (it.code()) {
+                200 -> Observable.just<T>(it.body())
+                304 -> Observable.empty()
+                else -> Observable.error(ApiError(it.message(), it.code()))
             }
+        }
+    }
+}
+
+class RetryWhenTransformer<T> : ObservableTransformer<T, T> {
+
+    private var mThrowable: Throwable? = null
+
+    override fun apply(upstream: Observable<T>): ObservableSource<T> {
+        return upstream.retryWhen {
+            it.zipWith<Int, Int>(1..5,
+                    BiFunction { throwable, attempt -> mThrowable = throwable; return@BiFunction attempt })
+
+                    .flatMap<Long> {
+                        if (it == AppConfig.RETRY_REQUEST_COUNT) {
+                            return@flatMap Observable.error<Long>(mThrowable)
+                        } else {
+                            return@flatMap Observable.just(AppConfig.RETRY_REQUEST_BASE_DELAY * Math.pow(Math.E, it.toDouble()).toLong())
+                        }
+                    }
+                    .flatMap { Observable.timer(it, TimeUnit.MILLISECONDS) }
         }
     }
 }

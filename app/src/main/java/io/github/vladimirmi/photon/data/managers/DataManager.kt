@@ -5,9 +5,9 @@ import io.github.vladimirmi.photon.data.network.RestErrorTransformer
 import io.github.vladimirmi.photon.data.network.RestLastModifiedTransformer
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.data.network.models.Photocard
+import io.github.vladimirmi.photon.data.network.models.Tag
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.realm.RealmObject
 import javax.inject.Inject
 
@@ -24,8 +24,14 @@ constructor(private val restService: RestService,
 
     //region =============== Network ==============
 
-    fun getPhotocardsFromNet(limit: Int, offset: Int): Single<List<Photocard>> {
+    fun getPhotocardsFromNet(limit: Int, offset: Int): Observable<List<Photocard>> {
         return restService.getPhotocards(getLastUpdate(), limit, offset)
+                .compose(RestLastModifiedTransformer())
+                .compose(RestErrorTransformer())
+    }
+
+    fun getTagsFromNet(): Observable<List<Tag>> {
+        return restService.getTags(getLastUpdate())
                 .compose(RestLastModifiedTransformer())
                 .compose(RestErrorTransformer())
     }
