@@ -14,13 +14,13 @@ class RootActivityModule {
 
     @Provides
     @DaggerScope(RootActivity::class)
-    internal fun provideIRootModel(dataManager: DataManager): IRootModel {
+    fun provideIRootModel(dataManager: DataManager): IRootModel {
         return RootModel(dataManager)
     }
 
     @Provides
     @DaggerScope(RootActivity::class)
-    internal fun provideRootPresenter(model: IRootModel): RootPresenter {
+    fun provideRootPresenter(model: IRootModel): RootPresenter {
         return RootPresenter(model)
     }
 }

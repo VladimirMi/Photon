@@ -2,9 +2,12 @@ package io.github.vladimirmi.photon.di.modules
 
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import io.github.vladimirmi.photon.core.App
+import io.github.vladimirmi.photon.data.network.RealmListJsonAdapter
+import io.github.vladimirmi.photon.data.network.TagJsonAdapter
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.utils.AppConfig
@@ -37,7 +40,7 @@ class NetworkModule {
 
     private fun createClient(): OkHttpClient {
         return OkHttpClient.Builder()
-                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
                 .addNetworkInterceptor(StethoInterceptor())
                 .connectTimeout(AppConfig.CONNECT_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
                 .readTimeout(AppConfig.READ_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
@@ -54,5 +57,11 @@ class NetworkModule {
                 .build()
     }
 
-    private fun createConvertFactory(): Converter.Factory = MoshiConverterFactory.create()
+    private fun createConvertFactory(): Converter.Factory {
+        val moshi = Moshi.Builder()
+                .add(TagJsonAdapter())
+                .add(RealmListJsonAdapter.FACTORY)
+                .build()
+        return MoshiConverterFactory.create(moshi)
+    }
 }

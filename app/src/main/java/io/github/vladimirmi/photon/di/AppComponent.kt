@@ -2,6 +2,7 @@ package io.github.vladimirmi.photon.di
 
 import dagger.Component
 import io.github.vladimirmi.photon.core.App
+import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.modules.LocaleModule
 import io.github.vladimirmi.photon.di.modules.NetworkModule
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
@@ -15,4 +16,5 @@ import io.github.vladimirmi.photon.features.root.RootActivityComponent
 @Component(modules = arrayOf(NetworkModule::class, LocaleModule::class))
 interface AppComponent {
     fun rootActivityComponentBuilder(): RootActivityComponent.Builder
+    fun dataManager(): DataManager
 }
