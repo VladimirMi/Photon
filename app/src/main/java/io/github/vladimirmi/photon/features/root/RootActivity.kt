@@ -4,6 +4,10 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
+import android.support.design.widget.TabLayout
+import android.support.v4.view.ViewPager
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
@@ -57,19 +61,8 @@ class RootActivity : FlowActivity(), IRootView {
     override val defaultKey: BaseScreen<*>
         get() = SplashScreen()
 
+
     //region =============== IRootView ==============
-
-    override fun setToolbarVisible(visible: Boolean) {
-        if (visible) {
-            toolbar.visibility = View.VISIBLE
-        } else {
-            toolbar.visibility = View.GONE
-        }
-    }
-
-    override fun setToolbarTitle(@StringRes titleId: Int) {
-        supportActionBar?.setTitle(titleId)
-    }
 
     private var progressDialog: ProgressDialog? = null
 
@@ -96,6 +89,74 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun showMessage(string: String) {
         Snackbar.make(coordinator_container, string, Snackbar.LENGTH_LONG).show()
+    }
+
+    //endregion
+
+    //region =============== IViewBuilder ==============
+
+    override fun setBottomMenuChecked(bottomItemIndex: Int) {
+        //todo implement me
+    }
+
+    override fun setToolbarVisible(visible: Boolean) {
+        if (visible) {
+            toolbar.visibility = View.VISIBLE
+        } else {
+            toolbar.visibility = View.GONE
+        }
+    }
+
+    override fun setToolbarTitle(@StringRes titleId: Int) {
+        supportActionBar?.setTitle(titleId)
+    }
+
+    override fun enableTabs(tabsEnabled: Boolean) {
+        if (tabsEnabled) {
+            setTabLayout()
+        } else {
+            removeTabLayout()
+        }
+    }
+
+    private fun setTabLayout() {
+        val tabs = TabLayout(this)
+        val pager = view_container.findViewWithTag("pager") as ViewPager
+        tabs.setupWithViewPager(pager)
+        appbar.addView(tabs)
+        pager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabs))
+    }
+
+    private fun removeTabLayout() {
+        val tabs = appbar.getChildAt(1)
+        if (tabs != null && tabs is TabLayout) {
+            appbar.removeView(tabs)
+        }
+    }
+
+    private var actionBarMenuItems: List<MenuItemHolder> = ArrayList()
+
+    override fun setMenuItems(menuItems: List<MenuItemHolder>) {
+        actionBarMenuItems = menuItems
+        supportInvalidateOptionsMenu()
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        if (!actionBarMenuItems.isEmpty()) {
+            for (menuItemHolder in actionBarMenuItems) {
+                val item = menu.add(menuItemHolder.itemTitle)
+                item.setIcon(menuItemHolder.iconResId)
+                item.setOnMenuItemClickListener(menuItemHolder.listener)
+                item.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            }
+        } else {
+            menu.clear()
+        }
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun setBackground(backgroundId: Int) {
+        coordinator_container.setBackgroundResource(backgroundId)
     }
 
     //endregion

@@ -1,8 +1,10 @@
 package io.github.vladimirmi.photon.features.search
 
 import android.support.v4.view.PagerAdapter
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 
 /**
@@ -23,6 +25,15 @@ class SearchAdapter(private val tabTitles: Array<String>) : PagerAdapter() {
     }
 
     override fun instantiateItem(container: ViewGroup?, position: Int): Any {
-        return super.instantiateItem(container, position)
+        val view: View
+        if (position == 0) {
+            view = LayoutInflater.from(container?.context).inflate(R.layout.view_tags, container, false)
+        } else {
+            view = LayoutInflater.from(container?.context).inflate(R.layout.view_filters, container, false)
+        }
+        container?.addView(view)
+        (view as BaseView<*, *>).onViewRestored()
+
+        return view
     }
 }

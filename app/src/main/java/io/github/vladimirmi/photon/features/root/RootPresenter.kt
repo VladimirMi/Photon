@@ -1,12 +1,13 @@
 package io.github.vladimirmi.photon.features.root
 
 import android.content.Context
-import android.os.Bundle
+import android.support.annotation.StringRes
+import android.view.MenuItem
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.di.DaggerScope
-import mortar.MortarScope
 import mortar.Presenter
 import mortar.bundler.BundleService
-import timber.log.Timber
+import java.util.*
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -20,29 +21,61 @@ class RootPresenter(val model: IRootModel) :
         return BundleService.getBundleService(view as Context)
     }
 
-
-    override fun onEnterScope(scope: MortarScope?) {
-        super.onEnterScope(scope)
-        Timber.tag(javaClass.simpleName)
-        Timber.d("onEnterScope: ${scope?.name}")
-    }
-
-    override fun onLoad(savedInstanceState: Bundle?) {
-        super.onLoad(savedInstanceState)
-        Timber.d("onLoad")
-    }
-
-    override fun dropView(view: IRootView) {
-        super.dropView(view)
-        Timber.tag(javaClass.simpleName)
-        Timber.d("dropView")
-    }
-
-    override fun onExitScope() {
-        super.onExitScope()
-        Timber.tag(javaClass.simpleName)
-        Timber.d("onExitScope")
-    }
-
     fun hasActiveView() = hasView()
+
+    fun getNewRootBuilder(): RootBuilder = RootBuilder()
+
+    inner class RootBuilder {
+        private var isToolbarVisible = true
+        @StringRes private var toolbarTitleId = R.string.app_name
+        private var bottomItemIndex = 0
+        private var isTabsEnabled = false
+        private var backgroundId = R.color.grey_light
+        private val menuItems = ArrayList<MenuItemHolder>()
+
+        fun setToolbarVisible(toolbarVisible: Boolean): RootBuilder {
+            isToolbarVisible = toolbarVisible
+            return this
+        }
+
+        fun setToolbarTitleId(@StringRes toolbarTitleId: Int): RootBuilder {
+            this.toolbarTitleId = toolbarTitleId
+            return this
+        }
+
+        fun setDrawerItemIndex(index: Int): RootBuilder {
+            bottomItemIndex = index
+            return this
+        }
+
+        fun setTabsEnabled(tabsEnabled: Boolean): RootBuilder {
+            isTabsEnabled = tabsEnabled
+            return this
+        }
+
+        fun setBackGround(resId: Int): RootBuilder {
+            backgroundId = resId
+            return this
+        }
+
+        fun addAction(menuItemHolder: MenuItemHolder): RootBuilder {
+            menuItems.add(menuItemHolder)
+            return this
+        }
+
+        fun build() {
+            view.setToolbarVisible(isToolbarVisible)
+            view.setToolbarTitle(toolbarTitleId)
+            view.setBottomMenuChecked(bottomItemIndex)
+            view.enableTabs(isTabsEnabled)
+            view.setBackground(backgroundId)
+            view.setMenuItems(menuItems)
+        }
+    }
 }
+
+class MenuItemHolder(val itemTitle: String,
+                     val iconResId: Int,
+                     val listener: MenuItem.OnMenuItemClickListener)
+
+

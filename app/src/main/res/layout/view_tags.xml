@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.github.vladimirmi.photon.features.search.tags.SearchTagView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            >
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:hint="Поиск"
+                android:textColorHint="@android:color/black"
+                />
+
+            <ImageView
+                android:id="@+id/icon_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                app:srcCompat="@drawable/ic_action_back_arrow"
+                />
+
+            <ImageView
+                android:id="@+id/icon_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_action_close"
+                />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_below="@+id/search_bar"
+            android:background="@drawable/shadow"
+            />
+
+        <FrameLayout
+            android:id="@+id/recent_search_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:layout_below="@+id/search_bar"
+            android:visibility="gone"
+            tools:visibility="visible"
+            >
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recent_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/shadow"
+                />
+        </FrameLayout>
+
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/tags"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/recent_search_wrapper"
+            android:padding="12dp"
+            app:alignContent="flex_start"
+            app:flexDirection="row"
+            app:flexWrap="wrap"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:text="Теги"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_tag"
+                android:padding="4dp"
+                android:text="#Tag"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_tag"
+                android:padding="4dp"
+                android:text="Est placidus elevatus, cesaris."
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_tag"
+                android:padding="4dp"
+                android:text="Est placidus elevatus, cesaris."
+                />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+
+    </RelativeLayout>
+</io.github.vladimirmi.photon.features.search.tags.SearchTagView>

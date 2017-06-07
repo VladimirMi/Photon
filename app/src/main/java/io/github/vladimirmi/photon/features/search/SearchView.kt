@@ -2,6 +2,7 @@ package io.github.vladimirmi.photon.features.search
 
 import android.content.Context
 import android.util.AttributeSet
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.di.DaggerService
 import kotlinx.android.synthetic.main.screen_search.view.*

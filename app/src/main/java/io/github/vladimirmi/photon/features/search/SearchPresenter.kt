@@ -12,7 +12,10 @@ class SearchPresenter(model: ISearchModel, rootPresenter: RootPresenter)
 
 
     override fun initView(view: SearchView) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        rootPresenter.getNewRootBuilder()
+                .setToolbarVisible(false)
+                .setTabsEnabled(true)
+                .build()
     }
 }
 

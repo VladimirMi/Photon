@@ -21,4 +21,8 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="AccentButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:button">@drawable/btn_tag</item>
+    </style>
+
 </resources>
