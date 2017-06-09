@@ -1,11 +1,13 @@
 package io.github.vladimirmi.photon.features.main
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.network.models.Photocard
+import io.github.vladimirmi.photon.utils.getDisplayMetrics
 import io.github.vladimirmi.photon.utils.setImage
 import kotlinx.android.synthetic.main.item_card.view.*
 import java.util.*
@@ -14,7 +16,7 @@ import java.util.*
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class MainAdapter : RecyclerView.Adapter<CardViewHolder>() {
+class MainAdapter(private val context: Context) : RecyclerView.Adapter<CardViewHolder>() {
 
     var data: List<Photocard> = ArrayList()
 
@@ -26,6 +28,10 @@ class MainAdapter : RecyclerView.Adapter<CardViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_card, parent, false)
+        val lp = view.layoutParams
+        lp.width = getDisplayMetrics(context).widthPixels / 2
+        lp.height = lp.width
+        view.layoutParams = lp
         return CardViewHolder(view)
     }
 

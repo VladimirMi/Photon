@@ -95,8 +95,16 @@ class RootActivity : FlowActivity(), IRootView {
 
     //region =============== IViewBuilder ==============
 
-    override fun setBottomMenuChecked(bottomItemIndex: Int) {
+    override fun setBottomMenuChecked(index: Int) {
         //todo implement me
+    }
+
+    override fun setBottomMenuVisible(visible: Boolean) {
+        if (visible) {
+            bottom_menu.visibility = View.VISIBLE
+        } else {
+            bottom_menu.visibility = View.GONE
+        }
     }
 
     override fun setToolbarVisible(visible: Boolean) {
@@ -111,9 +119,9 @@ class RootActivity : FlowActivity(), IRootView {
         supportActionBar?.setTitle(titleId)
     }
 
-    override fun enableTabs(tabsEnabled: Boolean) {
+    override fun enableTabs(enabled: Boolean) {
         removeTabLayout()
-        if (tabsEnabled) setTabLayout()
+        if (enabled) setTabLayout()
     }
 
     private fun setTabLayout() {

@@ -25,6 +25,10 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                             Flow.get(view).set(SearchScreen())
                             return@OnMenuItemClickListener true
                         }))
+                .addAction(MenuItemHolder("Login", R.drawable.ic_action_settings,
+                        MenuItem.OnMenuItemClickListener {
+                            return@OnMenuItemClickListener true
+                        }))
                 .build()
     }
 

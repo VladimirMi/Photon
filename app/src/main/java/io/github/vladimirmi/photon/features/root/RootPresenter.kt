@@ -28,6 +28,7 @@ class RootPresenter(val model: IRootModel) :
     inner class RootBuilder {
         private var isToolbarVisible = true
         @StringRes private var toolbarTitleId = R.string.app_name
+        private var bottomMenuEnabled = true
         private var bottomItemIndex = 0
         private var isTabsEnabled = false
         private var backgroundId = R.color.grey_light
@@ -38,13 +39,13 @@ class RootPresenter(val model: IRootModel) :
             return this
         }
 
-        fun setToolbarTitleId(@StringRes toolbarTitleId: Int): RootBuilder {
-            this.toolbarTitleId = toolbarTitleId
+        fun setBottomMenuEnabled(menuEnabled: Boolean): RootBuilder {
+            bottomMenuEnabled = menuEnabled
             return this
         }
 
-        fun setDrawerItemIndex(index: Int): RootBuilder {
-            bottomItemIndex = index
+        fun setToolbarTitleId(@StringRes toolbarTitleId: Int): RootBuilder {
+            this.toolbarTitleId = toolbarTitleId
             return this
         }
 
@@ -64,6 +65,7 @@ class RootPresenter(val model: IRootModel) :
         }
 
         fun build() {
+            view.setBottomMenuVisible(bottomMenuEnabled)
             view.setToolbarVisible(isToolbarVisible)
             view.setToolbarTitle(toolbarTitleId)
             view.setBottomMenuChecked(bottomItemIndex)

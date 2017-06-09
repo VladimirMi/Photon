@@ -11,6 +11,10 @@ class TagView(context: Context, tag: String, val runnable: (TagView) -> Unit) :
         TextView(context) {
     private var picked = false
 
+    override fun getText(): CharSequence {
+        return super.getText().removePrefix("#")
+    }
+
     init {
         setBackgroundResource(R.drawable.btn_tag)
         setTextColor(ContextCompat.getColor(context, R.color.black))
@@ -20,7 +24,7 @@ class TagView(context: Context, tag: String, val runnable: (TagView) -> Unit) :
         })
         val padding: Int = (getDensity(context) * 4).toInt()
         setPadding(padding, padding, padding, padding)
-        text = tag
+        text = "#" + tag
     }
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {

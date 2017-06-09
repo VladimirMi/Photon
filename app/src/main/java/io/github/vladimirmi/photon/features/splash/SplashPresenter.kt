@@ -1,6 +1,8 @@
 package io.github.vladimirmi.photon.features.splash
 
+import flow.Direction
 import flow.Flow
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -16,9 +18,15 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
 
 
     override fun initView(view: SplashView) {
+        rootPresenter.getNewRootBuilder()
+                .setBottomMenuEnabled(false)
+                .setToolbarVisible(false)
+                .setBackGround(R.color.transparent)
+                .build()
+
         model.updateLimitPhotoCards(60, 3000)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({}, {}, { Flow.get(view).set(MainScreen()) })
+                .subscribe({}, {}, { Flow.get(view).replaceTop(MainScreen(), Direction.FORWARD) })
     }
 }

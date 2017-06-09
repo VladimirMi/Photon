@@ -22,7 +22,7 @@ class MainView(context: Context, attrs: AttributeSet) :
     }
 
     override fun initView() {
-        adapter = MainAdapter()
+        adapter = MainAdapter(context)
         recycler_view.layoutManager = GridLayoutManager(context, 2)
         recycler_view.adapter = adapter
     }

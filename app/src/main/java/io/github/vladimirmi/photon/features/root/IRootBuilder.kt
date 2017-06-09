@@ -8,9 +8,11 @@ interface IRootBuilder {
 
     fun setToolbarTitle(@StringRes titleId: Int)
 
-    fun setBottomMenuChecked(bottomItemIndex: Int)
+    fun setBottomMenuVisible(visible: Boolean)
 
-    fun enableTabs(tabsEnabled: Boolean)
+    fun setBottomMenuChecked(index: Int)
+
+    fun enableTabs(enabled: Boolean)
 
     fun setBackground(backgroundId: Int)
 

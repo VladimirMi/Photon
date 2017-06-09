@@ -5,7 +5,7 @@ package io.github.vladimirmi.photon.utils
  */
 
 object AppConfig {
-    const val BASE_URL = "http://207.154.248.163:8000"
+    const val BASE_URL = "http://207.154.248.163:5000"
     const val CONNECT_TIMEOUT = 5000
     const val READ_TIMEOUT = 5000
     const val WRITE_TIMEOUT = 5000

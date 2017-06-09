@@ -49,7 +49,7 @@ fun getScaledDensity(context: Context): Float {
     return getDisplayMetrics(context).scaledDensity
 }
 
-private fun getDisplayMetrics(context: Context): DisplayMetrics {
+fun getDisplayMetrics(context: Context): DisplayMetrics {
     val displayMetrics = DisplayMetrics()
     (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getMetrics(displayMetrics)
     return displayMetrics
