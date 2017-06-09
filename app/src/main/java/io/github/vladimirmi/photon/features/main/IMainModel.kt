@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.features.main
 
 import io.github.vladimirmi.photon.core.IModel
-import io.github.vladimirmi.photon.data.network.models.Photocard
+import io.github.vladimirmi.photon.data.models.Photocard
 import io.reactivex.Observable
 
 /**

@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.data.network
 
 import com.squareup.moshi.*
-import io.github.vladimirmi.photon.data.network.models.Tag
+import io.github.vladimirmi.photon.data.models.Tag
 import io.realm.RealmList
 import io.realm.RealmModel
 

@@ -1,11 +1,11 @@
 package io.github.vladimirmi.photon.data.managers
 
 import io.github.vladimirmi.photon.core.App
+import io.github.vladimirmi.photon.data.models.Photocard
+import io.github.vladimirmi.photon.data.models.Tag
 import io.github.vladimirmi.photon.data.network.RestErrorTransformer
 import io.github.vladimirmi.photon.data.network.RestLastModifiedTransformer
 import io.github.vladimirmi.photon.data.network.api.RestService
-import io.github.vladimirmi.photon.data.network.models.Photocard
-import io.github.vladimirmi.photon.data.network.models.Tag
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Observable
 import io.realm.RealmObject

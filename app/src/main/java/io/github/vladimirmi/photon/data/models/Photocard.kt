@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.data.network.models
+package io.github.vladimirmi.photon.data.models
 
 import io.realm.RealmList
 import io.realm.RealmObject

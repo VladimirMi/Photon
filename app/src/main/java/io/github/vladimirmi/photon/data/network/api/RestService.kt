@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.data.network.api
 
-import io.github.vladimirmi.photon.data.network.models.Photocard
-import io.github.vladimirmi.photon.data.network.models.Tag
+import io.github.vladimirmi.photon.data.models.Photocard
+import io.github.vladimirmi.photon.data.models.Tag
 import io.github.vladimirmi.photon.utils.Constants.HEADER_IF_MODIFIED_SINCE
 import io.reactivex.Observable
 import retrofit2.Response

@@ -4,6 +4,8 @@
     <string name="message.wait">Пожлуйста, подождите</string>
     <string name="app_description">Онлайн-галерея фуд-фотографии.\n
         Для вдохновления и обучения.</string>
+    <string name="search">Поиск</string>
+    <string name="tags">Теги</string>
 
     <string-array name="search_tabs">
         <item>Поиск</item>

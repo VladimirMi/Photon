@@ -4,7 +4,7 @@ import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.network.models.Photocard
+import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import kotlinx.android.synthetic.main.screen_main.view.*
 
@@ -15,14 +15,13 @@ import kotlinx.android.synthetic.main.screen_main.view.*
 class MainView(context: Context, attrs: AttributeSet) :
         BaseView<MainPresenter, MainView>(context, attrs) {
 
-    lateinit var adapter: MainAdapter
+    val adapter = MainAdapter()
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<MainScreen.Component>(context).inject(this)
     }
 
     override fun initView() {
-        adapter = MainAdapter(context)
         recycler_view.layoutManager = GridLayoutManager(context, 2)
         recycler_view.adapter = adapter
     }
