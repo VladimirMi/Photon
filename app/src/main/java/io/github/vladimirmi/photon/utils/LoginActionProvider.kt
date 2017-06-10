@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.utils
 import android.content.Context
 import android.support.v4.view.ActionProvider
 import android.view.SubMenu
+import io.github.vladimirmi.photon.R
 
 
 /**
@@ -23,10 +24,13 @@ class LoginActionProvider(context: Context,
     override fun onPrepareSubMenu(subMenu: SubMenu) {
         subMenu.clear()
         if (isLogin) {
-            subMenu.add("Выйти").setOnMenuItemClickListener { run(logoutAction!!) }
+            subMenu.add(context.getString(R.string.menu_search_exit))
+                    .setOnMenuItemClickListener { run(logoutAction!!) }
         } else {
-            subMenu.add("Войти").setOnMenuItemClickListener { run(loginAction!!) }
-            subMenu.add("Зарегистрироваться").setOnMenuItemClickListener { run(registrationAction!!) }
+            subMenu.add(context.getString(R.string.menu_search_enter))
+                    .setOnMenuItemClickListener { run(loginAction!!) }
+            subMenu.add(context.getString(R.string.menu_search_registration))
+                    .setOnMenuItemClickListener { run(registrationAction!!) }
         }
     }
 }

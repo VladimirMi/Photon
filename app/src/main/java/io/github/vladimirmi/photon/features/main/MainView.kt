@@ -45,4 +45,12 @@ class MainView(context: Context, attrs: AttributeSet) :
                 .show()
         return true
     }
+
+    fun openRegistrationDialog(): Boolean {
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_registration, this, false)
+        AlertDialog.Builder(context)
+                .setView(view)
+                .show()
+        return true
+    }
 }

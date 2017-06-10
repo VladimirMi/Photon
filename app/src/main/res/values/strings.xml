@@ -1,14 +1,29 @@
 <resources>
     <string name="app_name">Фотон</string>
-
-    <string name="message.wait">Пожлуйста, подождите</string>
     <string name="app_description">Онлайн-галерея фуд-фотографии.\n
         Для вдохновления и обучения.</string>
-    <string name="search">Поиск</string>
-    <string name="tags">Теги</string>
+
+    <string name="message_wait">Пожалйста, подождите</string>
+
+    <string name="menu_search_exit">Выйти</string>
+    <string name="menu_search_enter">Войти</string>
+    <string name="menu_search_registration">Зарегистрироваться</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Отмена</string>
+
+    <string name="dialog_registration">Регистрация</string>
+    <string name="dialog_enter">Вход в аккаунт</string>
+    <string name="dialog_login">Логин</string>
+    <string name="dialog_email">Email</string>
+    <string name="dialog_name">Имя</string>
+    <string name="dialog_password">Пароль</string>
 
     <string-array name="search_tabs">
         <item>Поиск</item>
         <item>Фильтры</item>
     </string-array>
+    <string name="search_search">Поиск</string>
+    <string name="search_tags">Теги</string>
+
 </resources>

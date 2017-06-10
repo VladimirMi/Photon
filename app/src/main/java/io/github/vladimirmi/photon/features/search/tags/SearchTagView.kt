@@ -53,10 +53,6 @@ class SearchTagView(context: Context, attrs: AttributeSet)
         tags_wrapper.addView(tagsContainer)
     }
 
-    private fun addTags(tags: View) {
-        tags_wrapper.addView(tags)
-    }
-
     private fun select(tagView: TagView) {
         Timber.e("tagView selected with tag - ${tagView.text}")
     }

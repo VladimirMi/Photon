@@ -19,8 +19,9 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         BasePresenter<MainView, IMainModel>(model, rootPresenter) {
 
     override fun initView(view: MainView) {
-        val loginActionProvider = LoginActionProvider(view.context
-                , loginAction = view::openLoginDialog)
+        val loginActionProvider = LoginActionProvider(view.context,
+                loginAction = view::openLoginDialog,
+                registrationAction = view::openRegistrationDialog)
 
         compDisp.add(subscribeOnPhotocards())
         rootPresenter.getNewRootBuilder()

@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    tools:ignore="RtlHardcoded, ContentDescription"
     >
 
     <ImageView
@@ -17,10 +18,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:background="@drawable/card_gradient"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:layout_gravity="bottom"
         android:padding="16dp"
         >
 
