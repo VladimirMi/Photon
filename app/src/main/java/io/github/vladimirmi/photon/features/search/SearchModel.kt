@@ -11,6 +11,6 @@ import io.reactivex.Observable
 class SearchModel(private val dataManager: DataManager) : ISearchModel {
 
     override fun getTags(): Observable<List<Tag>> {
-        return dataManager.getTagsFromNet()
+        return dataManager.getFromDb(Tag::class.java)
     }
 }

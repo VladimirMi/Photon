@@ -7,6 +7,7 @@ import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
+import io.github.vladimirmi.photon.utils.LoginActionProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 
@@ -18,6 +19,9 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         BasePresenter<MainView, IMainModel>(model, rootPresenter) {
 
     override fun initView(view: MainView) {
+        val loginActionProvider = LoginActionProvider(view.context
+                , loginAction = view::openLoginDialog)
+
         compDisp.add(subscribeOnPhotocards())
         rootPresenter.getNewRootBuilder()
                 .addAction(MenuItemHolder("Search", R.drawable.ic_action_search,
@@ -25,10 +29,9 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                             Flow.get(view).set(SearchScreen())
                             return@OnMenuItemClickListener true
                         }))
-                .addAction(MenuItemHolder("Login", R.drawable.ic_action_settings,
-                        MenuItem.OnMenuItemClickListener {
-                            return@OnMenuItemClickListener true
-                        }))
+                .addAction(MenuItemHolder("Login", R.drawable.ic_action_settings
+                        , actionProvider = loginActionProvider
+                ))
                 .build()
     }
 

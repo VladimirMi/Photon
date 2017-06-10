@@ -3,14 +3,17 @@ package io.github.vladimirmi.photon.features.search.tags
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.Search
 import io.github.vladimirmi.photon.data.models.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.utils.TagView
-import kotlinx.android.synthetic.main.view_tags.view.*
+import kotlinx.android.synthetic.main.view_search.view.*
 import timber.log.Timber
 
 /**
@@ -41,8 +44,17 @@ class SearchTagView(context: Context, attrs: AttributeSet)
 
     private val tagAction: (TagView) -> Unit = { select(it) }
 
-    fun addTag(tag: Tag) {
-        tags.addView(TagView(context, tag.tag, tagAction))
+    fun addTags(tags: List<Tag>) {
+        val tagsContainer = LayoutInflater.from(context).inflate(R.layout.view_tags, tags_wrapper, false)
+        tagsContainer as ViewGroup
+        tags.forEach {
+            tagsContainer.addView(TagView(context, it.tag, tagAction))
+        }
+        tags_wrapper.addView(tagsContainer)
+    }
+
+    private fun addTags(tags: View) {
+        tags_wrapper.addView(tags)
     }
 
     private fun select(tagView: TagView) {

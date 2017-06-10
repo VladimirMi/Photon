@@ -26,7 +26,11 @@
     </style>
 
     <style name="AccentButton" parent="Base.Widget.AppCompat.Button">
-        <item name="android:button">@drawable/btn_tag</item>
+        <item name="colorButtonNormal">@color/color_accent</item>
+    </style>
+
+    <style name="GreyDarkButton" parent="Base.Widget.AppCompat.Button">
+        <item name="colorButtonNormal">@color/grey_dark</item>
     </style>
 
 </resources>

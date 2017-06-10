@@ -4,8 +4,10 @@
     <color name="color_primary_dark">#666666</color>
     <color name="color_accent">#00aaff</color>
 
-    <color name="grey_light">#EDEFF3</color>
+    <color name="background">#EDEFF3</color>
+    <color name="grey_light">#c3c1c1</color>
     <color name="grey">#454545</color>
+    <color name="grey_dark">#212121</color>
 
     <color name="transparent">#00FFFFFF</color>
     <color name="black">#000</color>

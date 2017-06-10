@@ -2,6 +2,7 @@ package io.github.vladimirmi.photon.features.root
 
 import android.content.Context
 import android.support.annotation.StringRes
+import android.support.v4.view.ActionProvider
 import android.view.MenuItem
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -31,7 +32,7 @@ class RootPresenter(val model: IRootModel) :
         private var bottomMenuEnabled = true
         private var bottomItemIndex = 0
         private var isTabsEnabled = false
-        private var backgroundId = R.color.grey_light
+        private var backgroundId = R.color.background
         private val menuItems = ArrayList<MenuItemHolder>()
 
         fun setToolbarVisible(toolbarVisible: Boolean): RootBuilder {
@@ -76,8 +77,9 @@ class RootPresenter(val model: IRootModel) :
     }
 }
 
-class MenuItemHolder(val itemTitle: String,
+class MenuItemHolder(val itemTitle: String = "",
                      val iconResId: Int,
-                     val listener: MenuItem.OnMenuItemClickListener)
+                     val listener: MenuItem.OnMenuItemClickListener? = null,
+                     val actionProvider: ActionProvider? = null)
 
 

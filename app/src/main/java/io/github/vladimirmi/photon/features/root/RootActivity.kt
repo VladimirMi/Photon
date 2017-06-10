@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
+import android.support.v4.view.MenuItemCompat
 import android.support.v4.view.ViewPager
 import android.view.Menu
 import android.view.MenuItem
@@ -15,6 +16,7 @@ import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.splash.SplashScreen
 import io.github.vladimirmi.photon.flow.FlowActivity
 import kotlinx.android.synthetic.main.activity_root.*
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -147,10 +149,12 @@ class RootActivity : FlowActivity(), IRootView {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        Timber.e("prepare")
         if (!actionBarMenuItems.isEmpty()) {
             for (menuItemHolder in actionBarMenuItems) {
                 val item = menu.add(menuItemHolder.itemTitle)
                 item.setIcon(menuItemHolder.iconResId)
+                MenuItemCompat.setActionProvider(item, menuItemHolder.actionProvider)
                 item.setOnMenuItemClickListener(menuItemHolder.listener)
                 item.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
             }

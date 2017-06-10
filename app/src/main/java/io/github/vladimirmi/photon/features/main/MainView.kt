@@ -1,12 +1,16 @@
 package io.github.vladimirmi.photon.features.main
 
+import android.app.AlertDialog
 import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
+import android.view.LayoutInflater
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import kotlinx.android.synthetic.main.screen_main.view.*
+
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -32,5 +36,13 @@ class MainView(context: Context, attrs: AttributeSet) :
 
     fun setData(data: List<Photocard>) {
         adapter.updateData(data)
+    }
+
+    fun openLoginDialog(): Boolean {
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_login, this, false)
+        AlertDialog.Builder(context)
+                .setView(view)
+                .show()
+        return true
     }
 }

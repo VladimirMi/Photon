@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <style name="AccentButton" parent="Base.Widget.AppCompat.Button">
-        <item name="android:colorButtonNormal">@color/color_accent</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
-</resources>

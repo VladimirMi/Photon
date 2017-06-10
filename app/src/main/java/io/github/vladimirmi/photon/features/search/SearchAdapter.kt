@@ -27,7 +27,7 @@ class SearchAdapter(private val tabTitles: Array<String>) : PagerAdapter() {
     override fun instantiateItem(container: ViewGroup?, position: Int): Any {
         val view: View
         if (position == 0) {
-            view = LayoutInflater.from(container?.context).inflate(R.layout.view_tags, container, false)
+            view = LayoutInflater.from(container?.context).inflate(R.layout.view_search, container, false)
         } else {
             view = LayoutInflater.from(container?.context).inflate(R.layout.view_filters, container, false)
         }
