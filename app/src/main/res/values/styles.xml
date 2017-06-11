@@ -5,6 +5,7 @@
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorAccent">@color/color_accent</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="SplashTheme" parent="AppTheme">
@@ -31,6 +32,16 @@
 
     <style name="GreyDarkButton" parent="Base.Widget.AppCompat.Button">
         <item name="colorButtonNormal">@color/grey_dark</item>
+    </style>
+
+    <style name="FilterElement">
+        <item name="android:textSize">8sp</item>
+        <item name="android:textColor">@color/grey</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
     </style>
 
 </resources>

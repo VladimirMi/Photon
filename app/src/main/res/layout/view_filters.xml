@@ -1,8 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <io.github.vladimirmi.photon.features.search.filters.SearchFilterView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:ignore="ContentDescription, SmallSp"
     >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp"
+            android:paddingTop="24dp"
+            >
+
+            <include layout="@layout/view_filters_dishes"/>
+
+            <include layout="@layout/view_filters_nuances"/>
+
+            <include layout="@layout/view_filters_decor"/>
+
+            <include layout="@layout/view_filters_temp"/>
+
+            <include layout="@layout/view_filters_light"/>
+
+            <include layout="@layout/view_filters_light_dir"/>
+
+            <include layout="@layout/view_filters_light_src"/>
+
+        </LinearLayout>
+    </ScrollView>
 
 </io.github.vladimirmi.photon.features.search.filters.SearchFilterView>

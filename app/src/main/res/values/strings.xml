@@ -26,4 +26,44 @@
     <string name="search_search">Поиск</string>
     <string name="search_tags">Теги</string>
 
+    <string name="filters_dish">Блюдо</string>
+    <string name="filters_dish_meat">Мясо</string>
+    <string name="filters_dish_fish">Рыба</string>
+    <string name="filters_dish_vegetable">Овощи</string>
+    <string name="filters_dish_fruit">Фрукты</string>
+    <string name="filters_dish_cheese">Сыр</string>
+    <string name="filters_dish_dessert">Десерты</string>
+    <string name="filters_dish_drink">Напитки</string>
+    <string name="filters_nuance">Оттенки</string>
+    <string name="filters_nuance_red">Красный</string>
+    <string name="filters_nuance_orange">Оранжевый</string>
+    <string name="filters_nuance_yellow">Желтый</string>
+    <string name="filters_nuance_green">Зеленый</string>
+    <string name="filters_nuance_lightBlue">Голубой</string>
+    <string name="filters_nuance_blue">Синий</string>
+    <string name="filters_nuance_purple">Фиолетовый</string>
+    <string name="filters_nuance_brown">Коричневый</string>
+    <string name="filters_nuance_black">Черный</string>
+    <string name="filters_nuance_white">Белый</string>
+    <string name="filters_decor">Оформление</string>
+    <string name="filters_decor_simple">Обычное</string>
+    <string name="filters_decor_holiday">Праздничное</string>
+    <string name="filters_temp">Температура</string>
+    <string name="filters_temp_hot">Горячая</string>
+    <string name="filters_temp_normal">Комнатная</string>
+    <string name="filters_temp_cold">Холодная</string>
+    <string name="filters_light">Свет</string>
+    <string name="filters_light_natural">Естественный</string>
+    <string name="filters_light_synthetic">Искуственный</string>
+    <string name="filters_light_mixed">Смешанный</string>
+    <string name="filters_light_dir">Направление света</string>
+    <string name="filters_light_dir_forward">Прямой</string>
+    <string name="filters_light_dir_back">Контровой</string>
+    <string name="filters_light_dir_side">Боковой</string>
+    <string name="filters_light_dir_mix">Смешанный</string>
+    <string name="filters_light_src">Источник света</string>
+    <string name="filters_light_src_1">Один</string>
+    <string name="filters_light_src_2">Два</string>
+    <string name="filters_light_src_3">Три</string>
+
 </resources>

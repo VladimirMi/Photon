@@ -7,7 +7,6 @@ import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
-import io.github.vladimirmi.photon.utils.LoginActionProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 

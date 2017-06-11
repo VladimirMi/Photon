@@ -12,7 +12,6 @@ import io.github.vladimirmi.photon.data.models.Search
 import io.github.vladimirmi.photon.data.models.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
-import io.github.vladimirmi.photon.utils.TagView
 import kotlinx.android.synthetic.main.view_search.view.*
 import timber.log.Timber
 

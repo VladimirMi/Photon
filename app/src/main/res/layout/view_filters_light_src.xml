@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:tools="http://schemas.android.com/tools"
+       xmlns:android="http://schemas.android.com/apk/res/android"
+       tools:showIn="@layout/view_filters"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/filters_light_src"
+        android:textAlignment="center"
+        android:layout_marginBottom="16dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:tag="lightSource"
+        >
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            android:text="@string/filters_light_src_1"
+            android:drawableTop="@drawable/ic_light_count_1"
+            style="@style/FilterElement"
+            android:tag="one"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            android:text="@string/filters_light_src_2"
+            android:drawableTop="@drawable/ic_light_count_2"
+            style="@style/FilterElement"
+            android:tag="two"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            android:text="@string/filters_light_src_3"
+            android:drawableTop="@drawable/ic_light_count_3"
+            style="@style/FilterElement"
+            android:tag="three"
+            />
+    </LinearLayout>
+</merge>

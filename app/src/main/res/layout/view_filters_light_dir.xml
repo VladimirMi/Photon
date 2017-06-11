@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       tools:showIn="@layout/view_filters"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/filters_light_dir"
+        android:textAlignment="center"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:tag="lightDirection"
+        >
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/ic_light_dir_forward"
+            android:text="@string/filters_light_dir_forward"
+            android:tag="direct"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/ic_light_dir_back"
+            android:text="@string/filters_light_dir_back"
+            android:tag="backlight"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/ic_light_dir_side"
+            android:text="@string/filters_light_dir_side"
+            android:tag="sideLight"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/ic_light_dir_mix"
+            android:text="@string/filters_light_dir_mix"
+            android:tag="mixed"
+            />
+    </LinearLayout>
+</merge>

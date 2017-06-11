@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.utils
+package io.github.vladimirmi.photon.features.main
 
 import android.content.Context
 import android.support.v4.view.ActionProvider

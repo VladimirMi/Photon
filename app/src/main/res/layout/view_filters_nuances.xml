@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:tools="http://schemas.android.com/tools"
+       xmlns:app="http://schemas.android.com/apk/res-auto"
+       xmlns:android="http://schemas.android.com/apk/res/android"
+       tools:showIn="@layout/view_filters"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/filters_nuance"
+        android:textAlignment="center"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:layout_marginBottom="16dp"
+        android:tag="nuances"
+        >
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_red"
+            app:solidColor="@color/red"
+            android:tag="red"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_orange"
+            app:solidColor="@color/orange"
+            android:tag="orange"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_yellow"
+            app:solidColor="@color/yellow"
+            android:tag="yellow"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_green"
+            app:solidColor="@color/green"
+            android:tag="green"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_lightBlue"
+            app:solidColor="@color/lightBlue"
+            android:tag="lightBlue"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:layout_marginBottom="24dp"
+        android:tag="nuances"
+        >
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_blue"
+            app:solidColor="@color/blue"
+            android:tag="blue"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_purple"
+            app:solidColor="@color/purple"
+            android:tag="purple"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_brown"
+            app:solidColor="@color/brown"
+            android:tag="brown"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_black"
+            app:solidColor="@color/grey"
+            android:tag="black"
+            />
+
+        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+            style="@style/FilterElement"
+            android:drawableTop="@drawable/shape_round"
+            android:text="@string/filters_nuance_white"
+            app:solidColor="@color/white"
+            android:tag="white"
+            />
+    </LinearLayout>
+</merge>
