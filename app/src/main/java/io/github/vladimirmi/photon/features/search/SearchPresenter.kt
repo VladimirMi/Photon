@@ -17,7 +17,6 @@ class SearchPresenter(model: ISearchModel, rootPresenter: RootPresenter)
                 .build()
 
         view.setPage(model.page)
-        view.restorePages(model.getQuery())
     }
 
     fun savePageNum(page: SearchView.Page) {
@@ -26,8 +25,8 @@ class SearchPresenter(model: ISearchModel, rootPresenter: RootPresenter)
 
     fun getQuery() = model.getQuery()
 
-    fun addQuery(query: Pair<String, String>) {
-        model.addQuery(query)
-    }
+    fun addQuery(query: Pair<String, String>) = model.addQuery(query)
+
+    fun makeQuery() = model.makeQuery()
 }
 

@@ -60,6 +60,7 @@ dependencies {
     compile "io.reactivex.rxjava2:rxandroid:2.0.1"
     compile "io.reactivex.rxjava2:rxjava:$RXJAVA_VERSION"
     compile 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.0.0'
+    compile 'com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:2.0.0'
     // logging
     compile "com.jakewharton.timber:timber:4.5.1"
     compile "com.facebook.stetho:stetho:1.5.0"
