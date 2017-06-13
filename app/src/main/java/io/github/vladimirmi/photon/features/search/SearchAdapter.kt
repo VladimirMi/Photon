@@ -33,7 +33,6 @@ class SearchAdapter(private val tabTitles: Array<String>) : PagerAdapter() {
         }
         container?.addView(view)
         (view as BaseView<*, *>).onViewRestored()
-
         return view
     }
 }

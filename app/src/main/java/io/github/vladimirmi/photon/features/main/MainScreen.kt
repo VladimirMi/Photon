@@ -32,13 +32,13 @@ class MainScreen : BaseScreen<RootActivityComponent>() {
     class Module {
         @Provides
         @DaggerScope(MainScreen::class)
-        internal fun provideMainModel(dataManager: DataManager): IMainModel {
+        fun provideMainModel(dataManager: DataManager): IMainModel {
             return MainModel(dataManager)
         }
 
         @Provides
         @DaggerScope(MainScreen::class)
-        internal fun provideMainPresenter(model: IMainModel, rootPresenter: RootPresenter): MainPresenter {
+        fun provideMainPresenter(model: IMainModel, rootPresenter: RootPresenter): MainPresenter {
             return MainPresenter(model, rootPresenter)
         }
     }

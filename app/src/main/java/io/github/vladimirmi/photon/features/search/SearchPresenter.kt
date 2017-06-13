@@ -15,6 +15,19 @@ class SearchPresenter(model: ISearchModel, rootPresenter: RootPresenter)
                 .setToolbarVisible(false)
                 .setTabsEnabled(true)
                 .build()
+
+        view.setPage(model.page)
+        view.restorePages(model.getQuery())
+    }
+
+    fun savePageNum(page: SearchView.Page) {
+        model.page = page
+    }
+
+    fun getQuery() = model.getQuery()
+
+    fun addQuery(query: Pair<String, String>) {
+        model.addQuery(query)
     }
 }
 

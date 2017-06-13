@@ -31,10 +31,7 @@
                 android:background="@color/transparent"
                 android:hint="@string/search_search"
                 android:textColorHint="@android:color/black"
-                >
-
-                <requestFocus/>
-            </EditText>
+                />
 
             <ImageView
                 android:id="@+id/ic_action"

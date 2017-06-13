@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
-import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 07.06.2017.
@@ -15,39 +14,43 @@ import timber.log.Timber
 
 class SearchFilterView(context: Context, attrs: AttributeSet) :
         BaseView<SearchFilterPresenter, SearchFilterView>(context, attrs) {
+
+    lateinit var filterElements: List<FilterElementView>
+
     override fun onBackPressed(): Boolean = false
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<SearchScreen.Component>(context).inject(this)
     }
 
-    override fun initView() {
-        //todo implement me
-        addListeners(this)
-    }
-
-    override fun onViewRestored() {
-        super.onViewRestored()
-    }
-
     private val filterAction: (FilterElementView) -> Unit = { select(it) }
 
-    private fun addListeners(view: View) {
+    override fun initView() {
+        filterElements = findAllFilters(this)
+        filterElements.forEach { it.setAction(filterAction) }
+    }
+
+    private fun findAllFilters(view: View): List<FilterElementView> {
+        val result = ArrayList<FilterElementView>()
         when (view) {
-            is FilterElementView -> {
-                view.setAction(filterAction)
-                return
-            }
+            is FilterElementView -> result.add(view)
             is ViewGroup -> {
                 for (idx in 1..view.childCount) {
-                    addListeners(view.getChildAt(idx - 1))
+                    result.addAll(findAllFilters(view.getChildAt(idx - 1)))
                 }
             }
         }
+        return result
     }
 
     private fun select(filterElement: FilterElementView) {
-        Timber.e("add query ${filterElement.query}")
+        presenter.addQuery(filterElement.query)
+    }
+
+    fun restoreStateFromQuery(query: HashMap<String, MutableList<String>>) {
+        filterElements.forEach { view ->
+            query[view.query.first]?.forEach { value -> if (value == view.query.second) view.pick() }
+        }
     }
 }
 

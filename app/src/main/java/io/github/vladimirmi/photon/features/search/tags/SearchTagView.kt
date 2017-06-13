@@ -13,7 +13,6 @@ import io.github.vladimirmi.photon.data.models.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import kotlinx.android.synthetic.main.view_search.view.*
-import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 06.06.2017.
@@ -43,20 +42,23 @@ class SearchTagView(context: Context, attrs: AttributeSet)
 
     private val tagAction: (TagView) -> Unit = { select(it) }
 
-    fun addTags(tags: List<Tag>) {
-        val tagsContainer = LayoutInflater.from(context).inflate(R.layout.view_tags, tags_wrapper, false)
+    fun addTags(tags: List<Tag>, query: HashMap<String, MutableList<String>>) {
+        val tagsContainer = LayoutInflater.from(context).inflate(R.layout.view_search_tags, tags_wrapper, false)
         tagsContainer as ViewGroup
+        val queryTags = query["tags"]
         tags.forEach {
-            tagsContainer.addView(TagView(context, it.tag, tagAction))
+            val view = TagView(context, it.tag, tagAction)
+            if (queryTags?.contains(it.tag) ?: false) view.pick()
+            tagsContainer.addView(view)
         }
         tags_wrapper.addView(tagsContainer)
     }
 
     private fun select(tagView: TagView) {
-        Timber.e("tagView selected with tag - ${tagView.text}")
+        presenter.addQuery(Pair("tags", tagView.text.toString()))
     }
 
-    fun setRecentSearchs(list: List<Search>) {
+    fun setRecentSearches(list: List<Search>) {
         searchAdapter.data = list
     }
 }

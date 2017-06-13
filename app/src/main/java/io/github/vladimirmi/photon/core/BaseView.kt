@@ -45,6 +45,6 @@ abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
         @Suppress("UNCHECKED_CAST")
         presenter.dropView(this as V)
         Timber.tag(javaClass.simpleName)
-        Timber.d("onViewDestroyed")
+        Timber.d("onViewDestroyed by Flow $removedByFlow")
     }
 }

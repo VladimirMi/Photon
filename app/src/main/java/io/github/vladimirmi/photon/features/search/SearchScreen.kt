@@ -7,6 +7,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
+import io.github.vladimirmi.photon.features.main.IMainModel
 import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.filters.SearchFilterPresenter
@@ -37,26 +38,30 @@ class SearchScreen : BaseScreen<MainScreen.Component>(), TreeKey {
     class Module {
         @Provides
         @DaggerScope(SearchScreen::class)
-        internal fun provideSearchModel(dataManager: DataManager): ISearchModel {
-            return SearchModel(dataManager)
+        fun provideSearchModel(dataManager: DataManager, mainModel: IMainModel): ISearchModel {
+            return SearchModel(dataManager, mainModel)
         }
 
         @Provides
         @DaggerScope(SearchScreen::class)
-        internal fun provideSearchPresenter(model: ISearchModel, rootPresenter: RootPresenter): SearchPresenter {
+        fun provideSearchPresenter(model: ISearchModel, rootPresenter: RootPresenter): SearchPresenter {
             return SearchPresenter(model, rootPresenter)
         }
 
         @Provides
         @DaggerScope(SearchScreen::class)
-        internal fun provideSearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter): SearchTagPresenter {
-            return SearchTagPresenter(model, rootPresenter)
+        fun provideSearchTagPresenter(model: ISearchModel,
+                                      rootPresenter: RootPresenter,
+                                      searchPresenter: SearchPresenter): SearchTagPresenter {
+            return SearchTagPresenter(model, rootPresenter, searchPresenter)
         }
 
         @Provides
         @DaggerScope(SearchScreen::class)
-        internal fun provideSearchFilterPresenter(model: ISearchModel, rootPresenter: RootPresenter): SearchFilterPresenter {
-            return SearchFilterPresenter(model, rootPresenter)
+        fun provideSearchFilterPresenter(model: ISearchModel,
+                                         rootPresenter: RootPresenter,
+                                         searchPresenter: SearchPresenter): SearchFilterPresenter {
+            return SearchFilterPresenter(model, rootPresenter, searchPresenter)
         }
     }
 

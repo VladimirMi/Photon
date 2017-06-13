@@ -11,8 +11,8 @@ import timber.log.Timber
  * Developer Vladimir Mikhalev, 30.05.2017
  */
 
-abstract class BasePresenter<V : BaseView<*, V>, M : IModel>
-(protected var model: M, protected var rootPresenter: RootPresenter)
+abstract class BasePresenter<V : BaseView<*, V>, out M : IModel>
+(protected val model: M, protected val rootPresenter: RootPresenter)
     : ViewPresenter<V>() {
 
     protected lateinit var compDisp: CompositeDisposable

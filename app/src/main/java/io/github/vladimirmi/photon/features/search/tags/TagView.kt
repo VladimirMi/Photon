@@ -17,8 +17,6 @@ class TagView(context: Context, tag: String, val runnable: (TagView) -> Unit) :
     }
 
     init {
-        setBackgroundResource(R.drawable.btn_tag)
-        setTextColor(ContextCompat.getColor(context, R.color.black))
         setOnClickListener({
             pick()
             run(runnable)
@@ -26,6 +24,8 @@ class TagView(context: Context, tag: String, val runnable: (TagView) -> Unit) :
         val padding: Int = (getDensity(context) * 4).toInt()
         setPadding(padding, padding, padding, padding)
         text = "#" + tag
+        id = tag.hashCode()
+        setupView()
     }
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
@@ -38,6 +38,10 @@ class TagView(context: Context, tag: String, val runnable: (TagView) -> Unit) :
 
     fun pick() {
         picked = !picked
+        setupView()
+    }
+
+    private fun setupView() {
         if (picked) {
             setBackgroundResource(R.drawable.btn_tag_accent)
             setTextColor(ContextCompat.getColor(context, R.color.color_accent))

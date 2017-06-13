@@ -67,7 +67,7 @@ abstract class BaseDispatcher(val baseContext: Context) : Dispatcher,
     fun restoreViewFromState(traversal: Traversal, view: View?) {
         if (view != null) {
             if (view is FlowLifecycles.ViewLifecycleListener) {
-                view.onViewRestored()
+                onViewRestored()
             }
             val incomingState = traversal.getState(Flow.getKey<Any>(view.context) ?: return)
             incomingState.restore(view)
@@ -77,7 +77,7 @@ abstract class BaseDispatcher(val baseContext: Context) : Dispatcher,
     private fun persistViewToState(traversal: Traversal, view: View?) {
         if (view != null) {
             if (view is FlowLifecycles.PreSaveViewStateListener) {
-                view.preSaveViewState()
+                preSaveViewState()
             }
             val outgoingState = traversal.getState(Flow.getKey<Any>(view.context) ?: return)
             outgoingState.save(view)
@@ -86,7 +86,7 @@ abstract class BaseDispatcher(val baseContext: Context) : Dispatcher,
 
     private fun notifyViewForFlowRemoval(view: View?) {
         if (view is FlowLifecycles.ViewLifecycleListener) {
-            view.onViewDestroyed(true)
+            onViewDestroyed(true)
         }
     }
 }

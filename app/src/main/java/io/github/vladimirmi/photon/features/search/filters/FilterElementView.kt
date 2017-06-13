@@ -18,7 +18,7 @@ import io.github.vladimirmi.photon.R
 
 class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(context, attrs) {
 
-    private var picked = true
+    private var picked = false
     private val drawable: Drawable = DrawableCompat.wrap(compoundDrawables[1])
     private val colorAccent = ContextCompat.getColor(context, R.color.color_accent)
     private val colorGrey = ContextCompat.getColor(context, R.color.grey)
@@ -32,7 +32,16 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
             a.recycle()
             drawable.setColor(shapeColor)
         }
-        pick()
+        setupDrawable(drawable)
+    }
+
+    private fun setupDrawable(drawable: Drawable) {
+        color = if (picked) colorAccent else colorGrey
+        if (drawable is GradientDrawable) {
+            setupShapeDrawable(drawable)
+        } else {
+            setupVectorDrawable(drawable)
+        }
     }
 
     private fun setupVectorDrawable(vectorDrawable: Drawable) {
@@ -48,12 +57,7 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
 
     fun pick() {
         picked = !picked
-        color = if (picked) colorAccent else colorGrey
-        if (drawable is GradientDrawable) {
-            setupShapeDrawable(drawable)
-        } else {
-            setupVectorDrawable(drawable)
-        }
+        setupDrawable(drawable)
     }
 
     fun setAction(filterAction: (FilterElementView) -> Unit) {
