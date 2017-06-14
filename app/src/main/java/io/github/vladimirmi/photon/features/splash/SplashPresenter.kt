@@ -17,7 +17,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
         BasePresenter<SplashView, ISplashModel>(model, rootPresenter) {
 
     override fun initToolbar() {
-        rootPresenter.getNewRootBuilder()
+        rootPresenter.getNewToolbarBuilder()
                 .setBottomMenuEnabled(false)
                 .setToolbarVisible(false)
                 .setBackGround(R.color.transparent)

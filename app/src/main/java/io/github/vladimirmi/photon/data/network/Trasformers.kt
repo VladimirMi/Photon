@@ -14,14 +14,14 @@ import java.util.concurrent.TimeUnit
  * Created by Vladimir Mikhalev 04.06.2017.
  */
 
-class RestLastModifiedTransformer<T> : ObservableTransformer<Response<T>, Response<T>> {
+class RestLastModifiedTransformer<T>(val name: String) : ObservableTransformer<Response<T>, Response<T>> {
 
     override fun apply(upstream: Observable<Response<T>>): ObservableSource<Response<T>> {
         return upstream.map {
             if (it.code() == 200) {
                 val lastModified = it.headers().get(HEADER_LAST_MODIFIED)
                 if (lastModified != null) {
-                    DaggerService.appComponent.dataManager().saveLastUpdate(lastModified)
+                    DaggerService.appComponent.dataManager().saveLastUpdate(name, lastModified)
                 }
             }
             it

@@ -11,7 +11,7 @@ class SearchPresenter(model: ISearchModel, rootPresenter: RootPresenter)
     : BasePresenter<SearchView, ISearchModel>(model, rootPresenter) {
 
     override fun initToolbar() {
-        rootPresenter.getNewRootBuilder()
+        rootPresenter.getNewToolbarBuilder()
                 .setToolbarVisible(false)
                 .setTabsEnabled(true)
                 .build()

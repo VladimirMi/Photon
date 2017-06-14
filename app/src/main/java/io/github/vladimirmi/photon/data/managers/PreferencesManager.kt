@@ -11,7 +11,7 @@ import java.util.*
  */
 
 class PreferencesManager(context: Context) {
-    private val KEY_PRODUCT_LAST_UPDATE = "PRODUCT_LAST_UPDATE"
+    private val KEY_LAST_UPDATE_PREFIX = "LAST_UPDATE_"
 
     private val editor: SharedPreferences.Editor
     private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -22,10 +22,12 @@ class PreferencesManager(context: Context) {
     }
 
 
-    fun getLastUpdate(): String = sharedPreferences.getString(KEY_PRODUCT_LAST_UPDATE, Date(0).toString())
+    fun getLastUpdate(name: String): String {
+        return sharedPreferences.getString(KEY_LAST_UPDATE_PREFIX + name, Date(0).toString())
+    }
 
-    fun saveLastUpdate(lastModified: String) {
-        editor.putString(KEY_PRODUCT_LAST_UPDATE, lastModified)
+    fun saveLastUpdate(name: String, lastModified: String) {
+        editor.putString(KEY_LAST_UPDATE_PREFIX + name, lastModified)
         editor.commit()
     }
 }

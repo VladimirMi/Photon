@@ -17,7 +17,7 @@ open class Photocard(
         var views: Int = 0,
         var favorits: Int = 0,
         var filters: Filter? = null,
-        var tags: RealmList<Tag>? = RealmList()
+        var tags: RealmList<Tag> = RealmList()
 ) : RealmObject() {
     fun withId(): Photocard {
         filters?.generateId()

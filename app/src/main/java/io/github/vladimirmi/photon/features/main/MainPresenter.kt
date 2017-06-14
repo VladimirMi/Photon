@@ -21,7 +21,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         val loginActionProvider = LoginActionProvider(view.context,
                 loginAction = view::openLoginDialog,
                 registrationAction = view::openRegistrationDialog)
-        rootPresenter.getNewRootBuilder()
+        rootPresenter.getNewToolbarBuilder()
                 .addAction(MenuItemHolder("Search", R.drawable.ic_action_search,
                         MenuItem.OnMenuItemClickListener {
                             Flow.get(view).set(SearchScreen())

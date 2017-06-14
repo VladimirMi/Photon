@@ -1,17 +1,35 @@
 package io.github.vladimirmi.photon.features.photocard
 
+import flow.Flow
 import io.github.vladimirmi.photon.core.BasePresenter
+import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.features.root.RootPresenter
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 
 class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         BasePresenter<PhotocardView, IPhotocardModel>(model, rootPresenter) {
 
     override fun initToolbar() {
-        TODO("not implemented")
+        rootPresenter.getNewToolbarBuilder()
+                .build()
     }
 
     override fun initView(view: PhotocardView) {
-        TODO("not implemented")
+        val photocard = Flow.getKey<PhotocardScreen>(view)?.photocard!!
+        compDisp.add(subscribeOnUser(photocard.owner))
+        compDisp.add(subscribeOnPhotocard(photocard))
+    }
+
+    private fun subscribeOnUser(owner: String): Disposable {
+        return model.getUser(owner)
+                .subscribe { view.setUser(it) }
+    }
+
+    private fun subscribeOnPhotocard(photocard: Photocard): Disposable {
+        return Observable.just(photocard)
+                .mergeWith(model.getPhotocard(photocard.id, photocard.owner))
+                .subscribe { view.setPhotoCard(it) }
     }
 
 }

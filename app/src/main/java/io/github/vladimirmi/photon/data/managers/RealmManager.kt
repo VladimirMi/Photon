@@ -32,6 +32,18 @@ class RealmManager {
                 .map { realm.copyFromRealm(it) }
                 .doAfterTerminate { realm.close() }
     }
+
+    fun <T : RealmObject> get(clazz: Class<T>, id: String): Observable<T> {
+        val realm = Realm.getDefaultInstance()
+        return RealmObjectObservable.from(realm
+                .where(clazz)
+                .equalTo("id", id)
+                .findFirstAsync())
+                .filter { it.isLoaded }
+                .filter { it.isValid }
+                .map { realm.copyFromRealm(it) }
+                .doAfterTerminate { realm.close() }
+    }
 }
 
 class RealmObjectObservable<T : RealmModel> private constructor(private val objekt: T) : ObservableOnSubscribe<T> {

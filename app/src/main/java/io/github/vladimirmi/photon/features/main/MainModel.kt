@@ -28,6 +28,6 @@ class MainModel(private val dataManager: DataManager) : IMainModel {
     }
 
     override fun getPhotoCards(): Observable<List<Photocard>> {
-        return dataManager.getFromDb(Photocard::class.java)
+        return dataManager.getListFromDb(Photocard::class.java)
     }
 }

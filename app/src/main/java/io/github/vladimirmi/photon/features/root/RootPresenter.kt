@@ -24,9 +24,9 @@ class RootPresenter(val model: IRootModel) :
 
     fun hasActiveView() = hasView()
 
-    fun getNewRootBuilder(): RootBuilder = RootBuilder()
+    fun getNewToolbarBuilder(): ToolbarBuilder = ToolbarBuilder()
 
-    inner class RootBuilder {
+    inner class ToolbarBuilder {
         private var isToolbarVisible = true
         @StringRes private var toolbarTitleId = R.string.app_name
         private var bottomMenuEnabled = true
@@ -35,32 +35,32 @@ class RootPresenter(val model: IRootModel) :
         private var backgroundId = R.color.background
         private val menuItems = ArrayList<MenuItemHolder>()
 
-        fun setToolbarVisible(toolbarVisible: Boolean): RootBuilder {
+        fun setToolbarVisible(toolbarVisible: Boolean): ToolbarBuilder {
             isToolbarVisible = toolbarVisible
             return this
         }
 
-        fun setBottomMenuEnabled(menuEnabled: Boolean): RootBuilder {
+        fun setBottomMenuEnabled(menuEnabled: Boolean): ToolbarBuilder {
             bottomMenuEnabled = menuEnabled
             return this
         }
 
-        fun setToolbarTitleId(@StringRes toolbarTitleId: Int): RootBuilder {
+        fun setToolbarTitleId(@StringRes toolbarTitleId: Int): ToolbarBuilder {
             this.toolbarTitleId = toolbarTitleId
             return this
         }
 
-        fun setTabsEnabled(tabsEnabled: Boolean): RootBuilder {
+        fun setTabsEnabled(tabsEnabled: Boolean): ToolbarBuilder {
             isTabsEnabled = tabsEnabled
             return this
         }
 
-        fun setBackGround(resId: Int): RootBuilder {
+        fun setBackGround(resId: Int): ToolbarBuilder {
             backgroundId = resId
             return this
         }
 
-        fun addAction(menuItemHolder: MenuItemHolder): RootBuilder {
+        fun addAction(menuItemHolder: MenuItemHolder): ToolbarBuilder {
             menuItems.add(menuItemHolder)
             return this
         }

@@ -3,7 +3,10 @@ package io.github.vladimirmi.photon.features.photocard
 import android.content.Context
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
+import io.github.vladimirmi.photon.data.models.Photocard
+import io.github.vladimirmi.photon.data.models.User
 import io.github.vladimirmi.photon.di.DaggerService
+import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 14.06.2017.
@@ -19,11 +22,19 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
     }
 
     override fun initView() {
-        TODO("not implemented")
+
     }
 
     override fun onViewRestored() {
         super.onViewRestored()
+    }
+
+    fun setUser(user: User) {
+        Timber.e(user.toString())
+    }
+
+    fun setPhotoCard(photocard: Photocard) {
+        Timber.e(photocard.toString())
     }
 }
 

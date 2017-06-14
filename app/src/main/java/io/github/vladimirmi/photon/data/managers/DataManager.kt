@@ -3,12 +3,14 @@ package io.github.vladimirmi.photon.data.managers
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.data.models.Tag
+import io.github.vladimirmi.photon.data.models.User
 import io.github.vladimirmi.photon.data.network.RestErrorTransformer
 import io.github.vladimirmi.photon.data.network.RestLastModifiedTransformer
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Observable
 import io.realm.RealmObject
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -25,14 +27,26 @@ constructor(private val restService: RestService,
     //region =============== Network ==============
 
     fun getPhotocardsFromNet(limit: Int, offset: Int): Observable<List<Photocard>> {
-        return restService.getPhotocards(getLastUpdate(), limit, offset)
-                .compose(RestLastModifiedTransformer())
+        return restService.getPhotocards(getLastUpdate(Photocard::class.java.name), limit, offset)
+                .compose(RestLastModifiedTransformer(Photocard::class.java.name))
+                .compose(RestErrorTransformer())
+    }
+
+    fun getPhotocardFromNet(id: String, ownerId: String): Observable<Photocard> {
+        //todo смысл в last-modified?
+        return restService.getPhotocard(id, ownerId, Date(0).toString())
                 .compose(RestErrorTransformer())
     }
 
     fun getTagsFromNet(): Observable<List<Tag>> {
-        return restService.getTags(getLastUpdate())
-                .compose(RestLastModifiedTransformer())
+        return restService.getTags(getLastUpdate(Tag::class.java.name))
+                .compose(RestLastModifiedTransformer(Tag::class.java.name))
+                .compose(RestErrorTransformer())
+    }
+
+    fun getUserFromNet(id: String): Observable<User> {
+        return restService.getUser(id, getLastUpdate(Tag::class.java.name))
+                .compose(RestLastModifiedTransformer(Tag::class.java.name))
                 .compose(RestErrorTransformer())
     }
 
@@ -44,20 +58,24 @@ constructor(private val restService: RestService,
         realmManager.save(realmObject)
     }
 
-    fun <T : RealmObject> getFromDb(clazz: Class<T>): Observable<List<T>> {
+    fun <T : RealmObject> getListFromDb(clazz: Class<T>): Observable<List<T>> {
         return realmManager.get(clazz)
+    }
+
+    fun <T : RealmObject> getObjectFromDb(clazz: Class<T>, id: String): Observable<T> {
+        return realmManager.get(clazz, id)
     }
 
     //endregion
 
     //region =============== Shared Preferences ==============
 
-    private fun getLastUpdate(): String {
-        return preferencesManager.getLastUpdate()
+    private fun getLastUpdate(name: String): String {
+        return preferencesManager.getLastUpdate(name)
     }
 
-    fun saveLastUpdate(lastModified: String) {
-        preferencesManager.saveLastUpdate(lastModified)
+    fun saveLastUpdate(name: String, lastModified: String) {
+        preferencesManager.saveLastUpdate(name, lastModified)
     }
 
     //endregion
