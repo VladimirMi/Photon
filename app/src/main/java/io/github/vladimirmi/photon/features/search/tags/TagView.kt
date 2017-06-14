@@ -8,7 +8,7 @@ import com.google.android.flexbox.FlexboxLayout
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.utils.getDensity
 
-class TagView(context: Context, tag: String, val runnable: (TagView) -> Unit) :
+class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
         TextView(context) {
     private var picked = false
 
@@ -17,10 +17,12 @@ class TagView(context: Context, tag: String, val runnable: (TagView) -> Unit) :
     }
 
     init {
-        setOnClickListener({
-            pick()
-            run(runnable)
-        })
+        if (action != null) {
+            setOnClickListener({
+                pick()
+                run(action)
+            })
+        }
         val padding: Int = (getDensity(context) * 4).toInt()
         setPadding(padding, padding, padding, padding)
         text = "#" + tag

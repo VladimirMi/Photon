@@ -45,8 +45,8 @@ constructor(private val restService: RestService,
     }
 
     fun getUserFromNet(id: String): Observable<User> {
-        return restService.getUser(id, getLastUpdate(Tag::class.java.name))
-                .compose(RestLastModifiedTransformer(Tag::class.java.name))
+        //todo смысл в last-modified?
+        return restService.getUser(id, Date(0).toString())
                 .compose(RestErrorTransformer())
     }
 

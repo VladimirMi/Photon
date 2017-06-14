@@ -15,7 +15,6 @@ open class User(
         var login: String = "",
         var mail: String = "",
         var avatar: String = "",
-        var token: String = "",
         var albumCount: Int = 0,
         var photocardCount: Int = 0,
         var albums: RealmList<Album> = RealmList()

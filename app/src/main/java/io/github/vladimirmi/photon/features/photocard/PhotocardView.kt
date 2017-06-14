@@ -2,11 +2,17 @@ package io.github.vladimirmi.photon.features.photocard
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.data.models.User
 import io.github.vladimirmi.photon.di.DaggerService
-import timber.log.Timber
+import io.github.vladimirmi.photon.features.search.tags.TagView
+import io.github.vladimirmi.photon.utils.setImage
+import io.github.vladimirmi.photon.utils.setRoundAvatarWithBorder
+import kotlinx.android.synthetic.main.screen_photocard.view.*
 
 /**
  * Created by Vladimir Mikhalev 14.06.2017.
@@ -30,11 +36,22 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
     }
 
     fun setUser(user: User) {
-        Timber.e(user.toString())
+        setRoundAvatarWithBorder(user.avatar, author_avatar, 0f)
+        author_name.text = user.name
+        album_num.text = user.albumCount.toString()
+        card_num.text = user.photocardCount.toString()
     }
 
     fun setPhotoCard(photocard: Photocard) {
-        Timber.e(photocard.toString())
+        setImage(photocard.photo, photo)
+        card_name.text = photocard.title
+        val tagsContainer = LayoutInflater.from(context).inflate(R.layout.view_search_tags, photocard_tags_wrapper, false)
+        tagsContainer as ViewGroup
+        photocard.tags.forEach {
+            val tag = TagView(context, it.tag, null)
+            tagsContainer.addView(tag)
+        }
+        photocard_tags_wrapper.addView(tagsContainer)
     }
 }
 

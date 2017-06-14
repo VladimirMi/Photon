@@ -8,126 +8,132 @@
     android:layout_height="match_parent"
     >
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:ignore="RtlHardcoded, ContentDescription"
         >
 
-        <FrameLayout
-            android:id="@+id/photo_wrapper"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
-
-            <ImageView
-                android:id="@+id/photo"
-                android:layout_width="match_parent"
-                android:layout_height="280dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/splash"
-                />
-
-            <TextView
-                android:id="@+id/card_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginBottom="28dp"
-                android:layout_marginLeft="16dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="Черный чай с печеньем макарон"
-                />
-
-        </FrameLayout>
-
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/photo_wrapper"
-            android:padding="24dp"
-            >
-
-            <ImageView
-                android:id="@+id/author_avatar"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                tools:src="@color/color_accent"
-                />
-
-            <TextView
-                android:id="@+id/author_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="0dp"
-                app:layout_constraintLeft_toRightOf="@+id/author_avatar"
-                app:layout_constraintTop_toTopOf="@+id/author_avatar"
-                tools:text="Хелена Марчиано"
-                />
-
-            <TextView
-                android:id="@+id/album"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="0dp"
-                android:layout_marginTop="6dp"
-                android:fontFamily="sans-serif-light"
-                android:text="@string/photocard_album"
-                app:layout_constraintLeft_toLeftOf="@+id/author_name"
-                app:layout_constraintTop_toBottomOf="@+id/author_name"
-                />
-
-            <TextView
-                android:id="@+id/card"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:layout_marginTop="6dp"
-                android:fontFamily="sans-serif-light"
-                android:text="@string/photocard_card"
-                app:layout_constraintLeft_toRightOf="@+id/album"
-                app:layout_constraintTop_toBottomOf="@+id/author_name"
-                />
-
-            <TextView
-                android:id="@+id/album_num"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="0dp"
-                android:layout_marginTop="8dp"
-                android:fontFamily="sans-serif-medium"
-                app:layout_constraintLeft_toLeftOf="@+id/album"
-                app:layout_constraintTop_toBottomOf="@+id/album"
-                tools:text="9"
-                />
-
-            <TextView
-                android:id="@+id/card_num"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="0dp"
-                android:layout_marginTop="8dp"
-                android:fontFamily="sans-serif-medium"
-                app:layout_constraintLeft_toLeftOf="@+id/card"
-                app:layout_constraintTop_toBottomOf="@+id/card"
-                tools:text="22"
-                />
-        </android.support.constraint.ConstraintLayout>
-
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/tags"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/info"
-            app:alignContent="flex_start"
-            app:flexDirection="row"
-            app:flexWrap="wrap"
-            />
+            android:orientation="vertical"
+            tools:ignore="RtlHardcoded, ContentDescription"
+            >
 
+            <FrameLayout
+                android:id="@+id/photo_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                >
 
-    </RelativeLayout>
+                <ImageView
+                    android:id="@+id/photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/splash"
+                    />
+
+                <TextView
+                    android:id="@+id/card_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="28dp"
+                    android:layout_marginLeft="16dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="Черный чай с печеньем макарон"
+                    />
+
+            </FrameLayout>
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/photo_wrapper"
+                android:paddingRight="24dp"
+                android:paddingLeft="24dp"
+                >
+
+                <ImageView
+                    android:id="@+id/author_avatar"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    tools:src="@color/color_accent"
+                    />
+
+                <TextView
+                    android:id="@+id/author_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="0dp"
+                    app:layout_constraintLeft_toRightOf="@+id/author_avatar"
+                    app:layout_constraintTop_toTopOf="@+id/author_avatar"
+                    tools:text="Хелена Марчиано"
+                    />
+
+                <TextView
+                    android:id="@+id/album"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="sans-serif-light"
+                    android:text="@string/photocard_album"
+                    app:layout_constraintLeft_toLeftOf="@+id/author_name"
+                    app:layout_constraintTop_toBottomOf="@+id/author_name"
+                    />
+
+                <TextView
+                    android:id="@+id/card"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="sans-serif-light"
+                    android:text="@string/photocard_card"
+                    app:layout_constraintLeft_toRightOf="@+id/album"
+                    app:layout_constraintTop_toBottomOf="@+id/author_name"
+                    />
+
+                <TextView
+                    android:id="@+id/album_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="sans-serif-medium"
+                    app:layout_constraintLeft_toLeftOf="@+id/album"
+                    app:layout_constraintTop_toBottomOf="@+id/album"
+                    tools:text="9"
+                    />
+
+                <TextView
+                    android:id="@+id/card_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="sans-serif-medium"
+                    app:layout_constraintLeft_toLeftOf="@+id/card"
+                    app:layout_constraintTop_toBottomOf="@+id/card"
+                    tools:text="22"
+                    />
+            </android.support.constraint.ConstraintLayout>
+
+            <FrameLayout
+                android:id="@+id/photocard_tags_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/info"
+                android:padding="12dp"
+                />
+
+        </RelativeLayout>
+    </ScrollView>
+
 </io.github.vladimirmi.photon.features.photocard.PhotocardView>
