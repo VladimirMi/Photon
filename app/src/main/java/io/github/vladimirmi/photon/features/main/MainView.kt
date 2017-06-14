@@ -5,10 +5,12 @@ import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import kotlinx.android.synthetic.main.screen_main.view.*
 
 
@@ -19,7 +21,8 @@ import kotlinx.android.synthetic.main.screen_main.view.*
 class MainView(context: Context, attrs: AttributeSet) :
         BaseView<MainPresenter, MainView>(context, attrs) {
 
-    val adapter = MainAdapter()
+    val cardAction: (Photocard) -> Unit = { showPhotoCard(it) }
+    val adapter = MainAdapter(cardAction)
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<MainScreen.Component>(context).inject(this)
@@ -36,6 +39,10 @@ class MainView(context: Context, attrs: AttributeSet) :
 
     fun setData(data: List<Photocard>) {
         adapter.updateData(data)
+    }
+
+    fun showPhotoCard(photocard: Photocard) {
+        Flow.get(this).set(PhotocardScreen(photocard))
     }
 
     fun openLoginDialog(): Boolean {

@@ -16,14 +16,15 @@ import io.reactivex.schedulers.Schedulers
 class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
         BasePresenter<SplashView, ISplashModel>(model, rootPresenter) {
 
-
-    override fun initView(view: SplashView) {
+    override fun initToolbar() {
         rootPresenter.getNewRootBuilder()
                 .setBottomMenuEnabled(false)
                 .setToolbarVisible(false)
                 .setBackGround(R.color.transparent)
                 .build()
+    }
 
+    override fun initView(view: SplashView) {
         model.updateLimitPhotoCards(60, 3000)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

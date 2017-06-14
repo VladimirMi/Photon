@@ -17,12 +17,10 @@ import io.reactivex.disposables.Disposable
 class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         BasePresenter<MainView, IMainModel>(model, rootPresenter) {
 
-    override fun initView(view: MainView) {
+    override fun initToolbar() {
         val loginActionProvider = LoginActionProvider(view.context,
                 loginAction = view::openLoginDialog,
                 registrationAction = view::openRegistrationDialog)
-
-        compDisp.add(subscribeOnPhotocards())
         rootPresenter.getNewRootBuilder()
                 .addAction(MenuItemHolder("Search", R.drawable.ic_action_search,
                         MenuItem.OnMenuItemClickListener {
@@ -33,6 +31,10 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                         , actionProvider = loginActionProvider
                 ))
                 .build()
+    }
+
+    override fun initView(view: MainView) {
+        compDisp.add(subscribeOnPhotocards())
     }
 
     private fun subscribeOnPhotocards(): Disposable? {

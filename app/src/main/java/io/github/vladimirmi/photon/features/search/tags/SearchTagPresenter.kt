@@ -10,6 +10,10 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter,
                          private val searchPresenter: SearchPresenter) :
         BasePresenter<SearchTagView, ISearchModel>(model, rootPresenter) {
 
+    override fun initToolbar() {
+        // do nothing
+    }
+
     override fun initView(view: SearchTagView) {
         compDisp.add(subscribeOnTags())
     }

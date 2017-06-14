@@ -9,6 +9,9 @@ class SearchFilterPresenter(model: ISearchModel, rootPresenter: RootPresenter,
                             private val searchPresenter: SearchPresenter) :
         BasePresenter<SearchFilterView, ISearchModel>(model, rootPresenter) {
 
+    override fun initToolbar() {
+        // do nothing
+    }
 
     override fun initView(view: SearchFilterView) {
         view.restoreStateFromQuery(searchPresenter.getQuery())

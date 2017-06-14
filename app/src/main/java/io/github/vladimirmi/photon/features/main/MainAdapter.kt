@@ -15,7 +15,7 @@ import java.util.*
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class MainAdapter : RecyclerView.Adapter<CardViewHolder>() {
+class MainAdapter(val cardAction: (Photocard) -> Unit) : RecyclerView.Adapter<CardViewHolder>() {
 
     var data: List<Photocard> = ArrayList()
 
@@ -31,7 +31,7 @@ class MainAdapter : RecyclerView.Adapter<CardViewHolder>() {
         lp.width = getDisplayMetrics(parent.context).widthPixels / 2
         lp.height = lp.width
         view.layoutParams = lp
-        return CardViewHolder(view)
+        return CardViewHolder(view, cardAction)
     }
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
@@ -43,10 +43,12 @@ class MainAdapter : RecyclerView.Adapter<CardViewHolder>() {
     }
 }
 
-class CardViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+class CardViewHolder(itemView: View?, val cardAction: (Photocard) -> Unit) : RecyclerView.ViewHolder(itemView) {
+
     fun bind(photoCard: Photocard) {
         itemView.likes.text = photoCard.favorits.toString()
         itemView.views.text = photoCard.views.toString()
+        itemView.photo_card.setOnClickListener { cardAction(photoCard) }
         setImage(photoCard.photo, itemView.photo_card)
     }
 

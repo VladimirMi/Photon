@@ -26,6 +26,7 @@ abstract class BasePresenter<V : BaseView<*, V>, out M : IModel>
     override fun onLoad(savedInstanceState: Bundle?) {
         super.onLoad(savedInstanceState)
         compDisp = CompositeDisposable()
+        initToolbar()
         initView(view)
         Timber.tag(javaClass.simpleName)
         Timber.d("onLoad")
@@ -43,6 +44,8 @@ abstract class BasePresenter<V : BaseView<*, V>, out M : IModel>
         Timber.tag(javaClass.simpleName)
         Timber.d("onExitScope")
     }
+
+    protected abstract fun initToolbar()
 
     protected abstract fun initView(view: V)
 }

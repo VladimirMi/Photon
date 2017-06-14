@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.features.root
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.main.MainScreen
+import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.splash.SplashScreen
 
 /**
@@ -21,6 +22,7 @@ interface RootActivityComponent {
 
     fun splashComponentBuilder(): SplashScreen.Component.Builder
     fun mainComponentBuilder(): MainScreen.Component.Builder
+    fun photocardComponentBuilder(): PhotocardScreen.Component.Builder
 
     fun inject(view: RootActivity)
 }

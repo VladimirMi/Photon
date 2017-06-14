@@ -10,12 +10,14 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
 class SearchPresenter(model: ISearchModel, rootPresenter: RootPresenter)
     : BasePresenter<SearchView, ISearchModel>(model, rootPresenter) {
 
-    override fun initView(view: SearchView) {
+    override fun initToolbar() {
         rootPresenter.getNewRootBuilder()
                 .setToolbarVisible(false)
                 .setTabsEnabled(true)
                 .build()
+    }
 
+    override fun initView(view: SearchView) {
         view.setPage(model.page)
     }
 
