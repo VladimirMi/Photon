@@ -65,5 +65,7 @@
     <string name="filters_light_src_1">Один</string>
     <string name="filters_light_src_2">Два</string>
     <string name="filters_light_src_3">Три</string>
+    <string name="photocard_album">Альбомы</string>
+    <string name="photocard_card">Карты</string>
 
 </resources>

@@ -16,14 +16,14 @@ class MainModel(private val dataManager: DataManager) : IMainModel {
     val query = HashMap<String, MutableList<String>>()
 
     override fun makeQuery(searchQuery: HashMap<String, MutableList<String>>, currentPage: SearchView.Page) {
-        searchQuery.forEach { key, value ->
+        query.clear()
+        searchQuery.forEach { (key, value) ->
             if (currentPage == SearchView.Page.TAGS && (key == "search" || key == "tags")) {
                 query[key] = value
-            } else if (currentPage == SearchView.Page.FILTERS && (key != "search" || key != "tags")) {
+            } else if (currentPage == SearchView.Page.FILTERS && key != "search" && key != "tags") {
                 query[key] = value
             }
         }
-        Timber.e(currentPage.toString())
         Timber.e(query.toString())
     }
 
