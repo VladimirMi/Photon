@@ -1,26 +1,26 @@
-package io.github.vladimirmi.photon.features.photocard
+package io.github.vladimirmi.photon.features.profile
 
 import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
 
 /**
- * Created by Vladimir Mikhalev 14.06.2017.
+ * Created by Vladimir Mikhalev 15.06.2017.
  */
 
-class PhotocardScreen(val photocard: Photocard) : BaseScreen<RootActivityComponent>() {
-    override val layoutResId = R.layout.screen_photocard
+class ProfileScreen : BaseScreen<RootActivityComponent>() {
+
+    override val layoutResId = R.layout.screen_profile
 
     //region =============== DI ==============
 
     override fun createScreenComponent(parentComponent: RootActivityComponent): Component {
-        return parentComponent.photocardComponentBuilder()
+        return parentComponent.profileComponentBuilder()
                 .module(Module())
                 .build()
     }
@@ -28,19 +28,19 @@ class PhotocardScreen(val photocard: Photocard) : BaseScreen<RootActivityCompone
     @dagger.Module
     class Module {
         @Provides
-        @DaggerScope(PhotocardScreen::class)
-        fun providePhotocardModel(dataManager: DataManager): IPhotocardModel {
-            return PhotocardModel(dataManager)
+        @DaggerScope(ProfileScreen::class)
+        fun provideProfileModel(dataManager: DataManager): IProfileModel {
+            return ProfileModel(dataManager)
         }
 
         @Provides
-        @DaggerScope(PhotocardScreen::class)
-        fun providePhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter): PhotocardPresenter {
-            return PhotocardPresenter(model, rootPresenter)
+        @DaggerScope(ProfileScreen::class)
+        fun provideProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter): ProfilePresenter {
+            return ProfilePresenter(model, rootPresenter)
         }
     }
 
-    @DaggerScope(PhotocardScreen::class)
+    @DaggerScope(ProfileScreen::class)
     @dagger.Subcomponent(modules = arrayOf(Module::class))
     interface Component {
         @Subcomponent.Builder
@@ -49,9 +49,9 @@ class PhotocardScreen(val photocard: Photocard) : BaseScreen<RootActivityCompone
             fun build(): Component
         }
 
-        fun inject(photocardView: PhotocardView)
+        fun inject(profileView: ProfileView)
     }
 
     //endregion
-
 }
+

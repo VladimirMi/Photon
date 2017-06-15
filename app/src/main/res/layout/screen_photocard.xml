@@ -66,7 +66,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/author_name"
+                    android:id="@+id/author_nickname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
@@ -84,8 +84,8 @@
                     android:layout_marginTop="6dp"
                     android:fontFamily="sans-serif-light"
                     android:text="@string/photocard_album"
-                    app:layout_constraintLeft_toLeftOf="@+id/author_name"
-                    app:layout_constraintTop_toBottomOf="@+id/author_name"
+                    app:layout_constraintLeft_toLeftOf="@+id/author_nickname"
+                    app:layout_constraintTop_toBottomOf="@+id/author_nickname"
                     />
 
                 <TextView
@@ -97,7 +97,7 @@
                     android:fontFamily="sans-serif-light"
                     android:text="@string/photocard_card"
                     app:layout_constraintLeft_toRightOf="@+id/album"
-                    app:layout_constraintTop_toBottomOf="@+id/author_name"
+                    app:layout_constraintTop_toBottomOf="@+id/author_nickname"
                     />
 
                 <TextView

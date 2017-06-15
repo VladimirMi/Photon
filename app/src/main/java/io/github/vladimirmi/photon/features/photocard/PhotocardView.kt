@@ -37,7 +37,7 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
 
     fun setUser(user: User) {
         setRoundAvatarWithBorder(user.avatar, author_avatar, 0f)
-        author_name.text = user.name
+        author_nickname.text = user.name
         album_num.text = user.albumCount.toString()
         card_num.text = user.photocardCount.toString()
     }
