@@ -10,10 +10,12 @@ import android.support.v4.view.ViewPager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.splash.SplashScreen
+import io.github.vladimirmi.photon.flow.BottomNavDispatcher
 import io.github.vladimirmi.photon.flow.FlowActivity
 import kotlinx.android.synthetic.main.activity_root.*
 import javax.inject.Inject
@@ -37,6 +39,11 @@ class RootActivity : FlowActivity(), IRootView {
         initToolbar()
         initDagger()
         presenter.takeView(this)
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        bottom_menu.setOnNavigationItemSelectedListener(BottomNavDispatcher(Flow.get(this)))
     }
 
     override fun onStart() {

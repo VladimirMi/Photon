@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import io.github.vladimirmi.photon.utils.Constants.KEY_LAST_UPDATE_PREFIX
+import io.github.vladimirmi.photon.utils.Constants.KEY_USER_ID
+import io.github.vladimirmi.photon.utils.Constants.KEY_USER_TOKEN
 import java.util.*
 
 /**
@@ -11,7 +14,6 @@ import java.util.*
  */
 
 class PreferencesManager(context: Context) {
-    private val KEY_LAST_UPDATE_PREFIX = "LAST_UPDATE_"
 
     private val editor: SharedPreferences.Editor
     private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -30,4 +32,20 @@ class PreferencesManager(context: Context) {
         editor.putString(KEY_LAST_UPDATE_PREFIX + name, lastModified)
         editor.commit()
     }
+
+    fun getUserId(): String {
+        return sharedPreferences.getString(KEY_USER_ID, "")
+    }
+
+    fun getUserToken(): String {
+        return sharedPreferences.getString(KEY_USER_TOKEN, "")
+    }
+
+    fun clearUser() {
+        editor.remove(KEY_USER_ID)
+        editor.remove(KEY_USER_TOKEN)
+        editor.commit()
+    }
+
+    fun isUserAuth() = !getUserId().isEmpty() && !getUserToken().isEmpty()
 }

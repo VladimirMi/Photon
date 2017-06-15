@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.di.DaggerService
+import kotlinx.android.synthetic.main.view_profile.view.*
+import kotlinx.android.synthetic.main.view_profile_not_auth.view.*
 
 /**
  * Created by Vladimir Mikhalev 15.06.2017.
@@ -20,6 +22,11 @@ class ProfileView(context: Context, attrs: AttributeSet)
 
     override fun initView() {
 
+    }
+
+    fun showAuth() {
+        auth_view.visibility = VISIBLE
+        profile_view.visibility = GONE
     }
 }
 

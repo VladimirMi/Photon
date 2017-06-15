@@ -11,7 +11,9 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     }
 
     override fun initView(view: ProfileView) {
-        //todo implement me
+        if (!model.isUserAuth()) {
+            view.showAuth()
+        }
     }
 
 }

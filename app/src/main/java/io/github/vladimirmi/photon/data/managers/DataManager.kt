@@ -78,6 +78,12 @@ constructor(private val restService: RestService,
         preferencesManager.saveLastUpdate(name, lastModified)
     }
 
+    fun getUserId() = preferencesManager.getUserId()
+
+    fun getUserToken() = preferencesManager.getUserToken()
+
+    fun isUserAuth() = preferencesManager.isUserAuth()
+
     //endregion
 }
 
