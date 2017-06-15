@@ -21,14 +21,14 @@
         android:tag="decor"
         >
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_decor_simple"
             android:drawableTop="@drawable/ic_decor_simple"
             style="@style/FilterElement"
             android:tag="simple"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_decor_holiday"
             android:drawableTop="@drawable/ic_decor_holiday"
             style="@style/FilterElement"

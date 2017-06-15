@@ -21,21 +21,21 @@
         android:tag="temperature"
         >
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_temp_hot"
             android:drawableTop="@drawable/ic_temp_hot"
             style="@style/FilterElement"
             android:tag="hot"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_temp_normal"
             android:drawableTop="@drawable/ic_temp_normal"
             style="@style/FilterElement"
             android:tag="middle"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_temp_cold"
             android:drawableTop="@drawable/ic_temp_cold"
             style="@style/FilterElement"

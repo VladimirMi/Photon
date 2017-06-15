@@ -21,49 +21,49 @@
         android:tag="dish"
         >
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_dish_meat"
             android:drawableTop="@drawable/ic_dish_meat"
             style="@style/FilterElement"
             android:tag="meat"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_dish_fish"
             android:drawableTop="@drawable/ic_dish_fish"
             style="@style/FilterElement"
             android:tag="fish"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_dish_vegetable"
             android:drawableTop="@drawable/ic_dish_vegetables"
             style="@style/FilterElement"
             android:tag="vegetables"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_dish_fruit"
             android:drawableTop="@drawable/ic_dish_fruit"
             style="@style/FilterElement"
             android:tag="fruit"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_dish_cheese"
             android:drawableTop="@drawable/ic_dish_cheese"
             style="@style/FilterElement"
             android:tag="cheese"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_dish_dessert"
             android:drawableTop="@drawable/ic_dish_desserts"
             style="@style/FilterElement"
             android:tag="dessert"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_dish_drink"
             android:drawableTop="@drawable/ic_dish_drinks"
             style="@style/FilterElement"

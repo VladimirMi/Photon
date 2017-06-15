@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.Photocard
-import io.github.vladimirmi.photon.utils.getDisplayMetrics
-import io.github.vladimirmi.photon.utils.setImage
+import io.github.vladimirmi.photon.ui.getDisplayMetrics
+import io.github.vladimirmi.photon.ui.setImage
 import kotlinx.android.synthetic.main.item_card.view.*
 import java.util.*
 

@@ -21,21 +21,21 @@
         android:tag="light"
         >
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_light_natural"
             android:drawableTop="@drawable/ic_light_natural"
             style="@style/FilterElement"
             android:tag="natural"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_light_synthetic"
             android:drawableTop="@drawable/ic_light_synthetic"
             style="@style/FilterElement"
             android:tag="synthetic"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             android:text="@string/filters_light_mixed"
             android:drawableTop="@drawable/ic_light_mixed"
             style="@style/FilterElement"

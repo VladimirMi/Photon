@@ -9,9 +9,9 @@ import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.data.models.User
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.features.search.tags.TagView
-import io.github.vladimirmi.photon.utils.setImage
-import io.github.vladimirmi.photon.utils.setRoundAvatarWithBorder
+import io.github.vladimirmi.photon.ui.TagView
+import io.github.vladimirmi.photon.ui.setImage
+import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder
 import kotlinx.android.synthetic.main.screen_photocard.view.*
 
 /**

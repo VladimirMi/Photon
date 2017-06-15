@@ -5,12 +5,18 @@
 
     <string name="message_wait">Пожалйста, подождите</string>
 
+    <string name="menu_bottom_main">Главная</string>
+    <string name="menu_bottom_profile">Профиль</string>
+    <string name="menu_bottom_load">Загрузить</string>
+
     <string name="menu_search_exit">Выйти</string>
     <string name="menu_search_enter">Войти</string>
     <string name="menu_search_registration">Зарегистрироваться</string>
 
     <string name="button_ok">OK</string>
     <string name="button_cancel">Отмена</string>
+    <string name="button_registration">Регистрация</string>
+    <string name="button_login">Вход</string>
 
     <string name="dialog_registration">Регистрация</string>
     <string name="dialog_enter">Вход в аккаунт</string>
@@ -65,10 +71,9 @@
     <string name="filters_light_src_1">Один</string>
     <string name="filters_light_src_2">Два</string>
     <string name="filters_light_src_3">Три</string>
+
     <string name="photocard_album">Альбомы</string>
     <string name="photocard_card">Карты</string>
-    <string name="button_registration">Регистрация</string>
-    <string name="button_login">Вход</string>
-    <string name="profile_message_not_auth">Авторизуйтесь, чтобы посмотреть данные профиля</string>
 
+    <string name="profile_message_not_auth">Авторизуйтесь, чтобы посмотреть данные профиля</string>
 </resources>

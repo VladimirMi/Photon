@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.utils
+package io.github.vladimirmi.photon.ui
 
 import android.content.Context
 import android.util.DisplayMetrics

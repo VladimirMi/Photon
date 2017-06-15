@@ -22,7 +22,7 @@
         android:tag="nuances"
         >
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_red"
@@ -30,7 +30,7 @@
             android:tag="red"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_orange"
@@ -38,7 +38,7 @@
             android:tag="orange"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_yellow"
@@ -46,7 +46,7 @@
             android:tag="yellow"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_green"
@@ -54,7 +54,7 @@
             android:tag="green"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_lightBlue"
@@ -72,7 +72,7 @@
         android:tag="nuances"
         >
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_blue"
@@ -80,7 +80,7 @@
             android:tag="blue"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_purple"
@@ -88,7 +88,7 @@
             android:tag="purple"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_brown"
@@ -96,7 +96,7 @@
             android:tag="brown"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_black"
@@ -104,7 +104,7 @@
             android:tag="black"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/shape_round"
             android:text="@string/filters_nuance_white"

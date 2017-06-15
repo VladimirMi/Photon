@@ -21,28 +21,28 @@
         android:tag="lightDirection"
         >
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/ic_light_dir_forward"
             android:text="@string/filters_light_dir_forward"
             android:tag="direct"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/ic_light_dir_back"
             android:text="@string/filters_light_dir_back"
             android:tag="backlight"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/ic_light_dir_side"
             android:text="@string/filters_light_dir_side"
             android:tag="sideLight"
             />
 
-        <io.github.vladimirmi.photon.features.search.filters.FilterElementView
+        <io.github.vladimirmi.photon.ui.FilterElementView
             style="@style/FilterElement"
             android:drawableTop="@drawable/ic_light_dir_mix"
             android:text="@string/filters_light_dir_mix"

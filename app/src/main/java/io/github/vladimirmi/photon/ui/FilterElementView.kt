@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.features.search.filters
+package io.github.vladimirmi.photon.ui
 
 import android.content.Context
 import android.graphics.PorterDuff

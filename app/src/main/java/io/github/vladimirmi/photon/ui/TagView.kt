@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.features.search.tags
+package io.github.vladimirmi.photon.ui
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.google.android.flexbox.FlexboxLayout
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.utils.getDensity
 
 class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
         TextView(context) {

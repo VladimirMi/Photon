@@ -11,6 +11,7 @@ import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
+import io.github.vladimirmi.photon.ui.RegistrationDialog
 import kotlinx.android.synthetic.main.screen_main.view.*
 
 
@@ -54,10 +55,7 @@ class MainView(context: Context, attrs: AttributeSet) :
     }
 
     fun openRegistrationDialog(): Boolean {
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_registration, this, false)
-        AlertDialog.Builder(context)
-                .setView(view)
-                .show()
+        RegistrationDialog(this).dialog.show()
         return true
     }
 }
