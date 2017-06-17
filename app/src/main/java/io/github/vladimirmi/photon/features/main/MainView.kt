@@ -1,16 +1,16 @@
 package io.github.vladimirmi.photon.features.main
 
-import android.app.AlertDialog
 import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import flow.Flow
-import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
+import io.github.vladimirmi.photon.data.models.LoginReq
 import io.github.vladimirmi.photon.data.models.Photocard
+import io.github.vladimirmi.photon.data.models.RegistrationReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
+import io.github.vladimirmi.photon.ui.LoginDialog
 import io.github.vladimirmi.photon.ui.RegistrationDialog
 import kotlinx.android.synthetic.main.screen_main.view.*
 
@@ -46,16 +46,22 @@ class MainView(context: Context, attrs: AttributeSet) :
         Flow.get(this).set(PhotocardScreen(photocard))
     }
 
-    fun openLoginDialog(): Boolean {
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_login, this, false)
-        AlertDialog.Builder(context)
-                .setView(view)
-                .show()
-        return true
+    fun openLoginDialog() {
+        LoginDialog(this, loginAction).dialog.show()
     }
 
-    fun openRegistrationDialog(): Boolean {
-        RegistrationDialog(this).dialog.show()
-        return true
+    fun openRegistrationDialog() {
+        RegistrationDialog(this, registrationAction).dialog.show()
+    }
+
+    val registrationAction: (RegistrationReq) -> Unit = { register(it) }
+    val loginAction: (LoginReq) -> Unit = { login(it) }
+
+    private fun register(req: RegistrationReq) {
+        presenter.register(req)
+    }
+
+    private fun login(req: LoginReq) {
+        presenter.login(req)
     }
 }

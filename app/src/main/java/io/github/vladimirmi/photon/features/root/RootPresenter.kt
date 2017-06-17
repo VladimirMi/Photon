@@ -25,6 +25,14 @@ class RootPresenter(val model: IRootModel) :
     fun hasActiveView() = hasView()
 
     fun getNewToolbarBuilder(): ToolbarBuilder = ToolbarBuilder(view)
+
+    fun showMessage(msg: String) {
+        view.showMessage(msg)
+    }
+
+    fun isUserAuth(): Boolean {
+        return model.isUserAuth()
+    }
 }
 
 class ToolbarBuilder(val rootView: IRootView) {

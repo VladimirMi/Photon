@@ -15,10 +15,17 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="36dp"
+            android:layout_marginBottom="20dp"
             android:text="@string/dialog_enter"
             android:textAlignment="center"
             android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/email_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/error"
             />
 
         <EditText
@@ -26,10 +33,17 @@
             android:textSize="14sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="8dp"
             android:background="@drawable/input_field"
             android:hint="@string/dialog_email"
             android:inputType="textEmailAddress"
+            />
+
+        <TextView
+            android:id="@+id/password_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/error"
             />
 
         <EditText
@@ -45,35 +59,26 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="58dp"
             android:orientation="horizontal"
             >
 
             <Button
                 android:id="@+id/ok"
+                android:theme="@style/GreyDarkButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/button_ok"
-                android:textColor="@android:color/white"
-                android:foreground="?attr/selectableItemBackground"
-                android:background="@drawable/btn_login"
-                />
-
-            <View
-                android:layout_width="8dp"
-                android:layout_height="match_parent"
                 />
 
             <Button
                 android:id="@+id/cancel"
+                android:theme="@style/GreyDarkButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/button_cancel"
-                android:foreground="?attr/selectableItemBackground"
-                android:background="@drawable/btn_login"
-                android:textColor="@android:color/white"
                 />
         </LinearLayout>
 

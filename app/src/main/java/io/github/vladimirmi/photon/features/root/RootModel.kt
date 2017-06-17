@@ -3,7 +3,9 @@ package io.github.vladimirmi.photon.features.root
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -22,7 +24,13 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
         val updateObs = dataManager.getPhotocardsFromNet(limit = 60, offset = 0)
                 .flatMap { save(it) }
                 .share()
-        updateObs.subscribe()
+
+        Observable.interval(1, TimeUnit.MINUTES)
+                .withLatestFrom(dataManager.isNetworkAvailable(),
+                        BiFunction { _: Long, netAvail: Boolean -> netAvail })
+                .filter { it == true }
+                .flatMap { updateObs }
+                .subscribe()
 
         return updateObs
     }
@@ -36,4 +44,6 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
                 }
                 .flatMap { Observable.just(++count) }
     }
+
+    override fun isUserAuth() = dataManager.isUserAuth()
 }

@@ -76,4 +76,10 @@
     <string name="photocard_card">Карты</string>
 
     <string name="profile_message_not_auth">Авторизуйтесь, чтобы посмотреть данные профиля</string>
+    <string name="message_err_email">Неверный email</string>
+    <string name="message_err_password">Неверный пароль</string>
+    <string name="message_err_name">Неверное имя</string>
+    <string name="message_err_login">Неверный login</string>
+    <string name="message_err_net">Нет сети</string>
+    <string name="message_err_connect">Невозможно подключиться к серверу</string>
 </resources>

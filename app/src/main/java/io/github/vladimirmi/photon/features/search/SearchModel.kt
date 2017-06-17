@@ -14,7 +14,7 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
     override var page: SearchView.Page = SearchView.Page.TAGS
 
     override fun getTags(): Observable<List<Tag>> {
-        return dataManager.getListFromDb(Tag::class.java)
+        return dataManager.getListFromDb(Tag::class.java, "tag")
     }
 
     override fun getQuery(): HashMap<String, MutableList<String>> {

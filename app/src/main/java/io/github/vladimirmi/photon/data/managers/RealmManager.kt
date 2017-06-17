@@ -4,10 +4,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.disposables.Disposables
-import io.realm.Realm
-import io.realm.RealmModel
-import io.realm.RealmObject
-import io.realm.RealmResults
+import io.realm.*
 
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
@@ -23,16 +20,6 @@ class RealmManager {
         realm.close()
     }
 
-    fun <T : RealmObject> get(clazz: Class<T>): Observable<List<T>> {
-        val realm = Realm.getDefaultInstance()
-        return RealmResultObservable.from(realm
-                .where(clazz)
-                .findAllAsync())
-                .filter { it.isLoaded }
-                .map { realm.copyFromRealm(it) }
-                .doAfterTerminate { realm.close() }
-    }
-
     fun <T : RealmObject> get(clazz: Class<T>, id: String): Observable<T> {
         val realm = Realm.getDefaultInstance()
         return RealmObjectObservable.from(realm
@@ -41,6 +28,17 @@ class RealmManager {
                 .findFirstAsync())
                 .filter { it.isLoaded }
                 .filter { it.isValid }
+                .map { realm.copyFromRealm(it) }
+                .doAfterTerminate { realm.close() }
+    }
+
+    fun <T : RealmObject> getList(clazz: Class<T>, sortBy: String, order: Sort): Observable<List<T>> {
+        val realm = Realm.getDefaultInstance()
+        return RealmResultObservable.from(realm
+                .where(clazz)
+                .findAllAsync()
+                .sort(sortBy, order))
+                .filter { it.isLoaded }
                 .map { realm.copyFromRealm(it) }
                 .doAfterTerminate { realm.close() }
     }

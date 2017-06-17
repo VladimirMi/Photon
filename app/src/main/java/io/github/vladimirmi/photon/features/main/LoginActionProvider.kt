@@ -11,10 +11,10 @@ import io.github.vladimirmi.photon.R
  */
 
 class LoginActionProvider(context: Context,
-                          val isLogin: Boolean = false,
-                          val loginAction: (() -> Boolean)? = null,
-                          val logoutAction: (() -> Boolean)? = null,
-                          val registrationAction: (() -> Boolean)? = null)
+                          val isLogin: Boolean,
+                          val loginAction: (() -> Unit),
+                          val logoutAction: (() -> Unit),
+                          val registrationAction: (() -> Unit))
     : ActionProvider(context) {
 
     override fun onCreateActionView() = null
@@ -25,12 +25,21 @@ class LoginActionProvider(context: Context,
         subMenu.clear()
         if (isLogin) {
             subMenu.add(context.getString(R.string.menu_search_exit))
-                    .setOnMenuItemClickListener { run(logoutAction!!) }
+                    .setOnMenuItemClickListener {
+                        run(logoutAction)
+                        return@setOnMenuItemClickListener true
+                    }
         } else {
             subMenu.add(context.getString(R.string.menu_search_enter))
-                    .setOnMenuItemClickListener { run(loginAction!!) }
+                    .setOnMenuItemClickListener {
+                        run(loginAction)
+                        return@setOnMenuItemClickListener true
+                    }
             subMenu.add(context.getString(R.string.menu_search_registration))
-                    .setOnMenuItemClickListener { run(registrationAction!!) }
+                    .setOnMenuItemClickListener {
+                        run(registrationAction)
+                        return@setOnMenuItemClickListener true
+                    }
         }
     }
 }

@@ -4,6 +4,8 @@ import android.view.MenuItem
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
+import io.github.vladimirmi.photon.data.models.LoginReq
+import io.github.vladimirmi.photon.data.models.RegistrationReq
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
@@ -19,8 +21,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     override fun initToolbar() {
         val loginActionProvider = LoginActionProvider(view.context,
+                isLogin = rootPresenter.isUserAuth(),
                 loginAction = view::openLoginDialog,
-                registrationAction = view::openRegistrationDialog)
+                registrationAction = view::openRegistrationDialog,
+                logoutAction = this::logout
+        )
         rootPresenter.getNewToolbarBuilder()
                 .addAction(MenuItemHolder("Search", R.drawable.ic_action_search,
                         MenuItem.OnMenuItemClickListener {
@@ -41,6 +46,18 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         return model.getPhotoCards()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ view.setData(it) })
+    }
+
+    fun register(req: RegistrationReq) {
+        //TODO("not implemented")
+    }
+
+    fun login(req: LoginReq) {
+        //TODO("not implemented")
+    }
+
+    fun logout() {
+        //TODO("not implemented")
     }
 }
 

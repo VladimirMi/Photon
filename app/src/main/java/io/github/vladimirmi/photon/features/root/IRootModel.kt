@@ -9,4 +9,5 @@ import io.reactivex.Observable
 
 interface IRootModel : IModel {
     fun updatePhotoCards(): Observable<Int>
+    fun isUserAuth(): Boolean
 }

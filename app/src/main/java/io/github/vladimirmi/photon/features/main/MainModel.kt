@@ -4,6 +4,7 @@ import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
 import io.reactivex.Observable
+import io.realm.Sort
 import timber.log.Timber
 
 /**
@@ -28,6 +29,7 @@ class MainModel(private val dataManager: DataManager) : IMainModel {
     }
 
     override fun getPhotoCards(): Observable<List<Photocard>> {
-        return dataManager.getListFromDb(Photocard::class.java)
+        return dataManager.getListFromDb(
+                Photocard::class.java, sortBy = "views", order = Sort.DESCENDING)
     }
 }

@@ -8,6 +8,8 @@ import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
+import java.net.ConnectException
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -28,6 +30,20 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
         model.updateLimitPhotoCards(60, 3000)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({}, {}, { Flow.get(view).replaceTop(MainScreen(), Direction.FORWARD) })
+                .subscribe({},
+                        { handleError(it) },
+                        { openMainScreen() })
+    }
+
+    private fun handleError(error: Throwable) {
+        Timber.e(error.message)
+        if (error is ConnectException) {
+            rootPresenter.showMessage(view.context.getString(R.string.message_err_connect))
+            openMainScreen()
+        }
+    }
+
+    private fun openMainScreen() {
+        Flow.get(view).replaceTop(MainScreen(), Direction.FORWARD)
     }
 }

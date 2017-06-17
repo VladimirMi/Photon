@@ -1,5 +1,7 @@
 package io.github.vladimirmi.photon.data.managers
 
+import android.content.Context
+import android.net.ConnectivityManager
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.data.models.Tag
@@ -10,7 +12,9 @@ import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Observable
 import io.realm.RealmObject
+import io.realm.Sort
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -22,7 +26,8 @@ class DataManager
 @Inject
 constructor(private val restService: RestService,
             private val preferencesManager: PreferencesManager,
-            private val realmManager: RealmManager) {
+            private val realmManager: RealmManager,
+            private val context: Context) {
 
     //region =============== Network ==============
 
@@ -58,8 +63,9 @@ constructor(private val restService: RestService,
         realmManager.save(realmObject)
     }
 
-    fun <T : RealmObject> getListFromDb(clazz: Class<T>): Observable<List<T>> {
-        return realmManager.get(clazz)
+    fun <T : RealmObject> getListFromDb(clazz: Class<T>, sortBy: String, order: Sort = Sort.ASCENDING)
+            : Observable<List<T>> {
+        return realmManager.getList(clazz, sortBy, order)
     }
 
     fun <T : RealmObject> getObjectFromDb(clazz: Class<T>, id: String): Observable<T> {
@@ -85,6 +91,15 @@ constructor(private val restService: RestService,
     fun isUserAuth() = preferencesManager.isUserAuth()
 
     //endregion
+
+    fun isNetworkAvailable(): Observable<Boolean> {
+        return Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
+                .flatMap<Boolean> { _ ->
+                    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                    Observable.just(cm.activeNetworkInfo != null && cm.activeNetworkInfo.isConnectedOrConnecting)
+                }
+                .distinctUntilChanged()
+    }
 }
 
 
