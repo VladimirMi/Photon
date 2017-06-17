@@ -25,7 +25,7 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
                 .flatMap { save(it) }
                 .share()
 
-        Observable.interval(1, TimeUnit.MINUTES)
+        Observable.interval(5, TimeUnit.MINUTES)
                 .withLatestFrom(dataManager.isNetworkAvailable(),
                         BiFunction { _: Long, netAvail: Boolean -> netAvail })
                 .filter { it == true }

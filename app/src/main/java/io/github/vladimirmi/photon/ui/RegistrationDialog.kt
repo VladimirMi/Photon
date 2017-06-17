@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.ui
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.RegistrationReq
+import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.reactivex.Observable
 import io.reactivex.functions.Function5
 import kotlinx.android.synthetic.main.dialog_registration.view.*
@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.dialog_registration.view.*
  * Created by Vladimir Mikhalev 15.06.2017.
  */
 
-class RegistrationDialog(viewGroup: ViewGroup, val registrationAction: (RegistrationReq) -> Unit)
+class RegistrationDialog(viewGroup: ViewGroup, val registrationAction: (SignUpReq) -> Unit)
     : ValidationDialog(R.layout.dialog_registration, viewGroup) {
 
     val login = view.login
@@ -26,7 +26,7 @@ class RegistrationDialog(viewGroup: ViewGroup, val registrationAction: (Registra
         cancel.setOnClickListener { dialog.cancel() }
         ok.setOnClickListener {
             kotlin.run {
-                val request = RegistrationReq(login = login.text.toString(),
+                val request = SignUpReq(login = login.text.toString(),
                         email = email.text.toString(),
                         name = name.text.toString(),
                         password = password.text.toString()

@@ -5,9 +5,9 @@ import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import flow.Flow
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.LoginReq
 import io.github.vladimirmi.photon.data.models.Photocard
-import io.github.vladimirmi.photon.data.models.RegistrationReq
+import io.github.vladimirmi.photon.data.models.SignInReq
+import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.ui.LoginDialog
@@ -25,6 +25,12 @@ class MainView(context: Context, attrs: AttributeSet) :
     val cardAction: (Photocard) -> Unit = { showPhotoCard(it) }
     val adapter = MainAdapter(cardAction)
 
+    val registrationAction: (SignUpReq) -> Unit = { register(it) }
+    val loginAction: (SignInReq) -> Unit = { login(it) }
+
+    val registrationDialog = RegistrationDialog(this, registrationAction)
+    val loginDialog = LoginDialog(this, loginAction)
+
     override fun initDagger(context: Context) {
         DaggerService.getComponent<MainScreen.Component>(context).inject(this)
     }
@@ -34,34 +40,25 @@ class MainView(context: Context, attrs: AttributeSet) :
         recycler_view.adapter = adapter
     }
 
-    override fun onBackPressed(): Boolean {
-        return false
+    override fun onBackPressed(): Boolean = false
+
+    fun setData(data: List<Photocard>) = adapter.updateData(data)
+
+    fun showPhotoCard(photocard: Photocard) = Flow.get(this).set(PhotocardScreen(photocard))
+
+    fun openRegistrationDialog() = registrationDialog.dialog.show()
+
+    fun openLoginDialog() = loginDialog.dialog.show()
+
+    fun closeRegistrationDialog() = registrationDialog.dialog.cancel()
+
+    fun closeLoginDialog() = loginDialog.dialog.cancel()
+
+    fun showMessage(errorResId: Int) {
+        if (registrationDialog.dialog.isShowing) registrationDialog.showMessage(errorResId) else
+            loginDialog.showMessage(errorResId)
     }
 
-    fun setData(data: List<Photocard>) {
-        adapter.updateData(data)
-    }
-
-    fun showPhotoCard(photocard: Photocard) {
-        Flow.get(this).set(PhotocardScreen(photocard))
-    }
-
-    fun openLoginDialog() {
-        LoginDialog(this, loginAction).dialog.show()
-    }
-
-    fun openRegistrationDialog() {
-        RegistrationDialog(this, registrationAction).dialog.show()
-    }
-
-    val registrationAction: (RegistrationReq) -> Unit = { register(it) }
-    val loginAction: (LoginReq) -> Unit = { login(it) }
-
-    private fun register(req: RegistrationReq) {
-        presenter.register(req)
-    }
-
-    private fun login(req: LoginReq) {
-        presenter.login(req)
-    }
+    private fun register(req: SignUpReq) = presenter.register(req)
+    private fun login(req: SignInReq) = presenter.login(req)
 }

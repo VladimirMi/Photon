@@ -26,12 +26,24 @@ class RootPresenter(val model: IRootModel) :
 
     fun getNewToolbarBuilder(): ToolbarBuilder = ToolbarBuilder(view)
 
+    fun isUserAuth(): Boolean {
+        return model.isUserAuth()
+    }
+
     fun showMessage(msg: String) {
         view.showMessage(msg)
     }
 
-    fun isUserAuth(): Boolean {
-        return model.isUserAuth()
+    fun showMessage(id: Int) {
+        view.showMessage(id)
+    }
+
+    fun showLoading() {
+        view.showLoading()
+    }
+
+    fun hideLoading() {
+        view.hideLoading()
     }
 }
 

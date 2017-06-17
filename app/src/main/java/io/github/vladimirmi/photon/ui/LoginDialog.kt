@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.ui
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.LoginReq
+import io.github.vladimirmi.photon.data.models.SignInReq
 import io.reactivex.Observable
 import io.reactivex.functions.Function3
 import kotlinx.android.synthetic.main.dialog_login.view.*
@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.dialog_login.view.*
  * Created by Vladimir Mikhalev 17.06.2017.
  */
 
-class LoginDialog(viewGroup: ViewGroup, val loginAction: (LoginReq) -> Unit)
+class LoginDialog(viewGroup: ViewGroup, val loginAction: (SignInReq) -> Unit)
     : ValidationDialog(R.layout.dialog_login, viewGroup) {
 
     val email = view.email
@@ -24,7 +24,7 @@ class LoginDialog(viewGroup: ViewGroup, val loginAction: (LoginReq) -> Unit)
         cancel.setOnClickListener { dialog.cancel() }
         ok.setOnClickListener {
             kotlin.run {
-                val request = LoginReq(email = email.text.toString(),
+                val request = SignInReq(email = email.text.toString(),
                         password = password.text.toString()
                 )
                 loginAction(request)

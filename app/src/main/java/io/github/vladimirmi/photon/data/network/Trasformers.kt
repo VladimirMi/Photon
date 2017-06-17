@@ -34,9 +34,9 @@ class RestErrorTransformer<T> : ObservableTransformer<Response<T>, T> {
     override fun apply(upstream: Observable<Response<T>>): ObservableSource<T> {
         return upstream.flatMap {
             when (it.code()) {
-                200 -> Observable.just<T>(it.body())
-                304 -> Observable.empty()
-                else -> Observable.error(ApiError(it.message(), it.code()))
+                in 200..299 -> Observable.just<T>(it.body())
+                in 300..399 -> Observable.empty()
+                else -> Observable.error(ApiError(it.message(), it.code(), it.errorBody()))
             }
         }
     }

@@ -75,7 +75,7 @@ class RealmResultObservable<T : RealmModel>(private val results: RealmResults<T>
         e.onNext(results)
     }
 
-    companion object {
+    companion object { // factory method
         fun <T : RealmModel> from(results: RealmResults<T>): Observable<RealmResults<T>> {
             return Observable.create(RealmResultObservable(results))
         }

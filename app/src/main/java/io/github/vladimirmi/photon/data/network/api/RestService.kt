@@ -1,21 +1,22 @@
 package io.github.vladimirmi.photon.data.network.api
 
-import io.github.vladimirmi.photon.data.models.Photocard
-import io.github.vladimirmi.photon.data.models.Tag
-import io.github.vladimirmi.photon.data.models.User
+import io.github.vladimirmi.photon.data.models.*
 import io.github.vladimirmi.photon.utils.Constants.HEADER_IF_MODIFIED_SINCE
 import io.reactivex.Observable
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
 interface RestService {
+
+    @POST("user/signIn")
+    fun signIn(@Body req: SignInReq): Observable<Response<User>>
+
+    @POST("user/signUp")
+    fun signUp(@Body req: SignUpReq): Observable<Response<User>>
 
     @GET("photocard/list")
     fun getPhotocards(@Header(HEADER_IF_MODIFIED_SINCE) lastUpdate: String,

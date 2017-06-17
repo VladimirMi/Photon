@@ -3,9 +3,7 @@ package io.github.vladimirmi.photon.data.managers
 import android.content.Context
 import android.net.ConnectivityManager
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.models.Photocard
-import io.github.vladimirmi.photon.data.models.Tag
-import io.github.vladimirmi.photon.data.models.User
+import io.github.vladimirmi.photon.data.models.*
 import io.github.vladimirmi.photon.data.network.RestErrorTransformer
 import io.github.vladimirmi.photon.data.network.RestLastModifiedTransformer
 import io.github.vladimirmi.photon.data.network.api.RestService
@@ -13,6 +11,7 @@ import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Observable
 import io.realm.RealmObject
 import io.realm.Sort
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -55,11 +54,22 @@ constructor(private val restService: RestService,
                 .compose(RestErrorTransformer())
     }
 
+    fun signIn(req: SignInReq): Observable<User> {
+        return restService.signIn(req)
+                .compose(RestErrorTransformer())
+    }
+
+    fun signUp(req: SignUpReq): Observable<User> {
+        return restService.signUp(req)
+                .compose(RestErrorTransformer())
+    }
+
     //endregion
 
     //region =============== DataBase ==============
 
     fun saveToDB(realmObject: RealmObject) {
+        Timber.e("saveToDB ${realmObject.javaClass}")
         realmManager.save(realmObject)
     }
 
@@ -76,19 +86,21 @@ constructor(private val restService: RestService,
 
     //region =============== Shared Preferences ==============
 
-    private fun getLastUpdate(name: String): String {
-        return preferencesManager.getLastUpdate(name)
-    }
+    private fun getLastUpdate(name: String): String = preferencesManager.getLastUpdate(name)
 
-    fun saveLastUpdate(name: String, lastModified: String) {
-        preferencesManager.saveLastUpdate(name, lastModified)
-    }
+    fun saveLastUpdate(name: String, lastModified: String) = preferencesManager.saveLastUpdate(name, lastModified)
+
+    fun saveUserId(id: String) = preferencesManager.saveUserId(id)
+
+    fun saveUserToken(token: String) = preferencesManager.saveUserToken(token)
 
     fun getUserId() = preferencesManager.getUserId()
 
     fun getUserToken() = preferencesManager.getUserToken()
 
     fun isUserAuth() = preferencesManager.isUserAuth()
+
+    fun logout() = preferencesManager.clearUser()
 
     //endregion
 

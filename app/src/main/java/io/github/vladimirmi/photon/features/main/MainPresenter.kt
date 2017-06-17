@@ -4,8 +4,9 @@ import android.view.MenuItem
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.models.LoginReq
-import io.github.vladimirmi.photon.data.models.RegistrationReq
+import io.github.vladimirmi.photon.data.models.SignInReq
+import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
@@ -48,16 +49,42 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                 .subscribe({ view.setData(it) })
     }
 
-    fun register(req: RegistrationReq) {
-        //TODO("not implemented")
+    fun register(req: SignUpReq) {
+        model.register(req)
+                .doOnSubscribe { rootPresenter.showLoading() }
+                .doAfterTerminate { rootPresenter.hideLoading() }
+                .subscribe({}, {
+                    // onError
+                    if (it is ApiError) view.showMessage(it.errorResId)
+                }, {
+                    //onComplete
+                    view.closeRegistrationDialog()
+                    initToolbar()
+                })
     }
 
-    fun login(req: LoginReq) {
-        //TODO("not implemented")
+    fun login(req: SignInReq) {
+        model.login(req)
+                .doOnSubscribe { rootPresenter.showLoading() }
+                .doAfterTerminate { rootPresenter.hideLoading() }
+                .subscribe({}, {
+                    // onError
+                    if (it is ApiError) {
+                        when (it.statusCode) {
+                            404 -> view.showMessage(R.string.message_api_err_auth)
+                            else -> view.showMessage(it.errorResId)
+                        }
+                    }
+                }, {
+                    //onComplete
+                    view.closeLoginDialog()
+                    initToolbar()
+                })
     }
 
     fun logout() {
-        //TODO("not implemented")
+        model.logout()
+        initToolbar()
     }
 }
 

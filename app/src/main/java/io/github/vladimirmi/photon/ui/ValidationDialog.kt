@@ -1,9 +1,9 @@
 package io.github.vladimirmi.photon.ui
 
-import android.app.AlertDialog
 import android.graphics.drawable.GradientDrawable
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -31,7 +31,7 @@ open class ValidationDialog(val layoutId: Int, val viewGroup: ViewGroup) {
     val NAME_PATTERN = Pattern.compile(".{3,}")
     val PASSWORD_PATTERN = Pattern.compile("[a-zA-Z0-9_]{8,}")
 
-    val view: View = LayoutInflater.from(viewGroup.context).inflate(layoutId, viewGroup, false)
+    val view: View = LayoutInflater.from(viewGroup.context).inflate(layoutId, null, false)
 
     val dialog: AlertDialog
 
@@ -65,5 +65,9 @@ open class ValidationDialog(val layoutId: Int, val viewGroup: ViewGroup) {
                     if (!it) Snackbar.make(viewGroup, errorMsg, Snackbar.LENGTH_LONG).show()
                 }
                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun showMessage(errorResId: Int) {
+        Snackbar.make(viewGroup, errorResId, Snackbar.LENGTH_LONG).show()
     }
 }

@@ -33,6 +33,16 @@ class PreferencesManager(context: Context) {
         editor.commit()
     }
 
+    fun saveUserId(id: String) {
+        editor.putString(KEY_USER_ID, id)
+        editor.commit()
+    }
+
+    fun saveUserToken(token: String) {
+        editor.putString(KEY_USER_TOKEN, token)
+        editor.commit()
+    }
+
     fun getUserId(): String {
         return sharedPreferences.getString(KEY_USER_ID, "")
     }
