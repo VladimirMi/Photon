@@ -21,21 +21,22 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         BasePresenter<MainView, IMainModel>(model, rootPresenter) {
 
     override fun initToolbar() {
-        val loginActionProvider = LoginActionProvider(view.context,
-                isLogin = rootPresenter.isUserAuth(),
-                loginAction = view::openLoginDialog,
-                registrationAction = view::openRegistrationDialog,
-                logoutAction = this::logout
-        )
+        val actions: (MenuItem) -> Unit = {
+            when (it.itemId) {
+                R.id.signIn -> view.openLoginDialog()
+                R.id.signUp -> view.openRegistrationDialog()
+                R.id.logOut -> logout()
+            }
+        }
+
+        val menu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth else R.menu.submenu_main_screen_not_auth
+
         rootPresenter.getNewToolbarBuilder()
                 .addAction(MenuItemHolder("Search", R.drawable.ic_action_search,
-                        MenuItem.OnMenuItemClickListener {
-                            Flow.get(view).set(SearchScreen())
-                            return@OnMenuItemClickListener true
-                        }))
-                .addAction(MenuItemHolder("Login", R.drawable.ic_action_settings
-                        , actionProvider = loginActionProvider
-                ))
+                        actions = { Flow.get(view).set(SearchScreen()) }))
+                .addAction(MenuItemHolder("Login", R.drawable.ic_action_settings,
+                        popupMenu = menu,
+                        actions = actions))
                 .build()
     }
 

@@ -5,8 +5,12 @@ import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
-import android.support.v4.view.MenuItemCompat
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
+import android.support.v7.view.menu.MenuBuilder
+import android.support.v7.view.menu.MenuPopupHelper
+import android.support.v7.widget.PopupMenu
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,6 +22,7 @@ import io.github.vladimirmi.photon.features.splash.SplashScreen
 import io.github.vladimirmi.photon.flow.BottomNavDispatcher
 import io.github.vladimirmi.photon.flow.FlowActivity
 import kotlinx.android.synthetic.main.activity_root.*
+import kotlinx.android.synthetic.main.view_menu_item.view.*
 import javax.inject.Inject
 
 /**
@@ -34,7 +39,7 @@ class RootActivity : FlowActivity(), IRootView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_root)
-        setupFlowDispatcher(coordinator_container, view_container)
+        setupFlowDispatcher(root_container, view_container)
 
         initToolbar()
         initDagger()
@@ -96,7 +101,7 @@ class RootActivity : FlowActivity(), IRootView {
     }
 
     override fun showMessage(string: String) {
-        Snackbar.make(coordinator_container, string, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(root_container, string, Snackbar.LENGTH_LONG).show()
     }
 
     //endregion
@@ -158,9 +163,40 @@ class RootActivity : FlowActivity(), IRootView {
         if (!actionBarMenuItems.isEmpty()) {
             for (menuItemHolder in actionBarMenuItems) {
                 val item = menu.add(menuItemHolder.itemTitle)
-                item.setIcon(menuItemHolder.iconResId)
-                MenuItemCompat.setActionProvider(item, menuItemHolder.actionProvider)
-                item.setOnMenuItemClickListener(menuItemHolder.listener)
+                if (menuItemHolder.hasPopupMenu()) {
+                    var actionView: View
+                    if (menuItemHolder.actionView == null) {
+                        actionView = LayoutInflater.from(this).inflate(R.layout.view_menu_item, toolbar, false)
+                    } else {
+                        actionView = menuItemHolder.actionView
+                    }
+                    actionView.icon.setImageDrawable(ContextCompat.getDrawable(this, menuItemHolder.iconResId as Int))
+                    item.actionView = actionView
+
+                    val popup = PopupMenu(this, actionView)
+                    popup.inflate(menuItemHolder.popupMenu!!)
+                    popup.setOnMenuItemClickListener {
+                        kotlin.run {
+                            menuItemHolder.actions(it)
+                            return@run true
+                        }
+                    }
+                    val menuHelper = MenuPopupHelper(this, popup.menu as MenuBuilder,
+                            toolbar)
+                    if (popup.menu.getItem(0).icon != null) {
+                        menuHelper.setForceShowIcon(true)
+                    }
+                    menuHelper.setAnchorView(actionView)
+                    actionView.setOnClickListener { menuHelper.show(0, -actionView.height) }
+                } else {
+                    item.setIcon(menuItemHolder.iconResId!!)
+                    item.setOnMenuItemClickListener {
+                        kotlin.run {
+                            menuItemHolder.actions(it)
+                            return@run true
+                        }
+                    }
+                }
                 item.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
             }
         } else {
@@ -170,7 +206,7 @@ class RootActivity : FlowActivity(), IRootView {
     }
 
     override fun setBackground(backgroundId: Int) {
-        coordinator_container.setBackgroundResource(backgroundId)
+        root_container.setBackgroundResource(backgroundId)
     }
 
     //endregion

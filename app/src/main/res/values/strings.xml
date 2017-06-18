@@ -3,15 +3,15 @@
     <string name="app_description">Онлайн-галерея фуд-фотографии.\n
         Для вдохновления и обучения.</string>
 
-    <string name="message_wait">Пожалйста, подождите</string>
+    <string name="message_wait">Пожалуйста, подождите</string>
 
     <string name="menu_bottom_main">Главная</string>
     <string name="menu_bottom_profile">Профиль</string>
     <string name="menu_bottom_load">Загрузить</string>
 
-    <string name="menu_search_exit">Выйти</string>
-    <string name="menu_search_enter">Войти</string>
-    <string name="menu_search_registration">Зарегистрироваться</string>
+    <string name="menu_main_exit">Выйти</string>
+    <string name="menu_main_enter">Войти</string>
+    <string name="menu_main_registration">Зарегистрироваться</string>
 
     <string name="button_ok">OK</string>
     <string name="button_cancel">Отмена</string>
@@ -24,6 +24,18 @@
     <string name="dialog_email">Email</string>
     <string name="dialog_name">Имя</string>
     <string name="dialog_password">Пароль</string>
+
+
+    <string name="message_err_email">Неверный email</string>
+    <string name="message_err_password">Неверный пароль</string>
+    <string name="message_err_name">Неверное имя</string>
+    <string name="message_err_login">Неверный login</string>
+    <string name="message_err_net">Нет сети</string>
+    <string name="message_err_connect">Невозможно подключиться к серверу</string>
+    <string name="message_api_err_login">Пользователь с таким логином уже существует</string>
+    <string name="message_api_err_mail">Пользователь с такой почтой уже существует</string>
+    <string name="message_api_err_unknown">Неизвестная ошибка</string>
+    <string name="message_api_err_auth">"Неправильный логин или пароль"</string>
 
     <string-array name="search_tabs">
         <item>Поиск</item>
@@ -76,14 +88,6 @@
     <string name="photocard_card">Карты</string>
 
     <string name="profile_message_not_auth">Авторизуйтесь,\n чтобы посмотреть\n данные профиля</string>
-    <string name="message_err_email">Неверный email</string>
-    <string name="message_err_password">Неверный пароль</string>
-    <string name="message_err_name">Неверное имя</string>
-    <string name="message_err_login">Неверный login</string>
-    <string name="message_err_net">Нет сети</string>
-    <string name="message_err_connect">Невозможно подключиться к серверу</string>
-    <string name="message_api_err_login">Пользователь с таким логином уже существует</string>
-    <string name="message_api_err_mail">Пользователь с такой почтой уже существует</string>
-    <string name="message_api_err_unknown">Неизвестная ошибка</string>
-    <string name="message_api_err_auth">"Неправильный логин или пароль"</string>
+    <string name="profile_menu_delete">Удалить</string>
+    <string name="profile_menu_edit">Редактировать</string>
 </resources>

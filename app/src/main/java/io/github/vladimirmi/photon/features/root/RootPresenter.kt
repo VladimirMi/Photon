@@ -2,8 +2,8 @@ package io.github.vladimirmi.photon.features.root
 
 import android.content.Context
 import android.support.annotation.StringRes
-import android.support.v4.view.ActionProvider
 import android.view.MenuItem
+import android.view.View
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.di.DaggerScope
 import mortar.Presenter
@@ -98,8 +98,11 @@ class ToolbarBuilder(val rootView: IRootView) {
 }
 
 class MenuItemHolder(val itemTitle: String = "",
-                     val iconResId: Int,
-                     val listener: MenuItem.OnMenuItemClickListener? = null,
-                     val actionProvider: ActionProvider? = null)
+                     val iconResId: Int? = null,
+                     val actionView: View? = null,
+                     val popupMenu: Int? = null,
+                     val actions: (MenuItem) -> Unit) {
+    fun hasPopupMenu() = popupMenu != null
+}
 
 
