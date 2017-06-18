@@ -28,14 +28,14 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                 R.id.logOut -> logout()
             }
         }
-
-        val menu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth else R.menu.submenu_main_screen_not_auth
+        val loginMenu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth
+        else R.menu.submenu_main_screen_not_auth
 
         rootPresenter.getNewToolbarBuilder()
                 .addAction(MenuItemHolder("Search", R.drawable.ic_action_search,
                         actions = { Flow.get(view).set(SearchScreen()) }))
                 .addAction(MenuItemHolder("Login", R.drawable.ic_action_settings,
-                        popupMenu = menu,
+                        popupMenu = loginMenu,
                         actions = actions))
                 .build()
     }
@@ -51,9 +51,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     fun register(req: SignUpReq) {
-        model.register(req)
-                .doOnSubscribe { rootPresenter.showLoading() }
-                .doAfterTerminate { rootPresenter.hideLoading() }
+        compDisp.add(rootPresenter.register(req)
                 .subscribe({}, {
                     // onError
                     if (it is ApiError) view.showMessage(it.errorResId)
@@ -61,11 +59,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                     //onComplete
                     view.closeRegistrationDialog()
                     initToolbar()
-                })
+                }))
     }
 
     fun login(req: SignInReq) {
-        model.login(req)
+        compDisp.add(rootPresenter.login(req)
                 .doOnSubscribe { rootPresenter.showLoading() }
                 .doAfterTerminate { rootPresenter.hideLoading() }
                 .subscribe({}, {
@@ -80,11 +78,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                     //onComplete
                     view.closeLoginDialog()
                     initToolbar()
-                })
+                }))
     }
 
     fun logout() {
-        model.logout()
+        rootPresenter.logout()
         initToolbar()
     }
 }

@@ -38,7 +38,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     private fun handleError(error: Throwable) {
         Timber.e(error.message)
         if (error is ConnectException) {
-            rootPresenter.showMessage(view.context.getString(R.string.message_err_connect))
+            view.showMessage(R.string.message_err_connect)
             openMainScreen()
         }
     }

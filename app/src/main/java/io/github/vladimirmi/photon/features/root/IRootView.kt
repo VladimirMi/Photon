@@ -1,6 +1,5 @@
 package io.github.vladimirmi.photon.features.root
 
-import android.support.annotation.StringRes
 import io.github.vladimirmi.photon.core.IView
 
 
@@ -13,10 +12,5 @@ interface IRootView : IView, IRootBuilder {
     fun showLoading()
 
     fun hideLoading()
-
-    fun showMessage(@StringRes stringId: Int)
-
-    fun showMessage(string: String)
-
 }
 

@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.core
 
 import android.content.Context
+import android.support.design.widget.Snackbar
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import io.github.vladimirmi.photon.flow.FlowLifecycles
@@ -46,5 +47,13 @@ abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
         presenter.dropView(this as V)
         Timber.tag(javaClass.simpleName)
         Timber.d("onViewDestroyed by Flow $removedByFlow")
+    }
+
+    override fun showMessage(string: String) {
+        Snackbar.make(this, string, Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun showMessage(stringId: Int) {
+        Snackbar.make(this, stringId, Snackbar.LENGTH_LONG).show()
     }
 }

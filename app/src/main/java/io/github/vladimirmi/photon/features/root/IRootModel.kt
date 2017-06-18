@@ -1,6 +1,9 @@
 package io.github.vladimirmi.photon.features.root
 
 import io.github.vladimirmi.photon.core.IModel
+import io.github.vladimirmi.photon.data.models.SignInReq
+import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.User
 import io.reactivex.Observable
 
 /**
@@ -10,4 +13,7 @@ import io.reactivex.Observable
 interface IRootModel : IModel {
     fun updatePhotoCards(): Observable<Int>
     fun isUserAuth(): Boolean
+    fun logout()
+    fun login(req: SignInReq): Observable<User>
+    fun register(req: SignUpReq): Observable<User>
 }

@@ -66,8 +66,4 @@ open class ValidationDialog(val layoutId: Int, val viewGroup: ViewGroup) {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-
-    fun showMessage(errorResId: Int) {
-        Snackbar.make(viewGroup, errorResId, Snackbar.LENGTH_LONG).show()
-    }
 }

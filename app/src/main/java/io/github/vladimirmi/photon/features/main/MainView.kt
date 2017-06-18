@@ -54,11 +54,6 @@ class MainView(context: Context, attrs: AttributeSet) :
 
     fun closeLoginDialog() = loginDialog.dialog.cancel()
 
-    fun showMessage(errorResId: Int) {
-        if (registrationDialog.dialog.isShowing) registrationDialog.showMessage(errorResId) else
-            loginDialog.showMessage(errorResId)
-    }
-
     private fun register(req: SignUpReq) = presenter.register(req)
     private fun login(req: SignInReq) = presenter.login(req)
 }

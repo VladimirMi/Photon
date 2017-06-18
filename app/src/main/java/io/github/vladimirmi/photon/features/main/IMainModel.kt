@@ -2,9 +2,6 @@ package io.github.vladimirmi.photon.features.main
 
 import io.github.vladimirmi.photon.core.IModel
 import io.github.vladimirmi.photon.data.models.Photocard
-import io.github.vladimirmi.photon.data.models.SignInReq
-import io.github.vladimirmi.photon.data.models.SignUpReq
-import io.github.vladimirmi.photon.data.models.User
 import io.github.vladimirmi.photon.features.search.SearchView
 import io.reactivex.Observable
 
@@ -17,7 +14,4 @@ interface IMainModel : IModel {
     fun getPhotoCards(): Observable<List<Photocard>>
     val searchQuery: HashMap<String, MutableList<String>>
     fun makeQuery(searchQuery: HashMap<String, MutableList<String>>, currentPage: SearchView.Page)
-    fun register(req: SignUpReq): Observable<User>
-    fun login(req: SignInReq): Observable<User>
-    fun logout()
 }

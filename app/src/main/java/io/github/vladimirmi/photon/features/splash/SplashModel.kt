@@ -18,7 +18,6 @@ class SplashModel(private val dataManager: DataManager, private val rootModel: I
                 rootModel.updatePhotoCards()
                         .doOnComplete { Timber.e("update complete") }
                         .filter { i -> i < limit })
-                .doOnNext { Timber.e("next") }
                 .doOnComplete { Timber.e("load complete") }
     }
 }

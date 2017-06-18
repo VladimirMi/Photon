@@ -164,32 +164,9 @@ class RootActivity : FlowActivity(), IRootView {
             for (menuItemHolder in actionBarMenuItems) {
                 val item = menu.add(menuItemHolder.itemTitle)
                 if (menuItemHolder.hasPopupMenu()) {
-                    var actionView: View
-                    if (menuItemHolder.actionView == null) {
-                        actionView = LayoutInflater.from(this).inflate(R.layout.view_menu_item, toolbar, false)
-                    } else {
-                        actionView = menuItemHolder.actionView
-                    }
-                    actionView.icon.setImageDrawable(ContextCompat.getDrawable(this, menuItemHolder.iconResId as Int))
-                    item.actionView = actionView
-
-                    val popup = PopupMenu(this, actionView)
-                    popup.inflate(menuItemHolder.popupMenu!!)
-                    popup.setOnMenuItemClickListener {
-                        kotlin.run {
-                            menuItemHolder.actions(it)
-                            return@run true
-                        }
-                    }
-                    val menuHelper = MenuPopupHelper(this, popup.menu as MenuBuilder,
-                            toolbar)
-                    if (popup.menu.getItem(0).icon != null) {
-                        menuHelper.setForceShowIcon(true)
-                    }
-                    menuHelper.setAnchorView(actionView)
-                    actionView.setOnClickListener { menuHelper.show(0, -actionView.height) }
+                    configurePopupFor(item, menuItemHolder)
                 } else {
-                    item.setIcon(menuItemHolder.iconResId!!)
+                    item.setIcon(menuItemHolder.iconResId)
                     item.setOnMenuItemClickListener {
                         kotlin.run {
                             menuItemHolder.actions(it)
@@ -203,6 +180,31 @@ class RootActivity : FlowActivity(), IRootView {
             menu.clear()
         }
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun configurePopupFor(item: MenuItem, menuItemHolder: MenuItemHolder) {
+        val actionView: View
+        if (menuItemHolder.actionView == null) {
+            actionView = LayoutInflater.from(this).inflate(R.layout.view_menu_item, toolbar, false)
+        } else {
+            actionView = menuItemHolder.actionView
+        }
+        actionView.icon.setImageDrawable(ContextCompat.getDrawable(this, menuItemHolder.iconResId))
+        item.actionView = actionView
+
+        val popup = PopupMenu(this, actionView)
+        popup.inflate(menuItemHolder.popupMenu!!)
+        popup.setOnMenuItemClickListener {
+            kotlin.run {
+                menuItemHolder.actions(it)
+                return@run true
+            }
+        }
+        val menuHelper = MenuPopupHelper(this, popup.menu as MenuBuilder, actionView)
+        (0..popup.menu.size() - 1).asSequence()
+                .filter { popup.menu.getItem(it).icon != null }
+                .forEach { menuHelper.setForceShowIcon(true); return@forEach }
+        actionView.setOnClickListener { menuHelper.show(0, -actionView.height) }
     }
 
     override fun setBackground(backgroundId: Int) {
