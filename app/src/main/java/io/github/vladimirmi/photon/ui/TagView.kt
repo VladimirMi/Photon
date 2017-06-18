@@ -2,6 +2,7 @@ package io.github.vladimirmi.photon.ui
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
+import android.util.TypedValue
 import android.view.ViewGroup
 import android.widget.TextView
 import com.google.android.flexbox.FlexboxLayout
@@ -22,8 +23,9 @@ class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
                 run(action)
             })
         }
-        val padding: Int = (getDensity(context) * 4).toInt()
+        val padding: Int = (getDensity(context) * 8).toInt()
         setPadding(padding, padding, padding, padding)
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         text = "#" + tag
         id = tag.hashCode()
         setupView()
@@ -31,7 +33,7 @@ class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
         if (params is FlexboxLayout.LayoutParams) {
-            val margin: Int = (getDensity(context) * 4).toInt()
+            val margin: Int = (getDensity(context) * 6).toInt()
             params.setMargins(margin, margin, margin, margin)
         }
         super.setLayoutParams(params)

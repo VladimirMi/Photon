@@ -8,7 +8,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.ui.getDisplayMetrics
 import io.github.vladimirmi.photon.ui.setImage
-import kotlinx.android.synthetic.main.item_card.view.*
+import kotlinx.android.synthetic.main.item_photocard.view.*
 import java.util.*
 
 /**
@@ -26,7 +26,7 @@ class MainAdapter(val cardAction: (Photocard) -> Unit) : RecyclerView.Adapter<Ca
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.item_card, parent, false)
+        val view = inflater.inflate(R.layout.item_photocard, parent, false)
         val lp = view.layoutParams
         lp.width = getDisplayMetrics(parent.context).widthPixels / 2
         lp.height = lp.width

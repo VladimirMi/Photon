@@ -2,10 +2,10 @@
 
 <io.github.vladimirmi.photon.features.photocard.PhotocardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:ignore="RtlHardcoded, ContentDescription, RtlSymmetry"
     >
 
     <ScrollView
@@ -17,120 +17,113 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            tools:ignore="RtlHardcoded, ContentDescription"
             >
 
             <FrameLayout
                 android:id="@+id/photo_wrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
                 >
 
                 <ImageView
                     android:id="@+id/photo"
                     android:layout_width="match_parent"
                     android:layout_height="280dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/splash"
+                    tools:src="@drawable/splash"
                     />
 
                 <TextView
                     android:id="@+id/card_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_marginBottom="28dp"
-                    android:layout_marginLeft="16dp"
+                    android:gravity="bottom"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:paddingBottom="28dp"
+                    android:background="@drawable/card_gradient"
+                    android:paddingLeft="16dp"
                     android:textSize="16sp"
-                    android:textStyle="bold"
                     tools:text="Черный чай с печеньем макарон"
+                    style="@style/CustomText.White"
                     />
 
             </FrameLayout>
 
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/info"
+            <RelativeLayout
+                android:id="@+id/author_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/photo_wrapper"
-                android:paddingRight="24dp"
-                android:paddingLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginBottom="18dp"
                 >
 
                 <ImageView
-                    android:id="@+id/avatar"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    android:id="@+id/user_avatar"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerVertical="true"
                     tools:src="@color/color_accent"
                     />
 
                 <TextView
-                    android:id="@+id/login"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="0dp"
-                    app:layout_constraintLeft_toRightOf="@+id/avatar"
-                    app:layout_constraintTop_toTopOf="@+id/avatar"
+                    android:id="@+id/user_name"
+                    style="@style/CustomText.Black"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="14dp"
+                    android:layout_toRightOf="@id/user_avatar"
                     tools:text="Хелена Марчиано"
                     />
 
                 <TextView
                     android:id="@+id/album"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginTop="6dp"
+                    style="@style/CustomText.Black"
+                    android:layout_alignStart="@+id/user_name"
+                    android:layout_below="@id/user_name"
+                    android:layout_marginBottom="4dp"
                     android:fontFamily="sans-serif-light"
                     android:text="@string/photocard_album"
-                    app:layout_constraintLeft_toLeftOf="@+id/login"
-                    app:layout_constraintTop_toBottomOf="@+id/login"
                     />
 
                 <TextView
                     android:id="@+id/card"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/CustomText.Black"
+                    android:layout_below="@id/user_name"
                     android:layout_marginLeft="12dp"
-                    android:layout_marginTop="6dp"
+                    android:layout_toRightOf="@id/album"
                     android:fontFamily="sans-serif-light"
                     android:text="@string/photocard_card"
-                    app:layout_constraintLeft_toRightOf="@+id/album"
-                    app:layout_constraintTop_toBottomOf="@+id/login"
                     />
 
                 <TextView
-                    android:id="@+id/album_num"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginTop="8dp"
+                    android:id="@+id/album_count"
+                    style="@style/CustomText.Black"
+                    android:layout_alignStart="@+id/user_name"
+                    android:layout_below="@id/album"
                     android:fontFamily="sans-serif-medium"
-                    app:layout_constraintLeft_toLeftOf="@+id/album"
-                    app:layout_constraintTop_toBottomOf="@+id/album"
+                    android:textSize="16sp"
                     tools:text="9"
                     />
 
                 <TextView
-                    android:id="@+id/card_num"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginTop="8dp"
+                    android:id="@+id/card_count"
+                    style="@style/CustomText.Black"
+                    android:layout_alignStart="@+id/card"
+                    android:layout_below="@id/album"
                     android:fontFamily="sans-serif-medium"
-                    app:layout_constraintLeft_toLeftOf="@+id/card"
-                    app:layout_constraintTop_toBottomOf="@+id/card"
+                    android:textSize="16sp"
                     tools:text="22"
                     />
-            </android.support.constraint.ConstraintLayout>
+            </RelativeLayout>
 
             <FrameLayout
                 android:id="@+id/photocard_tags_wrapper"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/info"
-                android:padding="12dp"
+                android:layout_below="@+id/author_info"
+                android:layout_marginLeft="18dp"
+                android:layout_marginRight="18dp"
+                android:layout_marginBottom="18dp"
                 />
 
         </RelativeLayout>

@@ -36,22 +36,22 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
     }
 
     fun setUser(user: User) {
-        setRoundAvatarWithBorder(user.avatar, avatar, 0f)
-        login.text = user.name
-        album_num.text = user.albumCount.toString()
-        card_num.text = user.photocardCount.toString()
+        setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
+        user_name.text = user.name
+        album_count.text = user.albumCount.toString()
+        card_count.text = user.photocardCount.toString()
     }
 
     fun setPhotoCard(photocard: Photocard) {
         setImage(photocard.photo, photo)
         card_name.text = photocard.title
-        val tagsContainer = LayoutInflater.from(context).inflate(R.layout.view_search_tags, photocard_tags_wrapper, false)
-        tagsContainer as ViewGroup
+        val flexbox = LayoutInflater.from(context).inflate(R.layout.view_search_tags, this, false)
+        flexbox as ViewGroup
         photocard.tags.forEach {
             val tag = TagView(context, it.tag, null)
-            tagsContainer.addView(tag)
+            flexbox.addView(tag)
         }
-        photocard_tags_wrapper.addView(tagsContainer)
+        photocard_tags_wrapper.addView(flexbox)
     }
 }
 

@@ -48,6 +48,8 @@ class AlbumViewHolder(itemView: View, val albumAction: (Album) -> Unit)
     : RecyclerView.ViewHolder(itemView) {
 
     fun bind(album: Album) {
+        itemView.album_name.text = album.title
+        itemView.card_count.text = album.photocards.size.toString()
         itemView.likes.text = album.favorits.toString()
         itemView.views.text = album.views.toString()
         itemView.preview.setOnClickListener { albumAction(album) }

@@ -75,7 +75,7 @@
     <string name="photocard_album">Альбомы</string>
     <string name="photocard_card">Карты</string>
 
-    <string name="profile_message_not_auth">Авторизуйтесь, чтобы посмотреть данные профиля</string>
+    <string name="profile_message_not_auth">Авторизуйтесь,\n чтобы посмотреть\n данные профиля</string>
     <string name="message_err_email">Неверный email</string>
     <string name="message_err_password">Неверный пароль</string>
     <string name="message_err_name">Неверное имя</string>

@@ -15,47 +15,45 @@
         tools:src="@drawable/splash"
         />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@drawable/album_gradient"
         android:padding="16dp"
         >
 
         <TextView
             android:id="@+id/album_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Избранное"
-            android:layout_marginBottom="12dp"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Карты"
+            style="@style/CustomText.White"
+            android:layout_alignParentTop="true"
             android:layout_marginBottom="8dp"
-            android:textColor="@color/white"
+            android:textSize="16sp"
+            tools:text="Избранное"
             />
 
         <TextView
-            android:id="@+id/card_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="16sp"
+            android:id="@+id/card"
+            style="@style/CustomText.White"
+            android:layout_below="@id/album_name"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/photocard_card"
+            />
+
+        <TextView
+            android:id="@+id/card_count"
+            style="@style/CustomText.White"
+            android:layout_below="@id/card"
             android:fontFamily="sans-serif-medium"
+            android:textSize="16sp"
             tools:text="7"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:gravity="bottom"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             >
 
@@ -68,12 +66,9 @@
 
             <TextView
                 android:id="@+id/likes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/CustomText.White"
                 android:layout_marginLeft="16dp"
-                android:textColor="@android:color/white"
                 android:textSize="12sp"
-                android:textStyle="bold"
                 tools:text="73"
                 />
 
@@ -87,15 +82,12 @@
 
             <TextView
                 android:id="@+id/views"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/CustomText.White"
                 android:layout_marginLeft="16dp"
-                android:textColor="@android:color/white"
                 android:textSize="12sp"
-                android:textStyle="bold"
                 tools:text="73"
                 />
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
 </FrameLayout>

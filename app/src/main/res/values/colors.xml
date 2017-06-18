@@ -10,6 +10,7 @@
     <color name="grey_dark">#212121</color>
     <color name="error">#A20707</color>
     <color name="text_color">#151515</color>
+    <color name="text_color_grey">#666666</color>
 
     <color name="transparent">#00FFFFFF</color>
     <color name="red">#f66156</color>

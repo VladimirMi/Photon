@@ -36,8 +36,8 @@ class MainView(context: Context, attrs: AttributeSet) :
     }
 
     override fun initView() {
-        recycler_view.layoutManager = GridLayoutManager(context, 2)
-        recycler_view.adapter = adapter
+        photocard_list.layoutManager = GridLayoutManager(context, 2)
+        photocard_list.adapter = adapter
     }
 
     override fun onBackPressed(): Boolean = false

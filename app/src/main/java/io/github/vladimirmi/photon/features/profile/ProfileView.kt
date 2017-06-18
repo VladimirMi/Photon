@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.features.profile
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
@@ -44,13 +45,14 @@ class ProfileView(context: Context, attrs: AttributeSet)
         profile_view.visibility = VISIBLE
     }
 
+    @SuppressLint("SetTextI18n")
     fun setProfile(user: User) {
         Timber.e(user.name)
-        profile_login.text = user.login
-        profile_name.text = user.name
-        album_num.text = user.albumCount.toString()
-        card_num.text = user.photocardCount.toString()
-        setRoundAvatarWithBorder(user.avatar, profile_avatar, 0f)
+        user_login.text = user.login
+        user_name.text = "/  " + user.name
+        album_count.text = user.albumCount.toString()
+        card_count.text = user.photocardCount.toString()
+        setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
         adapter.updateData(user.albums)
     }
 

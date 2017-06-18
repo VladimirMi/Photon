@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:ignore="ContentDescription"
+    tools:ignore="ContentDescription, RtlHardcoded"
     >
 
     <RelativeLayout
@@ -22,7 +22,6 @@
             android:padding="16dp"
             >
 
-
             <EditText
                 android:id="@+id/search_field"
                 android:layout_width="0dp"
@@ -31,6 +30,7 @@
                 android:background="@color/transparent"
                 android:hint="@string/search_search"
                 android:textColorHint="@android:color/black"
+                android:textSize="16sp"
                 />
 
             <ImageView
@@ -82,11 +82,36 @@
 
 
         <ScrollView
-            android:id="@+id/tags_wrapper"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/recent_search_wrapper"
-            />
+            >
+
+            <LinearLayout
+                android:id="@+id/tags_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
+                android:paddingTop="18dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="18dp"
+                >
+
+                <TextView
+                    style="@style/CustomText.Black"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_marginBottom="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/search_tags"
+                    android:textSize="16sp"
+                    />
+
+            </LinearLayout>
+
+        </ScrollView>
 
     </RelativeLayout>
 </io.github.vladimirmi.photon.features.search.tags.SearchTagView>

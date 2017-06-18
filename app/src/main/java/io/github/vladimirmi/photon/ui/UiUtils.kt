@@ -15,7 +15,7 @@ import io.github.vladimirmi.photon.R
 fun setImage(path: String, view: ImageView) {
     Glide.with(view.context)
             .load(path)
-            .fitCenter()
+            .centerCrop()
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.RESULT)
             .placeholder(R.drawable.ic_image_placeholder)

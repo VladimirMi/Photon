@@ -5,7 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import com.google.android.flexbox.FlexboxLayout
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.Search
@@ -44,15 +44,15 @@ class SearchTagView(context: Context, attrs: AttributeSet)
     private val tagAction: (TagView) -> Unit = { select(it) }
 
     fun addTags(tags: List<Tag>, query: HashMap<String, MutableList<String>>) {
-        val tagsContainer = LayoutInflater.from(context).inflate(R.layout.view_search_tags, tags_wrapper, false)
-        tagsContainer as ViewGroup
+        val flexbox = LayoutInflater.from(context).inflate(R.layout.view_search_tags, tags_wrapper, false)
+        flexbox as FlexboxLayout
         val queryTags = query["tags"]
         tags.forEach {
             val view = TagView(context, it.tag, tagAction)
             if (queryTags?.contains(it.tag) ?: false) view.pick()
-            tagsContainer.addView(view)
+            flexbox.addView(view)
         }
-        tags_wrapper.addView(tagsContainer)
+        tags_wrapper.addView(flexbox)
     }
 
     private fun select(tagView: TagView) {
