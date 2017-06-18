@@ -9,7 +9,6 @@
     >
 
     <RelativeLayout
-        android:id="@+id/profile_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
@@ -17,7 +16,7 @@
         >
 
         <ImageView
-            android:id="@+id/author_avatar"
+            android:id="@+id/profile_avatar"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_centerVertical="true"
@@ -25,22 +24,22 @@
             />
 
         <TextView
-            android:id="@+id/author_nickname"
+            android:id="@+id/profile_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
             android:layout_marginLeft="12dp"
-            android:layout_toRightOf="@id/author_avatar"
+            android:layout_toRightOf="@id/avatar"
             tools:text="rufus21"
             />
 
         <TextView
-            android:id="@+id/author_name"
+            android:id="@+id/profile_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
             android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/author_nickname"
+            android:layout_toRightOf="@id/login"
             android:fontFamily="sans-serif-light"
             tools:text="/  Руфус Данн"
             />
@@ -49,8 +48,8 @@
             android:id="@+id/album"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/author_nickname"
-            android:layout_below="@id/author_nickname"
+            android:layout_alignStart="@+id/profile_login"
+            android:layout_below="@id/login"
             android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-light"
             android:text="@string/photocard_album"
@@ -60,7 +59,7 @@
             android:id="@+id/card"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/author_nickname"
+            android:layout_below="@id/login"
             android:layout_marginLeft="12dp"
             android:layout_toRightOf="@id/album"
             android:fontFamily="sans-serif-light"
@@ -71,7 +70,7 @@
             android:id="@+id/album_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/author_nickname"
+            android:layout_alignStart="@+id/profile_login"
             android:layout_below="@id/album"
             android:fontFamily="sans-serif-medium"
             tools:text="9"

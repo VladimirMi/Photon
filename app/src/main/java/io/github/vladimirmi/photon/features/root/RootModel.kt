@@ -4,7 +4,6 @@ import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 /**
@@ -39,7 +38,6 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
         var count = 0
         return Observable.fromIterable(photocards)
                 .doOnNext {
-                    Timber.e("save $it")
                     dataManager.saveToDB(it.withId())
                 }
                 .flatMap { Observable.just(++count) }

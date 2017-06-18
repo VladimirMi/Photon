@@ -20,6 +20,9 @@ class ProfileModel(private val dataManager: DataManager) : IProfileModel {
     private fun updateUser(id: String) {
         dataManager.getUserFromNet(id)
                 .subscribeOn(Schedulers.io())
-                .subscribe { dataManager.saveToDB(it) }
+                .subscribe {
+                    it.id = id  //todo workaround on miss id in response
+                    dataManager.saveToDB(it)
+                }
     }
 }

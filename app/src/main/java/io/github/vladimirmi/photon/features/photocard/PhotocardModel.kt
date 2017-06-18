@@ -20,7 +20,10 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
     private fun updateUser(id: String) {
         dataManager.getUserFromNet(id)
                 .subscribeOn(Schedulers.io())
-                .subscribe { dataManager.saveToDB(it) }
+                .subscribe {
+                    it.id = id  //todo workaround on miss id in response
+                    dataManager.saveToDB(it)
+                }
     }
 
     override fun getPhotocard(id: String, ownerId: String): Observable<Photocard> {

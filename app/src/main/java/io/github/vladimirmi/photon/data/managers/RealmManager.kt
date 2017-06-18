@@ -29,7 +29,7 @@ class RealmManager {
                 .filter { it.isLoaded }
                 .filter { it.isValid }
                 .map { realm.copyFromRealm(it) }
-                .doAfterTerminate { realm.close() }
+                .doFinally { realm.close() }
     }
 
     fun <T : RealmObject> getList(clazz: Class<T>, sortBy: String, order: Sort): Observable<List<T>> {
@@ -40,7 +40,7 @@ class RealmManager {
                 .sort(sortBy, order))
                 .filter { it.isLoaded }
                 .map { realm.copyFromRealm(it) }
-                .doAfterTerminate { realm.close() }
+                .doFinally { realm.close() }
     }
 }
 

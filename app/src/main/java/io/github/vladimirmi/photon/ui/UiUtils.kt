@@ -18,6 +18,7 @@ fun setImage(path: String, view: ImageView) {
             .fitCenter()
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.RESULT)
+            .placeholder(R.drawable.ic_image_placeholder)
             .into(view)
 }
 

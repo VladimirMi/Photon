@@ -15,7 +15,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             tools:ignore="RtlHardcoded, ContentDescription"
             >
@@ -59,20 +59,20 @@
                 >
 
                 <ImageView
-                    android:id="@+id/author_avatar"
+                    android:id="@+id/avatar"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     tools:src="@color/color_accent"
                     />
 
                 <TextView
-                    android:id="@+id/author_nickname"
+                    android:id="@+id/login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="0dp"
-                    app:layout_constraintLeft_toRightOf="@+id/author_avatar"
-                    app:layout_constraintTop_toTopOf="@+id/author_avatar"
+                    app:layout_constraintLeft_toRightOf="@+id/avatar"
+                    app:layout_constraintTop_toTopOf="@+id/avatar"
                     tools:text="Хелена Марчиано"
                     />
 
@@ -84,8 +84,8 @@
                     android:layout_marginTop="6dp"
                     android:fontFamily="sans-serif-light"
                     android:text="@string/photocard_album"
-                    app:layout_constraintLeft_toLeftOf="@+id/author_nickname"
-                    app:layout_constraintTop_toBottomOf="@+id/author_nickname"
+                    app:layout_constraintLeft_toLeftOf="@+id/login"
+                    app:layout_constraintTop_toBottomOf="@+id/login"
                     />
 
                 <TextView
@@ -97,7 +97,7 @@
                     android:fontFamily="sans-serif-light"
                     android:text="@string/photocard_card"
                     app:layout_constraintLeft_toRightOf="@+id/album"
-                    app:layout_constraintTop_toBottomOf="@+id/author_nickname"
+                    app:layout_constraintTop_toBottomOf="@+id/login"
                     />
 
                 <TextView
