@@ -7,6 +7,7 @@ import flow.Flow
 import flow.History
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.features.main.MainScreen
+import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.profile.ProfileScreen
 import io.github.vladimirmi.photon.flow.BottomNavDispatcher.BottomItem.*
 
@@ -31,7 +32,7 @@ class BottomNavDispatcher(private val flowInstance: Flow) : BottomNavigationView
 
     val historyMap = hashMapOf(MAIN to History.single(MainScreen()),
             PROFILE to History.single(ProfileScreen()),
-            LOAD to History.single(ProfileScreen())) //todo stab
+            LOAD to History.single(NewCardScreen()))
 
 
     fun dispatch(from: BottomItem, to: BottomItem) {

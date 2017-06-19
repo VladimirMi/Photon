@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.github.vladimirmi.photon.features.newcard.NewCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <include
+        layout="@layout/view_load"
+        android:visibility="gone"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <include layout="@layout/view_new_card"/>
+    </ScrollView>
+
+
+</io.github.vladimirmi.photon.features.newcard.NewCardView>

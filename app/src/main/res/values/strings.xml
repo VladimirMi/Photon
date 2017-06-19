@@ -17,6 +17,8 @@
     <string name="button_cancel">Отмена</string>
     <string name="button_registration">Регистрация</string>
     <string name="button_login">Вход</string>
+    <string name="button_choose">Выбрать фото</string>
+    <string name="button_save">Сохранить</string>
 
     <string name="dialog_registration">Регистрация</string>
     <string name="dialog_enter">Вход в аккаунт</string>
@@ -87,7 +89,15 @@
     <string name="photocard_album">Альбомы</string>
     <string name="photocard_card">Карты</string>
 
-    <string name="profile_message_not_auth">Авторизуйтесь,\n чтобы посмотреть\n данные профиля</string>
+    <string name="profile_not_auth">Авторизуйтесь,\nчтобы посмотреть\nданные профиля</string>
     <string name="profile_menu_delete">Удалить</string>
     <string name="profile_menu_edit">Редактировать</string>
+
+    <string name="newcard_choose">Выберите фотокарточку\nиз галлереи и добавьте\nк вашим альбомам</string>
+    <string name="newcard_name_hint">Название фотографии</string>
+    <string name="newcard_name_title">Укажите название фотографии</string>
+    <string name="newcard_tag_title">Укажите теги</string>
+    <string name="newcard_tag_hint">Имя тега</string>
+    <string name="newcard_param_title">Укажите параметры фотографии</string>
+    <string name="newcard_album_title">Выберите альбом</string>
 </resources>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+    >
+
+    <include layout="@layout/view_new_card_name"/>
+
+    <TextView
+        style="@style/CustomText.Black.Title"
+        android:text="@string/newcard_param_title"
+        />
+
+    <include layout="@layout/view_filters_dishes"/>
+
+    <include layout="@layout/view_filters_nuances"/>
+
+    <include layout="@layout/view_filters_decor"/>
+
+    <include layout="@layout/view_filters_temp"/>
+
+    <include layout="@layout/view_filters_light"/>
+
+    <include layout="@layout/view_filters_light_dir"/>
+
+    <include layout="@layout/view_filters_light_src"/>
+
+    <include layout="@layout/view_new_card_tags"/>
+
+    <TextView
+        style="@style/CustomText.Black.Title"
+        android:text="@string/newcard_album_title"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/album_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="58dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:layout_gravity="center_horizontal"
+        tools:ignore="ButtonStyle"
+        >
+
+        <Button
+            android:id="@+id/save"
+            android:layout_width="140dp"
+            android:layout_height="match_parent"
+            android:text="@string/button_save"
+            android:theme="@style/GreyDarkButton"
+            />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="140dp"
+            android:layout_height="match_parent"
+            android:text="@string/button_cancel"
+            android:theme="@style/GreyDarkButton"
+            />
+    </LinearLayout>
+
+
+</LinearLayout>
