@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="FilterElementView">
         <attr name="solidColor" format="color"/>
+        <attr name="radioMode" format="boolean"/>
     </declare-styleable>
 </resources>

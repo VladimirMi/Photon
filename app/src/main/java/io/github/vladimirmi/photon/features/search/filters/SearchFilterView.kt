@@ -34,8 +34,8 @@ class SearchFilterView(context: Context, attrs: AttributeSet) :
         when (view) {
             is FilterElementView -> result.add(view)
             is ViewGroup -> {
-                for (idx in 1..view.childCount) {
-                    result.addAll(findAllFilters(view.getChildAt(idx - 1)))
+                for (idx in 0..view.childCount - 1) {
+                    result.addAll(findAllFilters(view.getChildAt(idx)))
                 }
             }
         }
@@ -43,12 +43,18 @@ class SearchFilterView(context: Context, attrs: AttributeSet) :
     }
 
     private fun select(filterElement: FilterElementView) {
-        presenter.addQuery(filterElement.query)
+        if (filterElement.picked) {
+            presenter.addFilter(filterElement.filter)
+        } else {
+            presenter.removeFilter(filterElement.filter)
+        }
     }
 
-    fun restoreStateFromQuery(query: HashMap<String, MutableList<String>>) {
-        filterElements.forEach { view ->
-            query[view.query.first]?.forEach { value -> if (value == view.query.second) view.pick() }
+    fun restoreFilterState(filters: HashMap<String, MutableList<String>>) {
+        for (view in filterElements) {
+            filters[view.filter.first]?.forEach {
+                if (it == view.filter.second) view.pick()
+            }
         }
     }
 }

@@ -49,6 +49,5 @@ class NewCardScreen : BaseScreen<RootActivityComponent>() {
 
         fun inject(newCardView: NewCardView)
     }
-
     //endregion
 }

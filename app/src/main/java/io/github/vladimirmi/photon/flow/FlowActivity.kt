@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import flow.Flow
 import io.github.vladimirmi.photon.di.DaggerService
 import mortar.bundler.BundleServiceRunner
+import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -54,6 +55,8 @@ abstract class FlowActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
+        Timber.e("onStop")
+        dispatcher.onStop()
         dispatcher.onViewDestroyed(false)
         super.onStop()
     }

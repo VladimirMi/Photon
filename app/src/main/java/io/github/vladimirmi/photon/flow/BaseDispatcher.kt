@@ -13,7 +13,7 @@ import flow.*
 abstract class BaseDispatcher(val baseContext: Context) : Dispatcher,
         FlowLifecycles.BackPressListener, FlowLifecycles.ActivityResultListener,
         FlowLifecycles.PermissionRequestListener, FlowLifecycles.ViewLifecycleListener,
-        FlowLifecycles.PreSaveViewStateListener {
+        FlowLifecycles.PreSaveViewStateListener, FlowLifecycles.StartStopListener {
 
     abstract override fun dispatch(traversal: Traversal, callback: TraversalCallback)
 
@@ -21,6 +21,14 @@ abstract class BaseDispatcher(val baseContext: Context) : Dispatcher,
 
     fun getActiveView(): View? {
         return viewContainer?.getChildAt(0)
+    }
+
+    override fun onStart() {
+        FlowLifecycleProvider.onStart(getActiveView() ?: return)
+    }
+
+    override fun onStop() {
+        FlowLifecycleProvider.onStop(getActiveView() ?: return)
     }
 
     override fun onViewRestored() {

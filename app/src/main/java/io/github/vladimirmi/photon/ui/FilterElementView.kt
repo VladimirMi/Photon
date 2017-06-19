@@ -18,18 +18,22 @@ import io.github.vladimirmi.photon.R
 
 class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(context, attrs) {
 
-    private var picked = false
+    var picked = false
+        private set
+    var radioMode: Boolean
     private val drawable: Drawable = DrawableCompat.wrap(compoundDrawables[1])
     private val colorAccent = ContextCompat.getColor(context, R.color.color_accent)
     private val colorGrey = ContextCompat.getColor(context, R.color.grey)
     private var color = colorGrey
-    val query get() = Pair((parent as ViewGroup).tag as String, tag as String)
+    val filter get() = Pair((parent as ViewGroup).tag as String, tag as String)
 
     init {
+        val a = context.theme.obtainStyledAttributes(attrs, R.styleable.FilterElementView, 0, 0)
+        val shapeColor = a.getColor(R.styleable.FilterElementView_solidColor, 0)
+        radioMode = a.getBoolean(R.styleable.FilterElementView_radioMode, false)
+        a.recycle()
+
         if (drawable is GradientDrawable) {
-            val a = context.theme.obtainStyledAttributes(attrs, R.styleable.FilterElementView, 0, 0)
-            val shapeColor = a.getColor(R.styleable.FilterElementView_solidColor, 0)
-            a.recycle()
             drawable.setColor(shapeColor)
         }
         setupDrawable(drawable)
@@ -58,12 +62,19 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
     fun pick() {
         picked = !picked
         setupDrawable(drawable)
+        if (radioMode && picked) {
+            val parent = parent as ViewGroup
+            (0..parent.childCount - 1)
+                    .map { parent.getChildAt(it) as FilterElementView }
+                    .filter { it.picked && it.tag != tag }
+                    .forEach { it.pick() }
+        }
     }
 
     fun setAction(filterAction: (FilterElementView) -> Unit) {
         setOnClickListener {
-            run(filterAction)
             pick()
+            run(filterAction)
         }
     }
 }

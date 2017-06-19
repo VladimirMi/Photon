@@ -14,10 +14,14 @@ class SearchFilterPresenter(model: ISearchModel, rootPresenter: RootPresenter,
     }
 
     override fun initView(view: SearchFilterView) {
-        view.restoreStateFromQuery(searchPresenter.getQuery())
+        view.restoreFilterState(searchPresenter.getQuery())
     }
 
-    fun addQuery(query: Pair<String, String>) {
+    fun addFilter(query: Pair<String, String>) {
         searchPresenter.addQuery(query)
+    }
+
+    fun removeFilter(query: Pair<String, String>) {
+
     }
 }
