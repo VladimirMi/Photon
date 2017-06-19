@@ -34,8 +34,6 @@ class ProfileView(context: Context, attrs: AttributeSet)
     val registrationDialog = RegistrationDialog(this, registrationAction)
     val loginDialog = LoginDialog(this, loginAction)
 
-    override fun onBackPressed() = false
-
     override fun initDagger(context: Context) {
         DaggerService.getComponent<ProfileScreen.Component>(context).inject(this)
     }
@@ -68,9 +66,7 @@ class ProfileView(context: Context, attrs: AttributeSet)
         adapter.updateData(user.albums)
     }
 
-    private fun showAlbum(album: Album) {
-        //TODO("not implemented")
-    }
+    private fun showAlbum(album: Album) = presenter.showAlbum(album)
 
     fun openRegistrationDialog() = registrationDialog.dialog.show()
 

@@ -1,11 +1,14 @@
 package io.github.vladimirmi.photon.features.profile
 
 import android.view.MenuItem
+import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
+import io.github.vladimirmi.photon.data.models.Album
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.network.ApiError
+import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.reactivex.disposables.Disposable
@@ -83,5 +86,6 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                 }))
     }
 
+    fun showAlbum(album: Album) = Flow.get(view).set(AlbumScreen(album))
 }
 

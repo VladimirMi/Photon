@@ -49,6 +49,8 @@ abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
         Timber.d("onViewDestroyed by Flow $removedByFlow")
     }
 
+    override fun onBackPressed(): Boolean = false
+
     override fun showMessage(string: String) {
         Snackbar.make(this, string, Snackbar.LENGTH_LONG).show()
     }

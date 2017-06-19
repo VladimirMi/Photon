@@ -18,8 +18,6 @@ class SearchFilterView(context: Context, attrs: AttributeSet) :
 
     lateinit var filterElements: List<FilterElementView>
 
-    override fun onBackPressed(): Boolean = false
-
     override fun initDagger(context: Context) {
         DaggerService.getComponent<SearchScreen.Component>(context).inject(this)
     }

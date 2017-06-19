@@ -25,14 +25,12 @@ class RegistrationDialog(viewGroup: ViewGroup, val registrationAction: (SignUpRe
         listenFields()
         cancel.setOnClickListener { dialog.cancel() }
         ok.setOnClickListener {
-            kotlin.run {
                 val request = SignUpReq(login = login.text.toString(),
                         email = email.text.toString(),
                         name = name.text.toString(),
                         password = password.text.toString()
                 )
                 registrationAction(request)
-            }
         }
     }
 

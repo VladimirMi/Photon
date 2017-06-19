@@ -23,7 +23,7 @@ class MainView(context: Context, attrs: AttributeSet) :
         BaseView<MainPresenter, MainView>(context, attrs) {
 
     val cardAction: (Photocard) -> Unit = { showPhotoCard(it) }
-    val adapter = MainAdapter(cardAction)
+    val adapter = CardAdapter(cardAction, true)
 
     val registrationAction: (SignUpReq) -> Unit = { register(it) }
     val loginAction: (SignInReq) -> Unit = { login(it) }
@@ -39,8 +39,6 @@ class MainView(context: Context, attrs: AttributeSet) :
         photocard_list.layoutManager = GridLayoutManager(context, 2)
         photocard_list.adapter = adapter
     }
-
-    override fun onBackPressed(): Boolean = false
 
     fun setData(data: List<Photocard>) = adapter.updateData(data)
 

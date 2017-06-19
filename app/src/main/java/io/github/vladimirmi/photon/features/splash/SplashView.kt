@@ -20,8 +20,4 @@ class SplashView(context: Context, attrs: AttributeSet) :
     override fun initView() {
         loading.show()
     }
-
-    override fun onBackPressed(): Boolean {
-        return false
-    }
 }

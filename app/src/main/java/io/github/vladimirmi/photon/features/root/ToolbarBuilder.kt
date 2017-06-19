@@ -6,7 +6,7 @@ import android.view.View
 import io.github.vladimirmi.photon.R
 import java.util.*
 
-class ToolbarBuilder(val rootView: IRootView) {
+class ToolbarBuilder(private val rootView: IRootView) {
     private var isToolbarVisible = true
     @StringRes private var toolbarTitleId = R.string.app_name
     private var bottomMenuEnabled = true

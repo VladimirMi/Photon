@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.github.vladimirmi.photon.features.album.AlbumView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            tools:ignore="RtlHardcoded"
+            >
+
+            <TextView
+                android:id="@+id/album_name"
+                style="@style/CustomText.Black"
+                android:layout_marginBottom="12dp"
+                android:layout_marginRight="24dp"
+                android:textSize="16sp"
+                tools:text="Закуски"
+                />
+
+            <TextView
+                android:id="@+id/card"
+                style="@style/CustomText.Black"
+                android:layout_below="@id/album_name"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/photocard_card"
+                />
+
+            <TextView
+                android:id="@+id/card_count"
+                style="@style/CustomText.Black"
+                android:layout_below="@id/card"
+                android:fontFamily="16sp"
+                tools:text="9"
+                />
+
+            <TextView
+                android:id="@+id/album_description"
+                style="@style/CustomText.Black"
+                android:layout_alignBaseline="@id/album_name"
+                android:layout_toRightOf="@id/album_name"
+                android:fontFamily="sans-serif-light"
+                android:lineSpacingMultiplier="1.1"
+                tools:text="Burguss observare, tanquam fortis solitudo. Nunquam fallere idoleum. Fiscinas favere!"
+                />
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/photocard_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+</io.github.vladimirmi.photon.features.album.AlbumView>
+

@@ -1,8 +1,10 @@
 package io.github.vladimirmi.photon.features.main
 
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.Photocard
@@ -15,9 +17,10 @@ import java.util.*
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class MainAdapter(val cardAction: (Photocard) -> Unit) : RecyclerView.Adapter<CardViewHolder>() {
+class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideInfo: Boolean = false)
+    : RecyclerView.Adapter<CardViewHolder>() {
 
-    var data: List<Photocard> = ArrayList()
+    private var data: List<Photocard> = ArrayList()
 
     fun updateData(data: List<Photocard>) {
         this.data = data
@@ -27,8 +30,10 @@ class MainAdapter(val cardAction: (Photocard) -> Unit) : RecyclerView.Adapter<Ca
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_photocard, parent, false)
+        if (hideInfo) view.info.visibility = GONE
         val lp = view.layoutParams
-        lp.width = getDisplayMetrics(parent.context).widthPixels / 2
+        val spanCount = (((parent as RecyclerView).layoutManager) as GridLayoutManager).spanCount
+        lp.width = getDisplayMetrics(parent.context).widthPixels / spanCount
         lp.height = lp.width
         view.layoutParams = lp
         return CardViewHolder(view, cardAction)

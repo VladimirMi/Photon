@@ -24,8 +24,6 @@ class SearchTagView(context: Context, attrs: AttributeSet)
 
     val searchAdapter = RecentSearchesAdapter()
 
-    override fun onBackPressed() = false
-
     override fun initDagger(context: Context) {
         DaggerService.getComponent<SearchScreen.Component>(context).inject(this)
     }
