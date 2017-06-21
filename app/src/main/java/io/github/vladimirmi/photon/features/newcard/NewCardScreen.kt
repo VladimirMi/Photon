@@ -1,5 +1,7 @@
 package io.github.vladimirmi.photon.features.newcard
 
+import android.os.Parcelable
+import android.util.SparseArray
 import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
@@ -13,6 +15,7 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
  */
 
 class NewCardScreen : BaseScreen<RootActivityComponent>() {
+    val state = SparseArray<Parcelable>()
     override val layoutResId = R.layout.screen_newcard
 
     //region =============== DI ==============

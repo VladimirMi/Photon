@@ -24,6 +24,7 @@
             android:drawableTop="@drawable/ic_light_dir_forward"
             android:text="@string/filters_light_dir_forward"
             android:tag="direct"
+            android:id="@+id/direct"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
@@ -31,6 +32,7 @@
             android:drawableTop="@drawable/ic_light_dir_back"
             android:text="@string/filters_light_dir_back"
             android:tag="backlight"
+            android:id="@+id/backlight"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
@@ -38,6 +40,7 @@
             android:drawableTop="@drawable/ic_light_dir_side"
             android:text="@string/filters_light_dir_side"
             android:tag="sideLight"
+            android:id="@+id/sideLight"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
@@ -45,6 +48,7 @@
             android:drawableTop="@drawable/ic_light_dir_mix"
             android:text="@string/filters_light_dir_mix"
             android:tag="mixed"
+            android:id="@+id/mixed"
             />
     </LinearLayout>
 </merge>

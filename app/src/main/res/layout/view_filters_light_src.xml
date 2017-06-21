@@ -23,6 +23,7 @@
             android:drawableTop="@drawable/ic_light_count_1"
             style="@style/FilterElement"
             android:tag="one"
+            android:id="@+id/one"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
@@ -30,6 +31,7 @@
             android:drawableTop="@drawable/ic_light_count_2"
             style="@style/FilterElement"
             android:tag="two"
+            android:id="@+id/two"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
@@ -37,6 +39,7 @@
             android:drawableTop="@drawable/ic_light_count_3"
             style="@style/FilterElement"
             android:tag="three"
+            android:id="@+id/three"
             />
     </LinearLayout>
 </merge>

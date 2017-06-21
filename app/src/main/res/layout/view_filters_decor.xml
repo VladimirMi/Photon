@@ -24,6 +24,7 @@
             android:drawableTop="@drawable/ic_decor_simple"
             style="@style/FilterElement"
             android:tag="simple"
+            android:id="@+id/simple"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
@@ -31,6 +32,7 @@
             android:drawableTop="@drawable/ic_decor_holiday"
             style="@style/FilterElement"
             android:tag="holiday"
+            android:id="@+id/holiday"
             />
     </LinearLayout>
 </merge>

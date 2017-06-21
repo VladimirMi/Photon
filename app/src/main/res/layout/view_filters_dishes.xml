@@ -1,71 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:tools="http://schemas.android.com/tools"
-       xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
        tools:showIn="@layout/view_filters"
     >
 
     <TextView
         style="@style/CustomText.Black"
         android:layout_gravity="center"
-        android:text="@string/filters_dish"
         android:layout_marginBottom="16dp"
+        android:text="@string/filters_dish"
         />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginBottom="24dp"
+        android:orientation="horizontal"
         android:tag="dish"
         >
 
         <io.github.vladimirmi.photon.ui.FilterElementView
-            android:text="@string/filters_dish_meat"
+            android:id="@+id/meat"
+            style="@style/FilterElement"
             android:drawableTop="@drawable/ic_dish_meat"
-            style="@style/FilterElement"
             android:tag="meat"
+            android:text="@string/filters_dish_meat"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
-            android:text="@string/filters_dish_fish"
+            android:id="@+id/fish"
+            style="@style/FilterElement"
             android:drawableTop="@drawable/ic_dish_fish"
-            style="@style/FilterElement"
             android:tag="fish"
+            android:text="@string/filters_dish_fish"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
-            android:text="@string/filters_dish_vegetable"
+            android:id="@+id/vegetables"
+            style="@style/FilterElement"
             android:drawableTop="@drawable/ic_dish_vegetables"
-            style="@style/FilterElement"
             android:tag="vegetables"
+            android:text="@string/filters_dish_vegetable"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
-            android:text="@string/filters_dish_fruit"
+            android:id="@+id/fruit"
+            style="@style/FilterElement"
             android:drawableTop="@drawable/ic_dish_fruit"
-            style="@style/FilterElement"
             android:tag="fruit"
+            android:text="@string/filters_dish_fruit"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
-            android:text="@string/filters_dish_cheese"
+            android:id="@+id/cheese"
+            style="@style/FilterElement"
             android:drawableTop="@drawable/ic_dish_cheese"
-            style="@style/FilterElement"
             android:tag="cheese"
+            android:text="@string/filters_dish_cheese"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
-            android:text="@string/filters_dish_dessert"
+            android:id="@+id/dessert"
+            style="@style/FilterElement"
             android:drawableTop="@drawable/ic_dish_desserts"
-            style="@style/FilterElement"
             android:tag="dessert"
+            android:text="@string/filters_dish_dessert"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
-            android:text="@string/filters_dish_drink"
-            android:drawableTop="@drawable/ic_dish_drinks"
+            android:id="@+id/drinks"
             style="@style/FilterElement"
+            android:drawableTop="@drawable/ic_dish_drinks"
             android:tag="drinks"
+            android:text="@string/filters_dish_drink"
             />
 
     </LinearLayout>

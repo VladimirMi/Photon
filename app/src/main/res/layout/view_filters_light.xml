@@ -24,6 +24,7 @@
             android:drawableTop="@drawable/ic_light_natural"
             style="@style/FilterElement"
             android:tag="natural"
+            android:id="@+id/natural"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
@@ -31,6 +32,7 @@
             android:drawableTop="@drawable/ic_light_synthetic"
             style="@style/FilterElement"
             android:tag="synthetic"
+            android:id="@+id/synthetic"
             />
 
         <io.github.vladimirmi.photon.ui.FilterElementView
@@ -38,6 +40,7 @@
             android:drawableTop="@drawable/ic_light_mixed"
             style="@style/FilterElement"
             android:tag="mixed"
+            android:id="@+id/mixed"
             />
     </LinearLayout>
 </merge>

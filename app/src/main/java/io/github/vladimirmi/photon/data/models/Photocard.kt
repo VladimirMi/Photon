@@ -16,11 +16,11 @@ open class Photocard(
         var photo: String = "",
         var views: Int = 0,
         var favorits: Int = 0,
-        var filters: Filter? = null,
+        var filters: Filter = Filter(),
         var tags: RealmList<Tag> = RealmList()
 ) : RealmObject() {
     fun withId(): Photocard {
-        filters?.generateId()
+        filters.generateId()
         return this
     }
 }

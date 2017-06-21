@@ -4,12 +4,15 @@ import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.os.Bundle
+import android.os.Parcelable
 import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.drawable.DrawableCompat
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.TextView
 import io.github.vladimirmi.photon.R
+import timber.log.Timber
 
 
 /**
@@ -36,10 +39,10 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
         if (drawable is GradientDrawable) {
             drawable.setColor(shapeColor)
         }
-        setupDrawable(drawable)
+        setupDrawable()
     }
 
-    private fun setupDrawable(drawable: Drawable) {
+    private fun setupDrawable() {
         color = if (picked) colorAccent else colorGrey
         if (drawable is GradientDrawable) {
             setupShapeDrawable(drawable)
@@ -61,7 +64,7 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
 
     fun pick() {
         picked = !picked
-        setupDrawable(drawable)
+        setupDrawable()
         if (radioMode && picked) {
             val parent = parent as ViewGroup
             (0..parent.childCount - 1)
@@ -76,5 +79,23 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
             pick()
             run(filterAction)
         }
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        Timber.e("onSaveInstanceState: ")
+        val state = Bundle()
+        state.putParcelable("SUPER", super.onSaveInstanceState())
+        state.putBoolean("PICKED", picked)
+        return state
+    }
+
+
+    override fun onRestoreInstanceState(state: Parcelable) {
+        Timber.e("onRestoreInstanceState: ")
+        state as Bundle
+        picked = state.getBoolean("PICKED", false)
+        setupDrawable()
+        val superState = state.getParcelable<Parcelable>("SUPER")
+        super.onRestoreInstanceState(superState)
     }
 }

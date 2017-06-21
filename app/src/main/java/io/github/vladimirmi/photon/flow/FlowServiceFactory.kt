@@ -12,7 +12,7 @@ import timber.log.Timber
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-internal class FlowServiceFactory : ServicesFactory() {
+class FlowServiceFactory : ServicesFactory() {
     override fun bindServices(services: Services.Binder) {
         val screen: BaseScreen<Any?>
         if (services.getKey<Any>() is BaseScreen<*>) {

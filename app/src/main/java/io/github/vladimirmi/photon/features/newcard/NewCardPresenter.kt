@@ -1,6 +1,5 @@
 package io.github.vladimirmi.photon.features.newcard
 
-import com.jakewharton.rxbinding2.InitialValueObservable
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -14,24 +13,15 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     override fun initView(view: NewCardView) {
-        view.setPhotoCard(model.getPhotoCard())
+
     }
 
     fun addFilter(filter: Pair<String, String>) {
-
+        model.addFilter(filter)
     }
 
     fun removeFilter(filter: Pair<String, String>) {
-
+        model.removeFilter(filter)
     }
-
-    fun nameChanges(textChanges: InitialValueObservable<CharSequence>) {
-        compDisp.add(textChanges.subscribe { model.saveName(it.toString()) })
-    }
-
-    fun tagChanges(textChanges: InitialValueObservable<CharSequence>) {
-        compDisp.add(textChanges.subscribe { model.saveTag(it.toString()) })
-    }
-
 }
 
