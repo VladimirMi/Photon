@@ -18,4 +18,6 @@ interface IRootBuilder {
 
     fun setMenuItems(menuItems: List<MenuItemHolder>)
 
+    fun enableBackNavigation(backNavEnabled: Boolean)
+
 }

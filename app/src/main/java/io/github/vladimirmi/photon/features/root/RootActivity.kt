@@ -18,11 +18,12 @@ import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.features.splash.SplashScreen
+import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.flow.BottomNavDispatcher
 import io.github.vladimirmi.photon.flow.FlowActivity
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.view_menu_item.view.*
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -56,7 +57,10 @@ class RootActivity : FlowActivity(), IRootView {
         super.onStart()
     }
 
+    private val popups = ArrayList<MenuPopupHelper>()
+
     override fun onStop() {
+        popups.forEach { it.dismiss() }
         presenter.dropView(this)
         super.onStop()
     }
@@ -72,7 +76,7 @@ class RootActivity : FlowActivity(), IRootView {
     }
 
     override val defaultKey: BaseScreen<*>
-        get() = SplashScreen()
+        get() = MainScreen()
 
 
     //region =============== IRootView ==============
@@ -132,6 +136,11 @@ class RootActivity : FlowActivity(), IRootView {
         supportActionBar?.setTitle(titleId)
     }
 
+    override fun enableBackNavigation(backNavEnabled: Boolean) {
+        supportActionBar?.setDisplayHomeAsUpEnabled(backNavEnabled)
+        supportActionBar
+    }
+
     override fun enableTabs(enabled: Boolean) {
         removeTabLayout()
         if (enabled) setTabLayout()
@@ -156,10 +165,11 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun setMenuItems(menuItems: List<MenuItemHolder>) {
         actionBarMenuItems = menuItems
-        supportInvalidateOptionsMenu()
+        invalidateOptionsMenu()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        Timber.e("onPrepareOptionsMenu: ")
         if (!actionBarMenuItems.isEmpty()) {
             for (menuItemHolder in actionBarMenuItems) {
                 val item = menu.add(menuItemHolder.itemTitle)
@@ -178,17 +188,13 @@ class RootActivity : FlowActivity(), IRootView {
             }
         } else {
             menu.clear()
+            popups.clear()
         }
         return super.onPrepareOptionsMenu(menu)
     }
 
     private fun configurePopupFor(item: MenuItem, menuItemHolder: MenuItemHolder) {
-        val actionView: View
-        if (menuItemHolder.actionView == null) {
-            actionView = LayoutInflater.from(this).inflate(R.layout.view_menu_item, toolbar, false)
-        } else {
-            actionView = menuItemHolder.actionView
-        }
+        val actionView = LayoutInflater.from(this).inflate(R.layout.view_menu_item, toolbar, false)
         actionView.icon.setImageDrawable(ContextCompat.getDrawable(this, menuItemHolder.iconResId))
         item.actionView = actionView
 
@@ -204,7 +210,10 @@ class RootActivity : FlowActivity(), IRootView {
         (0..popup.menu.size() - 1).asSequence()
                 .filter { popup.menu.getItem(it).icon != null }
                 .forEach { menuHelper.setForceShowIcon(true); return@forEach }
-        actionView.setOnClickListener { menuHelper.show(0, -actionView.height) }
+        actionView.setOnClickListener {
+            if (!menuHelper.isShowing) menuHelper.show(0, -actionView.height)
+        }
+        popups.add(menuHelper)
     }
 
     override fun setBackground(backgroundId: Int) {

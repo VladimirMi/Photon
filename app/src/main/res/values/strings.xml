@@ -88,6 +88,9 @@
 
     <string name="photocard_album">Альбомы</string>
     <string name="photocard_card">Карты</string>
+    <string name="photocard_menu_favorite">В избранное</string>
+    <string name="photocard_menu_share">Поделиться</string>
+    <string name="photocard_menu_download">Скачать</string>
 
     <string name="profile_not_auth">Авторизуйтесь,\nчтобы посмотреть\nданные профиля</string>
     <string name="profile_menu_delete">Удалить</string>

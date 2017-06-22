@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 import android.view.ViewGroup
 import flow.Flow
 import io.github.vladimirmi.photon.di.DaggerService
@@ -72,6 +73,15 @@ abstract class FlowActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (!(dispatcher.onBackPressed())) {
             super.onBackPressed()
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == android.R.id.home) {
+            Flow.get(this).goBack()
+            return true
+        } else {
+            return super.onOptionsItemSelected(item)
         }
     }
 }

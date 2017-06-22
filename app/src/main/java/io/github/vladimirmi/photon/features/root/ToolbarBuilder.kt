@@ -2,13 +2,13 @@ package io.github.vladimirmi.photon.features.root
 
 import android.support.annotation.StringRes
 import android.view.MenuItem
-import android.view.View
 import io.github.vladimirmi.photon.R
 import java.util.*
 
 class ToolbarBuilder(private val rootView: IRootView) {
     private var isToolbarVisible = true
     @StringRes private var toolbarTitleId = R.string.app_name
+    private var backNavEnabled = false
     private var bottomMenuEnabled = true
     private var bottomItemIndex = 0
     private var isTabsEnabled = false
@@ -20,13 +20,18 @@ class ToolbarBuilder(private val rootView: IRootView) {
         return this
     }
 
-    fun setBottomMenuEnabled(menuEnabled: Boolean): ToolbarBuilder {
-        bottomMenuEnabled = menuEnabled
+    fun setToolbarTitleId(@StringRes titleId: Int): ToolbarBuilder {
+        toolbarTitleId = titleId
         return this
     }
 
-    fun setToolbarTitleId(@StringRes toolbarTitleId: Int): ToolbarBuilder {
-        this.toolbarTitleId = toolbarTitleId
+    fun setBackNavigationEnabled(backEnabled: Boolean): ToolbarBuilder {
+        backNavEnabled = backEnabled
+        return this
+    }
+
+    fun setBottomMenuEnabled(menuEnabled: Boolean): ToolbarBuilder {
+        bottomMenuEnabled = menuEnabled
         return this
     }
 
@@ -46,9 +51,10 @@ class ToolbarBuilder(private val rootView: IRootView) {
     }
 
     fun build() {
-        rootView.setBottomMenuVisible(bottomMenuEnabled)
         rootView.setToolbarVisible(isToolbarVisible)
         rootView.setToolbarTitle(toolbarTitleId)
+        rootView.enableBackNavigation(backNavEnabled)
+        rootView.setBottomMenuVisible(bottomMenuEnabled)
         rootView.setBottomMenuChecked(bottomItemIndex)
         rootView.enableTabs(isTabsEnabled)
         rootView.setBackground(backgroundId)
@@ -59,7 +65,6 @@ class ToolbarBuilder(private val rootView: IRootView) {
 class MenuItemHolder(val itemTitle: String,
                      val iconResId: Int,
                      val actions: (MenuItem) -> Unit,
-                     val popupMenu: Int? = null,
-                     val actionView: View? = null) {
+                     val popupMenu: Int? = null) {
     fun hasPopupMenu() = popupMenu != null
 }

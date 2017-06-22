@@ -34,7 +34,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         rootPresenter.getNewToolbarBuilder()
                 .addAction(MenuItemHolder("Search", R.drawable.ic_action_search,
                         actions = { Flow.get(view).set(SearchScreen()) }))
-                .addAction(MenuItemHolder("Login", R.drawable.ic_action_settings,
+                .addAction(MenuItemHolder("Login",
+                        iconResId = R.drawable.ic_action_settings,
                         popupMenu = loginMenu,
                         actions = actions))
                 .build()

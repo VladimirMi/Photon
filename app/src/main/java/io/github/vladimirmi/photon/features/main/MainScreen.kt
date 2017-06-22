@@ -1,6 +1,9 @@
 package io.github.vladimirmi.photon.features.main
 
+import android.os.Parcelable
+import android.util.SparseArray
 import dagger.Provides
+
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
@@ -16,9 +19,10 @@ import io.github.vladimirmi.photon.features.search.SearchScreen
 
 class MainScreen : BaseScreen<RootActivityComponent>() {
 
+    val state = SparseArray<Parcelable>()
+
     override val layoutResId: Int
         get() = R.layout.screen_main
-
 
     //region =============== DI ==============
 
@@ -30,6 +34,7 @@ class MainScreen : BaseScreen<RootActivityComponent>() {
 
     @dagger.Module
     class Module {
+
         @Provides
         @DaggerScope(MainScreen::class)
         fun provideMainModel(dataManager: DataManager): IMainModel {
@@ -41,6 +46,7 @@ class MainScreen : BaseScreen<RootActivityComponent>() {
         fun provideMainPresenter(model: IMainModel, rootPresenter: RootPresenter): MainPresenter {
             return MainPresenter(model, rootPresenter)
         }
+
     }
 
     @DaggerScope(MainScreen::class)
@@ -50,11 +56,12 @@ class MainScreen : BaseScreen<RootActivityComponent>() {
         interface Builder {
             fun module(module: Module): Component.Builder
             fun build(): Component
+
         }
 
         fun inject(mainView: MainView)
-
         fun searchComponentBuilder(): SearchScreen.Component.Builder
+
     }
 
     //endregion
