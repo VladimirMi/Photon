@@ -1,9 +1,12 @@
 package io.github.vladimirmi.photon.features.search
 
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.models.Search
 import io.github.vladimirmi.photon.data.models.Tag
 import io.github.vladimirmi.photon.features.main.IMainModel
 import io.reactivex.Observable
+import io.realm.Sort
+import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 06.06.2017.
@@ -30,9 +33,22 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
         } else {
             mainModel.searchQuery[query.first]!!.add(query.second)
         }
+        Timber.e("addQuery $query to ${mainModel.searchQuery}")
     }
 
     override fun makeQuery() {
         mainModel.makeQuery(mainModel.searchQuery, page)
+    }
+
+    override fun search(string: String): Observable<List<Search>> {
+        val query = mapOf(Pair("value", string))
+        val exprQuery = mapOf(Pair("contains", query))
+        return dataManager.search(Search::class.java, exprQuery,
+                sortBy = "date", order = Sort.DESCENDING)
+                .map { if (it.size > 5) it.subList(0, 5) else it }
+    }
+
+    override fun saveSearch(search: String) {
+        dataManager.saveToDB(Search(search))
     }
 }

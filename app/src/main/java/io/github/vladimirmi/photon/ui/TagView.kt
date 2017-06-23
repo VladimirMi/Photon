@@ -26,7 +26,7 @@ class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
         val padding: Int = (getDensity(context) * 8).toInt()
         setPadding(padding, padding, padding, padding)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-        text = "#" + tag
+        text = if (tag.startsWith("#")) tag else "#$tag"
         id = tag.hashCode()
         setupView()
     }

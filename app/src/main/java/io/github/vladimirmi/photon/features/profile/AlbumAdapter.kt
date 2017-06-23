@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.features.main
 
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -24,9 +25,20 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
 
     var data: List<Album> = ArrayList()
 
-    fun updateData(data: List<Album>) {
-        this.data = data
-        notifyDataSetChanged()
+    fun updateData(list: List<Album>) {
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize() = data.size
+
+            override fun getNewListSize() = list.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return data[oldItemPosition].id == list[newItemPosition].id
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = true
+        })
+        data = list
+        diffResult.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {

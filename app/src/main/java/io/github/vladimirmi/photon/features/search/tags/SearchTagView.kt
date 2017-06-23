@@ -4,8 +4,8 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import com.google.android.flexbox.FlexboxLayout
+import com.jakewharton.rxbinding2.widget.textChanges
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.Search
@@ -22,7 +22,8 @@ import kotlinx.android.synthetic.main.view_search.view.*
 class SearchTagView(context: Context, attrs: AttributeSet)
     : BaseView<SearchTagPresenter, SearchTagView>(context, attrs) {
 
-    val searchAdapter = RecentSearchesAdapter()
+    val searchAdapter = SearchAdapter()
+    val searchObs by lazy { search_field.textChanges() }
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<SearchScreen.Component>(context).inject(this)
@@ -31,12 +32,7 @@ class SearchTagView(context: Context, attrs: AttributeSet)
     override fun initView() {
         recent_search.layoutManager = LinearLayoutManager(context)
         recent_search.adapter = searchAdapter
-        search_field.setOnClickListener { recent_search_wrapper.visibility = View.VISIBLE }
-    }
-
-    override fun onViewDestroyed(removedByFlow: Boolean) {
-        super.onViewDestroyed(removedByFlow)
-        recent_search.adapter = null
+        ic_action.setOnClickListener { presenter.submitSearch(search_field.text.toString()) }
     }
 
     private val tagAction: (TagView) -> Unit = { select(it) }
@@ -58,7 +54,15 @@ class SearchTagView(context: Context, attrs: AttributeSet)
     }
 
     fun setRecentSearches(list: List<Search>) {
-        searchAdapter.data = list
+        searchAdapter.updateData(list.map { it.value })
+    }
+
+    fun enableSubmit(enable: Boolean) {
+        ic_action.setImageResource(if (enable) R.drawable.ic_action_submit else R.drawable.ic_action_back_arrow)
+    }
+
+    fun restoreFromQuery(query: Any): Unit {
+        // todo implement
     }
 }
 

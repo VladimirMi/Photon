@@ -22,6 +22,6 @@ class SearchFilterPresenter(model: ISearchModel, rootPresenter: RootPresenter,
     }
 
     fun removeFilter(query: Pair<String, String>) {
-
+        //todo remove filter
     }
 }

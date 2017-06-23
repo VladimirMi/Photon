@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.features.search
 
 import io.github.vladimirmi.photon.core.IModel
+import io.github.vladimirmi.photon.data.models.Search
 import io.github.vladimirmi.photon.data.models.Tag
 import io.reactivex.Observable
 
@@ -10,4 +11,6 @@ interface ISearchModel : IModel {
     fun makeQuery()
     fun getQuery(): HashMap<String, MutableList<String>>
     var page: SearchView.Page
+    fun search(string: String): Observable<List<Search>>
+    fun saveSearch(search: String)
 }

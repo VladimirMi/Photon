@@ -26,10 +26,10 @@ class SearchView(context: Context, attrs: AttributeSet)
 
     override fun initView() {
         val tabTitles = this.resources.getStringArray(R.array.search_tabs)
-        search_pager.adapter = SearchAdapter(tabTitles)
+        search_pager.adapter = SearchPagerAdapter(tabTitles)
         disposable = search_pager.pageSelections().skipInitialValue()
                 .subscribe {
-                    presenter.savePageNum(if (it == 0) Page.TAGS else Page.FILTERS)
+                    presenter.savePageType(if (it == 0) Page.TAGS else Page.FILTERS)
                 }
     }
 

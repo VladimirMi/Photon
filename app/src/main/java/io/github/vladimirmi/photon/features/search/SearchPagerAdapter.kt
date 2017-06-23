@@ -11,7 +11,7 @@ import io.github.vladimirmi.photon.core.BaseView
  * Developer Vladimir Mikhalev, 06.06.2017.
  */
 
-class SearchAdapter(private val tabTitles: Array<String>) : PagerAdapter() {
+class SearchPagerAdapter(private val tabTitles: Array<String>) : PagerAdapter() {
 
     override fun isViewFromObject(view: View?, `object`: Any?): Boolean = view?.equals(`object`) ?: false
 
@@ -24,14 +24,14 @@ class SearchAdapter(private val tabTitles: Array<String>) : PagerAdapter() {
         if (`object` is BaseView<*, *>) `object`.onViewDestroyed(false)
     }
 
-    override fun instantiateItem(container: ViewGroup?, position: Int): Any {
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val view: View
         if (position == 0) {
-            view = LayoutInflater.from(container?.context).inflate(R.layout.view_search, container, false)
+            view = LayoutInflater.from(container.context).inflate(R.layout.view_search, container, false)
         } else {
-            view = LayoutInflater.from(container?.context).inflate(R.layout.view_filters, container, false)
+            view = LayoutInflater.from(container.context).inflate(R.layout.view_filters, container, false)
         }
-        container?.addView(view)
+        container.addView(view)
         (view as BaseView<*, *>).onViewRestored()
         return view
     }

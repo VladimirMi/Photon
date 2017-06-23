@@ -5,105 +5,105 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:ignore="ContentDescription, RtlHardcoded"
+    tools:ignore="ContentDescription, RtlHardcoded, RtlSymmetry"
     >
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
 
-        <LinearLayout
-            android:id="@+id/search_bar"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="16dp"
             >
 
-            <EditText
-                android:id="@+id/search_field"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@color/transparent"
-                android:hint="@string/search_search"
-                android:textColorHint="@android:color/black"
-                android:textSize="16sp"
-                />
-
-            <ImageView
-                android:id="@+id/ic_action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                app:srcCompat="@drawable/ic_action_back_arrow"
-                />
-
-            <ImageView
-                android:id="@+id/ic_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_action_close"
-                />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_below="@+id/search_bar"
-            android:background="@drawable/shadow"
-            />
-
-        <FrameLayout
-            android:id="@+id/recent_search_wrapper"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/search_bar"
-            android:visibility="gone"
-            tools:visibility="visible"
-            >
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recent_search"
+            <LinearLayout
+                android:id="@+id/search_bar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <EditText
+                    android:id="@+id/search_field"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:hint="@string/search_search"
+                    android:paddingLeft="16dp"
+                    android:textColorHint="@android:color/black"
+                    android:textSize="16sp"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
+                    />
+
+                <ImageView
+                    android:id="@+id/ic_action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:srcCompat="@drawable/ic_action_back_arrow"
+                    />
+
+                <ImageView
+                    android:id="@+id/ic_clear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp"
+                    app:srcCompat="@drawable/ic_action_close"
+                    />
+            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="4dp"
-                android:layout_gravity="bottom"
+                android:layout_below="@+id/search_bar"
                 android:background="@drawable/shadow"
                 />
-        </FrameLayout>
 
+            <FrameLayout
+                android:id="@+id/recent_search_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/search_bar"
+                >
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/recent_search_wrapper"
-            >
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recent_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/shadow"
+                    />
+            </FrameLayout>
+
 
             <LinearLayout
                 android:id="@+id/tags_wrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/recent_search_wrapper"
                 android:orientation="vertical"
-                android:paddingLeft="10dp"
-                android:paddingTop="18dp"
-                android:paddingRight="10dp"
                 android:paddingBottom="18dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="18dp"
                 >
 
                 <TextView
                     style="@style/CustomText.Black"
-                    android:layout_marginLeft="6dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginRight="6dp"
                     android:layout_marginBottom="12dp"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_marginTop="6dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/search_tags"
                     android:textSize="16sp"
@@ -111,7 +111,6 @@
 
             </LinearLayout>
 
-        </ScrollView>
-
-    </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
 </io.github.vladimirmi.photon.features.search.tags.SearchTagView>

@@ -5,6 +5,7 @@ import io.reactivex.ObservableEmitter
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.disposables.Disposables
 import io.realm.*
+import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
@@ -42,15 +43,28 @@ class RealmManager {
     }
 
 
-    fun <T : RealmObject> getList(clazz: Class<T>, sortBy: String, order: Sort): Observable<List<T>> {
+    fun <T : RealmObject> search(clazz: Class<T>, query: Map<String, Map<String, String>>?, sortBy: String, order: Sort): Observable<List<T>> {
         val realm = Realm.getDefaultInstance()
-        return RealmResultObservable.from(realm
-                .where(clazz)
-                .findAllAsync()
-                .sort(sortBy, order))
+        val realmQuery = parseQuery(query, realm.where(clazz))
+        return RealmResultObservable.from(realmQuery
+                .findAllSortedAsync(sortBy, order))
                 .filter { it.isLoaded }
                 .map { realm.copyFromRealm(it) }
                 .doFinally { realm.close() }
+    }
+
+    private fun <T : RealmModel> parseQuery(query: Map<String, Map<String, String>>?, realmQuery: RealmQuery<T>)
+            : RealmQuery<T> {
+        Timber.e("parseQuery: $query")
+
+        if (query == null) return realmQuery
+        for ((expr, map) in query) {
+            when (expr) {
+                "contains" -> for ((field, value) in map) realmQuery.contains(field, value)
+                "equal" -> for ((field, value) in map) realmQuery.equalTo(field, value)
+            }
+        }
+        return realmQuery
     }
 }
 

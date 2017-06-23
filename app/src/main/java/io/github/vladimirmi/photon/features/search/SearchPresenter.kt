@@ -21,7 +21,7 @@ class SearchPresenter(model: ISearchModel, rootPresenter: RootPresenter)
         view.setPage(model.page)
     }
 
-    fun savePageNum(page: SearchView.Page) {
+    fun savePageType(page: SearchView.Page) {
         model.page = page
     }
 

@@ -80,11 +80,17 @@ constructor(private val restService: RestService,
 
     fun <T : RealmObject> getListFromDb(clazz: Class<T>, sortBy: String, order: Sort = Sort.ASCENDING)
             : Observable<List<T>> {
-        return realmManager.getList(clazz, sortBy, order)
+        return search(clazz, null, sortBy, order)
     }
 
     fun <T : RealmObject> getObjectFromDb(clazz: Class<T>, id: String): Observable<T> {
         return realmManager.get(clazz, id)
+    }
+
+    fun <T : RealmObject> search(clazz: Class<T>,
+                                 expQuery: Map<String, Map<String, String>>?,
+                                 sortBy: String, order: Sort = Sort.ASCENDING): Observable<List<T>> {
+        return realmManager.search(clazz, expQuery, sortBy, order)
     }
 
     //endregion
