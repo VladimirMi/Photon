@@ -32,7 +32,7 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_album, parent, false)
-        if (authorMode) view.likesNViews.visibility = GONE else view.share.visibility = GONE
+        if (authorMode) view.likesNViews.visibility = GONE else view.menu_share.visibility = GONE
         val lp = view.layoutParams
         lp.width = getDisplayMetrics(parent.context).widthPixels / 2
         lp.height = lp.width

@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.data.network.api
 
 import io.github.vladimirmi.photon.data.models.*
+import io.github.vladimirmi.photon.utils.Constants.HEADER_AUTHORIZATION
 import io.github.vladimirmi.photon.utils.Constants.HEADER_IF_MODIFIED_SINCE
 import io.reactivex.Observable
 import retrofit2.Response
@@ -38,5 +39,11 @@ interface RestService {
                      @Path("userId") userId: String,
                      @Header(HEADER_IF_MODIFIED_SINCE) lastUpdate: String)
             : Observable<Response<Photocard>>
+
+    @POST("user/{userId}/album")
+    fun createAlbum(@Path("userId") userId: String,
+                    @Body req: NewAlbumReq,
+                    @Header(HEADER_AUTHORIZATION) token: String)
+            : Observable<Response<Album>>
 
 }

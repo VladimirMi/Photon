@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/signIn"
+        android:id="@+id/menu_signIn"
         android:title="@string/menu_main_enter"/>
 
     <item
-        android:id="@+id/signUp"
+        android:id="@+id/menu_signUp"
         android:title="@string/menu_main_registration"/>
 </menu>

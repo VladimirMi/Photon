@@ -2,13 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/edit"
-        android:title="@string/profile_menu_edit"
-        android:icon="@drawable/ic_action_edit"/>
+        android:id="@+id/menu_new_album"
+        android:title="@string/menu_profile_new_album"/>
 
     <item
-        android:id="@+id/delete"
-        android:title="@string/profile_menu_delete"
-        android:icon="@drawable/ic_action_delete"/>
+        android:id="@+id/menu_edit_profile"
+        android:title="@string/menu_profile_edit_info"/>
+
+    <item
+        android:id="@+id/menu_change_avatar"
+        android:title="@string/menu_profile_edit_avatar"/>
+
+    <item
+        android:id="@+id/menu_logout"
+        android:title="@string/menu_profile_logout"/>
 
 </menu>

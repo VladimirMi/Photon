@@ -20,15 +20,16 @@ import io.reactivex.disposables.Disposable
 class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         BasePresenter<MainView, IMainModel>(model, rootPresenter) {
 
-    override fun initToolbar() {
-        val actions: (MenuItem) -> Unit = {
-            when (it.itemId) {
-                R.id.signIn -> view.openLoginDialog()
-                R.id.signUp -> view.openRegistrationDialog()
-                R.id.logOut -> logout()
-            }
+    val menuActions: (MenuItem) -> Unit = {
+        when (it.itemId) {
+            R.id.menu_signIn -> view.openLoginDialog()
+            R.id.menu_signUp -> view.openRegistrationDialog()
+            R.id.menu_logout -> logout()
         }
-        val loginMenu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth
+    }
+
+    override fun initToolbar() {
+        val popupMenu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth
         else R.menu.submenu_main_screen_not_auth
 
         rootPresenter.getNewToolbarBuilder()
@@ -36,8 +37,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                         actions = { Flow.get(view).set(SearchScreen()) }))
                 .addAction(MenuItemHolder("Login",
                         iconResId = R.drawable.ic_action_settings,
-                        popupMenu = loginMenu,
-                        actions = actions))
+                        popupMenu = popupMenu,
+                        actions = menuActions))
                 .build()
     }
 

@@ -64,6 +64,11 @@ constructor(private val restService: RestService,
                 .compose(RestErrorTransformer())
     }
 
+    fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Album> {
+        return restService.createAlbum(getProfileId(), newAlbumReq, getUserToken())
+                .compose(RestErrorTransformer())
+    }
+
     //endregion
 
     //region =============== DataBase ==============

@@ -10,9 +10,7 @@ import io.realm.*
  * Created by Vladimir Mikhalev 04.06.2017.
  */
 
-
 class RealmManager {
-
 
     fun save(realmObject: RealmObject) {
         val realm = Realm.getDefaultInstance()
@@ -20,17 +18,29 @@ class RealmManager {
         realm.close()
     }
 
-    fun <T : RealmObject> get(clazz: Class<T>, id: String): Observable<T> {
+    fun <T : RealmObject> getObject(clazz: Class<T>, id: String): Observable<T> {
         val realm = Realm.getDefaultInstance()
         return RealmObjectObservable.from(realm
                 .where(clazz)
                 .equalTo("id", id)
                 .findFirstAsync())
                 .filter { it.isLoaded }
-                .filter { it.isValid }
                 .map { realm.copyFromRealm(it) }
                 .doFinally { realm.close() }
     }
+
+    fun <T : RealmObject> get(clazz: Class<T>, id: String): Observable<T> {
+        val realm = Realm.getDefaultInstance()
+        return RealmResultObservable.from(realm
+                .where(clazz)
+                .equalTo("id", id)
+                .findAllAsync())
+                .filter { it.isLoaded }
+                .filter { it.isNotEmpty() }
+                .map { realm.copyFromRealm(it[0]) }
+                .doFinally { realm.close() }
+    }
+
 
     fun <T : RealmObject> getList(clazz: Class<T>, sortBy: String, order: Sort): Observable<List<T>> {
         val realm = Realm.getDefaultInstance()
@@ -44,7 +54,9 @@ class RealmManager {
     }
 }
 
-class RealmObjectObservable<T : RealmModel> private constructor(private val objekt: T) : ObservableOnSubscribe<T> {
+class RealmObjectObservable<T : RealmModel> private constructor(private val objekt: T)
+    : ObservableOnSubscribe<T> {
+
     override fun subscribe(e: ObservableEmitter<T>) {
         val listener = { element: T ->
             if (!e.isDisposed) {
@@ -63,7 +75,9 @@ class RealmObjectObservable<T : RealmModel> private constructor(private val obje
     }
 }
 
-class RealmResultObservable<T : RealmModel>(private val results: RealmResults<T>) : ObservableOnSubscribe<RealmResults<T>> {
+class RealmResultObservable<T : RealmModel>(private val results: RealmResults<T>)
+    : ObservableOnSubscribe<RealmResults<T>> {
+
     override fun subscribe(e: ObservableEmitter<RealmResults<T>>) {
         val listener = { element: RealmResults<T> ->
             if (!e.isDisposed) {

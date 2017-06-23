@@ -11,6 +11,7 @@ object Constants {
 
     const val HEADER_IF_MODIFIED_SINCE = "If-Modified-Since"
     const val HEADER_LAST_MODIFIED = "Last-Modified"
+    const val HEADER_AUTHORIZATION = "Authorization"
 
     const val KEY_LAST_UPDATE_PREFIX = "KEY_LAST_UPDATE_"
     const val KEY_USER_ID = "KEY_USER_ID"

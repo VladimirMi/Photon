@@ -13,6 +13,14 @@
     <string name="menu_main_enter">Войти</string>
     <string name="menu_main_registration">Зарегистрироваться</string>
 
+    <string name="menu_profile_new_album">Новый альбом</string>
+    <string name="menu_profile_edit_info">Редактрировать информацию</string>
+    <string name="menu_profile_edit_avatar">Изменить аватар</string>
+    <string name="menu_profile_logout">Выйти</string>
+
+    <string name="menu_album_delete">Удалить</string>
+    <string name="menu_album_edit">Редактировать</string>
+
     <string name="button_ok">OK</string>
     <string name="button_cancel">Отмена</string>
     <string name="button_registration">Регистрация</string>
@@ -26,7 +34,8 @@
     <string name="dialog_email">Email</string>
     <string name="dialog_name">Имя</string>
     <string name="dialog_password">Пароль</string>
-
+    <string name="dialog_description">Описание</string>
+    <string name="dialog_new_album">Новый альбом</string>
 
     <string name="message_err_email">Неверный email</string>
     <string name="message_err_password">Неверный пароль</string>
@@ -93,8 +102,6 @@
     <string name="photocard_menu_download">Скачать</string>
 
     <string name="profile_not_auth">Авторизуйтесь,\nчтобы посмотреть\nданные профиля</string>
-    <string name="profile_menu_delete">Удалить</string>
-    <string name="profile_menu_edit">Редактировать</string>
 
     <string name="newcard_choose">Выберите фотокарточку\nиз галлереи и добавьте\nк вашим альбомам</string>
     <string name="newcard_name_hint">Название фотографии</string>
@@ -103,4 +110,5 @@
     <string name="newcard_tag_hint">Имя тега</string>
     <string name="newcard_param_title">Укажите параметры фотографии</string>
     <string name="newcard_album_title">Выберите альбом</string>
+
 </resources>

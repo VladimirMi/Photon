@@ -24,7 +24,7 @@ class MainView(context: Context, attrs: AttributeSet) :
         BaseView<MainPresenter, MainView>(context, attrs) {
 
     val cardAction: (Photocard) -> Unit = { showPhotoCard(it) }
-    val adapter = CardAdapter(cardAction, true)
+    val adapter = CardAdapter(cardAction)
 
     val registrationAction: (SignUpReq) -> Unit = { register(it) }
     val loginAction: (SignInReq) -> Unit = { login(it) }

@@ -13,9 +13,9 @@ open class Album(
         var id: String = "",
         var owner: String = "",
         var title: String = "",
-        var preview: String = "",
         var description: String = "",
         var views: Int = 0,
         var favorits: Int = 0,
+        var isFavorite: Boolean = false,
         var photocards: RealmList<Photocard> = RealmList()
 ) : RealmObject()
