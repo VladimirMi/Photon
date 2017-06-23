@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="180dp"
     android:layout_height="180dp"
@@ -26,40 +25,7 @@
         android:padding="16dp"
         >
 
-        <ImageView
-            android:id="@+id/icon_likes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_card_like"
-            />
-
-        <TextView
-            android:id="@+id/likes"
-            style="@style/CustomText.White"
-            android:layout_marginLeft="16dp"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            tools:text="73"
-            />
-
-        <ImageView
-            android:id="@+id/icon_views"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp"
-            app:srcCompat="@drawable/ic_card_view"
-            />
-
-        <TextView
-            android:id="@+id/views"
-            style="@style/CustomText.White"
-            android:layout_marginLeft="16dp"
-            android:fontFamily="sans-serif"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            tools:text="73"
-            />
-
+        <include layout="@layout/view_likes_views"/>
     </LinearLayout>
 
 </FrameLayout>

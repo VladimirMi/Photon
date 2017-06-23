@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.features.root
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.album.AlbumScreen
+import io.github.vladimirmi.photon.features.author.AuthorScreen
 import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
@@ -29,6 +30,7 @@ interface RootActivityComponent {
     fun profileComponentBuilder(): ProfileScreen.Component.Builder
     fun albumComponentBuilder(): AlbumScreen.Component.Builder
     fun newCardComponentBuilder(): NewCardScreen.Component.Builder
+    fun authorComponentBuilder(): AuthorScreen.Component.Builder
 
     fun inject(view: RootActivity)
 }

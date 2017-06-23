@@ -5,6 +5,7 @@ import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.Photocard
+import io.github.vladimirmi.photon.features.author.AuthorScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.reactivex.Observable
@@ -28,9 +29,12 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
                 .build()
     }
 
+    var ownerId = ""
+
     override fun initView(view: PhotocardView) {
         val photocard = Flow.getKey<PhotocardScreen>(view)?.photocard!!
-        compDisp.add(subscribeOnUser(photocard.owner))
+        ownerId = photocard.owner
+        compDisp.add(subscribeOnUser(ownerId))
         compDisp.add(subscribeOnPhotocard(photocard))
     }
 
@@ -43,6 +47,10 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         return Observable.just(photocard)
                 .mergeWith(model.getPhotocard(photocard.id, photocard.owner))
                 .subscribe { view.setPhotoCard(it) }
+    }
+
+    fun showAuthor() {
+        Flow.get(view).set(AuthorScreen(ownerId))
     }
 
 }

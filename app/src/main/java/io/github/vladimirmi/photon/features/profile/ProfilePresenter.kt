@@ -32,15 +32,6 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                 .build()
     }
 
-    private fun edit() {
-        Timber.e("edit")
-    }
-
-    private fun delete() {
-        Timber.e("delete")
-    }
-
-
     override fun initView(view: ProfileView) {
         if (!model.isUserAuth()) {
             view.showAuth()
@@ -50,8 +41,16 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
         }
     }
 
+    private fun edit() {
+        Timber.e("edit")
+    }
+
+    private fun delete() {
+        Timber.e("delete")
+    }
+
     private fun subscribeOnProfile(): Disposable {
-        return model.getUser()
+        return model.getProfile()
                 .subscribe { view.setProfile(it) }
     }
 

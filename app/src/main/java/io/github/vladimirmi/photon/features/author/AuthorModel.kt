@@ -1,25 +1,18 @@
-package io.github.vladimirmi.photon.features.profile
+package io.github.vladimirmi.photon.features.author
 
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.User
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
-class ProfileModel(private val dataManager: DataManager) : IProfileModel {
-
-    override fun isUserAuth(): Boolean {
-        return dataManager.isUserAuth()
-    }
-
-    override fun getProfile(): Observable<User> {
-        val id = dataManager.getProfileId()
-        return getUser(id)
-    }
+class AuthorModel(private val dataManager: DataManager) : IAuthorModel {
 
     override fun getUser(userId: String): Observable<User> {
         updateUser(userId)
         return dataManager.getObjectFromDb(User::class.java, userId)
                 .distinctUntilChanged()
+                .doOnDispose { Timber.e("getUser: dispose") }
     }
 
     private fun updateUser(id: String) {

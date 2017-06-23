@@ -94,7 +94,7 @@ constructor(private val restService: RestService,
 
     fun saveUserToken(token: String) = preferencesManager.saveUserToken(token)
 
-    fun getUserId() = preferencesManager.getUserId()
+    fun getProfileId() = preferencesManager.getUserId()
 
     fun getUserToken() = preferencesManager.getUserToken()
 

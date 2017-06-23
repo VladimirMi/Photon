@@ -13,6 +13,7 @@ import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.ui.getDisplayMetrics
 import io.github.vladimirmi.photon.ui.setImage
 import kotlinx.android.synthetic.main.item_photocard.view.*
+import kotlinx.android.synthetic.main.view_likes_views.view.*
 import java.util.*
 
 /**
@@ -63,11 +64,15 @@ class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideI
 
 class CardViewHolder(itemView: View?, val cardAction: (Photocard) -> Unit) : RecyclerView.ViewHolder(itemView) {
 
+    private var curImagePath = ""
     fun bind(photoCard: Photocard) {
         itemView.likes.text = photoCard.favorits.toString()
         itemView.views.text = photoCard.views.toString()
         itemView.photo_card.setOnClickListener { cardAction(photoCard) }
-        setImage(photoCard.photo, itemView.photo_card)
+        if (curImagePath != photoCard.photo) {
+            setImage(photoCard.photo, itemView.photo_card)
+            curImagePath = photoCard.photo
+        }
     }
 
 }

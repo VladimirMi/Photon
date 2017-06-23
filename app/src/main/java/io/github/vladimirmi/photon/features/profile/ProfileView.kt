@@ -55,6 +55,7 @@ class ProfileView(context: Context, attrs: AttributeSet)
         profile_view.visibility = VISIBLE
     }
 
+    private var curAvatarPath = ""
     @SuppressLint("SetTextI18n")
     fun setProfile(user: User) {
         Timber.e(user.name)
@@ -62,7 +63,10 @@ class ProfileView(context: Context, attrs: AttributeSet)
         user_name.text = "/  " + user.name
         album_count.text = user.albumCount.toString()
         card_count.text = user.photocardCount.toString()
-        setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
+        if (user.avatar != curAvatarPath) {
+            setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
+            curAvatarPath = user.avatar
+        }
         adapter.updateData(user.albums)
     }
 
@@ -75,7 +79,6 @@ class ProfileView(context: Context, attrs: AttributeSet)
     fun closeRegistrationDialog() = registrationDialog.dialog.cancel()
 
     fun closeLoginDialog() = loginDialog.dialog.cancel()
-
     private fun register(req: SignUpReq) = presenter.register(req)
     private fun login(req: SignInReq) = presenter.login(req)
 }

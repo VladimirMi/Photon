@@ -34,7 +34,7 @@ abstract class BasePresenter<V : BaseView<*, V>, out M : IModel>
 
     override fun dropView(view: V) {
         super.dropView(view)
-        if (!compDisp.isDisposed) compDisp.dispose()
+        compDisp.clear()
         Timber.tag(javaClass.simpleName)
         Timber.d("dropView")
     }

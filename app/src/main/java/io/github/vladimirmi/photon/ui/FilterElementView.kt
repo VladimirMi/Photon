@@ -12,7 +12,6 @@ import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.TextView
 import io.github.vladimirmi.photon.R
-import timber.log.Timber
 
 
 /**
@@ -82,7 +81,6 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
     }
 
     override fun onSaveInstanceState(): Parcelable {
-        Timber.e("onSaveInstanceState: ")
         val state = Bundle()
         state.putParcelable("SUPER", super.onSaveInstanceState())
         state.putBoolean("PICKED", picked)
@@ -91,7 +89,6 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
 
 
     override fun onRestoreInstanceState(state: Parcelable) {
-        Timber.e("onRestoreInstanceState: ")
         state as Bundle
         picked = state.getBoolean("PICKED", false)
         setupDrawable()

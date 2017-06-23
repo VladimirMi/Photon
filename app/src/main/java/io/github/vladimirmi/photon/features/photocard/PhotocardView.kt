@@ -25,18 +25,26 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
     }
 
     override fun initView() {
-
+        user_avatar.setOnClickListener { presenter.showAuthor() }
     }
 
+    private var curAvatarPath = ""
     fun setUser(user: User) {
-        setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
+        if (user.avatar != curAvatarPath) {
+            setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
+            curAvatarPath = user.avatar
+        }
         user_name.text = user.name
         album_count.text = user.albumCount.toString()
         card_count.text = user.photocardCount.toString()
     }
 
+    private var curImagePath = ""
     fun setPhotoCard(photocard: Photocard) {
-        setImage(photocard.photo, photo)
+        if (curImagePath != photocard.photo) {
+            setImage(photocard.photo, photo)
+            curImagePath = photocard.photo
+        }
         card_name.text = photocard.title
         val flexbox = LayoutInflater.from(context).inflate(R.layout.view_search_tags, this, false)
         flexbox as ViewGroup

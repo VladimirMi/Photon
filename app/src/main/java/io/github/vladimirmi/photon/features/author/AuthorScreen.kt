@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.features.profile
+package io.github.vladimirmi.photon.features.author
 
 import dagger.Provides
 import dagger.Subcomponent
@@ -10,17 +10,17 @@ import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
 
 /**
- * Created by Vladimir Mikhalev 15.06.2017.
+ * Created by Vladimir Mikhalev 22.06.2017.
  */
 
-class ProfileScreen(val userId: String = "") : BaseScreen<RootActivityComponent>() {
+class AuthorScreen(val userId: String) : BaseScreen<RootActivityComponent>() {
 
-    override val layoutResId = R.layout.screen_profile
+    override val layoutResId = R.layout.screen_author
 
     //region =============== DI ==============
 
     override fun createScreenComponent(parentComponent: RootActivityComponent): Component {
-        return parentComponent.profileComponentBuilder()
+        return parentComponent.authorComponentBuilder()
                 .module(Module())
                 .build()
     }
@@ -29,32 +29,29 @@ class ProfileScreen(val userId: String = "") : BaseScreen<RootActivityComponent>
     class Module {
 
         @Provides
-        @DaggerScope(ProfileScreen::class)
-        fun provideProfileModel(dataManager: DataManager): IProfileModel {
-            return ProfileModel(dataManager)
+        @DaggerScope(AuthorScreen::class)
+        fun provideAuthorModel(dataManager: DataManager): IAuthorModel {
+            return AuthorModel(dataManager)
         }
 
         @Provides
-        @DaggerScope(ProfileScreen::class)
-        fun provideProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter): ProfilePresenter {
-            return ProfilePresenter(model, rootPresenter)
+        @DaggerScope(AuthorScreen::class)
+        fun provideAuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter): AuthorPresenter {
+            return AuthorPresenter(model, rootPresenter)
         }
     }
 
-    @DaggerScope(ProfileScreen::class)
+    @DaggerScope(AuthorScreen::class)
     @dagger.Subcomponent(modules = arrayOf(Module::class))
     interface Component {
         @Subcomponent.Builder
         interface Builder {
             fun module(module: Module): Component.Builder
             fun build(): Component
-
         }
 
-        fun inject(profileView: ProfileView)
-
+        fun inject(authorView: AuthorView)
     }
 
     //endregion
 }
-
