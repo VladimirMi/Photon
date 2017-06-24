@@ -5,7 +5,6 @@ import io.reactivex.ObservableEmitter
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.disposables.Disposables
 import io.realm.*
-import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
@@ -43,26 +42,27 @@ class RealmManager {
     }
 
 
-    fun <T : RealmObject> search(clazz: Class<T>, query: Map<String, Map<String, String>>?, sortBy: String, order: Sort): Observable<List<T>> {
+    fun <T : RealmObject> search(clazz: Class<T>, query: List<Query>?, sortBy: String, order: Sort): Observable<List<T>> {
         val realm = Realm.getDefaultInstance()
-        val realmQuery = parseQuery(query, realm.where(clazz))
+        var realmQuery = realm.where(clazz)
+        query?.forEach { realmQuery = it.apply(realmQuery) }
+
         return RealmResultObservable.from(realmQuery
                 .findAllSortedAsync(sortBy, order))
                 .filter { it.isLoaded }
                 .map { realm.copyFromRealm(it) }
                 .doFinally { realm.close() }
     }
+}
 
-    private fun <T : RealmModel> parseQuery(query: Map<String, Map<String, String>>?, realmQuery: RealmQuery<T>)
-            : RealmQuery<T> {
-        Timber.e("parseQuery: $query")
+enum class RealmOperator {CONTAINS, EQUALTO }
 
-        if (query == null) return realmQuery
-        for ((expr, map) in query) {
-            when (expr) {
-                "contains" -> for ((field, value) in map) realmQuery.contains(field, value)
-                "equal" -> for ((field, value) in map) realmQuery.equalTo(field, value)
-            }
+class Query(val fieldName: String, val operator: RealmOperator, val value: String) {
+
+    fun <T : RealmModel> apply(realmQuery: RealmQuery<T>): RealmQuery<T> {
+        when (operator) {
+            RealmOperator.CONTAINS -> realmQuery.contains(fieldName, value)
+            RealmOperator.EQUALTO -> realmQuery.equalTo(fieldName, value)
         }
         return realmQuery
     }

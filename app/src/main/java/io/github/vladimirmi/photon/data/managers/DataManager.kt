@@ -88,9 +88,9 @@ constructor(private val restService: RestService,
     }
 
     fun <T : RealmObject> search(clazz: Class<T>,
-                                 expQuery: Map<String, Map<String, String>>?,
+                                 query: List<Query>?,
                                  sortBy: String, order: Sort = Sort.ASCENDING): Observable<List<T>> {
-        return realmManager.search(clazz, expQuery, sortBy, order)
+        return realmManager.search(clazz, query, sortBy, order)
     }
 
     //endregion

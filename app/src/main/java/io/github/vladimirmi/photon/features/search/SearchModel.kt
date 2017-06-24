@@ -1,6 +1,8 @@
 package io.github.vladimirmi.photon.features.search
 
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.managers.Query
+import io.github.vladimirmi.photon.data.managers.RealmOperator
 import io.github.vladimirmi.photon.data.models.Search
 import io.github.vladimirmi.photon.data.models.Tag
 import io.github.vladimirmi.photon.features.main.IMainModel
@@ -41,9 +43,8 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
     }
 
     override fun search(string: String): Observable<List<Search>> {
-        val query = mapOf(Pair("value", string))
-        val exprQuery = mapOf(Pair("contains", query))
-        return dataManager.search(Search::class.java, exprQuery,
+        val query = Query("value", RealmOperator.CONTAINS, string)
+        return dataManager.search(Search::class.java, listOf(query),
                 sortBy = "date", order = Sort.DESCENDING)
                 .map { if (it.size > 5) it.subList(0, 5) else it }
     }

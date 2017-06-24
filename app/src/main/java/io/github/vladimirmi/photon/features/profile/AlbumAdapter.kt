@@ -22,8 +22,8 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
     : RecyclerView.Adapter<AlbumViewHolder>() {
 
     var authorMode = false
-
-    var data: List<Album> = ArrayList()
+    private var selectedAlbum = ""
+    private var data: List<Album> = ArrayList()
 
     fun updateData(list: List<Album>) {
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
@@ -41,6 +41,11 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
         diffResult.dispatchUpdatesTo(this)
     }
 
+    fun selectAlbum(album: Album) {
+        selectedAlbum = album.id
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_album, parent, false)
@@ -54,6 +59,7 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
 
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
         holder.bind(data[position])
+        if (data[position].id == selectedAlbum) holder.select()
     }
 
     override fun getItemCount(): Int {
@@ -70,6 +76,7 @@ class AlbumViewHolder(itemView: View, val albumAction: (Album) -> Unit)
         itemView.card_count.text = album.photocards.size.toString()
         itemView.likes.text = album.favorits.toString()
         itemView.views.text = album.views.toString()
+        itemView.album_wrapper.setBackgroundResource(R.drawable.album_gradient)
         itemView.preview.setOnClickListener { albumAction(album) }
         if (album.photocards.size > 0 && curImagePath != album.photocards[0].photo) {
             setImage(album.photocards[0].photo, itemView.preview)
@@ -77,6 +84,10 @@ class AlbumViewHolder(itemView: View, val albumAction: (Album) -> Unit)
         } else {
             setImage("", itemView.preview)
         }
+    }
+
+    fun select() {
+        itemView.album_wrapper.setBackgroundResource(R.drawable.album_selected)
     }
 
 }

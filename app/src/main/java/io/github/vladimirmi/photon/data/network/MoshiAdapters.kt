@@ -47,7 +47,7 @@ class RealmListJsonAdapter<T : RealmModel>
 
 class TagJsonAdapter {
     @FromJson fun fromJson(tag: String): Tag {
-        return Tag(tag)
+        return Tag(tag.removePrefix("#"))
     }
 
     @ToJson fun toJson(tag: Tag): String {

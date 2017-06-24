@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import io.github.vladimirmi.photon.R
 import kotlinx.android.synthetic.main.item_simple_string.view.*
 
@@ -12,39 +13,43 @@ import kotlinx.android.synthetic.main.item_simple_string.view.*
  * Created by Vladimir Mikhalev 23.06.2017.
  */
 
-class SearchAdapter : RecyclerView.Adapter<ItemViewHolder>() {
+class StringAdapter(private val action: ((String) -> Unit)? = null) : RecyclerView.Adapter<ItemViewHolder>() {
 
-    var searchResult: List<String> = ArrayList()
+    private var strings: List<String> = ArrayList()
 
     fun updateData(list: List<String>) {
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize() = searchResult.size
+            override fun getOldListSize() = strings.size
 
             override fun getNewListSize() = list.size
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return searchResult[oldItemPosition] == list[newItemPosition]
+                return strings[oldItemPosition] == list[newItemPosition]
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = true
         })
-        searchResult = list
+        strings = list
         diffResult.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_simple_string, parent, false)
-        return ItemViewHolder(view)
+        return ItemViewHolder(view, action)
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.textView.text = searchResult[position]
+        holder.textView.text = strings[position]
     }
 
-    override fun getItemCount() = searchResult.size
+    override fun getItemCount() = strings.size
 }
 
-class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val textView = itemView.text_view
+class ItemViewHolder(itemView: View, action: ((String) -> Unit)? = null) : RecyclerView.ViewHolder(itemView) {
+    val textView: TextView = itemView.text_view
+
+    init {
+        textView.setOnClickListener { action?.invoke((it as TextView).text.toString()) }
+    }
 }

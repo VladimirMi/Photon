@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.view_search.view.*
 class SearchTagView(context: Context, attrs: AttributeSet)
     : BaseView<SearchTagPresenter, SearchTagView>(context, attrs) {
 
-    val searchAdapter = SearchAdapter()
+    val searchAdapter = StringAdapter()
     val searchObs by lazy { search_field.textChanges() }
 
     override fun initDagger(context: Context) {

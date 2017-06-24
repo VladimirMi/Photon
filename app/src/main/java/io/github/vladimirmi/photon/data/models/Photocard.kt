@@ -45,9 +45,7 @@ open class Filter(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
-
         other as Filter
-
         if (dish != other.dish) return false
         if (nuances != other.nuances) return false
         if (decor != other.decor) return false
@@ -74,4 +72,19 @@ open class Filter(
 
 }
 
-open class Tag(@PrimaryKey var tag: String = "") : RealmObject()
+open class Tag(@PrimaryKey var tag: String = "") : RealmObject() {
+    //region =============== hash and equals ==============
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+        other as Tag
+
+        if (tag != other.tag) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return tag.hashCode()
+    }
+    //endregion
+}

@@ -46,7 +46,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         compDisp.add(subscribeOnPhotocards())
     }
 
-    private fun subscribeOnPhotocards(): Disposable? {
+    private fun subscribeOnPhotocards(): Disposable {
         return model.getPhotoCards()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ view.setData(it) })
