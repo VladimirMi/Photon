@@ -7,6 +7,4 @@
 
     <include layout="@layout/view_profile"/>
 
-    <include layout="@layout/view_profile_not_auth"/>
-
 </io.github.vladimirmi.photon.features.profile.ProfileView>

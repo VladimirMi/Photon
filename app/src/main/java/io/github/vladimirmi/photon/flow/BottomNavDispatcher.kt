@@ -6,6 +6,9 @@ import flow.Direction
 import flow.Flow
 import flow.History
 import io.github.vladimirmi.photon.R
+import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.profile.ProfileScreen
@@ -28,8 +31,9 @@ class BottomNavDispatcher(private val flowInstance: Flow) : BottomNavigationView
         }
     }
 
-    private var currentItem = MAIN
+    var currentItem = MAIN
 
+    private val dm = DaggerService.appComponent.dataManager()
     val historyMap = hashMapOf(MAIN to History.single(MainScreen()),
             PROFILE to History.single(ProfileScreen()),
             LOAD to History.single(NewCardScreen()))
@@ -38,6 +42,17 @@ class BottomNavDispatcher(private val flowInstance: Flow) : BottomNavigationView
     fun dispatch(from: BottomItem, to: BottomItem) {
         val direction = getDirection(from, to)
         historyMap[from] = flowInstance.history
+
+        if (dm.isUserAuth()) {
+            val top = historyMap[to]!!.top<BaseScreen<*>>()
+            if (top is AuthScreen) {
+                if (to == PROFILE) historyMap[to] = History.single(ProfileScreen())
+                if (to == LOAD) historyMap[to] = History.single(NewCardScreen())
+            }
+        } else {
+            if (to == PROFILE || to == LOAD) historyMap[to] = History.single(AuthScreen())
+        }
+
         flowInstance.setHistory(historyMap[to]!!, direction)
         currentItem = to
     }

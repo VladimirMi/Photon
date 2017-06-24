@@ -33,7 +33,6 @@ class RootActivity : FlowActivity(), IRootView {
 
     @Inject internal lateinit var presenter: RootPresenter
 
-
     //region =============== Life cycle ==============
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +47,8 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        bottom_menu.setOnNavigationItemSelectedListener(BottomNavDispatcher(Flow.get(this)))
+        if (presenter.bottomNavigator == null) presenter.bottomNavigator = BottomNavDispatcher(Flow.get(this))
+        bottom_menu.setOnNavigationItemSelectedListener(presenter.bottomNavigator)
     }
 
     override fun onStart() {

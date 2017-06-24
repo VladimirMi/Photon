@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.github.vladimirmi.photon.features.auth.AuthView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            style="@style/CustomText.Black"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/profile_not_auth"
+            android:textAlignment="center"
+            />
+
+        <Button
+            android:id="@+id/registration_btn"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginTop="19dp"
+            android:text="@string/button_registration"
+            android:theme="@style/GreyDarkButton"
+            />
+
+        <Button
+            android:id="@+id/login_btn"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
+            android:text="@string/button_login"
+            android:theme="@style/GreyDarkButton"
+            />
+
+    </LinearLayout>
+
+</io.github.vladimirmi.photon.features.auth.AuthView>

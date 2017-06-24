@@ -9,8 +9,7 @@ import flow.ClassKey
 
 abstract class BaseScreen<in T> : ClassKey() {
 
-    val scopeName: String
-        get() = javaClass.name
+    open val scopeName: String = javaClass.name
 
     abstract fun createScreenComponent(parentComponent: T): Any
 

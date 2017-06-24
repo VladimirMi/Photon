@@ -10,7 +10,7 @@ import io.github.vladimirmi.photon.di.DaggerScope
  */
 
 @Module
-class RootActivityModule {
+class RootActivityModule() {
 
     @Provides
     @DaggerScope(RootActivity::class)
