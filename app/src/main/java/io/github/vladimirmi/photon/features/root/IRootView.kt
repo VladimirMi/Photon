@@ -10,7 +10,7 @@ import io.github.vladimirmi.photon.core.IView
 interface IRootView : IView, IRootBuilder {
 
     fun showLoading()
-
     fun hideLoading()
+    fun showPermissionSnackBar()
 }
 

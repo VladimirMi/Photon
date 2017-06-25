@@ -60,7 +60,7 @@ abstract class FlowActivity : AppCompatActivity() {
         super.onStop()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         dispatcher.onActivityResult(requestCode, resultCode, data)
     }

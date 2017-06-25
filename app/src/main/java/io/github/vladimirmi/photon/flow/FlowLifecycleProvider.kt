@@ -52,7 +52,7 @@ object FlowLifecycleProvider {
         return view is FlowLifecycles.BackPressListener && view.onBackPressed()
     }
 
-    fun onActivityResult(view: View, requestCode: Int, resultCode: Int, data: Intent) {
+    fun onActivityResult(view: View, requestCode: Int, resultCode: Int, data: Intent?) {
         if (view is FlowLifecycles.ActivityResultListener) {
             view.onActivityResult(requestCode, resultCode, data)
         }

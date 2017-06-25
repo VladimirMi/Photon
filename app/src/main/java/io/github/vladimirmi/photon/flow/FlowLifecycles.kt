@@ -42,7 +42,7 @@ interface FlowLifecycles {
     }
 
     interface ActivityResultListener {
-        fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent)
+        fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     }
 
     interface PermissionRequestListener {

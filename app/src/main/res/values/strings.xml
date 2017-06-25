@@ -4,6 +4,8 @@
         Для вдохновления и обучения.</string>
 
     <string name="message_wait">Пожалуйста, подождите</string>
+    <string name="message.permission.need">Необходимо дать требуемые разрешения</string>
+    <string name="message.permission.need.action">Разрешить</string>
 
     <string name="menu_bottom_main">Главная</string>
     <string name="menu_bottom_profile">Профиль</string>

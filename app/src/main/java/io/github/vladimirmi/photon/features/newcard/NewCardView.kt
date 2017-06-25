@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.features.newcard
 
 import android.content.Context
+import android.content.Intent
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.util.AttributeSet
@@ -15,7 +16,10 @@ import io.github.vladimirmi.photon.data.models.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.features.search.tags.StringAdapter
+import io.github.vladimirmi.photon.flow.FlowLifecycles
 import io.github.vladimirmi.photon.ui.FilterElementView
+import kotlinx.android.synthetic.main.screen_newcard.view.*
+import kotlinx.android.synthetic.main.view_choose.view.*
 import kotlinx.android.synthetic.main.view_new_card.view.*
 import kotlinx.android.synthetic.main.view_new_card_tags.view.*
 
@@ -24,7 +28,8 @@ import kotlinx.android.synthetic.main.view_new_card_tags.view.*
  */
 
 class NewCardView(context: Context, attrs: AttributeSet)
-    : BaseView<NewCardPresenter, NewCardView>(context, attrs) {
+    : BaseView<NewCardPresenter, NewCardView>(context, attrs),
+        FlowLifecycles.ActivityResultListener, FlowLifecycles.PermissionRequestListener {
 
     lateinit var filterElements: List<FilterElementView>
     val state = Flow.getKey<NewCardScreen>(context)!!.state
@@ -45,6 +50,7 @@ class NewCardView(context: Context, attrs: AttributeSet)
     private val filterAction: (FilterElementView) -> Unit = { select(it) }
 
     override fun initView() {
+        choose_btn.setOnClickListener { presenter.choosePhoto() }
         initFiltersSection()
         initTagSection()
         album_list.layoutManager = GridLayoutManager(context, 2)
@@ -119,12 +125,25 @@ class NewCardView(context: Context, attrs: AttributeSet)
         tagsAdapter.updateData(tags.map { it.tag })
     }
 
-    fun setAlbums(list: List<Album>, selectedAlbum: Album? = null) {
+    fun setAlbums(list: List<Album>) {
         albumAdapter.updateData(list)
     }
 
     fun selectAlbum(album: Album) {
         albumAdapter.selectAlbum(album)
+    }
+
+    fun showPhotoParams() {
+        choose_view.visibility = View.GONE
+        new_card_view.visibility = View.VISIBLE
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        presenter.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        presenter.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }
 

@@ -13,7 +13,7 @@ import timber.log.Timber
 
 class NewCardModel(private val dataManager: DataManager) : INewCardModel {
     val filters = Filter()
-    val photoCard = Photocard()
+    override val photoCard = Photocard()
 
     override fun addFilter(filter: Pair<String, String>) {
         changeFilterField(filter.first, filter.second)
@@ -52,10 +52,13 @@ class NewCardModel(private val dataManager: DataManager) : INewCardModel {
         }
     }
 
-    override fun getSavedTags() = photoCard.tags
-
     override fun getAlbums(): Observable<List<Album>> {
         val query = Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId())
         return dataManager.search(Album::class.java, listOf(query), sortBy = "views", order = Sort.DESCENDING)
+    }
+
+    override fun savePhotoUri(uri: String) {
+        Timber.e("savePhotoUri: $uri")
+        photoCard.photo = uri
     }
 }

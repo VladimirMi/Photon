@@ -1,7 +1,10 @@
 package io.github.vladimirmi.photon.features.root
 
 import android.app.ProgressDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
@@ -21,6 +24,7 @@ import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.splash.SplashScreen
 import io.github.vladimirmi.photon.flow.BottomNavDispatcher
 import io.github.vladimirmi.photon.flow.FlowActivity
+import io.github.vladimirmi.photon.utils.Constants
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.view_menu_item.view.*
 import javax.inject.Inject
@@ -105,6 +109,18 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun showMessage(string: String) {
         Snackbar.make(root_container, string, Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun showPermissionSnackBar() {
+        Snackbar.make(root_container, R.string.message_permission_need, Snackbar.LENGTH_LONG)
+                .setAction(R.string.message_permission_need_action, { openApplicationSettings() })
+                .show()
+    }
+
+    private fun openApplicationSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:" + packageName))
+        startActivityForResult(intent, Constants.REQUEST_SETTINGS_INTENT)
     }
 
     //endregion

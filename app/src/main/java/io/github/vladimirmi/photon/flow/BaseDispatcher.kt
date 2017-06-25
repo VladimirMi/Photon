@@ -39,7 +39,7 @@ abstract class BaseDispatcher(val baseContext: Context) : Dispatcher,
         FlowLifecycleProvider.onViewDestroyed(getActiveView() ?: return, removedByFlow)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         FlowLifecycleProvider.onActivityResult(getActiveView() ?: return, requestCode, resultCode, data)
     }
 

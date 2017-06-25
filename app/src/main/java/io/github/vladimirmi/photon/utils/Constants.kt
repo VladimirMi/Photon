@@ -16,4 +16,9 @@ object Constants {
     const val KEY_LAST_UPDATE_PREFIX = "KEY_LAST_UPDATE_"
     const val KEY_USER_ID = "KEY_USER_ID"
     const val KEY_USER_TOKEN = "KEY_USER_TOKEN"
+
+    const val REQUEST_GALLERY = 100
+    const val REQUEST_SETTINGS_INTENT = 101
+
+    const val MIME_TYPE_IMAGE = "image/*"
 }
