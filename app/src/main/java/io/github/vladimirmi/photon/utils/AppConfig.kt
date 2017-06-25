@@ -12,4 +12,10 @@ object AppConfig {
 
     const val RETRY_REQUEST_BASE_DELAY = 500
     const val RETRY_REQUEST_COUNT = 5
+
+    const val MIN_CONSUMER_COUNT = 1
+    const val MAX_CONSUMER_COUNT = 3
+    const val LOAD_FACTOR = 3
+    const val CONSUMER_KEEP_ALIVE = 120
+    const val INITIAL_BACK_OFF_IN_MS = 1000L
 }

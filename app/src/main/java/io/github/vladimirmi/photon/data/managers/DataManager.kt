@@ -11,6 +11,7 @@ import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Observable
 import io.realm.RealmObject
 import io.realm.Sort
+import okhttp3.MultipartBody
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -67,6 +68,15 @@ constructor(private val restService: RestService,
     fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Album> {
         return restService.createAlbum(getProfileId(), newAlbumReq, getUserToken())
                 .compose(RestErrorTransformer())
+    }
+
+    fun uploadPhoto(bodyPart: MultipartBody.Part): Observable<ImageUrlRes> {
+        return restService.uploadPhoto(getProfileId(), bodyPart)
+                .compose(RestErrorTransformer())
+    }
+
+    fun createPhotocard(photocard: Photocard): Observable<Photocard> {
+        TODO("not implemented")
     }
 
     //endregion

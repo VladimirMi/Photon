@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.di
 
+import android.content.Context
 import dagger.Component
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.managers.DataManager
@@ -17,4 +18,5 @@ import io.github.vladimirmi.photon.features.root.RootActivityComponent
 interface AppComponent {
     fun rootActivityComponentBuilder(): RootActivityComponent.Builder
     fun dataManager(): DataManager
+    fun context(): Context
 }

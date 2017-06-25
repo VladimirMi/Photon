@@ -2,6 +2,7 @@ package io.github.vladimirmi.photon.features.newcard
 
 import android.os.Parcelable
 import android.util.SparseArray
+import com.birbit.android.jobqueue.JobManager
 import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
@@ -31,8 +32,8 @@ class NewCardScreen : BaseScreen<RootActivityComponent>() {
     class Module {
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardModel(dataManager: DataManager): INewCardModel {
-            return NewCardModel(dataManager)
+        fun provideNewCardModel(dataManager: DataManager, jobManager: JobManager): INewCardModel {
+            return NewCardModel(dataManager, jobManager)
         }
 
         @Provides

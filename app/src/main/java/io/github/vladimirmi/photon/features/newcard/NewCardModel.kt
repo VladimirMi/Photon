@@ -1,5 +1,7 @@
 package io.github.vladimirmi.photon.features.newcard
 
+import com.birbit.android.jobqueue.JobManager
+import io.github.vladimirmi.photon.data.jobs.UploadPhotoJob
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.managers.RealmOperator
@@ -11,7 +13,7 @@ import io.reactivex.Observable
 import io.realm.Sort
 import timber.log.Timber
 
-class NewCardModel(private val dataManager: DataManager) : INewCardModel {
+class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : INewCardModel {
     val filters = Filter()
     override val photoCard = Photocard()
 
@@ -60,5 +62,9 @@ class NewCardModel(private val dataManager: DataManager) : INewCardModel {
     override fun savePhotoUri(uri: String) {
         Timber.e("savePhotoUri: $uri")
         photoCard.photo = uri
+    }
+
+    fun uploadPhoto(photocard: Photocard) {
+        jobManager.addJobInBackground(UploadPhotoJob(photocard))
     }
 }

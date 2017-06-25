@@ -41,7 +41,6 @@ dependencies {
     compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:design:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:cardview-v7:$SUPPORT_LIBRARY_VERSION"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.android:flexbox:0.2.6'
 
     compile "com.squareup.flow:flow:1.0.0-alpha3"
@@ -71,6 +70,8 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.8.0'
     // animation
     compile 'com.andkulikov:transitionseverywhere:1.7.3'
+    // jobs
+    compile 'com.birbit:android-priority-jobqueue:2.0.1'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }

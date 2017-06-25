@@ -4,6 +4,7 @@ import io.github.vladimirmi.photon.data.models.*
 import io.github.vladimirmi.photon.utils.Constants.HEADER_AUTHORIZATION
 import io.github.vladimirmi.photon.utils.Constants.HEADER_IF_MODIFIED_SINCE
 import io.reactivex.Observable
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -45,5 +46,10 @@ interface RestService {
                     @Body req: NewAlbumReq,
                     @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<Album>>
+
+    @Multipart
+    @POST("user/{userId}/image/upload")
+    fun uploadPhoto(@Path("userId") userId: String, @Part bodyPart: MultipartBody.Part)
+            : Observable<Response<ImageUrlRes>>
 
 }

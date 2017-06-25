@@ -72,14 +72,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        var requestCanceled = false
-        for (grantResult in grantResults) {
-            if (grantResult == PackageManager.PERMISSION_DENIED) {
-                requestCanceled = true
-                break
-            }
-        }
-        if (grantResults.isEmpty()) requestCanceled = true
+        val requestCanceled = grantResults.contains(PackageManager.PERMISSION_DENIED) || grantResults.isEmpty()
         if (requestCanceled) {
             rootPresenter.showPermissionSnackBar()
         } else if (requestCode == Constants.REQUEST_GALLERY) {
