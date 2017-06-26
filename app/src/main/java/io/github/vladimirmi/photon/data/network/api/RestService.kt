@@ -47,9 +47,17 @@ interface RestService {
                     @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<Album>>
 
+    @POST("user/{userId}/photocard")
+    fun createPhotocard(@Path("userId") userId: String,
+                        @Body req: Photocard,
+                        @Header(HEADER_AUTHORIZATION) token: String)
+            : Observable<Response<Photocard>>
+
     @Multipart
     @POST("user/{userId}/image/upload")
-    fun uploadPhoto(@Path("userId") userId: String, @Part bodyPart: MultipartBody.Part)
+    fun uploadPhoto(@Path("userId") userId: String,
+                    @Part bodyPart: MultipartBody.Part,
+                    @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<ImageUrlRes>>
 
 }

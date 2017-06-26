@@ -42,9 +42,7 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
     private fun save(photocards: List<Photocard>): Observable<Int> {
         var count = 0
         return Observable.fromIterable(photocards)
-                .doOnNext {
-                    dataManager.saveToDB(it.withId())
-                }
+                .doOnNext { dataManager.saveToDB(it.withId()) }
                 .flatMap { Observable.just(++count) }
     }
 

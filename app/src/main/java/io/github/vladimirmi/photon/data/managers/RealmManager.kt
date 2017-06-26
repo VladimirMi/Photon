@@ -5,12 +5,20 @@ import io.reactivex.ObservableEmitter
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.disposables.Disposables
 import io.realm.*
+import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
  */
 
 class RealmManager {
+
+    fun saveAsync(realmObject: RealmObject) {
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransactionAsync(Realm.Transaction { realm.insertOrUpdate(realmObject) },
+                Realm.Transaction.OnError { Timber.e("save: error ${it.message}") })
+        realm.close()
+    }
 
     fun save(realmObject: RealmObject) {
         val realm = Realm.getDefaultInstance()
@@ -29,6 +37,7 @@ class RealmManager {
                 .doFinally { realm.close() }
     }
 
+
     fun <T : RealmObject> get(clazz: Class<T>, id: String): Observable<T> {
         val realm = Realm.getDefaultInstance()
         return RealmResultObservable.from(realm
@@ -41,7 +50,6 @@ class RealmManager {
                 .doFinally { realm.close() }
     }
 
-
     fun <T : RealmObject> search(clazz: Class<T>, query: List<Query>?, sortBy: String, order: Sort): Observable<List<T>> {
         val realm = Realm.getDefaultInstance()
         var realmQuery = realm.where(clazz)
@@ -52,6 +60,14 @@ class RealmManager {
                 .filter { it.isLoaded }
                 .map { realm.copyFromRealm(it) }
                 .doFinally { realm.close() }
+    }
+
+    fun <T : RealmObject> remove(clazz: Class<T>, id: String) {
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransaction {
+            it.where(clazz).equalTo("id", id).findFirst()?.deleteFromRealm()
+        }
+        realm.close()
     }
 }
 

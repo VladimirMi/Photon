@@ -7,11 +7,12 @@ import io.github.vladimirmi.photon.data.models.Tag
 import io.reactivex.Observable
 
 interface INewCardModel : IModel {
-    val photoCard: Photocard
+    var photoCard: Photocard
     fun addFilter(filter: Pair<String, String>)
     fun removeFilter(filter: Pair<String, String>)
     fun search(tag: String): Observable<List<Tag>>
     fun addTag(tag: Tag)
     fun getAlbums(): Observable<List<Album>>
-    fun savePhotoUri(toString: String)
+    fun savePhotoUri(uri: String)
+    fun uploadPhotocard()
 }

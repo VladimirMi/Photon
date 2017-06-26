@@ -7,6 +7,7 @@ import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
+import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -16,22 +17,22 @@ import timber.log.Timber
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-
 class UploadPhotoJob(private val photocard: Photocard)
     : Job(Params(JobPriority.HIGH)
-        .singleInstanceBy(photocard.id)
-        .requireNetwork()
-        .persist()) {
+        .groupBy("Images")
+        .requireNetwork()) {
+
+    val tempId = photocard.id
 
     override fun onAdded() {
         Timber.e("onAdded: ")
-        //todo записать в бд то, что уже сейчас есть, как загрузится - заменить
+        photocard.id = ""
+        DaggerService.appComponent.dataManager().saveToDB(photocard)
     }
 
     override fun onRun() {
         Timber.e("onRun: ")
         val dataManager = DaggerService.appComponent.dataManager()
-
         val data = getByteArrayFromContent(photocard.photo)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
 
@@ -41,8 +42,12 @@ class UploadPhotoJob(private val photocard: Photocard)
                     photocard.photo = it.image
                     dataManager.createPhotocard(photocard)
                 }
-                .map { photocard.id = it.id }  //todo проверить что приходит
-                .subscribe { dataManager.saveToDB(photocard) }
+                .map { photocard.id = it.id }
+                .subscribeOn(Schedulers.io())
+                .subscribe {
+                    dataManager.removeFromDb(Photocard::class.java, tempId)
+                    dataManager.saveToDB(photocard)
+                }
 
     }
 

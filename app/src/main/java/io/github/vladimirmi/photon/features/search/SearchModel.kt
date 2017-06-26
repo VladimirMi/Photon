@@ -50,6 +50,6 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
     }
 
     override fun saveSearch(search: String) {
-        dataManager.saveToDB(Search(search))
+        dataManager.saveToDB(Search(search), async = true)
     }
 }

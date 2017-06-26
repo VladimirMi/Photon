@@ -5,7 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.models.Album
+import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.data.models.Tag
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.Constants
@@ -22,9 +22,16 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
 
     override fun initView(view: NewCardView) {
         if (model.photoCard.photo.isNotEmpty()) view.showPhotoParams()
+        compDisp.add(subscribeInTitleField())
         compDisp.add(subscribeOnTagField())
         view.setTags(model.photoCard.tags)
         compDisp.add(subscribeOnAlbums())
+    }
+
+    private fun subscribeInTitleField(): Disposable {
+        return view.nameObs
+                .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                .subscribe { model.photoCard.title = it.toString() }
     }
 
     private fun subscribeOnTagField(): Disposable {
@@ -39,21 +46,26 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
                 .subscribe { view.setAlbums(it) }
     }
 
-    fun addFilter(filter: Pair<String, String>) {
-        model.addFilter(filter)
-    }
+    fun addFilter(filter: Pair<String, String>) = model.addFilter(filter)
 
-    fun removeFilter(filter: Pair<String, String>) {
-        model.removeFilter(filter)
-    }
+    fun removeFilter(filter: Pair<String, String>) = model.removeFilter(filter)
 
     fun saveTag(tag: String) {
         model.addTag(Tag(tag))
         view.setTags(model.photoCard.tags)
     }
 
-    fun setAlbum(album: Album) {
-        view.selectAlbum(album)
+    fun setAlbumId(albumId: String) {
+        model.photoCard.album = albumId
+        view.selectAlbum(albumId)
+    }
+
+    fun savePhotocard() = model.uploadPhotocard()
+
+    fun clearPhotocard() {
+        model.photoCard = Photocard()
+        setAlbumId("")
+        view.clearView()
     }
 
     fun choosePhoto() {

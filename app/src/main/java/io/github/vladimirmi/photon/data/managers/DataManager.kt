@@ -71,21 +71,26 @@ constructor(private val restService: RestService,
     }
 
     fun uploadPhoto(bodyPart: MultipartBody.Part): Observable<ImageUrlRes> {
-        return restService.uploadPhoto(getProfileId(), bodyPart)
+        return restService.uploadPhoto(getProfileId(), bodyPart, getUserToken())
                 .compose(RestErrorTransformer())
     }
 
     fun createPhotocard(photocard: Photocard): Observable<Photocard> {
-        TODO("not implemented")
+        return restService.createPhotocard(getProfileId(), photocard, getUserToken())
+                .compose(RestErrorTransformer())
     }
 
     //endregion
 
     //region =============== DataBase ==============
 
-    fun saveToDB(realmObject: RealmObject) {
-        Timber.e("saveToDB ${realmObject.javaClass}")
-        realmManager.save(realmObject)
+    fun saveToDB(realmObject: RealmObject, async: Boolean = false) {
+        Timber.e("${if (async) "async saveToDB" else "saveToDB"} $realmObject")
+        if (async) {
+            realmManager.saveAsync(realmObject)
+        } else {
+            realmManager.save(realmObject)
+        }
     }
 
     fun <T : RealmObject> getListFromDb(clazz: Class<T>, sortBy: String, order: Sort = Sort.ASCENDING)
@@ -101,6 +106,10 @@ constructor(private val restService: RestService,
                                  query: List<Query>?,
                                  sortBy: String, order: Sort = Sort.ASCENDING): Observable<List<T>> {
         return realmManager.search(clazz, query, sortBy, order)
+    }
+
+    fun <T : RealmObject> removeFromDb(clazz: Class<T>, id: String) {
+        realmManager.remove(clazz, id)
     }
 
     //endregion

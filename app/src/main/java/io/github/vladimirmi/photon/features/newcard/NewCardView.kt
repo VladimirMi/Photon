@@ -21,6 +21,7 @@ import io.github.vladimirmi.photon.ui.FilterElementView
 import kotlinx.android.synthetic.main.screen_newcard.view.*
 import kotlinx.android.synthetic.main.view_choose.view.*
 import kotlinx.android.synthetic.main.view_new_card.view.*
+import kotlinx.android.synthetic.main.view_new_card_name.view.*
 import kotlinx.android.synthetic.main.view_new_card_tags.view.*
 
 /**
@@ -34,13 +35,17 @@ class NewCardView(context: Context, attrs: AttributeSet)
     lateinit var filterElements: List<FilterElementView>
     val state = Flow.getKey<NewCardScreen>(context)!!.state
 
+    val nameObs by lazy { name_field.textChanges() }
     val tagObs by lazy { tag_field.textChanges() }
 
     val tagsAdapter = StringAdapter()
-    val tagAction: (String) -> Unit = { tag_field.setText(it) }
+    val tagAction: (String) -> Unit = {
+        tag_field.setText(it)
+        tag_field.setSelection(it.length)
+    }
     val suggestTagAdapter = StringAdapter(tagAction)
 
-    val albumAction: (Album) -> Unit = { presenter.setAlbum(it) }
+    val albumAction: (Album) -> Unit = { presenter.setAlbumId(it.id) }
     val albumAdapter = AlbumAdapter(albumAction)
 
     override fun initDagger(context: Context) {
@@ -51,6 +56,8 @@ class NewCardView(context: Context, attrs: AttributeSet)
 
     override fun initView() {
         choose_btn.setOnClickListener { presenter.choosePhoto() }
+        save.setOnClickListener { presenter.savePhotocard() }
+        cancel.setOnClickListener { presenter.clearPhotocard() }
         initFiltersSection()
         initTagSection()
         album_list.layoutManager = GridLayoutManager(context, 2)
@@ -71,7 +78,10 @@ class NewCardView(context: Context, attrs: AttributeSet)
 
         ic_action.setOnClickListener {
             val tag = tag_field.text.toString()
-            if (tag.isNotEmpty()) presenter.saveTag(tag)
+            if (tag.isNotEmpty()) {
+                presenter.saveTag(tag)
+                tag_field.setText("")
+            }
         }
 
         suggestion_tag_list.layoutManager = LinearLayoutManager(context)
@@ -101,10 +111,6 @@ class NewCardView(context: Context, attrs: AttributeSet)
         return result
     }
 
-    private fun savePhotoCard() {
-
-    }
-
     private fun select(filterElement: FilterElementView) {
         if (filterElement.picked) {
             presenter.addFilter(filterElement.filter)
@@ -129,8 +135,15 @@ class NewCardView(context: Context, attrs: AttributeSet)
         albumAdapter.updateData(list)
     }
 
-    fun selectAlbum(album: Album) {
-        albumAdapter.selectAlbum(album)
+    fun selectAlbum(albumId: String) {
+        albumAdapter.selectedAlbum = albumId
+    }
+
+    fun clearView() {
+        name_field.setText("")
+        tag_field.setText("")
+        filterElements.filter { it.picked }.forEach { it.pick() }
+        setTags(emptyList())
     }
 
     fun showPhotoParams() {

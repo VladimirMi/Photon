@@ -22,7 +22,11 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
     : RecyclerView.Adapter<AlbumViewHolder>() {
 
     var authorMode = false
-    private var selectedAlbum = ""
+    var selectedAlbum = ""
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
     private var data: List<Album> = ArrayList()
 
     fun updateData(list: List<Album>) {
@@ -39,11 +43,6 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
         })
         data = list
         diffResult.dispatchUpdatesTo(this)
-    }
-
-    fun selectAlbum(album: Album) {
-        selectedAlbum = album.id
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
