@@ -9,7 +9,7 @@ import android.support.v4.content.ContextCompat
 
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
-import io.github.vladimirmi.photon.data.models.User
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavDispatcher
 import io.reactivex.Observable

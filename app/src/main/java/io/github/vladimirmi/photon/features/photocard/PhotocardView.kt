@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.Photocard
-import io.github.vladimirmi.photon.data.models.User
+import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.ui.TagView
 import io.github.vladimirmi.photon.ui.setImage

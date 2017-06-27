@@ -5,9 +5,9 @@ import io.github.vladimirmi.photon.data.jobs.UploadPhotoJob
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.managers.RealmOperator
-import io.github.vladimirmi.photon.data.models.Album
-import io.github.vladimirmi.photon.data.models.Photocard
-import io.github.vladimirmi.photon.data.models.Tag
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.reactivex.Observable
 import io.realm.Sort
 import timber.log.Timber

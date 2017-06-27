@@ -5,8 +5,8 @@ import flow.Direction
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.models.Album
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder

@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.features.main
 
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.Photocard
+import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
 import io.reactivex.Observable
 import io.realm.Sort

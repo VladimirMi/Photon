@@ -45,15 +45,14 @@ class RealmManager {
                 .equalTo("id", id)
                 .findAllAsync())
                 .filter { it.isLoaded }
-                .filter { it.isNotEmpty() }
-                .map { realm.copyFromRealm(it[0]) }
+                .map { if (it.isNotEmpty()) realm.copyFromRealm(it[0]) else clazz.newInstance() }
                 .doFinally { realm.close() }
     }
 
     fun <T : RealmObject> search(clazz: Class<T>, query: List<Query>?, sortBy: String, order: Sort): Observable<List<T>> {
         val realm = Realm.getDefaultInstance()
         var realmQuery = realm.where(clazz)
-        query?.forEach { realmQuery = it.apply(realmQuery) }
+        query?.forEach { realmQuery = it.applyTo(realmQuery) }
 
         return RealmResultObservable.from(realmQuery
                 .findAllSortedAsync(sortBy, order))
@@ -69,13 +68,21 @@ class RealmManager {
         }
         realm.close()
     }
+
+    fun <T : RealmObject> getSingle(java: Class<T>, id: String): T? {
+        val realm = Realm.getDefaultInstance()
+        var result = realm.where(java).equalTo("id", id).findFirst()
+        result = result?.let { realm.copyFromRealm(result) }
+        realm.close()
+        return result
+    }
 }
 
 enum class RealmOperator {CONTAINS, EQUALTO }
 
 class Query(val fieldName: String, val operator: RealmOperator, val value: String) {
 
-    fun <T : RealmModel> apply(realmQuery: RealmQuery<T>): RealmQuery<T> {
+    fun <T : RealmModel> applyTo(realmQuery: RealmQuery<T>): RealmQuery<T> {
         when (operator) {
             RealmOperator.CONTAINS -> realmQuery.contains(fieldName, value)
             RealmOperator.EQUALTO -> realmQuery.equalTo(fieldName, value)

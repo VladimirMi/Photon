@@ -6,6 +6,7 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import io.github.vladimirmi.photon.core.App
+import io.github.vladimirmi.photon.data.network.ISO8601DateJsonAdapter
 import io.github.vladimirmi.photon.data.network.RealmListJsonAdapter
 import io.github.vladimirmi.photon.data.network.TagJsonAdapter
 import io.github.vladimirmi.photon.data.network.api.RestService
@@ -59,6 +60,7 @@ class NetworkModule {
 
     private fun createConvertFactory(): Converter.Factory {
         val moshi = Moshi.Builder()
+                .add(ISO8601DateJsonAdapter())
                 .add(TagJsonAdapter())
                 .add(RealmListJsonAdapter.FACTORY)
                 .build()

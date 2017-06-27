@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.data.models
+package io.github.vladimirmi.photon.data.models.realm
 
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -20,6 +20,7 @@ open class Photocard(
         var favorits: Int = 0,
         var filters: Filter = Filter(),
         var tags: RealmList<Tag> = RealmList(),
+        var updated: Date = Date(),
         @Ignore var album: String = ""
 ) : RealmObject() {
     fun withId(): Photocard {
@@ -31,7 +32,6 @@ open class Photocard(
     override fun toString(): String {
         return "Photocard(id='$id', owner='$owner', title='$title', photo='$photo', views=$views, favorits=$favorits, filters=$filters, tags=$tags, album=$album)"
     }
-
 
 }
 
@@ -86,19 +86,4 @@ open class Filter(
 
 }
 
-open class Tag(@PrimaryKey var tag: String = "") : RealmObject() {
-    //region =============== hash and equals ==============
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as Tag
-
-        if (tag != other.tag) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return tag.hashCode()
-    }
-    //endregion
-}
+open class Tag(@PrimaryKey var tag: String = "") : RealmObject()

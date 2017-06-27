@@ -5,8 +5,8 @@ import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.Album
-import io.github.vladimirmi.photon.data.models.User
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder

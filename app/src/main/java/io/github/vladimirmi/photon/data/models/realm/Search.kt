@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.data.models
+package io.github.vladimirmi.photon.data.models.realm
 
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey

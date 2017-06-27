@@ -1,9 +1,13 @@
 package io.github.vladimirmi.photon.data.network
 
 import com.squareup.moshi.*
-import io.github.vladimirmi.photon.data.models.Tag
+import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.realm.RealmList
 import io.realm.RealmModel
+import io.realm.internal.android.ISO8601Utils
+import java.text.ParsePosition
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -52,5 +56,17 @@ class TagJsonAdapter {
 
     @ToJson fun toJson(tag: Tag): String {
         return tag.tag
+    }
+}
+
+class ISO8601DateJsonAdapter {
+    @FromJson fun fromJson(date: String): Date {
+        return ISO8601Utils.parse(date, ParsePosition(0))
+    }
+
+    @ToJson fun toJson(date: Date): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        return dateFormat.format(date)
     }
 }

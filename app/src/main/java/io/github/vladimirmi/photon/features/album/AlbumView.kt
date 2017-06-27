@@ -4,8 +4,8 @@ import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.Album
-import io.github.vladimirmi.photon.data.models.Photocard
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.CardAdapter
 import kotlinx.android.synthetic.main.screen_album.view.*

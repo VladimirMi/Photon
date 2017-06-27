@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.features.author
 
 import flow.Flow
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.models.Album
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.reactivex.disposables.Disposable

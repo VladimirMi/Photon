@@ -22,7 +22,7 @@ class FlowServiceFactory : ServicesFactory() {
         }
 
         val screenComponent: Any
-        var parentScope: MortarScope = DaggerService.rootActivityScope!! //default parent scope
+        var parentScope: MortarScope = DaggerService.rootActivityScope //default parent scope
         if (screen is TreeKey) {
             val parentScreen = screen.parentKey as BaseScreen<*>
             val parentScopeName = parentScreen.scopeName

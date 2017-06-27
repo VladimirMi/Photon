@@ -1,6 +1,13 @@
 package io.github.vladimirmi.photon.data.network.api
 
-import io.github.vladimirmi.photon.data.models.*
+import io.github.vladimirmi.photon.data.models.ImageUrlRes
+import io.github.vladimirmi.photon.data.models.NewAlbumReq
+import io.github.vladimirmi.photon.data.models.SignInReq
+import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.Tag
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.Constants.HEADER_AUTHORIZATION
 import io.github.vladimirmi.photon.utils.Constants.HEADER_IF_MODIFIED_SINCE
 import io.reactivex.Observable
@@ -21,24 +28,24 @@ interface RestService {
     fun signUp(@Body req: SignUpReq): Observable<Response<User>>
 
     @GET("photocard/list")
-    fun getPhotocards(@Header(HEADER_IF_MODIFIED_SINCE) lastUpdate: String,
-                      @Query("limit") limit: Int,
-                      @Query("offset") offset: Int)
+    fun getPhotocards(@Query("limit") limit: Int,
+                      @Query("offset") offset: Int,
+                      @Header(HEADER_IF_MODIFIED_SINCE) lastModified: String)
             : Observable<Response<List<Photocard>>>
 
     @GET("photocard/tags")
-    fun getTags(@Header(HEADER_IF_MODIFIED_SINCE) lastUpdate: String)
+    fun getTags(@Header(HEADER_IF_MODIFIED_SINCE) lastModified: String)
             : Observable<Response<List<Tag>>>
 
     @GET("user/{userId}")
     fun getUser(@Path("userId") id: String,
-                @Header(HEADER_IF_MODIFIED_SINCE) lastUpdate: String)
+                @Header(HEADER_IF_MODIFIED_SINCE) lastModified: String)
             : Observable<Response<User>>
 
     @GET("user/{userId}/photocard/{id}")
     fun getPhotocard(@Path("id") id: String,
                      @Path("userId") userId: String,
-                     @Header(HEADER_IF_MODIFIED_SINCE) lastUpdate: String)
+                     @Header(HEADER_IF_MODIFIED_SINCE) lastModified: String)
             : Observable<Response<Photocard>>
 
     @POST("user/{userId}/album")

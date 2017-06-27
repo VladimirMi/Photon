@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.features.album
 
 import io.github.vladimirmi.photon.core.IModel
-import io.github.vladimirmi.photon.data.models.Album
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.reactivex.Observable
 
 interface IAlbumModel : IModel {

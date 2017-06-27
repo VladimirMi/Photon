@@ -1,9 +1,9 @@
 package io.github.vladimirmi.photon.features.profile
 
 import io.github.vladimirmi.photon.core.IModel
-import io.github.vladimirmi.photon.data.models.Album
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
-import io.github.vladimirmi.photon.data.models.User
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.reactivex.Observable
 
 interface IProfileModel : IModel {

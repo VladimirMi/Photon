@@ -1,10 +1,10 @@
 package io.github.vladimirmi.photon.features.root
 
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
-import io.github.vladimirmi.photon.data.models.User
+import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
  */
 
 class RootModel(private val dataManager: DataManager) : IRootModel {
-    override fun updatePhotoCards(): Observable<Int> {
+    override fun updatePhotocards(): Observable<Int> {
 //        val updateObs = Observable.interval(0, 500, TimeUnit.MILLISECONDS)
 //                .flatMap {
 //                    dataManager.getPhotocardsFromNet(limit = 60,

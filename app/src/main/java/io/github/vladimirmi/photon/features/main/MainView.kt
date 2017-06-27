@@ -7,9 +7,9 @@ import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import flow.Flow
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.Photocard
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.ui.LoginDialog

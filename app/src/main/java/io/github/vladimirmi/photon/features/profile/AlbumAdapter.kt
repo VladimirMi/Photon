@@ -7,7 +7,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.Album
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.ui.getDisplayMetrics
 import io.github.vladimirmi.photon.ui.setImage
 import kotlinx.android.synthetic.main.item_album.view.*

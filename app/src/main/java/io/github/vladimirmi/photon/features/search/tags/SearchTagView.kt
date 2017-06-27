@@ -8,8 +8,8 @@ import com.google.android.flexbox.FlexboxLayout
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.Search
-import io.github.vladimirmi.photon.data.models.Tag
+import io.github.vladimirmi.photon.data.models.realm.Search
+import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.ui.TagView

@@ -3,8 +3,8 @@ package io.github.vladimirmi.photon.features.search
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.managers.RealmOperator
-import io.github.vladimirmi.photon.data.models.Search
-import io.github.vladimirmi.photon.data.models.Tag
+import io.github.vladimirmi.photon.data.models.realm.Search
+import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.features.main.IMainModel
 import io.reactivex.Observable
 import io.realm.Sort

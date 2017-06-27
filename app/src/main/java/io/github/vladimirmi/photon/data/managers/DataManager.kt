@@ -3,17 +3,22 @@ package io.github.vladimirmi.photon.data.managers
 import android.content.Context
 import android.net.ConnectivityManager
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.models.*
-import io.github.vladimirmi.photon.data.network.RestErrorTransformer
-import io.github.vladimirmi.photon.data.network.RestLastModifiedTransformer
+import io.github.vladimirmi.photon.data.models.ImageUrlRes
+import io.github.vladimirmi.photon.data.models.NewAlbumReq
+import io.github.vladimirmi.photon.data.models.SignInReq
+import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.Tag
+import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.network.ApiErrorTransformer
+import io.github.vladimirmi.photon.data.network.LastModifiedTransformer
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Observable
 import io.realm.RealmObject
 import io.realm.Sort
 import okhttp3.MultipartBody
-import timber.log.Timber
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -32,52 +37,59 @@ constructor(private val restService: RestService,
     //region =============== Network ==============
 
     fun getPhotocardsFromNet(limit: Int, offset: Int): Observable<List<Photocard>> {
-        return restService.getPhotocards(getLastUpdate(Photocard::class.java.name), limit, offset)
-                .compose(RestLastModifiedTransformer(Photocard::class.java.name))
-                .compose(RestErrorTransformer())
+        val tag = Photocard::class.java.simpleName
+        return restService.getPhotocards(limit, offset, getLastModified(tag))
+                .compose(ApiErrorTransformer())
+                .compose(LastModifiedTransformer(tag))
     }
 
-    fun getPhotocardFromNet(id: String, ownerId: String): Observable<Photocard> {
-        //todo смысл в last-modified?
-        return restService.getPhotocard(id, ownerId, Date(0).toString())
-                .compose(RestErrorTransformer())
+    fun getPhotocardFromNet(id: String, ownerId: String, lastModified: String): Observable<Photocard> {
+        return restService.getPhotocard(id, ownerId, lastModified)
+                .compose(ApiErrorTransformer())
+                .compose(LastModifiedTransformer())
     }
 
     fun getTagsFromNet(): Observable<List<Tag>> {
-        return restService.getTags(getLastUpdate(Tag::class.java.name))
-                .compose(RestLastModifiedTransformer(Tag::class.java.name))
-                .compose(RestErrorTransformer())
+        val tag = Tag::class.java.simpleName
+        return restService.getTags(getLastModified(tag))
+                .compose(ApiErrorTransformer())
+                .compose(LastModifiedTransformer(tag))
     }
 
-    fun getUserFromNet(id: String): Observable<User> {
-        //todo смысл в last-modified?
-        return restService.getUser(id, Date(0).toString())
-                .compose(RestErrorTransformer())
+    fun getUserFromNet(id: String, lastModified: String): Observable<User> {
+        return restService.getUser(id, lastModified)
+                .compose(ApiErrorTransformer())
+                .compose(LastModifiedTransformer())
     }
 
     fun signIn(req: SignInReq): Observable<User> {
         return restService.signIn(req)
-                .compose(RestErrorTransformer())
+                .compose(ApiErrorTransformer())
+                .map { it.body()!! }
     }
 
     fun signUp(req: SignUpReq): Observable<User> {
         return restService.signUp(req)
-                .compose(RestErrorTransformer())
+                .compose(ApiErrorTransformer())
+                .map { it.body()!! }
     }
 
     fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Album> {
         return restService.createAlbum(getProfileId(), newAlbumReq, getUserToken())
-                .compose(RestErrorTransformer())
+                .compose(ApiErrorTransformer())
+                .map { it.body()!! }
     }
 
     fun uploadPhoto(bodyPart: MultipartBody.Part): Observable<ImageUrlRes> {
         return restService.uploadPhoto(getProfileId(), bodyPart, getUserToken())
-                .compose(RestErrorTransformer())
+                .compose(ApiErrorTransformer())
+                .map { it.body()!! }
     }
 
     fun createPhotocard(photocard: Photocard): Observable<Photocard> {
         return restService.createPhotocard(getProfileId(), photocard, getUserToken())
-                .compose(RestErrorTransformer())
+                .compose(ApiErrorTransformer())
+                .map { it.body()!! }
     }
 
     //endregion
@@ -85,7 +97,6 @@ constructor(private val restService: RestService,
     //region =============== DataBase ==============
 
     fun saveToDB(realmObject: RealmObject, async: Boolean = false) {
-        Timber.e("${if (async) "async saveToDB" else "saveToDB"} $realmObject")
         if (async) {
             realmManager.saveAsync(realmObject)
         } else {
@@ -93,12 +104,14 @@ constructor(private val restService: RestService,
         }
     }
 
-    fun <T : RealmObject> getListFromDb(clazz: Class<T>, sortBy: String, order: Sort = Sort.ASCENDING)
-            : Observable<List<T>> {
+    fun <T : RealmObject> getListFromDb(clazz: Class<T>,
+                                        sortBy: String,
+                                        order: Sort = Sort.ASCENDING): Observable<List<T>> {
         return search(clazz, null, sortBy, order)
     }
 
-    fun <T : RealmObject> getObjectFromDb(clazz: Class<T>, id: String): Observable<T> {
+    fun <T : RealmObject> getObjectFromDb(clazz: Class<T>,
+                                          id: String): Observable<T> {
         return realmManager.get(clazz, id)
     }
 
@@ -116,9 +129,9 @@ constructor(private val restService: RestService,
 
     //region =============== Shared Preferences ==============
 
-    private fun getLastUpdate(name: String): String = preferencesManager.getLastUpdate(name)
+    private fun getLastModified(tag: String): String = preferencesManager.getLastUpdate(tag)
 
-    fun saveLastUpdate(name: String, lastModified: String) = preferencesManager.saveLastUpdate(name, lastModified)
+    fun saveLastUpdate(tag: String, lastModified: String) = preferencesManager.saveLastUpdate(tag, lastModified)
 
     fun saveUserId(id: String) = preferencesManager.saveUserId(id)
 
@@ -141,6 +154,10 @@ constructor(private val restService: RestService,
                     Observable.just(cm.activeNetworkInfo != null && cm.activeNetworkInfo.isConnectedOrConnecting)
                 }
                 .distinctUntilChanged()
+    }
+
+    fun <T : RealmObject> getSingleFromDb(java: Class<T>, id: String): T? {
+        return realmManager.getSingle(java, id)
     }
 }
 
