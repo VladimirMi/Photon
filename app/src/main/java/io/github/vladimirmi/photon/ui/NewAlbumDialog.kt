@@ -23,7 +23,7 @@ class NewAlbumDialog(viewGroup: ViewGroup, newAlbumAction: (NewAlbumReq) -> Unit
         listenFields()
         cancel.setOnClickListener { dialog.cancel() }
         ok.setOnClickListener {
-            val request = NewAlbumReq(name = name.text.toString(),
+            val request = NewAlbumReq(title = name.text.toString(),
                     description = description.text.toString()
             )
             newAlbumAction(request)

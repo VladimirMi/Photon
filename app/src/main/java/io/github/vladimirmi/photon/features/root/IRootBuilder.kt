@@ -10,8 +10,6 @@ interface IRootBuilder {
 
     fun setBottomMenuVisible(visible: Boolean)
 
-    fun setBottomMenuChecked(index: Int)
-
     fun enableTabs(enabled: Boolean)
 
     fun setBackground(backgroundId: Int)

@@ -1,9 +1,6 @@
 package io.github.vladimirmi.photon.data.network.api
 
-import io.github.vladimirmi.photon.data.models.ImageUrlRes
-import io.github.vladimirmi.photon.data.models.NewAlbumReq
-import io.github.vladimirmi.photon.data.models.SignInReq
-import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.*
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
@@ -66,5 +63,12 @@ interface RestService {
                     @Part bodyPart: MultipartBody.Part,
                     @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<ImageUrlRes>>
+
+    @PUT("user/{userId}/album/{id}")
+    fun editAlbum(@Path("userId") userId: String,
+                  @Path("id") id: String,
+                  @Body req: EditAlbumReq,
+                  @Header(HEADER_AUTHORIZATION) token: String)
+            : Observable<Response<Album>>
 
 }

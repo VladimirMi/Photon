@@ -23,12 +23,12 @@ class SearchScreen : BaseScreen<MainScreen.Component>(), TreeKey {
 
     override val layoutResId = R.layout.screen_search
 
-    override fun getParentKey(): Any = MainScreen()
+    override fun getParentKey() = MainScreen()
 
 
     //region =============== DI ==============
 
-    override fun createScreenComponent(parentComponent: MainScreen.Component): Any {
+    override fun createScreenComponent(parentComponent: MainScreen.Component): Component {
         return parentComponent.searchComponentBuilder()
                 .module(Module())
                 .build()

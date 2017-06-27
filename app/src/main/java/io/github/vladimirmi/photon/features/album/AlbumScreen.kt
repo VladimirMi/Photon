@@ -14,9 +14,10 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
  * Created by Vladimir Mikhalev 19.06.2017.
  */
 
-class AlbumScreen(val album: Album) : BaseScreen<RootActivityComponent>() {
+data class AlbumScreen(val album: Album) : BaseScreen<RootActivityComponent>() {
 
     override val layoutResId = R.layout.screen_album
+    override val scopeName = super.scopeName + album.id
 
     //region =============== DI ==============
 

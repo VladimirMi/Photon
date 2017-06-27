@@ -5,5 +5,5 @@ package io.github.vladimirmi.photon.data.models
  */
 
 class NewAlbumReq(var owner: String = "",
-                  val name: String,
+                  val title: String,
                   val description: String)

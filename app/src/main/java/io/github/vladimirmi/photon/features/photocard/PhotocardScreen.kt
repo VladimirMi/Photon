@@ -14,8 +14,9 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
  * Created by Vladimir Mikhalev 14.06.2017.
  */
 
-class PhotocardScreen(val photocard: Photocard) : BaseScreen<RootActivityComponent>() {
+data class PhotocardScreen(val photocard: Photocard) : BaseScreen<RootActivityComponent>() {
     override val layoutResId = R.layout.screen_photocard
+    override val scopeName = super.scopeName + photocard.id
 
     //region =============== DI ==============
 
@@ -23,6 +24,24 @@ class PhotocardScreen(val photocard: Photocard) : BaseScreen<RootActivityCompone
         return parentComponent.photocardComponentBuilder()
                 .module(Module())
                 .build()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+        if (!super.equals(other)) return false
+
+        other as PhotocardScreen
+
+        if (photocard != other.photocard) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + photocard.hashCode()
+        return result
     }
 
     @dagger.Module
@@ -53,5 +72,4 @@ class PhotocardScreen(val photocard: Photocard) : BaseScreen<RootActivityCompone
     }
 
     //endregion
-
 }

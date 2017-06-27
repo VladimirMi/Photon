@@ -127,10 +127,6 @@ class RootActivity : FlowActivity(), IRootView {
 
     //region =============== IViewBuilder ==============
 
-    override fun setBottomMenuChecked(index: Int) {
-        //todo implement me
-    }
-
     override fun setBottomMenuVisible(visible: Boolean) {
         if (visible) {
             bottom_menu.visibility = View.VISIBLE

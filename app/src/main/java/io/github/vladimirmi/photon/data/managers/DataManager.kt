@@ -3,10 +3,7 @@ package io.github.vladimirmi.photon.data.managers
 import android.content.Context
 import android.net.ConnectivityManager
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.models.ImageUrlRes
-import io.github.vladimirmi.photon.data.models.NewAlbumReq
-import io.github.vladimirmi.photon.data.models.SignInReq
-import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.*
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
@@ -88,6 +85,12 @@ constructor(private val restService: RestService,
 
     fun createPhotocard(photocard: Photocard): Observable<Photocard> {
         return restService.createPhotocard(getProfileId(), photocard, getUserToken())
+                .compose(ApiErrorTransformer())
+                .map { it.body()!! }
+    }
+
+    fun editAlbum(req: EditAlbumReq): Observable<Album> {
+        return restService.editAlbum(getProfileId(), req.id, req, getUserToken())
                 .compose(ApiErrorTransformer())
                 .map { it.body()!! }
     }

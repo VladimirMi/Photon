@@ -22,6 +22,7 @@
 
     <string name="menu_album_delete">Удалить</string>
     <string name="menu_album_edit">Редактировать</string>
+    <string name="menu_album_add">Добавить фотокарточку</string>
 
     <string name="button_ok">OK</string>
     <string name="button_cancel">Отмена</string>

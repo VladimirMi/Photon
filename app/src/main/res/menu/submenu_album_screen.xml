@@ -11,4 +11,9 @@
         android:title="@string/menu_album_delete"
         android:icon="@drawable/ic_action_delete"/>
 
+    <item
+        android:id="@+id/add_photocard"
+        android:title="@string/menu_album_add"
+        android:icon="@drawable/ic_action_add"/>
+
 </menu>

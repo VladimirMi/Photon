@@ -10,7 +10,6 @@ class ToolbarBuilder(private val rootView: IRootView) {
     @StringRes private var toolbarTitleId = R.string.app_name
     private var backNavEnabled = false
     private var bottomMenuEnabled = true
-    private var bottomItemIndex = 0
     private var isTabsEnabled = false
     private var backgroundId = R.color.background
     private val menuItems = ArrayList<MenuItemHolder>()
@@ -55,7 +54,6 @@ class ToolbarBuilder(private val rootView: IRootView) {
         rootView.setToolbarTitle(toolbarTitleId)
         rootView.enableBackNavigation(backNavEnabled)
         rootView.setBottomMenuVisible(bottomMenuEnabled)
-        rootView.setBottomMenuChecked(bottomItemIndex)
         rootView.enableTabs(isTabsEnabled)
         rootView.setBackground(backgroundId)
         rootView.setMenuItems(menuItems)

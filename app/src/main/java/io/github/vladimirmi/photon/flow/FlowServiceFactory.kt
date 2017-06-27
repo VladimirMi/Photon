@@ -31,16 +31,21 @@ class FlowServiceFactory : ServicesFactory() {
         } else {
             screenComponent = screen.createScreenComponent(parentScope.getService(DaggerService.SERVICE_NAME))
         }
-        val newScope = parentScope.buildChild()
-                .withService(DaggerService.SERVICE_NAME, screenComponent)
-                .build(screen.scopeName)
-        Timber.d("Build new scope with name ${newScope.name}")
+        val newScope = parentScope.findChild(screen.scopeName) ?:
+                parentScope.buildChild()
+                        .withService(DaggerService.SERVICE_NAME, screenComponent)
+                        .build(screen.scopeName)
+        Timber.e("Build new scope with name ${newScope.name}")
 
         services.bind(newScope.name, newScope)
     }
 
     override fun tearDownServices(services: Services) {
-        services.getService<MortarScope>(services.getKey<Any>().javaClass.name)?.destroy()
+        val scopeName = services.getKey<BaseScreen<*>>().scopeName
+        services.getService<MortarScope>(scopeName)?.let {
+            it.destroy()
+            Timber.e("Destroy scope with name ${it.name}")
+        }
         super.tearDownServices(services)
     }
 }
