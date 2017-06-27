@@ -23,7 +23,7 @@ class RegistrationDialog(viewGroup: ViewGroup, val registrationAction: (SignUpRe
 
     init {
         listenFields()
-        cancel.setOnClickListener { dialog.cancel() }
+        cancel.setOnClickListener { hide() }
         ok.setOnClickListener {
                 val request = SignUpReq(login = login.text.toString(),
                         email = email.text.toString(),

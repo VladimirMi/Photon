@@ -63,9 +63,13 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     private fun submit() {
         setEditable(false)
-        album.title = view.name.text.toString()
-        album.description = view.description.text.toString()
-        model.editAlbum(album)
+        val name = view.name.text.toString()
+        val description = view.description.text.toString()
+        var albumChanged = false
+        if (album.title != name || album.description != description) albumChanged = true
+        album.title = name
+        album.description = description
+        if (albumChanged) model.editAlbum(album)
     }
 
     private fun setEditable(boolean: Boolean) {
@@ -75,7 +79,11 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     private fun deleteAlbum() {
-        TODO("not implemented")
+        view.showDeleteDialog()
+    }
+
+    fun delete() {
+        model.deleteAlbum(album)
     }
 
     private fun addPhotocard() {

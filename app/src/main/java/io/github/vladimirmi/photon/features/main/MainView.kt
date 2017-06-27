@@ -54,13 +54,14 @@ class MainView(context: Context, attrs: AttributeSet) :
 
     fun showPhotoCard(photocard: Photocard) = Flow.get(this).set(PhotocardScreen(photocard))
 
-    fun openRegistrationDialog() = registrationDialog.dialog.show()
+    fun openRegistrationDialog() = registrationDialog.show()
 
-    fun openLoginDialog() = loginDialog.dialog.show()
+    fun openLoginDialog() = loginDialog.show()
 
-    fun closeRegistrationDialog() = registrationDialog.dialog.cancel()
+    fun closeRegistrationDialog() = registrationDialog.hide()
 
-    fun closeLoginDialog() = loginDialog.dialog.cancel()
+    fun closeLoginDialog() = loginDialog.hide()
+
     private fun register(req: SignUpReq) = presenter.register(req)
 
     private fun login(req: SignInReq) = presenter.login(req)

@@ -8,4 +8,5 @@ interface IAlbumModel : IModel {
     fun getAlbum(id: String): Observable<Album>
     fun getProfileId(): String
     fun editAlbum(album: Album)
+    fun deleteAlbum(album: Album)
 }

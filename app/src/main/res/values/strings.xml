@@ -39,6 +39,7 @@
     <string name="dialog_password">Пароль</string>
     <string name="dialog_description">Описание</string>
     <string name="dialog_new_album">Новый альбом</string>
+    <string name="dialog_delete_album">Вы действительно хотите удалить альбом и все его содержимое?</string>
 
     <string name="message_err_email">Неверный email</string>
     <string name="message_err_password">Неверный пароль</string>

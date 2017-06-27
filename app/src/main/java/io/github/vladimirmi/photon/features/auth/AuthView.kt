@@ -32,11 +32,11 @@ class AuthView(context: Context, attrs: AttributeSet)
         registration_btn.setOnClickListener { openRegistrationDialog() }
     }
 
-    fun openRegistrationDialog() = registrationDialog.dialog.show()
+    fun openRegistrationDialog() = registrationDialog.show()
 
-    fun openLoginDialog() = loginDialog.dialog.show()
+    fun openLoginDialog() = loginDialog.show()
 
-    fun closeRegistrationDialog() = registrationDialog.dialog.cancel()
+    fun closeRegistrationDialog() = registrationDialog.hide()
 
-    fun closeLoginDialog() = loginDialog.dialog.cancel()
+    fun closeLoginDialog() = loginDialog.hide()
 }

@@ -4,11 +4,13 @@ import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import android.view.inputmethod.InputMethodManager
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.CardAdapter
+import io.github.vladimirmi.photon.ui.SimpleDialog
 import kotlinx.android.synthetic.main.screen_album.view.*
 
 
@@ -26,6 +28,9 @@ class AlbumView(context: Context, attrs: AttributeSet)
 
     val cardAction: (Photocard) -> Unit = { presenter.showPhotoCard(it) }
     val adapter = CardAdapter(cardAction, hideInfo = true)
+
+    val deleteAction: () -> Unit = { presenter.delete() }
+    val deleteDialog = SimpleDialog(this, R.string.dialog_delete_album, deleteAction)
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<AlbumScreen.Component>(context).inject(this)
@@ -55,5 +60,7 @@ class AlbumView(context: Context, attrs: AttributeSet)
         }
         description.isEnabled = editMode
     }
+
+    fun showDeleteDialog() = deleteDialog.show()
 }
 

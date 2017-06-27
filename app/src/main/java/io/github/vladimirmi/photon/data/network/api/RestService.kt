@@ -71,4 +71,10 @@ interface RestService {
                   @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<Album>>
 
+    @DELETE("user/{userId}/album/{id}")
+    fun deleteAlbum(@Path("userId") userId: String,
+                    @Path("id") id: String,
+                    @Header(HEADER_AUTHORIZATION) token: String)
+            : Observable<Response<Void>>
+
 }

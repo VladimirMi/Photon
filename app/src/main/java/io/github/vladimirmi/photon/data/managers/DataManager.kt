@@ -95,6 +95,12 @@ constructor(private val restService: RestService,
                 .map { it.body()!! }
     }
 
+    fun deleteAlbum(id: String): Observable<Int> {
+        return restService.deleteAlbum(getProfileId(), id, getUserToken())
+                .compose(ApiErrorTransformer())
+                .map { it.code() }
+    }
+
     //endregion
 
     //region =============== DataBase ==============

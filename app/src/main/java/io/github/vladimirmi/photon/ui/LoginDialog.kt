@@ -21,7 +21,7 @@ class LoginDialog(viewGroup: ViewGroup, val loginAction: (SignInReq) -> Unit)
 
     init {
         listenFields()
-        cancel.setOnClickListener { dialog.cancel() }
+        cancel.setOnClickListener { hide() }
         ok.setOnClickListener {
             kotlin.run {
                 val request = SignInReq(email = email.text.toString(),

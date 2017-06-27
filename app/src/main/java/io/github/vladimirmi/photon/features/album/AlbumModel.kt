@@ -22,4 +22,11 @@ class AlbumModel(private val dataManager: DataManager) : IAlbumModel {
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribe()
     }
+
+    override fun deleteAlbum(album: Album) {
+        //todo перенести подписку в презентер, по завершению back
+        dataManager.deleteAlbum(album.id)
+                .doOnNext { dataManager.removeFromDb(Album::class.java, album.id) }
+                .subscribe()
+    }
 }

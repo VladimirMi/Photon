@@ -55,8 +55,8 @@ class ProfileView(context: Context, attrs: AttributeSet)
 
     private fun showAlbum(album: Album) = presenter.showAlbum(album)
 
-    fun openNewAlbumDialog() = newAlbumDialog.dialog.show()
+    fun openNewAlbumDialog() = newAlbumDialog.show()
 
-    fun closeNewAlbumDialog() = newAlbumDialog.dialog.cancel()
+    fun closeNewAlbumDialog() = newAlbumDialog.hide()
 }
 

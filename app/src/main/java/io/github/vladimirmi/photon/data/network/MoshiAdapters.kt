@@ -50,8 +50,8 @@ class RealmListJsonAdapter<T : RealmModel>
 }
 
 class TagJsonAdapter {
-    @FromJson fun fromJson(tag: String): Tag {
-        return Tag(tag.removePrefix("#"))
+    @FromJson fun fromJson(body: String): Tag {
+        return Tag(body.removePrefix("#"))
     }
 
     @ToJson fun toJson(tag: Tag): String {
@@ -60,13 +60,21 @@ class TagJsonAdapter {
 }
 
 class ISO8601DateJsonAdapter {
-    @FromJson fun fromJson(date: String): Date {
-        return ISO8601Utils.parse(date, ParsePosition(0))
+    @FromJson fun fromJson(body: String): Date {
+        return ISO8601Utils.parse(body, ParsePosition(0))
     }
 
     @ToJson fun toJson(date: Date): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
         dateFormat.timeZone = TimeZone.getTimeZone("UTC")
         return dateFormat.format(date)
+    }
+}
+
+class UnitJsonAdapter {
+    @FromJson fun fromJson(body: String): Unit {}
+
+    @ToJson fun toJson(unit: Unit): String {
+        return ""
     }
 }
