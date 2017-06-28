@@ -123,6 +123,10 @@ class RootActivity : FlowActivity(), IRootView {
         startActivityForResult(intent, Constants.REQUEST_SETTINGS_INTENT)
     }
 
+    override fun navigateTo(bottomItem: BottomNavDispatcher.BottomItem) {
+        bottom_menu.selectedItemId = bottomItem.id
+    }
+
     //endregion
 
     //region =============== IViewBuilder ==============

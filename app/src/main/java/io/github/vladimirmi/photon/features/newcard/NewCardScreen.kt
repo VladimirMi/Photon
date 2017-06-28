@@ -16,7 +16,7 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
  * Created by Vladimir Mikhalev 19.06.2017.
  */
 
-class NewCardScreen : BaseScreen<RootActivityComponent>() {
+class NewCardScreen(var albumId: String? = null) : BaseScreen<RootActivityComponent>() {
     val state = SparseArray<Parcelable>()
     override val layoutResId = R.layout.screen_newcard
 

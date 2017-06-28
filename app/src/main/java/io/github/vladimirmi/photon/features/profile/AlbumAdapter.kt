@@ -23,10 +23,7 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
 
     var authorMode = false
     var selectedAlbum = ""
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+
     private var data: List<Album> = ArrayList()
 
     fun updateData(list: List<Album>) {
@@ -58,11 +55,16 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
 
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
         holder.bind(data[position])
-        if (data[position].id == selectedAlbum) holder.select()
+        if (data[position].id == selectedAlbum) holder.select(true)
     }
 
     override fun getItemCount(): Int {
         return data.size
+    }
+
+    fun getPosition(albumId: String): Int {
+        data.forEachIndexed { index, album -> if (album.id == albumId) return index }
+        return -1
     }
 }
 
@@ -75,8 +77,8 @@ class AlbumViewHolder(itemView: View, val albumAction: (Album) -> Unit)
         itemView.card_count.text = album.photocards.size.toString()
         itemView.likes.text = album.favorits.toString()
         itemView.views.text = album.views.toString()
-        itemView.album_wrapper.setBackgroundResource(R.drawable.album_gradient)
         itemView.preview.setOnClickListener { albumAction(album) }
+
         if (album.photocards.size > 0 && curImagePath != album.photocards[0].photo) {
             setImage(album.photocards[0].photo, itemView.preview)
             curImagePath = album.photocards[0].photo
@@ -85,8 +87,7 @@ class AlbumViewHolder(itemView: View, val albumAction: (Album) -> Unit)
         }
     }
 
-    fun select() {
-        itemView.album_wrapper.setBackgroundResource(R.drawable.album_selected)
+    fun select(selected: Boolean) {
+        itemView.album_wrapper.setBackgroundResource(if (selected) R.drawable.album_selected else R.drawable.album_gradient)
     }
-
 }

@@ -62,5 +62,6 @@ class AlbumView(context: Context, attrs: AttributeSet)
     }
 
     fun showDeleteDialog() = deleteDialog.show()
+    fun closeDeleteDialog() = deleteDialog.hide()
 }
 

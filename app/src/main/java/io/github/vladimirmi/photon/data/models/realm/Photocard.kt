@@ -12,7 +12,7 @@ import java.util.*
 
 open class Photocard(
         @PrimaryKey
-        var id: String = "",
+        override var id: String = "",
         var owner: String = "",
         var title: String = "",
         var photo: String = "",
@@ -21,8 +21,9 @@ open class Photocard(
         var filters: Filter = Filter(),
         var tags: RealmList<Tag> = RealmList(),
         var updated: Date = Date(),
+        override var active: Boolean = true,
         @Ignore var album: String = ""
-) : RealmObject() {
+) : RealmObject(), Deletable {
     fun withId(): Photocard {
         if (id.isEmpty()) id = UUID.randomUUID().toString()
         filters.generateId()

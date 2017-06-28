@@ -4,10 +4,12 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import flow.Flow
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.features.root.RootPresenter
+import io.github.vladimirmi.photon.flow.BottomNavDispatcher.BottomItem.PROFILE
 import io.github.vladimirmi.photon.utils.Constants
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -16,16 +18,30 @@ import java.util.concurrent.TimeUnit
 class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     : BasePresenter<NewCardView, INewCardModel>(model, rootPresenter) {
 
+    private var returnToProfile: Boolean = false
+
     override fun initToolbar() {
         rootPresenter.getNewToolbarBuilder().build()
     }
 
     override fun initView(view: NewCardView) {
+        Flow.getKey<NewCardScreen>(view)?.albumId?.let {
+            returnToProfile = true
+            setAlbumId(it)
+        }
         if (model.photoCard.photo.isNotEmpty()) view.showPhotoParams()
         compDisp.add(subscribeInTitleField())
         compDisp.add(subscribeOnTagField())
         view.setTags(model.photoCard.tags)
         compDisp.add(subscribeOnAlbums())
+    }
+
+    fun onBackPressed(): Boolean {
+        if (returnToProfile) {
+            Flow.getKey<NewCardScreen>(view)?.albumId = null
+            rootPresenter.navigateTo(PROFILE)
+        }
+        return returnToProfile
     }
 
     private fun subscribeInTitleField(): Disposable {
@@ -43,7 +59,9 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
 
     private fun subscribeOnAlbums(): Disposable {
         return model.getAlbums()
-                .subscribe { view.setAlbums(it) }
+                .subscribe {
+                    view.setAlbums(it)
+                }
     }
 
     fun addFilter(filter: Pair<String, String>) = model.addFilter(filter)

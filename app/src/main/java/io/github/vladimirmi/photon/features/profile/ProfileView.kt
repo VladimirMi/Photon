@@ -50,7 +50,7 @@ class ProfileView(context: Context, attrs: AttributeSet)
             setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
             curAvatarPath = user.avatar
         }
-        adapter.updateData(user.albums)
+        adapter.updateData(user.albums.filter { it.active })
     }
 
     private fun showAlbum(album: Album) = presenter.showAlbum(album)

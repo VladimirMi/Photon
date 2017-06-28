@@ -15,6 +15,7 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
+import io.github.vladimirmi.photon.features.main.AlbumViewHolder
 import io.github.vladimirmi.photon.features.search.tags.StringAdapter
 import io.github.vladimirmi.photon.flow.FlowLifecycles
 import io.github.vladimirmi.photon.ui.FilterElementView
@@ -32,27 +33,28 @@ class NewCardView(context: Context, attrs: AttributeSet)
     : BaseView<NewCardPresenter, NewCardView>(context, attrs),
         FlowLifecycles.ActivityResultListener, FlowLifecycles.PermissionRequestListener {
 
-    lateinit var filterElements: List<FilterElementView>
-    val state = Flow.getKey<NewCardScreen>(context)!!.state
+    private val state = Flow.getKey<NewCardScreen>(context)!!.state
+    private val filterAction: (FilterElementView) -> Unit = { select(it) }
+    private val filterElements by lazy { findAllFilters(this) }
 
     val nameObs by lazy { name_field.textChanges() }
     val tagObs by lazy { tag_field.textChanges() }
 
-    val tagsAdapter = StringAdapter()
-    val tagAction: (String) -> Unit = {
+    private val tagsAdapter = StringAdapter()
+    private val tagAction: (String) -> Unit = {
         tag_field.setText(it)
         tag_field.setSelection(it.length)
     }
-    val suggestTagAdapter = StringAdapter(tagAction)
+    private val suggestTagAdapter = StringAdapter(tagAction)
 
-    val albumAction: (Album) -> Unit = { presenter.setAlbumId(it.id) }
-    val albumAdapter = AlbumAdapter(albumAction)
+    private val albumAction: (Album) -> Unit = { presenter.setAlbumId(it.id) }
+    private val albumAdapter = AlbumAdapter(albumAction)
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<NewCardScreen.Component>(context).inject(this)
     }
 
-    private val filterAction: (FilterElementView) -> Unit = { select(it) }
+    override fun onBackPressed() = presenter.onBackPressed()
 
     override fun initView() {
         choose_btn.setOnClickListener { presenter.choosePhoto() }
@@ -65,7 +67,6 @@ class NewCardView(context: Context, attrs: AttributeSet)
     }
 
     private fun initFiltersSection() {
-        filterElements = findAllFilters(this)
         filterElements.forEach {
             if (it.filter.first != "nuances") it.radioMode = true
             it.setAction(filterAction)
@@ -135,8 +136,20 @@ class NewCardView(context: Context, attrs: AttributeSet)
         albumAdapter.updateData(list)
     }
 
+    private var selectedAlbum = ""
+
     fun selectAlbum(albumId: String) {
-        albumAdapter.selectedAlbum = albumId
+        if (albumId == albumAdapter.selectedAlbum) return
+        val position = albumAdapter.getPosition(albumId)
+        val selectedPosition = albumAdapter.getPosition(selectedAlbum)
+        setAlbumSelection(position, true)
+        setAlbumSelection(selectedPosition, false)
+        selectedAlbum = albumId
+        albumAdapter.selectedAlbum = selectedAlbum
+    }
+
+    private fun setAlbumSelection(position: Int, selected: Boolean) {
+        if (position != -1) (album_list.findViewHolderForAdapterPosition(position) as AlbumViewHolder).select(selected)
     }
 
     fun clearView() {

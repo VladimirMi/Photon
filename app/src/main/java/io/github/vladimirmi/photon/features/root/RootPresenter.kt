@@ -81,6 +81,10 @@ class RootPresenter(val model: IRootModel) :
     fun showPermissionSnackBar() {
         view.showPermissionSnackBar()
     }
+
+    fun navigateTo(bottomItem: BottomNavDispatcher.BottomItem) {
+        view.navigateTo(bottomItem)
+    }
 }
 
 

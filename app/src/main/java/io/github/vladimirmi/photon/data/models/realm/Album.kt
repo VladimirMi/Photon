@@ -11,7 +11,7 @@ import java.util.*
 
 open class Album(
         @PrimaryKey
-        var id: String = "",
+        override var id: String = "",
         var owner: String = "",
         var title: String = "",
         var description: String = "",
@@ -19,5 +19,6 @@ open class Album(
         var favorits: Int = 0,
         var isFavorite: Boolean = false,
         var photocards: RealmList<Photocard> = RealmList(),
-        var updated: Date = Date()
-) : RealmObject(), java.io.Serializable
+        var updated: Date = Date(),
+        override var active: Boolean = true
+) : RealmObject(), Deletable

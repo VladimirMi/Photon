@@ -4,10 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.models.*
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.data.models.realm.Tag
-import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.realm.*
 import io.github.vladimirmi.photon.data.network.ApiErrorTransformer
 import io.github.vladimirmi.photon.data.network.LastModifiedTransformer
 import io.github.vladimirmi.photon.data.network.api.RestService
@@ -105,7 +102,8 @@ constructor(private val restService: RestService,
 
     //region =============== DataBase ==============
 
-    fun saveToDB(realmObject: RealmObject, async: Boolean = false) {
+    fun <T : RealmObject> saveToDB(realmObject: T, async: Boolean = false) {
+        if (removeNotActive(realmObject)) return
         if (async) {
             realmManager.saveAsync(realmObject)
         } else {
@@ -122,12 +120,28 @@ constructor(private val restService: RestService,
     fun <T : RealmObject> getObjectFromDb(clazz: Class<T>,
                                           id: String): Observable<T> {
         return realmManager.get(clazz, id)
+                .flatMap { if (removeNotActive(it)) Observable.empty<T>() else Observable.just(it) }
     }
 
     fun <T : RealmObject> search(clazz: Class<T>,
                                  query: List<Query>?,
                                  sortBy: String, order: Sort = Sort.ASCENDING): Observable<List<T>> {
         return realmManager.search(clazz, query, sortBy, order)
+                .map { list ->
+                    if (list.isNotEmpty() && list.first() is Deletable) {
+                        val cleanList = list.toMutableList()
+                        cleanList.removeAll { removeNotActive(it) }
+                        cleanList
+                    } else list
+                }
+    }
+
+    private fun <T : RealmObject> removeNotActive(realmObject: T): Boolean {
+        if (realmObject is Deletable && !realmObject.active) {
+            removeFromDb(realmObject::class.java, realmObject.id)
+            return true
+        }
+        return false
     }
 
     fun <T : RealmObject> removeFromDb(clazz: Class<T>, id: String) {

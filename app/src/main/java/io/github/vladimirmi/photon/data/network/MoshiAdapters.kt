@@ -70,11 +70,3 @@ class ISO8601DateJsonAdapter {
         return dateFormat.format(date)
     }
 }
-
-class UnitJsonAdapter {
-    @FromJson fun fromJson(body: String): Unit {}
-
-    @ToJson fun toJson(unit: Unit): String {
-        return ""
-    }
-}

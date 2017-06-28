@@ -4,6 +4,8 @@ import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by Vladimir Mikhalev 19.06.2017.
@@ -23,10 +25,10 @@ class AlbumModel(private val dataManager: DataManager) : IAlbumModel {
                 .subscribe()
     }
 
-    override fun deleteAlbum(album: Album) {
-        //todo перенести подписку в презентер, по завершению back
-        dataManager.deleteAlbum(album.id)
+    override fun deleteAlbum(album: Album): Observable<Int> {
+        return dataManager.deleteAlbum(album.id)
                 .doOnNext { dataManager.removeFromDb(Album::class.java, album.id) }
-                .subscribe()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 }
