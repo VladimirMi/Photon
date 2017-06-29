@@ -37,8 +37,8 @@ class AuthorView(context: Context, attrs: AttributeSet)
     @SuppressLint("SetTextI18n")
     fun setUser(user: User) {
         Timber.e(user.name)
-        user_login.text = user.login
-        user_name.text = "/  " + user.name
+        user_login.setText(user.login)
+        user_name.setText("/  ${user.name}")
         album_count.text = user.albumCount.toString()
         card_count.text = user.photocardCount.toString()
         if (user.avatar != curAvatarPath) {

@@ -1,18 +1,23 @@
 package io.github.vladimirmi.photon.utils
 
-import io.github.vladimirmi.photon.data.models.realm.Deletable
 import io.reactivex.Observable
-import io.realm.RealmObject
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import retrofit2.Response
 
 /**
  * Created by Vladimir Mikhalev 28.06.2017.
  */
 
+fun <T> Observable<T>.ioToMain(): Observable<T> {
+    return subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+}
 
-fun <T : RealmObject> Observable<T>.check(o: T): Observable<T> {
-    if (o is Deletable) {
-        return filter { (it as Deletable).active }
-    } else {
-        return this
-    }
+fun <T> Observable<Response<T>>.body(): Observable<T> {
+    return map { it.body()!! }
+}
+
+fun <T> Observable<Response<T>>.statusCode(): Observable<Int> {
+    return map { it.code() }
 }

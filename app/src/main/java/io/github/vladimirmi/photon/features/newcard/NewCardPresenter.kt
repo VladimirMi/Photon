@@ -9,7 +9,7 @@ import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.github.vladimirmi.photon.flow.BottomNavDispatcher.BottomItem.PROFILE
+import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.PROFILE
 import io.github.vladimirmi.photon.utils.Constants
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable

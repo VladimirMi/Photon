@@ -59,16 +59,12 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
     }
 
     override fun savePhotoUri(uri: String) {
-        Timber.e("savePhotoUri: $uri")
         photoCard.photo = uri
     }
 
     override fun uploadPhotocard() {
         photoCard.withId()
         photoCard.owner = dataManager.getProfileId()
-        Timber.e("uploadPhotocard: $photoCard")
-        Timber.e("uploadPhotocard: ${photoCard.filters}")
-        Timber.e("uploadPhotocard: ${photoCard.tags}")
         jobManager.addJobInBackground(UploadPhotoJob(photoCard))
     }
 }

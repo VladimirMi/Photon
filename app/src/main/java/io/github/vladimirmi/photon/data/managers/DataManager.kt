@@ -9,6 +9,8 @@ import io.github.vladimirmi.photon.data.network.ApiErrorTransformer
 import io.github.vladimirmi.photon.data.network.LastModifiedTransformer
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
+import io.github.vladimirmi.photon.utils.body
+import io.github.vladimirmi.photon.utils.statusCode
 import io.reactivex.Observable
 import io.realm.RealmObject
 import io.realm.Sort
@@ -59,43 +61,50 @@ constructor(private val restService: RestService,
     fun signIn(req: SignInReq): Observable<User> {
         return restService.signIn(req)
                 .compose(ApiErrorTransformer())
-                .map { it.body()!! }
+                .body()
     }
 
     fun signUp(req: SignUpReq): Observable<User> {
         return restService.signUp(req)
+                //todo transformers to ext
                 .compose(ApiErrorTransformer())
-                .map { it.body()!! }
+                .body()
     }
 
     fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Album> {
         return restService.createAlbum(getProfileId(), newAlbumReq, getUserToken())
                 .compose(ApiErrorTransformer())
-                .map { it.body()!! }
+                .body()
     }
 
     fun uploadPhoto(bodyPart: MultipartBody.Part): Observable<ImageUrlRes> {
         return restService.uploadPhoto(getProfileId(), bodyPart, getUserToken())
                 .compose(ApiErrorTransformer())
-                .map { it.body()!! }
+                .body()
     }
 
     fun createPhotocard(photocard: Photocard): Observable<Photocard> {
         return restService.createPhotocard(getProfileId(), photocard, getUserToken())
                 .compose(ApiErrorTransformer())
-                .map { it.body()!! }
+                .body()
     }
 
     fun editAlbum(req: EditAlbumReq): Observable<Album> {
         return restService.editAlbum(getProfileId(), req.id, req, getUserToken())
                 .compose(ApiErrorTransformer())
-                .map { it.body()!! }
+                .body()
     }
 
     fun deleteAlbum(id: String): Observable<Int> {
         return restService.deleteAlbum(getProfileId(), id, getUserToken())
                 .compose(ApiErrorTransformer())
-                .map { it.code() }
+                .statusCode()
+    }
+
+    fun editProfile(req: EditProfileReq): Observable<User> {
+        return restService.editProfile(getProfileId(), req, getUserToken())
+                .compose(ApiErrorTransformer())
+                .body()
     }
 
     //endregion

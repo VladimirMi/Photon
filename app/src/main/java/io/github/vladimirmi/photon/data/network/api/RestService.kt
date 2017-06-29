@@ -77,4 +77,9 @@ interface RestService {
                     @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<Void>>
 
+    @PUT("user/{userId}")
+    fun editProfile(@Path("userId") userId: String,
+                    @Body req: EditProfileReq,
+                    @Header(HEADER_AUTHORIZATION) token: String)
+            : Observable<Response<User>>
 }

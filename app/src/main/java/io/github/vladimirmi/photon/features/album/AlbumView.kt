@@ -22,15 +22,15 @@ class AlbumView(context: Context, attrs: AttributeSet)
     : BaseView<AlbumPresenter, AlbumView>(context, attrs) {
 
     val name by lazy { album_name }
-    val cardCount by lazy { card_count }
     val description by lazy { album_description }
-    val photocardList by lazy { photocard_list }
+    private val cardCount by lazy { card_count }
+    private val photocardList by lazy { photocard_list }
 
-    val cardAction: (Photocard) -> Unit = { presenter.showPhotoCard(it) }
-    val adapter = CardAdapter(cardAction, hideInfo = true)
+    private val cardAction: (Photocard) -> Unit = { presenter.showPhotoCard(it) }
+    private val adapter = CardAdapter(cardAction, hideInfo = true)
 
-    val deleteAction: () -> Unit = { presenter.delete() }
-    val deleteDialog = SimpleDialog(this, R.string.dialog_delete_album, deleteAction)
+    private val deleteAction: () -> Unit = { presenter.delete() }
+    private val deleteDialog = SimpleDialog(this, R.string.dialog_delete_album, deleteAction)
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<AlbumScreen.Component>(context).inject(this)

@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.features.profile
 
+import com.birbit.android.jobqueue.JobManager
 import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
@@ -30,8 +31,8 @@ class ProfileScreen(val userId: String = "") : BaseScreen<RootActivityComponent>
 
         @Provides
         @DaggerScope(ProfileScreen::class)
-        fun provideProfileModel(dataManager: DataManager): IProfileModel {
-            return ProfileModel(dataManager)
+        fun provideProfileModel(dataManager: DataManager, jobManager: JobManager): IProfileModel {
+            return ProfileModel(dataManager, jobManager)
         }
 
         @Provides

@@ -11,7 +11,7 @@ import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerScope
-import io.github.vladimirmi.photon.flow.BottomNavDispatcher
+import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.reactivex.Observable
 import mortar.Presenter
 import mortar.bundler.BundleService
@@ -23,7 +23,7 @@ import mortar.bundler.BundleService
 class RootPresenter(val model: IRootModel) :
         Presenter<IRootView>() {
 
-    var bottomNavigator: BottomNavDispatcher? = null
+    var bottomHistory: BottomNavHistory? = null
 
     override fun extractBundleService(view: IRootView?): BundleService {
         return BundleService.getBundleService(view as Context)
@@ -82,7 +82,7 @@ class RootPresenter(val model: IRootModel) :
         view.showPermissionSnackBar()
     }
 
-    fun navigateTo(bottomItem: BottomNavDispatcher.BottomItem) {
+    fun navigateTo(bottomItem: BottomNavHistory.BottomItem) {
         view.navigateTo(bottomItem)
     }
 }

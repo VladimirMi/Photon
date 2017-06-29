@@ -7,6 +7,6 @@ import io.reactivex.Observable
 interface IAlbumModel : IModel {
     fun getAlbum(id: String): Observable<Album>
     fun getProfileId(): String
-    fun editAlbum(album: Album)
+    fun editAlbum(album: Album): Observable<Album>
     fun deleteAlbum(album: Album): Observable<Int>
 }

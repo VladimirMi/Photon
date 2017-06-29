@@ -4,7 +4,8 @@ import android.net.Uri
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
-import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.EditProfileReq
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.reactivex.schedulers.Schedulers
@@ -17,36 +18,33 @@ import timber.log.Timber
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class UploadPhotoJob(private val photocard: Photocard)
+class UploadAvatarJob(private val profile: User)
     : Job(Params(JobPriority.HIGH)
-        .groupBy("Images")
         .requireNetwork()) {
 
-    val tempId = photocard.id
 
     override fun onAdded() {
         Timber.e("onAdded: ")
-        DaggerService.appComponent.dataManager().saveToDB(photocard)
     }
 
     override fun onRun() {
         Timber.e("onRun: ")
         val dataManager = DaggerService.appComponent.dataManager()
-        val data = getByteArrayFromContent(photocard.photo)
+        val data = getByteArrayFromContent(profile.avatar)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
 
-        val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(photocard.photo).lastPathSegment, body)
+        val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(profile.avatar).lastPathSegment, body)
         dataManager.uploadPhoto(bodyPart)
                 .flatMap {
-                    photocard.photo = it.image
-                    dataManager.createPhotocard(photocard)
+                    profile.avatar = it.image
+                    dataManager.editProfile(
+                            EditProfileReq(id = profile.id,
+                                    name = profile.name,
+                                    login = profile.login,
+                                    avatar = profile.avatar))
                 }
-                .map { photocard.id = it.id }
                 .subscribeOn(Schedulers.io())
-                .subscribe {
-                    dataManager.removeFromDb(Photocard::class.java, tempId)
-                    dataManager.saveToDB(photocard)
-                }
+                .subscribe { dataManager.saveToDB(it) }
 
     }
 

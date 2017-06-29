@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.features.root
 
 import io.github.vladimirmi.photon.core.IView
-import io.github.vladimirmi.photon.flow.BottomNavDispatcher
+import io.github.vladimirmi.photon.flow.BottomNavHistory
 
 
 /**
@@ -13,6 +13,6 @@ interface IRootView : IView, IRootBuilder {
     fun showLoading()
     fun hideLoading()
     fun showPermissionSnackBar()
-    fun navigateTo(bottomItem: BottomNavDispatcher.BottomItem)
+    fun navigateTo(bottomItem: BottomNavHistory.BottomItem)
 }
 

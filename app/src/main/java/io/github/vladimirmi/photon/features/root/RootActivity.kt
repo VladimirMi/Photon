@@ -22,7 +22,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.splash.SplashScreen
-import io.github.vladimirmi.photon.flow.BottomNavDispatcher
+import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.github.vladimirmi.photon.flow.FlowActivity
 import io.github.vladimirmi.photon.utils.Constants
 import kotlinx.android.synthetic.main.activity_root.*
@@ -51,8 +51,8 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        if (presenter.bottomNavigator == null) presenter.bottomNavigator = BottomNavDispatcher(Flow.get(this))
-        bottom_menu.setOnNavigationItemSelectedListener(presenter.bottomNavigator)
+        if (presenter.bottomHistory == null) presenter.bottomHistory = BottomNavHistory(Flow.get(this))
+        bottom_menu.setOnNavigationItemSelectedListener(presenter.bottomHistory)
     }
 
     override fun onStart() {
@@ -123,7 +123,7 @@ class RootActivity : FlowActivity(), IRootView {
         startActivityForResult(intent, Constants.REQUEST_SETTINGS_INTENT)
     }
 
-    override fun navigateTo(bottomItem: BottomNavDispatcher.BottomItem) {
+    override fun navigateTo(bottomItem: BottomNavHistory.BottomItem) {
         bottom_menu.selectedItemId = bottomItem.id
     }
 

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:ignore="RtlHardcoded, ContentDescription"
+    tools:ignore="RtlHardcoded, ContentDescription, LabelFor"
     >
 
     <RelativeLayout
@@ -23,21 +23,31 @@
             tools:src="@color/color_accent"
             />
 
-        <TextView
+        <EditText
             android:id="@+id/user_login"
             style="@style/CustomText.Black"
             android:layout_marginBottom="12dp"
             android:layout_marginLeft="12dp"
             android:layout_toRightOf="@id/user_avatar"
+            android:imeOptions="actionNext"
+            android:background="@drawable/edit_text"
+            android:inputType="text"
+            android:enabled="false"
+            android:textSize="14sp"
             tools:text="rufus21"
             />
 
-        <TextView
+        <EditText
             android:id="@+id/user_name"
             style="@style/CustomText.Black"
             android:layout_marginLeft="8dp"
             android:layout_toRightOf="@id/user_login"
             android:fontFamily="sans-serif-light"
+            android:background="@drawable/edit_text"
+            android:imeOptions="actionDone"
+            android:enabled="false"
+            android:inputType="text"
+            android:textSize="14sp"
             tools:text="/  Руфус Данн"
             />
 

@@ -11,7 +11,7 @@ import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.github.vladimirmi.photon.flow.BottomNavDispatcher.BottomItem.LOAD
+import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.LOAD
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 
@@ -21,14 +21,14 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     private var editMode: Boolean = false
     private val album by lazy { Flow.getKey<AlbumScreen>(view)?.album!! }
 
-    val moreActions: (MenuItem) -> Unit = {
+    private val moreActions: (MenuItem) -> Unit = {
         when (it.itemId) {
             R.id.edit -> setEditable(true)
             R.id.delete -> view.showDeleteDialog()
             R.id.add_photocard -> addPhotocard()
         }
     }
-    val submitAction: (MenuItem) -> Unit = { submit() }
+    private val submitAction: (MenuItem) -> Unit = { submit() }
 
     override fun initToolbar() {
         val builder = rootPresenter.getNewToolbarBuilder()
@@ -67,12 +67,13 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         val name = view.name.text.toString()
         val description = view.description.text.toString()
         var albumChanged = false
-        if (album.title != name || album.description != description) albumChanged = true
-        album.title = name
-        album.description = description
+        if (album.title != name || album.description != description) {
+            albumChanged = true
+            album.title = name
+            album.description = description
+        }
         if (albumChanged) {
-            //todo
-            model.editAlbum(album)
+            compDisp.add(model.editAlbum(album).subscribe())
         }
     }
 
@@ -91,7 +92,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     private fun addPhotocard() {
-        rootPresenter.bottomNavigator?.historyMap?.set(LOAD, History.single(NewCardScreen(album.id)))
+        rootPresenter.bottomHistory?.historyMap?.set(LOAD, History.single(NewCardScreen(album.id)))
         rootPresenter.navigateTo(LOAD)
     }
 

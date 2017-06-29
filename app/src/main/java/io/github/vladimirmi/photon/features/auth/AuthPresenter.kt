@@ -11,7 +11,7 @@ import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.profile.ProfileScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.github.vladimirmi.photon.flow.BottomNavDispatcher
+import io.github.vladimirmi.photon.flow.BottomNavHistory
 
 /**
  * Created by Vladimir Mikhalev 25.06.2017.
@@ -59,10 +59,10 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
     }
 
     private fun nextScreen() {
-        val nextScreen = when (rootPresenter.bottomNavigator!!.currentItem) {
-            BottomNavDispatcher.BottomItem.PROFILE -> ProfileScreen()
-            BottomNavDispatcher.BottomItem.LOAD -> NewCardScreen()
-            BottomNavDispatcher.BottomItem.MAIN -> MainScreen()
+        val nextScreen = when (rootPresenter.bottomHistory!!.currentItem) {
+            BottomNavHistory.BottomItem.PROFILE -> ProfileScreen()
+            BottomNavHistory.BottomItem.LOAD -> NewCardScreen()
+            BottomNavHistory.BottomItem.MAIN -> MainScreen()
         }
         Flow.get(view).replaceTop(nextScreen, Direction.REPLACE)
     }

@@ -12,13 +12,13 @@ import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.profile.ProfileScreen
-import io.github.vladimirmi.photon.flow.BottomNavDispatcher.BottomItem.*
+import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.*
 
 /**
  * Created by Vladimir Mikhalev 15.06.2017.
  */
 
-class BottomNavDispatcher(private val flowInstance: Flow) : BottomNavigationView.OnNavigationItemSelectedListener {
+class BottomNavHistory(private val flowInstance: Flow) : BottomNavigationView.OnNavigationItemSelectedListener {
 
     enum class BottomItem(val id: Int) {
         MAIN(R.id.nav_bottom_main),
@@ -31,9 +31,9 @@ class BottomNavDispatcher(private val flowInstance: Flow) : BottomNavigationView
         }
     }
 
-    var currentItem = MAIN
-
     private val dm = DaggerService.appComponent.dataManager()
+
+    var currentItem = MAIN
     val historyMap = hashMapOf(MAIN to History.single(MainScreen()),
             PROFILE to History.single(ProfileScreen()),
             LOAD to History.single(NewCardScreen()))

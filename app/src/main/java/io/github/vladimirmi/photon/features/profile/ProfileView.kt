@@ -2,31 +2,37 @@ package io.github.vladimirmi.photon.features.profile
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
+import android.view.inputmethod.InputMethodManager
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
+import io.github.vladimirmi.photon.flow.FlowLifecycles
 import io.github.vladimirmi.photon.ui.NewAlbumDialog
 import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder
 import kotlinx.android.synthetic.main.view_profile.view.*
-import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 15.06.2017.
  */
 
 class ProfileView(context: Context, attrs: AttributeSet)
-    : BaseView<ProfilePresenter, ProfileView>(context, attrs) {
+    : BaseView<ProfilePresenter, ProfileView>(context, attrs),
+        FlowLifecycles.ActivityResultListener, FlowLifecycles.PermissionRequestListener {
 
-    val albumAction: (Album) -> Unit = { showAlbum(it) }
-    val adapter = AlbumAdapter(albumAction)
+    private val albumAction: (Album) -> Unit = { showAlbum(it) }
+    private val adapter = AlbumAdapter(albumAction)
 
-    val newAlbumAction: (NewAlbumReq) -> Unit = { presenter.createNewAlbum(it) }
-    val newAlbumDialog = NewAlbumDialog(this, newAlbumAction)
+    private val newAlbumAction: (NewAlbumReq) -> Unit = { presenter.createNewAlbum(it) }
+    private val newAlbumDialog = NewAlbumDialog(this, newAlbumAction)
+
+    val login by lazy { user_login }
+    val name by lazy { user_name }
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<ProfileScreen.Component>(context).inject(this)
@@ -39,11 +45,11 @@ class ProfileView(context: Context, attrs: AttributeSet)
     }
 
     private var curAvatarPath = ""
+
     @SuppressLint("SetTextI18n")
     fun setProfile(user: User) {
-        Timber.e(user.name)
-        user_login.text = user.login
-        user_name.text = "/  " + user.name
+        login.setText(user.login)
+        name.setText("/  ${user.name}")
         album_count.text = user.albumCount.toString()
         card_count.text = user.photocardCount.toString()
         if (user.avatar != curAvatarPath) {
@@ -58,5 +64,26 @@ class ProfileView(context: Context, attrs: AttributeSet)
     fun openNewAlbumDialog() = newAlbumDialog.show()
 
     fun closeNewAlbumDialog() = newAlbumDialog.hide()
+
+
+    fun setEditable(editMode: Boolean) {
+        login.isEnabled = editMode
+        if (editMode) {
+            login.requestFocus()
+            login.setSelection(login.length())
+            name.setSelection(name.length())
+            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(name, InputMethodManager.SHOW_IMPLICIT)
+        }
+        name.isEnabled = editMode
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        presenter.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        presenter.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 }
 
