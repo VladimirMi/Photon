@@ -12,13 +12,14 @@ import java.util.*
 
 open class User(
         @PrimaryKey
-        var id: String = "",
+        override var id: String = "",
         var name: String = "",
         var login: String = "",
         var avatar: String = "",
         var albumCount: Int = 0,
         var photocardCount: Int = 0,
         var albums: RealmList<Album> = RealmList(),
-        var updated: Date = Date(),
+        override var updated: Date = Date(),
+        override var active: Boolean = true,
         @Ignore var token: String = ""
-) : RealmObject()
+) : RealmObject(), Changeable

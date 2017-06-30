@@ -19,13 +19,12 @@ import io.github.vladimirmi.photon.flow.BottomNavHistory
 
 class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
     : BasePresenter<AuthView, IAuthModel>(model, rootPresenter) {
+
     override fun initToolbar() {
         rootPresenter.getNewToolbarBuilder().build()
     }
 
-    override fun initView(view: AuthView) {
-
-    }
+    override fun initView(view: AuthView) = Unit
 
     fun register(req: SignUpReq) {
         compDisp.add(rootPresenter.register(req)
@@ -40,8 +39,8 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
     }
 
     fun login(req: SignInReq) {
+        rootPresenter.showLoading()
         compDisp.add(rootPresenter.login(req)
-                .doOnSubscribe { rootPresenter.showLoading() }
                 .doAfterTerminate { rootPresenter.hideLoading() }
                 .subscribe({}, {
                     // onError
@@ -53,7 +52,6 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
                     }
                 }, {
                     //onComplete
-                    view.closeLoginDialog()
                     nextScreen()
                 }))
     }

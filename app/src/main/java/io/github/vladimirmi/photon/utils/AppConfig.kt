@@ -10,7 +10,7 @@ object AppConfig {
     const val READ_TIMEOUT = 5000
     const val WRITE_TIMEOUT = 5000
 
-    const val RETRY_REQUEST_BASE_DELAY = 500
+    const val RETRY_REQUEST_BASE_DELAY = 500L
     const val RETRY_REQUEST_COUNT = 5
 
     const val MIN_CONSUMER_COUNT = 1

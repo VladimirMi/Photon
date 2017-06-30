@@ -20,20 +20,17 @@ open class Photocard(
         var favorits: Int = 0,
         var filters: Filter = Filter(),
         var tags: RealmList<Tag> = RealmList(),
-        var updated: Date = Date(),
+        override var updated: Date = Date(),
         override var active: Boolean = true,
         @Ignore var album: String = ""
-) : RealmObject(), Deletable {
+) : RealmObject(), Changeable {
+
     fun withId(): Photocard {
         if (id.isEmpty()) id = UUID.randomUUID().toString()
         filters.generateId()
         return this
-    }
 
-    override fun toString(): String {
-        return "Photocard(id='$id', owner='$owner', title='$title', photo='$photo', views=$views, favorits=$favorits, filters=$filters, tags=$tags, album=$album)"
     }
-
 }
 
 open class Filter(
@@ -77,10 +74,6 @@ open class Filter(
         result = 31 * result + lightDirection.hashCode()
         result = 31 * result + lightSource.hashCode()
         return result
-    }
-
-    override fun toString(): String {
-        return "Filter(id='$id', dish='$dish', nuances='$nuances', decor='$decor', temperature='$temperature', light='$light', lightDirection='$lightDirection', lightSource='$lightSource')"
     }
 
     //endregion

@@ -18,7 +18,7 @@ fun setImage(path: String, view: ImageView) {
             .centerCrop()
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.RESULT)
-            .placeholder(R.drawable.ic_image_placeholder)
+            .placeholder(R.drawable.ic_placeholder_image)
             .into(view)
 }
 
@@ -28,7 +28,7 @@ fun setRoundAvatarWithBorder(path: String, view: ImageView, border: Float) {
             .bitmapTransform(CircleTransformation(view.context, border))
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.RESULT)
-            .placeholder(R.drawable.ic_avatar_placeholder)
+            .placeholder(R.drawable.ic_placeholder_avatar)
             .into(view)
 }
 

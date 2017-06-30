@@ -15,7 +15,7 @@ class AuthorModel(private val dataManager: DataManager) : IAuthorModel {
     }
 
     private fun updateUser(id: String) {
-        val user = dataManager.getSingleFromDb(User::class.java, id)
+        val user = dataManager.getSingleObjFromDb(User::class.java, id)
         val updated = user?.updated ?: Date(0)
         dataManager.getUserFromNet(id, updated.toString())
                 .subscribeOn(Schedulers.io())

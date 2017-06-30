@@ -3,18 +3,22 @@
 
     <item
         android:id="@+id/menu_new_album"
+        android:icon="@drawable/ic_action_new_album"
         android:title="@string/menu_profile_new_album"/>
 
     <item
         android:id="@+id/menu_edit_profile"
+        android:icon="@drawable/ic_action_edit"
         android:title="@string/menu_profile_edit_info"/>
 
     <item
         android:id="@+id/menu_change_avatar"
+        android:icon="@drawable/ic_action_avatar"
         android:title="@string/menu_profile_edit_avatar"/>
 
     <item
         android:id="@+id/menu_logout"
+        android:icon="@drawable/ic_action_logout"
         android:title="@string/menu_profile_logout"/>
 
 </menu>

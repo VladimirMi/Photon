@@ -19,6 +19,6 @@ open class Album(
         var favorits: Int = 0,
         var isFavorite: Boolean = false,
         var photocards: RealmList<Photocard> = RealmList(),
-        var updated: Date = Date(),
+        override var updated: Date = Date(),
         override var active: Boolean = true
-) : RealmObject(), Deletable
+) : RealmObject(), Changeable

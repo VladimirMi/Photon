@@ -19,7 +19,7 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
     }
 
     private fun updateUser(id: String) {
-        val user = dataManager.getSingleFromDb(User::class.java, id)
+        val user = dataManager.getSingleObjFromDb(User::class.java, id)
         val updated = user?.updated ?: Date(0)
         dataManager.getUserFromNet(id, updated.toString())
                 .subscribeOn(Schedulers.io())
@@ -32,7 +32,7 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
     }
 
     private fun updatePhotocard(id: String, ownerId: String) {
-        val photocard = dataManager.getSingleFromDb(Photocard::class.java, id)
+        val photocard = dataManager.getSingleObjFromDb(Photocard::class.java, id)
         val updated = photocard?.updated ?: Date(0)
         dataManager.getPhotocardFromNet(id, ownerId, updated.toString())
                 .subscribeOn(Schedulers.io())
