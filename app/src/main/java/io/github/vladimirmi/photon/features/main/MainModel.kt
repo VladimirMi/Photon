@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.features.main
 
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
 import io.reactivex.Observable
@@ -13,23 +14,36 @@ import timber.log.Timber
 
 class MainModel(private val dataManager: DataManager) : IMainModel {
 
-    override val searchQuery = HashMap<String, MutableList<String>>()
-    val query = HashMap<String, MutableList<String>>()
+    override val query = ArrayList<Query>()
+    override var appliedPage: SearchView.Page = SearchView.Page.TAGS
+    private val searchQuery = ArrayList<Query>()
 
-    override fun makeQuery(searchQuery: HashMap<String, MutableList<String>>, currentPage: SearchView.Page) {
-        query.clear()
-        searchQuery.forEach { (key, value) ->
-            if (currentPage == SearchView.Page.TAGS && (key == "search" || key == "tags")) {
-                query[key] = value
-            } else if (currentPage == SearchView.Page.FILTERS && key != "search" && key != "tags") {
-                query[key] = value
-            }
+    private fun pageFilter(query: Query, page: SearchView.Page): Boolean {
+        return when (page) {
+            SearchView.Page.TAGS -> query.fieldName == "title" || query.fieldName == "tags.value"
+            SearchView.Page.FILTERS -> query.fieldName != "title" && query.fieldName != "tags.value"
         }
-        Timber.e(query.toString())
+    }
+
+    override fun makeQuery(queryList: List<Query>, currentPage: SearchView.Page) {
+        searchQuery.clear()
+        searchQuery.addAll(queryList.filter { pageFilter(it, currentPage) })
+        appliedPage = currentPage
     }
 
     override fun getPhotoCards(): Observable<List<Photocard>> {
-        return dataManager.getListFromDb(
-                Photocard::class.java, sortBy = "views", order = Sort.DESCENDING)
+        Timber.e("search with $searchQuery")
+        return dataManager.search(Photocard::class.java,
+                query = if (searchQuery.isNotEmpty()) searchQuery.toList() else null,
+                sortBy = "views",
+                order = Sort.DESCENDING)
+    }
+
+    override fun isFiltered() = searchQuery.isNotEmpty()
+
+    override fun resetFilter() {
+        searchQuery.clear()
+        query.clear()
+        appliedPage = SearchView.Page.TAGS
     }
 }

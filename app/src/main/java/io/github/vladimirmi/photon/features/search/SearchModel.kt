@@ -16,30 +16,41 @@ import timber.log.Timber
 
 class SearchModel(private val dataManager: DataManager, private val mainModel: IMainModel) : ISearchModel {
 
-    override var page: SearchView.Page = SearchView.Page.TAGS
+    override var page = mainModel.appliedPage
 
     override fun getTags(): Observable<List<Tag>> {
-        return dataManager.getListFromDb(Tag::class.java, "tag")
+        return dataManager.getListFromDb(Tag::class.java, "value")
     }
 
-    override fun getQuery(): HashMap<String, MutableList<String>> {
-        return mainModel.searchQuery
+    override fun getQuery(): List<Query> {
+        return mainModel.query
     }
 
-    override fun addQuery(query: Pair<String, String>) {
-        if (mainModel.searchQuery[query.first] == null) {
-            mainModel.searchQuery[query.first] = mutableListOf()
-        }
-        if (query.first == "search") {
-            mainModel.searchQuery[query.first] = mutableListOf(query.second)
+    override fun addQuery(pair: Pair<String, String>) {
+        if (pair.first == "title") removeQuery(pair)
+        if (pair.second.isEmpty()) return
+        Timber.e("addQuery $pair to ${mainModel.query}")
+        mainModel.query.add(parseToQuery(pair))
+    }
+
+    override fun removeQuery(pair: Pair<String, String>) {
+        val query = mainModel.query.find { it.fieldName == pair.first }
+        Timber.e("removeQuery $pair from ${mainModel.query}")
+        mainModel.query.remove(query)
+    }
+
+    private fun parseToQuery(pair: Pair<String, String>): Query {
+        val operator: RealmOperator
+        if (pair.first == "filters.nuances" || pair.first == "title") {
+            operator = RealmOperator.CONTAINS
         } else {
-            mainModel.searchQuery[query.first]!!.add(query.second)
+            operator = RealmOperator.EQUALTO
         }
-        Timber.e("addQuery $query to ${mainModel.searchQuery}")
+        return Query(pair.first, operator, pair.second)
     }
 
     override fun makeQuery() {
-        mainModel.makeQuery(mainModel.searchQuery, page)
+        mainModel.makeQuery(mainModel.query, page)
     }
 
     override fun search(string: String): Observable<List<Search>> {
@@ -49,7 +60,7 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
                 .map { if (it.size > 5) it.subList(0, 5) else it }
     }
 
-    override fun saveSearch(search: String) {
+    override fun saveSearchField(search: String) {
         dataManager.saveToDB(Search(search), async = true)
     }
 }

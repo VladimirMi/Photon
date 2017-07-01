@@ -15,6 +15,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="vertical"
             android:paddingBottom="24dp"
             android:paddingTop="24dp"
@@ -33,6 +34,15 @@
             <include layout="@layout/view_filters_light_dir"/>
 
             <include layout="@layout/view_filters_light_src"/>
+
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="140dp"
+                android:layout_height="60dp"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/button_search"
+                android:theme="@style/GreyDarkButton"
+                />
 
         </LinearLayout>
     </ScrollView>

@@ -49,7 +49,7 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
         val flexbox = LayoutInflater.from(context).inflate(R.layout.view_search_tags, this, false)
         flexbox as ViewGroup
         photocard.tags.forEach {
-            val tag = TagView(context, it.tag, null)
+            val tag = TagView(context, it.value, null)
             flexbox.addView(tag)
         }
         photocard_tags_wrapper.addView(flexbox)

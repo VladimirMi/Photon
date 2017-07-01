@@ -8,6 +8,7 @@ import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.di.DaggerService
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.screen_search.view.*
+import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 06.06.2017.
@@ -39,12 +40,8 @@ class SearchView(context: Context, attrs: AttributeSet)
         search_pager.adapter = null
     }
 
-    override fun onBackPressed(): Boolean {
-        presenter.makeQuery()
-        return false
-    }
-
     fun setPage(page: Page) {
+        Timber.e("setPage: ${page.position}")
         search_pager.currentItem = page.position
     }
 }

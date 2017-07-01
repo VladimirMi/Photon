@@ -1,11 +1,15 @@
 package io.github.vladimirmi.photon.features.main
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
+import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import flow.Flow
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
@@ -88,5 +92,13 @@ class MainView(context: Context, attrs: AttributeSet) :
         val bundle = state as Bundle
         super.onRestoreInstanceState(bundle.getParcelable("SUPER"))
         scroll = bundle.getInt("SCROLL")
+    }
+
+    fun showFilterWarning() {
+        val snackbar = Snackbar.make(this, R.string.main_message_filter, Snackbar.LENGTH_LONG)
+                .setActionTextColor(Color.WHITE)
+                .setAction(R.string.main_message_filter_action, { presenter.resetFilter() })
+        snackbar.view.setBackgroundColor(ContextCompat.getColor(context, R.color.color_accent))
+        snackbar.show()
     }
 }

@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.features.main
 
 import io.github.vladimirmi.photon.core.IModel
+import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
 import io.reactivex.Observable
@@ -12,6 +13,9 @@ import io.reactivex.Observable
 interface IMainModel : IModel {
 
     fun getPhotoCards(): Observable<List<Photocard>>
-    val searchQuery: HashMap<String, MutableList<String>>
-    fun makeQuery(searchQuery: HashMap<String, MutableList<String>>, currentPage: SearchView.Page)
+    val query: MutableList<Query>
+    var appliedPage: SearchView.Page
+    fun makeQuery(queryList: List<Query>, currentPage: SearchView.Page)
+    fun isFiltered(): Boolean
+    fun resetFilter()
 }

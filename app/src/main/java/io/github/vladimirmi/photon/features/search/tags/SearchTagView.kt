@@ -8,6 +8,7 @@ import com.google.android.flexbox.FlexboxLayout
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
+import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.models.realm.Search
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.di.DaggerService
@@ -22,8 +23,12 @@ import kotlinx.android.synthetic.main.view_search.view.*
 class SearchTagView(context: Context, attrs: AttributeSet)
     : BaseView<SearchTagPresenter, SearchTagView>(context, attrs) {
 
-    val searchAdapter = StringAdapter()
     val searchObs by lazy { search_field.textChanges() }
+    private val searchAdapter = StringAdapter()
+    private val tagAction: (TagView) -> Unit = { select(it) }
+    private val flexbox by lazy {
+        LayoutInflater.from(context).inflate(R.layout.view_search_tags, tags_wrapper, false) as FlexboxLayout
+    }
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<SearchScreen.Component>(context).inject(this)
@@ -33,24 +38,25 @@ class SearchTagView(context: Context, attrs: AttributeSet)
         recent_search.layoutManager = LinearLayoutManager(context)
         recent_search.adapter = searchAdapter
         ic_action.setOnClickListener { presenter.submitSearch(search_field.text.toString()) }
+        ic_clear.setOnClickListener { clearAll() }
     }
 
-    private val tagAction: (TagView) -> Unit = { select(it) }
-
-    fun addTags(tags: List<Tag>, query: HashMap<String, MutableList<String>>) {
-        val flexbox = LayoutInflater.from(context).inflate(R.layout.view_search_tags, tags_wrapper, false)
-        flexbox as FlexboxLayout
-        val queryTags = query["tags"]
-        tags.forEach {
-            val view = TagView(context, it.tag, tagAction)
-            if (queryTags?.contains(it.tag) ?: false) view.pick()
-            flexbox.addView(view)
-        }
-        tags_wrapper.addView(flexbox)
+    private fun clearAll() {
+        search_field.setText("")
+        (0..flexbox.childCount - 1)
+                .map { flexbox.getChildAt(it) as TagView }
+                .filter { it.picked }
+                .forEach { it.performClick() }
+        presenter.submit()
     }
 
     private fun select(tagView: TagView) {
-        presenter.addQuery(Pair("tags", tagView.text.toString()))
+        val query = Pair("tags.value", tagView.text.toString())
+        if (tagView.picked) {
+            presenter.addQuery(query)
+        } else {
+            presenter.removeQuery(query)
+        }
     }
 
     fun setRecentSearches(list: List<Search>) {
@@ -61,8 +67,18 @@ class SearchTagView(context: Context, attrs: AttributeSet)
         ic_action.setImageResource(if (enable) R.drawable.ic_action_submit else R.drawable.ic_action_back_arrow)
     }
 
-    fun restoreFromQuery(query: Any): Unit {
-        // todo implement
+    fun restoreFromQuery(query: List<Query>) {
+        search_field.setText(query.find { it.fieldName == "title" }?.value)
+    }
+
+    fun setTags(tags: List<Tag>, query: List<Query>) {
+        val queryTags = query.filter { it.fieldName == "tags.value" }
+        tags.forEach { tag ->
+            val view = TagView(context, tag.value, tagAction)
+            if (queryTags.find { it.value == tag.value } != null) view.pick()
+            flexbox.addView(view)
+        }
+        tags_wrapper.addView(flexbox)
     }
 }
 

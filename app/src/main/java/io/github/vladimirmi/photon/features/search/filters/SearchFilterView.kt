@@ -4,10 +4,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
+import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.ui.FilterElementView
+import kotlinx.android.synthetic.main.view_filters.view.*
 
 /**
  * Created by Vladimir Mikhalev 07.06.2017.
@@ -44,18 +47,32 @@ class SearchFilterView(context: Context, attrs: AttributeSet) :
 
     private fun select(filterElement: FilterElementView) {
         if (filterElement.picked) {
-            presenter.addFilter(filterElement.filter)
+            presenter.addQuery(filterElement.filter)
         } else {
-            presenter.removeFilter(filterElement.filter)
+            presenter.removeQuery(filterElement.filter)
         }
     }
 
-    fun restoreFilterState(filters: HashMap<String, MutableList<String>>) {
+    fun restoreFilterState(query: List<Query>) {
         for (view in filterElements) {
-            filters[view.filter.first]?.forEach {
-                if (it == view.filter.second) view.pick()
-            }
+            query.find { it.fieldName == view.filter.first && it.value == view.filter.second }?.let { view.pick() }
         }
+    }
+
+    fun setupSubmitBtn(queryChanged: Boolean) {
+        if (queryChanged) {
+            submit.setText(R.string.button_search)
+            submit.setOnClickListener { presenter.submit() }
+        } else {
+            submit.setText(R.string.button_drop)
+            submit.setOnClickListener { clearAll() }
+        }
+    }
+
+    private fun clearAll() {
+        filterElements.filter { it.picked }
+                .forEach { it.performClick() }
+        presenter.submitChange()
     }
 }
 

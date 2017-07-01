@@ -24,11 +24,5 @@ class SearchPresenter(model: ISearchModel, rootPresenter: RootPresenter)
     fun savePageType(page: SearchView.Page) {
         model.page = page
     }
-
-    fun getQuery() = model.getQuery()
-
-    fun addQuery(query: Pair<String, String>) = model.addQuery(query)
-
-    fun makeQuery() = model.makeQuery()
 }
 

@@ -10,7 +10,8 @@ import io.github.vladimirmi.photon.R
 
 class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
         TextView(context) {
-    private var picked = false
+    var picked = false
+        private set
 
     override fun getText(): CharSequence {
         return super.getText().removePrefix("#")

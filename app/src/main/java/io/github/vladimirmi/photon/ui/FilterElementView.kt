@@ -27,7 +27,7 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
     private val colorAccent = ContextCompat.getColor(context, R.color.color_accent)
     private val colorGrey = ContextCompat.getColor(context, R.color.grey)
     private var color = colorGrey
-    val filter get() = Pair((parent as ViewGroup).tag as String, tag as String)
+    val filter get() = Pair("filters." + (parent as ViewGroup).tag as String, tag as String)
 
     init {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.FilterElementView, 0, 0)

@@ -125,11 +125,11 @@ class NewCardView(context: Context, attrs: AttributeSet)
     }
 
     fun setTagSuggestions(tags: List<Tag>) {
-        suggestTagAdapter.updateData(tags.map { it.tag })
+        suggestTagAdapter.updateData(tags.map { it.value })
     }
 
     fun setTags(tags: List<Tag>) {
-        tagsAdapter.updateData(tags.map { it.tag })
+        tagsAdapter.updateData(tags.map { it.value })
     }
 
     fun setAlbums(list: List<Album>) {

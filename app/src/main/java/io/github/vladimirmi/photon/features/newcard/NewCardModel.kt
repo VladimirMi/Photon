@@ -42,8 +42,8 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
     }
 
     override fun search(tag: String): Observable<List<Tag>> {
-        val query = Query("tag", RealmOperator.CONTAINS, tag)
-        return dataManager.search(Tag::class.java, listOf(query), sortBy = "tag")
+        val query = Query("value", RealmOperator.CONTAINS, tag)
+        return dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
                 .map { if (it.size > 3) it.subList(0, 3) else it }
     }
 

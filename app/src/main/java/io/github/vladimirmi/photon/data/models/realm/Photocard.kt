@@ -80,4 +80,4 @@ open class Filter(
 
 }
 
-open class Tag(@PrimaryKey var tag: String = "") : RealmObject()
+open class Tag(@PrimaryKey var value: String = "") : RealmObject()

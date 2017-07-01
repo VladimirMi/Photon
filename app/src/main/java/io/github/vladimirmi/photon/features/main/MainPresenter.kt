@@ -32,8 +32,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         val popupMenu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth
         else R.menu.submenu_main_screen_not_auth
 
+        val searchIcon = if (model.isFiltered()) R.drawable.ic_action_search_active
+        else R.drawable.ic_action_search
+
         rootPresenter.getNewToolbarBuilder()
-                .addAction(MenuItemHolder("Search", R.drawable.ic_action_search,
+                .addAction(MenuItemHolder("Search", searchIcon,
                         actions = { Flow.get(view).set(SearchScreen()) }))
                 .addAction(MenuItemHolder("Login",
                         iconResId = R.drawable.ic_action_settings,
@@ -44,6 +47,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     override fun initView(view: MainView) {
         compDisp.add(subscribeOnPhotocards())
+        if (model.isFiltered()) view.showFilterWarning()
     }
 
     private fun subscribeOnPhotocards(): Disposable {
@@ -87,6 +91,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun logout() {
         rootPresenter.logout()
         initToolbar()
+    }
+
+    fun resetFilter() {
+        model.resetFilter()
+        initView(view)
     }
 }
 

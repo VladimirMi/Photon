@@ -55,7 +55,7 @@ class TagJsonAdapter {
     }
 
     @ToJson fun toJson(tag: Tag): String {
-        return tag.tag
+        return tag.value
     }
 }
 

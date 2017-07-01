@@ -52,7 +52,15 @@ class RealmManager {
     fun <T : RealmObject> search(clazz: Class<T>, query: List<Query>?, sortBy: String, order: Sort): Observable<List<T>> {
         val realm = Realm.getDefaultInstance()
         var realmQuery = realm.where(clazz)
-        query?.forEach { realmQuery = it.applyTo(realmQuery) }
+
+        query?.groupBy { it.fieldName }?.forEach { (_, list) ->
+            realmQuery = realmQuery.beginGroup()
+            list.forEachIndexed { idx, qry ->
+                realmQuery = qry.applyTo(realmQuery)
+                if (idx < list.size - 1) realmQuery = realmQuery.or()
+            }
+            realmQuery = realmQuery.endGroup()
+        }
 
         return RealmResultObservable.from(realmQuery
                 .findAllSortedAsync(sortBy, order))
@@ -88,6 +96,22 @@ class Query(val fieldName: String, val operator: RealmOperator, val value: Strin
             RealmOperator.EQUALTO -> realmQuery.equalTo(fieldName, value)
         }
         return realmQuery
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+        other as Query
+        if (fieldName != other.fieldName) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return fieldName.hashCode()
+    }
+
+    override fun toString(): String {
+        return "($fieldName $operator $value)"
     }
 }
 
