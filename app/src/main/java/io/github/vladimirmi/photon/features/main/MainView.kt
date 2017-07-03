@@ -14,7 +14,6 @@ import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.ui.LoginDialog
 import io.github.vladimirmi.photon.ui.RegistrationDialog
 import kotlinx.android.synthetic.main.screen_main.view.*
@@ -26,17 +25,17 @@ import kotlinx.android.synthetic.main.screen_main.view.*
 class MainView(context: Context, attrs: AttributeSet) :
         BaseView<MainPresenter, MainView>(context, attrs) {
 
-    val cardAction: (Photocard) -> Unit = { showPhotoCard(it) }
-    val adapter = CardAdapter(cardAction)
+    private val cardAction: (Photocard) -> Unit = { presenter.showPhotoCard(it) }
+    private val adapter = CardAdapter(cardAction)
 
-    val registrationAction: (SignUpReq) -> Unit = { register(it) }
-    val loginAction: (SignInReq) -> Unit = { login(it) }
+    private val registrationAction: (SignUpReq) -> Unit = { register(it) }
+    private val loginAction: (SignInReq) -> Unit = { login(it) }
 
-    val registrationDialog = RegistrationDialog(this, registrationAction)
-    val loginDialog = LoginDialog(this, loginAction)
+    private val registrationDialog = RegistrationDialog(this, registrationAction)
+    private val loginDialog = LoginDialog(this, loginAction)
 
     private var scroll = 0
-    val state = Flow.getKey<MainScreen>(context)!!.state
+    private val state = Flow.getKey<MainScreen>(context)!!.state
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<MainScreen.Component>(context).inject(this)
@@ -54,8 +53,6 @@ class MainView(context: Context, attrs: AttributeSet) :
             scroll = 0
         }
     }
-
-    fun showPhotoCard(photocard: Photocard) = Flow.get(this).set(PhotocardScreen(photocard))
 
     fun openRegistrationDialog() = registrationDialog.show()
 

@@ -102,6 +102,12 @@ constructor(private val restService: RestService,
                 .body()
     }
 
+    fun addView(id: String): Observable<SuccessRes> {
+        return restService.addView(id)
+                .parseStatusCode()
+                .body()
+    }
+
     //endregion
 
     //region =============== DataBase ==============

@@ -6,7 +6,9 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.network.ApiError
+import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
@@ -22,7 +24,7 @@ import java.util.concurrent.TimeUnit
 class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         BasePresenter<MainView, IMainModel>(model, rootPresenter) {
 
-    val menuActions: (MenuItem) -> Unit = {
+    private val menuActions: (MenuItem) -> Unit = {
         when (it.itemId) {
             R.id.menu_signIn -> view.openLoginDialog()
             R.id.menu_signUp -> view.openRegistrationDialog()
@@ -109,6 +111,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun resetFilter() {
         model.resetFilter()
         initView(view)
+    }
+
+    fun showPhotoCard(photocard: Photocard) {
+        model.addView(photocard)
+        Flow.get(view).set(PhotocardScreen(photocard))
     }
 }
 

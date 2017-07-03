@@ -82,4 +82,7 @@ interface RestService {
                     @Body req: EditProfileReq,
                     @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<User>>
+
+    @POST("photocard/{id}/view")
+    fun addView(@Path("id") id: String): Observable<Response<SuccessRes>>
 }

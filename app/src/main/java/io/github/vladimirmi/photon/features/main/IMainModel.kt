@@ -18,4 +18,5 @@ interface IMainModel : IModel {
     fun makeQuery(queryList: List<Query>, currentPage: SearchView.Page)
     fun isFiltered(): Boolean
     fun resetFilter()
+    fun addView(photocard: Photocard)
 }

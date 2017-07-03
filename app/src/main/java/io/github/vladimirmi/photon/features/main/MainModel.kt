@@ -12,7 +12,7 @@ import timber.log.Timber
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class MainModel(private val dataManager: DataManager) : IMainModel {
+class MainModel(val dataManager: DataManager) : IMainModel {
 
     override val query = ArrayList<Query>()
     override var appliedPage: SearchView.Page = SearchView.Page.TAGS
@@ -45,5 +45,9 @@ class MainModel(private val dataManager: DataManager) : IMainModel {
         searchQuery.clear()
         query.clear()
         appliedPage = SearchView.Page.TAGS
+    }
+
+    override fun addView(photocard: Photocard) {
+        dataManager.addView(photocard.id).subscribe()
     }
 }
