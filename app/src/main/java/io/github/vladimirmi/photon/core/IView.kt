@@ -7,4 +7,5 @@ package io.github.vladimirmi.photon.core
 interface IView {
     fun showMessage(string: String)
     fun showMessage(stringId: Int)
+    fun showError(stringId: Int)
 }

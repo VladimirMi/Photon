@@ -58,4 +58,8 @@ abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
     override fun showMessage(stringId: Int) {
         Snackbar.make(this, stringId, Snackbar.LENGTH_LONG).show()
     }
+
+    override fun showError(stringId: Int) {
+        Snackbar.make(this, stringId, Snackbar.LENGTH_SHORT).show()
+    }
 }

@@ -34,13 +34,12 @@ class SearchFilterPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
 
     fun submit() {
         model.makeQuery()
-        queryChanged = false
         Flow.get(view).goBack()
     }
 
     fun submitChange() {
         model.makeQuery()
-        queryChanged = false
+        queryChanged = true
         initView(view)
     }
 }

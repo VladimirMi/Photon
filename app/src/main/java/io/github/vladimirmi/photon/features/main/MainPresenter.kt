@@ -10,8 +10,10 @@ import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -59,9 +61,16 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     //todo попробовать использовать AuthPresenter
     fun register(req: SignUpReq) {
         compDisp.add(rootPresenter.register(req)
+                .doOnSubscribe {
+                    view.closeRegistrationDialog()
+                }
                 .subscribe({}, {
                     // onError
-                    if (it is ApiError) view.showMessage(it.errorResId)
+                    if (it is ApiError) view.showError(it.errorResId)
+                    else view.showError(R.string.message_api_err_unknown)
+                    Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
+                        view.openRegistrationDialog()
+                    }
                 }, {
                     //onComplete
                     view.closeRegistrationDialog()
@@ -71,15 +80,19 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     fun login(req: SignInReq) {
         compDisp.add(rootPresenter.login(req)
-                .doOnSubscribe { rootPresenter.showLoading() }
-                .doAfterTerminate { rootPresenter.hideLoading() }
+                .doOnSubscribe {
+                    view.closeLoginDialog()
+                }
                 .subscribe({}, {
                     // onError
                     if (it is ApiError) {
                         when (it.statusCode) {
-                            404 -> view.showMessage(R.string.message_api_err_auth)
-                            else -> view.showMessage(it.errorResId)
+                            404 -> view.showError(R.string.message_api_err_auth)
+                            else -> view.showError(it.errorResId)
                         }
+                    } else view.showError(R.string.message_api_err_unknown)
+                    Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
+                        view.openLoginDialog()
                     }
                 }, {
                     //onComplete

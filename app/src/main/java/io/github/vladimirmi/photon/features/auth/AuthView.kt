@@ -39,4 +39,6 @@ class AuthView(context: Context, attrs: AttributeSet)
     fun closeRegistrationDialog() = registrationDialog.hide()
 
     fun closeLoginDialog() = loginDialog.hide()
+
+
 }

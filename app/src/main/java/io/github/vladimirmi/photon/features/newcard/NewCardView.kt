@@ -68,7 +68,7 @@ class NewCardView(context: Context, attrs: AttributeSet)
 
     private fun initFiltersSection() {
         filterElements.forEach {
-            if (it.filter.first != "nuances") it.radioMode = true
+            if (it.filter.first != "filters.nuances") it.radioMode = true
             it.setAction(filterAction)
         }
     }

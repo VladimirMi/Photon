@@ -1,7 +1,6 @@
 package io.github.vladimirmi.photon.features.main
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.design.widget.Snackbar
@@ -96,9 +95,8 @@ class MainView(context: Context, attrs: AttributeSet) :
 
     fun showFilterWarning() {
         val snackbar = Snackbar.make(this, R.string.main_message_filter, Snackbar.LENGTH_LONG)
-                .setActionTextColor(Color.WHITE)
                 .setAction(R.string.main_message_filter_action, { presenter.resetFilter() })
-        snackbar.view.setBackgroundColor(ContextCompat.getColor(context, R.color.color_accent))
+        snackbar.view.setBackgroundColor(ContextCompat.getColor(context, R.color.text_color))
         snackbar.show()
     }
 }

@@ -103,12 +103,16 @@ class RootActivity : FlowActivity(), IRootView {
         }
     }
 
-    override fun showMessage(@StringRes stringId: Int) {
+    override fun showMessage(stringId: Int) {
         showMessage(getString(stringId))
     }
 
     override fun showMessage(string: String) {
         Snackbar.make(root_container, string, Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun showError(stringId: Int) {
+        Snackbar.make(root_container, stringId, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun showPermissionSnackBar() {
