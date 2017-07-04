@@ -1,6 +1,8 @@
 package io.github.vladimirmi.photon.core
 
 import android.app.Application
+import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
 import io.github.vladimirmi.photon.BuildConfig
 import io.github.vladimirmi.photon.di.DaggerService
 import io.realm.Realm
@@ -18,5 +20,8 @@ class App : Application() {
         DaggerService.createAppComponent(applicationContext)
 
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+
+        Fabric.with(this, Crashlytics())
     }
+
 }

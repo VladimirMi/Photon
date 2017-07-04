@@ -17,6 +17,7 @@ import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.ui.LoginDialog
 import io.github.vladimirmi.photon.ui.RegistrationDialog
 import kotlinx.android.synthetic.main.screen_main.view.*
+import java.lang.RuntimeException
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -52,6 +53,7 @@ class MainView(context: Context, attrs: AttributeSet) :
             photocard_list.scrollToPosition(scroll)
             scroll = 0
         }
+        throw RuntimeException("This is a crash")
     }
 
     fun openRegistrationDialog() = registrationDialog.show()

@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.utils
 
+import com.crashlytics.android.Crashlytics
 import io.github.vladimirmi.photon.data.models.realm.Changeable
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.reactivex.Observable
@@ -68,12 +69,12 @@ fun <T> Observable<T>.retryExp(): Observable<T> {
     }
 }
 
-class ErrorObserver<T> : DisposableObserver<T>() {
+open class ErrorObserver<T> : DisposableObserver<T>() {
     override fun onComplete() {}
 
     override fun onNext(t: T) {}
 
     override fun onError(e: Throwable) {
-
+        Crashlytics.logException(e)
     }
 }

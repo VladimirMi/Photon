@@ -97,9 +97,11 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     fun delete() {
         compDisp.add(model.deleteAlbum(album)
-                .subscribe({}, {}, {
-                    view.closeDeleteDialog()
-                    Flow.get(view).goBack()
+                .subscribeWith(object : ErrorObserver<Int>() {
+                    override fun onComplete() {
+                        view.closeDeleteDialog()
+                        Flow.get(view).goBack()
+                    }
                 }))
     }
 
