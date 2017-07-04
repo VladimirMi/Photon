@@ -85,4 +85,10 @@ interface RestService {
 
     @POST("photocard/{id}/view")
     fun addView(@Path("id") id: String): Observable<Response<SuccessRes>>
+
+    @POST("user/{userId}/favorite/{id}")
+    fun addToFavorite(@Path("userId") userId: String,
+                      @Path("id") id: String,
+                      @Header(HEADER_AUTHORIZATION) token: String)
+            : Observable<Response<SuccessRes>>
 }

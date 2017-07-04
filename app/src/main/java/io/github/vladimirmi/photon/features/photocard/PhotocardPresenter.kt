@@ -14,12 +14,15 @@ import io.reactivex.disposables.Disposable
 class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         BasePresenter<PhotocardView, IPhotocardModel>(model, rootPresenter) {
 
-    override fun initToolbar() {
-        val actions: (MenuItem) -> Unit = {
-            when (it.itemId) {
-            //todo
-            }
+    private val actions: (MenuItem) -> Unit = {
+        when (it.itemId) {
+            R.id.menu_favorite -> addToFavorite()
+            R.id.menu_share -> share()
+            R.id.menu_download -> download()
         }
+    }
+
+    override fun initToolbar() {
         rootPresenter.getNewToolbarBuilder()
                 .setBackNavigationEnabled(true)
                 .addAction(MenuItemHolder("Actions",
@@ -29,12 +32,12 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
                 .build()
     }
 
-    var ownerId = ""
+    lateinit var photocard: Photocard
 
     override fun initView(view: PhotocardView) {
         val photocard = Flow.getKey<PhotocardScreen>(view)?.photocard!!
-        ownerId = photocard.owner
-        compDisp.add(subscribeOnUser(ownerId))
+        this.photocard = photocard
+        compDisp.add(subscribeOnUser(photocard.owner))
         compDisp.add(subscribeOnPhotocard(photocard))
     }
 
@@ -50,7 +53,21 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     }
 
     fun showAuthor() {
-        Flow.get(view).set(AuthorScreen(ownerId))
+        Flow.get(view).set(AuthorScreen(photocard.owner))
     }
 
+    private fun addToFavorite() {
+        //todo предлагать войти или менять меню
+        if (rootPresenter.isUserAuth()) {
+            compDisp.add(model.addToFavorite(photocard).subscribe())
+        }
+    }
+
+    private fun share() {
+        //todo implement
+    }
+
+    private fun download() {
+        //todo implement
+    }
 }

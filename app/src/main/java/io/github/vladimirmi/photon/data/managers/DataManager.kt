@@ -108,6 +108,12 @@ constructor(private val restService: RestService,
                 .body()
     }
 
+    fun addToFavorite(id: String): Observable<SuccessRes> {
+        return restService.addToFavorite(getProfileId(), id, getUserToken())
+                .parseStatusCode()
+                .body()
+    }
+
     //endregion
 
     //region =============== DataBase ==============

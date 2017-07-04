@@ -38,13 +38,10 @@ fun <T> Observable<Response<T>>.parseResponse(saveUpdated: ((String) -> Unit)? =
         : Observable<T> {
     return parseStatusCode()
             .map {
-                val lastModified = it.headers().get(Constants.HEADER_LAST_MODIFIED)
+                saveUpdated?.invoke(Date().toString())
                 val body = it.body()!!
-                if (lastModified != null) {
-                    saveUpdated?.invoke(lastModified)
-                    if (body is Changeable) {
-                        body.updated = Date(lastModified)
-                    }
+                if (body is Changeable) {
+                    body.updated = Date()
                 }
                 return@map body
             }

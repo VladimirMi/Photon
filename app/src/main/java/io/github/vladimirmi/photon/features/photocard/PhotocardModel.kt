@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.features.photocard
 
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.models.SuccessRes
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.reactivex.Observable
@@ -39,4 +40,14 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
                 .subscribe { dataManager.saveToDB(it) }
     }
 
+    override fun addToFavorite(photocard: Photocard): Observable<SuccessRes> {
+        return dataManager.addToFavorite(photocard.id)
+                .doOnComplete {
+                    val user = dataManager.getSingleObjFromDb(User::class.java, dataManager.getProfileId())
+                    if (user != null) {
+                        user.updated = Date(0)
+                        dataManager.saveToDB(user)
+                    }
+                }
+    }
 }

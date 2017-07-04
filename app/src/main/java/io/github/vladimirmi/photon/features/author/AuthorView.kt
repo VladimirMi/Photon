@@ -11,7 +11,6 @@ import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder
 import kotlinx.android.synthetic.main.view_profile.view.*
-import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 15.06.2017.
@@ -20,8 +19,8 @@ import timber.log.Timber
 class AuthorView(context: Context, attrs: AttributeSet)
     : BaseView<AuthorPresenter, AuthorView>(context, attrs) {
 
-    val albumAction: (Album) -> Unit = { showAlbum(it) }
-    val adapter = AlbumAdapter(albumAction)
+    private val albumAction: (Album) -> Unit = { showAlbum(it) }
+    private val adapter = AlbumAdapter(albumAction)
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<AuthorScreen.Component>(context).inject(this)
@@ -36,7 +35,6 @@ class AuthorView(context: Context, attrs: AttributeSet)
     private var curAvatarPath = ""
     @SuppressLint("SetTextI18n")
     fun setUser(user: User) {
-        Timber.e(user.name)
         user_login.setText(user.login)
         user_name.setText("/  ${user.name}")
         album_count.text = user.albumCount.toString()
@@ -45,7 +43,7 @@ class AuthorView(context: Context, attrs: AttributeSet)
             setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
             curAvatarPath = user.avatar
         }
-        adapter.updateData(user.albums)
+        adapter.updateData(user.albums.filter { it.active })
     }
 
     private fun showAlbum(album: Album) = presenter.showAlbum(album)

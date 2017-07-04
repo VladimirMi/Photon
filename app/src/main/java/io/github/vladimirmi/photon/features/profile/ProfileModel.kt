@@ -30,7 +30,10 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : I
 
     private fun updateUser(id: String) {
         val user = dataManager.getSingleObjFromDb(User::class.java, id)
-        val updated = user?.updated ?: Date(0)
+        var updated = user?.updated ?: Date(0)
+        val hour = 3600000 // milliseconds
+        if (updated.time != 0L && Date().time - hour > updated.time) updated = Date(0)
+
         dataManager.getUserFromNet(id, updated.toString())
                 .subscribeOn(Schedulers.io())
                 .subscribe { dataManager.saveToDB(it) }
