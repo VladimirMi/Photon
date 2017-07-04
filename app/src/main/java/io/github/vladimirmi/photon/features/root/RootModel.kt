@@ -5,6 +5,7 @@ import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.utils.AppConfig
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
@@ -25,14 +26,15 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
 //                }
 //                .flatMap { save(it) }
 //                .share()
-        val updateObs = dataManager.getPhotocardsFromNet(limit = 60, offset = 0)
+
+        val updateObs = Observable.defer { dataManager.getPhotocardsFromNet(limit = 60, offset = 0) }
                 .flatMap { save(it) }
                 .share()
 
-        Observable.interval(5, TimeUnit.MINUTES)
+        Observable.interval(AppConfig.PHOTOCARD_UPDATE_DELAY, TimeUnit.MINUTES)
                 .withLatestFrom(dataManager.isNetworkAvailable(),
                         BiFunction { _: Long, netAvail: Boolean -> netAvail })
-                .filter { it == true }
+                .filter { it }
                 .flatMap { updateObs }
                 .subscribe()
 

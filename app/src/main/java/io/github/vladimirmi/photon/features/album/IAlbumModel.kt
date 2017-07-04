@@ -2,6 +2,7 @@ package io.github.vladimirmi.photon.features.album
 
 import io.github.vladimirmi.photon.core.IModel
 import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.reactivex.Observable
 
 interface IAlbumModel : IModel {
@@ -9,4 +10,5 @@ interface IAlbumModel : IModel {
     fun getProfileId(): String
     fun editAlbum(album: Album): Observable<Album>
     fun deleteAlbum(album: Album): Observable<Int>
+    fun removePhotos(photosForDelete: List<Photocard>): Observable<Int>
 }

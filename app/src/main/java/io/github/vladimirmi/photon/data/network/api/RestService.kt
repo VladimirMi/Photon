@@ -91,4 +91,10 @@ interface RestService {
                       @Path("id") id: String,
                       @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<SuccessRes>>
+
+    @DELETE("user/{userId}/photocard/{id}")
+    fun deletePhotocard(@Path("userId") userId: String,
+                        @Path("id") id: String,
+                        @Header(HEADER_AUTHORIZATION) token: String)
+            : Observable<Response<Void>>
 }

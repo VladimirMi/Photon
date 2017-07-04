@@ -4,6 +4,7 @@ import io.github.vladimirmi.photon.data.models.realm.Changeable
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
 import java.util.*
@@ -38,7 +39,9 @@ fun <T> Observable<Response<T>>.parseResponse(saveUpdated: ((String) -> Unit)? =
         : Observable<T> {
     return parseStatusCode()
             .map {
-                saveUpdated?.invoke(Date().toString())
+                if (saveUpdated != null) {
+                    saveUpdated(Date().toString())
+                }
                 val body = it.body()!!
                 if (body is Changeable) {
                     body.updated = Date()
@@ -62,5 +65,15 @@ fun <T> Observable<T>.retryExp(): Observable<T> {
                     }
                 }
                 .flatMap { Observable.timer(it, TimeUnit.MILLISECONDS) }
+    }
+}
+
+class ErrorObserver<T> : DisposableObserver<T>() {
+    override fun onComplete() {}
+
+    override fun onNext(t: T) {}
+
+    override fun onError(e: Throwable) {
+
     }
 }

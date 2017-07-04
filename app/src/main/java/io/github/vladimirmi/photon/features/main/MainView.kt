@@ -47,7 +47,7 @@ class MainView(context: Context, attrs: AttributeSet) :
     }
 
     fun setData(data: List<Photocard>) {
-        adapter.updateData(data)
+        adapter.updateData(data.filter { it.active })
         if (scroll != 0) {
             photocard_list.scrollToPosition(scroll)
             scroll = 0

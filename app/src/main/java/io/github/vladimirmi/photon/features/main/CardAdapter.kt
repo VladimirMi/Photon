@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.realm.Photocard
@@ -24,6 +25,11 @@ class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideI
     : RecyclerView.Adapter<CardViewHolder>() {
 
     private var data: List<Photocard> = ArrayList()
+    var longTapAction = false
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     fun updateData(list: List<Photocard>) {
         val diffResult = calculateDiff(object : DiffUtil.Callback() {
@@ -54,18 +60,22 @@ class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideI
     }
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
-        holder.bind(data[position])
+        holder.bind(data[position], longTapAction)
     }
 
     override fun getItemCount(): Int {
         return data.size
+    }
+
+    fun deletePhotocard(photocard: Photocard) {
+        updateData(data.filter { it.id != photocard.id })
     }
 }
 
 class CardViewHolder(itemView: View?, val cardAction: (Photocard) -> Unit) : RecyclerView.ViewHolder(itemView) {
 
     private var curImagePath = ""
-    fun bind(photoCard: Photocard) {
+    fun bind(photoCard: Photocard, longTapAction: Boolean) {
         itemView.likes.text = photoCard.favorits.toString()
         itemView.views.text = photoCard.views.toString()
         itemView.photo_card.setOnClickListener { cardAction(photoCard) }
@@ -73,6 +83,7 @@ class CardViewHolder(itemView: View?, val cardAction: (Photocard) -> Unit) : Rec
             setImage(photoCard.photo, itemView.photo_card)
             curImagePath = photoCard.photo
         }
+        itemView.long_tap_action.visibility = if (longTapAction) VISIBLE else GONE
     }
 
 }

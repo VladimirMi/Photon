@@ -3,7 +3,6 @@ package io.github.vladimirmi.photon.features.album
 import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
-import android.view.inputmethod.InputMethodManager
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.realm.Album
@@ -26,7 +25,11 @@ class AlbumView(context: Context, attrs: AttributeSet)
     private val cardCount by lazy { card_count }
     private val photocardList by lazy { photocard_list }
 
-    private val cardAction: (Photocard) -> Unit = { presenter.showPhotoCard(it) }
+    private var editMode: Boolean = false
+
+    private val cardAction: (Photocard) -> Unit = {
+        if (editMode) presenter.deletePhotocard(it) else presenter.showPhotoCard(it)
+    }
     private val adapter = CardAdapter(cardAction, hideInfo = true)
 
     private val deleteAction: () -> Unit = { presenter.delete() }
@@ -34,6 +37,10 @@ class AlbumView(context: Context, attrs: AttributeSet)
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<AlbumScreen.Component>(context).inject(this)
+    }
+
+    override fun onBackPressed(): Boolean {
+        return presenter.onBackPressed()
     }
 
     override fun initView() {
@@ -50,18 +57,22 @@ class AlbumView(context: Context, attrs: AttributeSet)
     }
 
     fun setEditable(editMode: Boolean) {
+        this.editMode = editMode
         name.isEnabled = editMode
         if (editMode) {
             name.requestFocus()
             name.setSelection(name.length())
             description.setSelection(description.length())
-            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(name, InputMethodManager.SHOW_IMPLICIT)
         }
         description.isEnabled = editMode
+        adapter.longTapAction = editMode
     }
 
     fun showDeleteDialog() = deleteDialog.show()
     fun closeDeleteDialog() = deleteDialog.hide()
+
+    fun deletePhotocard(photocard: Photocard) {
+        adapter.deletePhotocard(photocard)
+    }
 }
 

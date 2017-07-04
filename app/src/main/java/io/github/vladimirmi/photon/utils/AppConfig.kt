@@ -10,6 +10,7 @@ object AppConfig {
     const val READ_TIMEOUT = 5000
     const val WRITE_TIMEOUT = 5000
 
+    const val PHOTOCARD_UPDATE_DELAY = 5L //minutes
     const val RETRY_REQUEST_BASE_DELAY = 500L
     const val RETRY_REQUEST_COUNT = 5
 

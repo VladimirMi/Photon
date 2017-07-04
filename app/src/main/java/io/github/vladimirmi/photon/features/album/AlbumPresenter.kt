@@ -12,6 +12,7 @@ import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.LOAD
+import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 
@@ -20,6 +21,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     private var editMode: Boolean = false
     private val album by lazy { Flow.getKey<AlbumScreen>(view)?.album!! }
+    private val photosForDelete = ArrayList<Photocard>()
 
     private val moreActions: (MenuItem) -> Unit = {
         when (it.itemId) {
@@ -64,6 +66,18 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     private fun submit() {
         setEditable(false)
+        if (albumChange()) {
+            compDisp.add(model.editAlbum(album).subscribe())
+        }
+        if (photosForDelete.size > 0) {
+            album.photocards.removeAll(photosForDelete)
+            compDisp.add(model.removePhotos(photosForDelete)
+                    .subscribeWith(ErrorObserver<Int>()))
+            photosForDelete.clear()
+        }
+    }
+
+    private fun albumChange(): Boolean {
         val name = view.name.text.toString()
         val description = view.description.text.toString()
         var albumChanged = false
@@ -72,9 +86,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
             album.title = name
             album.description = description
         }
-        if (albumChanged) {
-            compDisp.add(model.editAlbum(album).subscribe())
-        }
+        return albumChanged
     }
 
     private fun setEditable(boolean: Boolean) {
@@ -91,9 +103,23 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
                 }))
     }
 
+    fun deletePhotocard(photocard: Photocard) {
+        photosForDelete.add(photocard)
+        view.deletePhotocard(photocard)
+    }
+
     private fun addPhotocard() {
         rootPresenter.bottomHistory?.historyMap?.set(LOAD, History.single(NewCardScreen(album.id)))
         rootPresenter.navigateTo(LOAD)
+    }
+
+    fun onBackPressed(): Boolean {
+        if (editMode) {
+            setEditable(false)
+            photosForDelete.clear()
+            view.setAlbum(album)
+            return true
+        } else return false
     }
 
 }

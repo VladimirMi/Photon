@@ -114,6 +114,12 @@ constructor(private val restService: RestService,
                 .body()
     }
 
+    fun deletePhotocard(id: String): Observable<Int> {
+        return restService.deletePhotocard(getProfileId(), id, getUserToken())
+                .parseStatusCode()
+                .statusCode()
+    }
+
     //endregion
 
     //region =============== DataBase ==============
