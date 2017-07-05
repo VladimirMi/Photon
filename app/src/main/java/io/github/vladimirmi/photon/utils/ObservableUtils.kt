@@ -72,7 +72,7 @@ fun <T> Observable<T>.retryExp(): Observable<T> {
 open class ErrorObserver<T> : DisposableObserver<T>() {
     override fun onComplete() {}
 
-    override fun onNext(t: T) {}
+    override fun onNext(it: T) {}
 
     override fun onError(e: Throwable) {
         Crashlytics.logException(e)

@@ -29,14 +29,28 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
             returnToProfile = true
             setAlbumId(it)
         }
-        if (model.photoCard.photo.isNotEmpty()) view.showPhotoParams()
         compDisp.add(subscribeInTitleField())
         compDisp.add(subscribeOnTagField())
         view.setTags(model.photoCard.tags)
         compDisp.add(subscribeOnAlbums())
+
+        chooseWhatShow()
+    }
+
+    private fun chooseWhatShow() {
+        if (model.photoCard.photo.isNotEmpty()) {
+            view.showPhotoParams()
+        } else {
+            view.showPhotoChoose()
+        }
     }
 
     fun onBackPressed(): Boolean {
+        if (model.photoCard.photo.isNotEmpty()) {
+            model.photoCard.photo = ""
+            chooseWhatShow()
+            return true
+        }
         if (returnToProfile) {
             Flow.getKey<NewCardScreen>(view)?.albumId = null
             rootPresenter.navigateTo(PROFILE)

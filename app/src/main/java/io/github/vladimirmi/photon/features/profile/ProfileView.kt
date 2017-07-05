@@ -67,6 +67,7 @@ class ProfileView(context: Context, attrs: AttributeSet)
 
 
     fun setEditable(editMode: Boolean) {
+
         login.isEnabled = editMode
         if (editMode) {
             login.requestFocus()

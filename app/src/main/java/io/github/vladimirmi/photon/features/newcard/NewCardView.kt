@@ -136,20 +136,19 @@ class NewCardView(context: Context, attrs: AttributeSet)
         albumAdapter.updateData(list)
     }
 
-    private var selectedAlbum = ""
-
     fun selectAlbum(albumId: String) {
         if (albumId == albumAdapter.selectedAlbum) return
         val position = albumAdapter.getPosition(albumId)
-        val selectedPosition = albumAdapter.getPosition(selectedAlbum)
+        val selectedPosition = albumAdapter.getPosition(albumAdapter.selectedAlbum)
         setAlbumSelection(position, true)
         setAlbumSelection(selectedPosition, false)
-        selectedAlbum = albumId
-        albumAdapter.selectedAlbum = selectedAlbum
+        albumAdapter.selectedAlbum = albumId
     }
 
     private fun setAlbumSelection(position: Int, selected: Boolean) {
-        if (position != -1) (album_list.findViewHolderForAdapterPosition(position) as AlbumViewHolder).select(selected)
+        if (position != -1) {
+            (album_list.findViewHolderForAdapterPosition(position) as AlbumViewHolder).select(selected)
+        }
     }
 
     fun clearView() {
@@ -162,6 +161,11 @@ class NewCardView(context: Context, attrs: AttributeSet)
     fun showPhotoParams() {
         choose_view.visibility = View.GONE
         new_card_view.visibility = View.VISIBLE
+    }
+
+    fun showPhotoChoose() {
+        choose_view.visibility = View.VISIBLE
+        new_card_view.visibility = View.GONE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

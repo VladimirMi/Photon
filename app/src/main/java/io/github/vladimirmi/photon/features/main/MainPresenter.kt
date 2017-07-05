@@ -7,11 +7,13 @@ import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
+import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -56,50 +58,60 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     private fun subscribeOnPhotocards(): Disposable {
         return model.getPhotoCards()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ view.setData(it) })
+                .subscribeWith(object : ErrorObserver<List<Photocard>>() {
+                    override fun onNext(it: List<Photocard>) {
+                        view.setData(it)
+                    }
+                })
     }
 
     //todo попробовать использовать AuthPresenter
     fun register(req: SignUpReq) {
         compDisp.add(rootPresenter.register(req)
-                .doOnSubscribe {
-                    view.closeRegistrationDialog()
-                }
-                .subscribe({}, {
-                    // onError
-                    if (it is ApiError) view.showError(it.errorResId)
-                    else view.showError(R.string.message_api_err_unknown)
-                    Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
-                        view.openRegistrationDialog()
+                .doOnSubscribe { view.closeRegistrationDialog() }
+                .subscribeWith(object : ErrorObserver<User>() {
+                    override fun onComplete() {
+                        view.closeRegistrationDialog()
+                        initToolbar()
                     }
-                }, {
-                    //onComplete
-                    view.closeRegistrationDialog()
-                    initToolbar()
+
+                    override fun onError(e: Throwable) {
+                        if (e is ApiError) {
+                            view.showError(e.errorResId)
+                        } else {
+                            view.showError(R.string.message_api_err_unknown)
+                            super.onError(e)
+                        }
+                        Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
+                            view.openRegistrationDialog()
+                        }
+                    }
                 }))
     }
 
     fun login(req: SignInReq) {
         compDisp.add(rootPresenter.login(req)
-                .doOnSubscribe {
-                    view.closeLoginDialog()
-                }
-                .subscribe({}, {
-                    // onError
-                    if (it is ApiError) {
-                        when (it.statusCode) {
-                            404 -> view.showError(R.string.message_api_err_auth)
-                            else -> view.showError(it.errorResId)
-                        }
-                    } else view.showError(R.string.message_api_err_unknown)
-                    Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
-                        view.openLoginDialog()
+                .doOnSubscribe { view.closeLoginDialog() }
+                .subscribeWith(object : ErrorObserver<User>() {
+                    override fun onComplete() {
+                        view.closeLoginDialog()
+                        initToolbar()
                     }
-                }, {
-                    //onComplete
-                    view.closeLoginDialog()
-                    initToolbar()
+
+                    override fun onError(e: Throwable) {
+                        if (e is ApiError) {
+                            when (e.statusCode) {
+                                404 -> view.showError(R.string.message_api_err_auth)
+                                else -> view.showError(e.errorResId)
+                            }
+                        } else {
+                            view.showError(R.string.message_api_err_unknown)
+                            super.onError(e)
+                        }
+                        Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
+                            view.openLoginDialog()
+                        }
+                    }
                 }))
     }
 

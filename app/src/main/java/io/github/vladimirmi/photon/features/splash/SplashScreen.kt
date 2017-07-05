@@ -4,6 +4,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.IRootModel
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
@@ -30,8 +31,8 @@ class SplashScreen : BaseScreen<RootActivityComponent>() {
     class Module {
         @Provides
         @DaggerScope(SplashScreen::class)
-        internal fun provideSplashModel(rootModel: IRootModel): ISplashModel {
-            return SplashModel(rootModel)
+        internal fun provideSplashModel(dataManager: DataManager, rootModel: IRootModel): ISplashModel {
+            return SplashModel(dataManager, rootModel)
         }
 
         @Provides

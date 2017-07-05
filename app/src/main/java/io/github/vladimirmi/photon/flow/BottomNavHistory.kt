@@ -9,20 +9,21 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.auth.AuthScreen
-import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.profile.ProfileScreen
+import io.github.vladimirmi.photon.features.splash.SplashScreen
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.*
 
 /**
  * Created by Vladimir Mikhalev 15.06.2017.
  */
 
-class BottomNavHistory(private val flowInstance: Flow) : BottomNavigationView.OnNavigationItemSelectedListener {
+class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
 
     enum class BottomItem(val id: Int) {
         MAIN(R.id.nav_bottom_main),
         PROFILE(R.id.nav_bottom_profile),
+
         LOAD(R.id.nav_bottom_load);
 
         companion object {
@@ -31,17 +32,19 @@ class BottomNavHistory(private val flowInstance: Flow) : BottomNavigationView.On
         }
     }
 
+    private var firstStart = true
+    lateinit var flow: Flow
     private val dm = DaggerService.appComponent.dataManager()
-
     var currentItem = MAIN
-    val historyMap = hashMapOf(MAIN to History.single(MainScreen()),
+
+
+    val historyMap = hashMapOf(MAIN to History.single(SplashScreen()),
             PROFILE to History.single(ProfileScreen()),
             LOAD to History.single(NewCardScreen()))
 
-
-    fun dispatch(from: BottomItem, to: BottomItem) {
+    fun dispatch(from: BottomItem, to: BottomItem, saveHistory: Boolean = true) {
         val direction = getDirection(from, to)
-        historyMap[from] = flowInstance.history
+        if (saveHistory) historyMap[from] = flow.history
 
         if (dm.isUserAuth()) {
             val top = historyMap[to]!!.top<BaseScreen<*>>()
@@ -53,7 +56,7 @@ class BottomNavHistory(private val flowInstance: Flow) : BottomNavigationView.On
             if (to == PROFILE || to == LOAD) historyMap[to] = History.single(AuthScreen())
         }
 
-        flowInstance.setHistory(historyMap[to]!!, direction)
+        flow.setHistory(historyMap[to]!!, direction)
         currentItem = to
     }
 
@@ -68,5 +71,9 @@ class BottomNavHistory(private val flowInstance: Flow) : BottomNavigationView.On
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         dispatch(from = currentItem, to = Companion.fromId(item.itemId)!!)
         return true
+    }
+
+    fun restoreCurrentItem() {
+        dispatch(BottomNavHistory.BottomItem.MAIN, currentItem, false)
     }
 }

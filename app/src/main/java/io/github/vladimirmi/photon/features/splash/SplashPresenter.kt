@@ -6,9 +6,8 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
+import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.reactivex.disposables.Disposable
 import java.net.ConnectException
 
 /**
@@ -27,20 +26,29 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     }
 
     override fun initView(view: SplashView) {
-        model.updateLimitPhotoCards(60, 3000)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({},
-                        { handleError(it) },
-                        { openMainScreen() })
+        compDisp.add(updatePhotos())
     }
 
+    private fun updatePhotos(): Disposable {
+        return model.updateLimitPhotoCards(60, 3000) //todo в AppConfig
+                .subscribeWith(object : ErrorObserver<Any>() {
+                    override fun onComplete() {
+                        openMainScreen()
+                    }
+
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        handleError(e)
+                    }
+                })
+    }
+
+
     private fun handleError(error: Throwable) {
-        Timber.e(error.message)
         if (error is ConnectException) {
             view.showMessage(R.string.message_err_connect)
-            openMainScreen()
         }
+        if (model.dbIsNotEmpty()) openMainScreen()
     }
 
     private fun openMainScreen() {

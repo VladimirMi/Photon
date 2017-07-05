@@ -51,8 +51,12 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        if (presenter.bottomHistory == null) presenter.bottomHistory = BottomNavHistory(Flow.get(this))
-        bottom_menu.setOnNavigationItemSelectedListener(presenter.bottomHistory)
+        if (presenter.bottomHistory == null) presenter.bottomHistory = BottomNavHistory()
+        val history = presenter.bottomHistory!!
+        history.flow = Flow.get(this)
+        history.restoreCurrentItem()
+        navigateTo(history.currentItem)
+        bottom_menu.setOnNavigationItemSelectedListener(history)
     }
 
     override fun onStart() {
@@ -225,7 +229,7 @@ class RootActivity : FlowActivity(), IRootView {
             }
         }
         val menuHelper = MenuPopupHelper(this, popup.menu as MenuBuilder, actionView)
-        (0..popup.menu.size() - 1).asSequence()
+        (0..popup.menu.size() - 1)
                 .filter { popup.menu.getItem(it).icon != null }
                 .forEach { menuHelper.setForceShowIcon(true); return@forEach }
         actionView.setOnClickListener {
