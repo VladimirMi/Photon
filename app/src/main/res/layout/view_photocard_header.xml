@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/photo_wrapper"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/card_name"
+        android:gravity="bottom"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:paddingBottom="28dp"
+        android:background="@drawable/card_gradient"
+        android:paddingLeft="16dp"
+        android:textSize="16sp"
+        tools:text="Черный чай с печеньем макарон"
+        style="@style/CustomText.White"
+        />
+</FrameLayout>

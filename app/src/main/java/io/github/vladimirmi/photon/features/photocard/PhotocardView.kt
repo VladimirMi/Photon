@@ -12,7 +12,9 @@ import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.ui.TagView
 import io.github.vladimirmi.photon.ui.setImage
 import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder
-import kotlinx.android.synthetic.main.screen_photocard.view.*
+import kotlinx.android.synthetic.main.view_photocard_content.view.*
+import kotlinx.android.synthetic.main.view_photocard_header.view.*
+import kotlinx.android.synthetic.main.view_photocard_zoom.view.*
 
 /**
  * Created by Vladimir Mikhalev 14.06.2017.
@@ -25,6 +27,7 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
     }
 
     override fun initView() {
+//        scroll_view.setHeaderViewSize(getDisplayMetrics(context).widthPixels, (getDensity(context) * 280).toInt())
         user_avatar.setOnClickListener { presenter.showAuthor() }
     }
 

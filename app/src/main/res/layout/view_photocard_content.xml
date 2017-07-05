@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/background"
+              android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:id="@+id/author_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="18dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginTop="24dp"
+        >
+
+        <ImageView
+            android:id="@+id/user_avatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            tools:src="@color/color_accent"
+            />
+
+        <TextView
+            android:id="@+id/user_name"
+            style="@style/CustomText.Black"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="14dp"
+            android:layout_toRightOf="@id/user_avatar"
+            tools:text="Хелена Марчиано"
+            />
+
+        <TextView
+            android:id="@+id/album"
+            style="@style/CustomText.Black"
+            android:layout_alignStart="@+id/user_name"
+            android:layout_below="@id/user_name"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/photocard_album"
+            />
+
+        <TextView
+            android:id="@+id/card"
+            style="@style/CustomText.Black"
+            android:layout_below="@id/user_name"
+            android:layout_marginLeft="12dp"
+            android:layout_toRightOf="@id/album"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/photocard_card"
+            />
+
+        <TextView
+            android:id="@+id/album_count"
+            style="@style/CustomText.Black"
+            android:layout_alignStart="@+id/user_name"
+            android:layout_below="@id/album"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="16sp"
+            tools:text="9"
+            />
+
+        <TextView
+            android:id="@+id/card_count"
+            style="@style/CustomText.Black"
+            android:layout_alignStart="@+id/card"
+            android:layout_below="@id/album"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="16sp"
+            tools:text="22"
+            />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/photocard_tags_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="18dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="18dp"
+        />
+</LinearLayout>
