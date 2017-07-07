@@ -4,10 +4,11 @@ import android.net.Uri
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
-import io.reactivex.schedulers.Schedulers
+import io.github.vladimirmi.photon.utils.ErrorObserver
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -41,12 +42,14 @@ class UploadPhotoJob(private val photocard: Photocard)
                     photocard.photo = it.image
                     dataManager.createPhotocard(photocard)
                 }
-                .map { photocard.id = it.id }
-                .subscribeOn(Schedulers.io())
-                .subscribe {
+                .doOnNext { photocard.id = it.id }
+                .flatMap { dataManager.getObjectFromDb(Album::class.java, photocard.album) }
+                .map {
                     dataManager.removeFromDb(Photocard::class.java, tempId)
-                    dataManager.saveToDB(photocard)
+                    it.photocards.add(photocard)
+                    dataManager.saveToDB(it)
                 }
+                .subscribeWith(ErrorObserver<Unit>())
 
     }
 

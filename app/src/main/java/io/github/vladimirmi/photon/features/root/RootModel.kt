@@ -6,10 +6,10 @@ import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.AppConfig
+import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
-import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 /**
@@ -36,7 +36,7 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
                         BiFunction { _: Long, netAvail: Boolean -> netAvail })
                 .filter { it }
                 .flatMap { updateObs }
-                .subscribe()
+                .subscribeWith(ErrorObserver())
 
         return updateObs
     }
@@ -54,16 +54,14 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
         return dataManager.signUp(req)
                 .doOnNext { saveUser(it) }
                 .delay(1000, TimeUnit.MILLISECONDS, true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .ioToMain()
     }
 
     override fun login(req: SignInReq): Observable<User> {
         return dataManager.signIn(req)
                 .doOnNext { saveUser(it) }
                 .delay(1000, TimeUnit.MILLISECONDS, true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .ioToMain()
     }
 
     override fun logout() = dataManager.logout()

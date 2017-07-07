@@ -12,7 +12,6 @@ import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.TextView
 import io.github.vladimirmi.photon.R
-import timber.log.Timber
 
 
 /**
@@ -63,7 +62,6 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
     }
 
     fun pick() {
-        Timber.e("pick: $picked radio $radioMode")
         picked = !picked
         setupDrawable()
         if (radioMode && picked) {

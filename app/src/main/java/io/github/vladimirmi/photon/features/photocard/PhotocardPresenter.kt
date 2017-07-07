@@ -72,7 +72,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     private fun addToFavorite() {
         //todo предлагать войти или менять меню
         if (rootPresenter.isUserAuth()) {
-            compDisp.add(model.addToFavorite(photocard).subscribe())
+            compDisp.add(model.addToFavorite(photocard).subscribeWith(ErrorObserver()))
         }
     }
 

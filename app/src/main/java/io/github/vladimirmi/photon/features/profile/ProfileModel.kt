@@ -7,10 +7,11 @@ import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import java.util.*
 
 class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : IProfileModel {
 
@@ -30,19 +31,23 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : I
 
     private fun updateUser(id: String) {
         val user = dataManager.getSingleObjFromDb(User::class.java, id)
-        var updated = user?.updated ?: Date(0)
-        val hour = 3600000 // milliseconds
-        if (updated.time != 0L && Date().time - hour > updated.time) updated = Date(0)
 
-        dataManager.getUserFromNet(id, updated.toString())
+        dataManager.getUserFromNet(id, getUpdated(user).toString())
                 .subscribeOn(Schedulers.io())
-                .subscribe { dataManager.saveToDB(it) }
+                .subscribeWith(object : ErrorObserver<User>() {
+                    override fun onNext(it: User) {
+                        dataManager.saveToDB(it)
+                    }
+                })
     }
 
-    override fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Album> {
+    override fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Unit> {
         newAlbumReq.owner = dataManager.getProfileId()
         return dataManager.createAlbum(newAlbumReq)
-                .doOnNext { dataManager.saveToDB(it) }
+                .zipWith(getProfile(), BiFunction { album: Album, profile: User ->
+                    profile.albums.add(album)
+                    dataManager.saveToDB(profile)
+                })
                 .ioToMain()
     }
 

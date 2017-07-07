@@ -6,7 +6,7 @@ import java.util.*
  * Created by Vladimir Mikhalev 28.06.2017.
  */
 
-internal interface Changeable {
+interface Changeable {
     var id: String
     var active: Boolean
     var updated: Date

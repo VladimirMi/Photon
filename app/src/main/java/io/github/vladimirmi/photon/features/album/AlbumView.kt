@@ -52,8 +52,9 @@ class AlbumView(context: Context, attrs: AttributeSet)
     fun setAlbum(album: Album) {
         name.setText(album.title)
         description.setText(album.description)
-        cardCount.text = album.photocards.size.toString()
-        adapter.updateData(album.photocards)
+        val photocards = album.photocards.filter { it.active }
+        cardCount.text = photocards.size.toString()
+        adapter.updateData(photocards)
     }
 
     fun setEditable(editMode: Boolean) {

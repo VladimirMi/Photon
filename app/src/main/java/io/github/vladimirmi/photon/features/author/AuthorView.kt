@@ -38,6 +38,7 @@ class AuthorView(context: Context, attrs: AttributeSet)
         user_login.setText(user.login)
         user_name.setText("/  ${user.name}")
         album_count.text = user.albumCount.toString()
+        //todo не учитывать favorite
         card_count.text = user.photocardCount.toString()
         if (user.avatar != curAvatarPath) {
             setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)

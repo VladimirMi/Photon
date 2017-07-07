@@ -4,6 +4,7 @@ import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
+import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.realm.Sort
 import timber.log.Timber
@@ -47,7 +48,14 @@ class MainModel(val dataManager: DataManager) : IMainModel {
         appliedPage = SearchView.Page.TAGS
     }
 
-    override fun addView(photocard: Photocard) {
-        dataManager.addView(photocard.id).subscribe()
+    override fun addView(photocard: Photocard): Observable<Unit> {
+        return dataManager.addView(photocard.id)
+                .map {
+                    if (it.success) {
+                        photocard.views++
+                        dataManager.saveToDB(photocard)
+                    }
+                }
+                .ioToMain()
     }
 }

@@ -26,13 +26,13 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
     fun setFilterField(name: String, value: String, remove: Boolean = false) {
         Timber.e("setFilterField: with $name to $value, remove = $remove")
         when (name) {
-            "dish" -> photoCard.filters.dish = if (remove) "" else value
-            "decor" -> photoCard.filters.decor = if (remove) "" else value
-            "light" -> photoCard.filters.light = if (remove) "" else value
-            "lightDirection" -> photoCard.filters.lightDirection = if (remove) "" else value
-            "lightSource" -> photoCard.filters.lightSource = if (remove) "" else value
-            "temperature" -> photoCard.filters.temperature = if (remove) "" else value
-            "nuances" -> {
+            "filters.dish" -> photoCard.filters.dish = if (remove) "" else value
+            "filters.decor" -> photoCard.filters.decor = if (remove) "" else value
+            "filters.light" -> photoCard.filters.light = if (remove) "" else value
+            "filters.lightDirection" -> photoCard.filters.lightDirection = if (remove) "" else value
+            "filters.lightSource" -> photoCard.filters.lightSource = if (remove) "" else value
+            "filters.temperature" -> photoCard.filters.temperature = if (remove) "" else value
+            "filters.nuances" -> {
                 val values = photoCard.filters.nuances.split(", ").toMutableList()
                 values.removeAll { it.isEmpty() }
                 if (remove) values.remove(value) else values.add(value)

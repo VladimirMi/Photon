@@ -8,7 +8,7 @@ import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
-import io.reactivex.schedulers.Schedulers
+import io.github.vladimirmi.photon.utils.ErrorObserver
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -43,8 +43,11 @@ class UploadAvatarJob(private val profile: User)
                                     login = profile.login,
                                     avatar = profile.avatar))
                 }
-                .subscribeOn(Schedulers.io())
-                .subscribe { dataManager.saveToDB(it) }
+                .subscribeWith(object : ErrorObserver<User>() {
+                    override fun onNext(it: User) {
+                        dataManager.saveToDB(it)
+                    }
+                })
 
     }
 

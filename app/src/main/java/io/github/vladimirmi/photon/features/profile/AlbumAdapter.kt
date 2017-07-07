@@ -36,7 +36,9 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
                 return data[oldItemPosition].id == list[newItemPosition].id
             }
 
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = true
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return data[oldItemPosition] == list[newItemPosition]
+            }
         })
         data = list
         diffResult.dispatchUpdatesTo(this)
@@ -73,15 +75,17 @@ class AlbumViewHolder(itemView: View, val albumAction: (Album) -> Unit)
 
     private var curImagePath = ""
     fun bind(album: Album) {
-        itemView.album_name.text = album.title
-        itemView.card_count.text = album.photocards.size.toString()
-        itemView.likes.text = album.favorits.toString()
-        itemView.views.text = album.views.toString()
         itemView.preview.setOnClickListener { albumAction(album) }
+        itemView.album_name.text = album.title
 
-        if (album.photocards.size > 0 && curImagePath != album.photocards[0].photo) {
-            setImage(album.photocards[0].photo, itemView.preview)
-            curImagePath = album.photocards[0].photo
+        val photocards = album.photocards.filter { it.active }
+        itemView.card_count.text = photocards.size.toString()
+        itemView.likes.text = photocards.fold(0, { acc, photocard -> acc + photocard.favorits }).toString()
+        itemView.views.text = photocards.fold(0, { acc, photocard -> acc + photocard.views }).toString()
+
+        if (photocards.isNotEmpty() && curImagePath != photocards[0].photo) {
+            setImage(photocards[0].photo, itemView.preview)
+            curImagePath = photocards[0].photo
         } else {
             setImage("", itemView.preview)
         }

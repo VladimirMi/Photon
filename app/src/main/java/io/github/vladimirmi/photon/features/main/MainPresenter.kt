@@ -126,8 +126,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     fun showPhotoCard(photocard: Photocard) {
-        model.addView(photocard)
-        Flow.get(view).set(PhotocardScreen(photocard))
+        model.addView(photocard).subscribeWith(object : ErrorObserver<Unit>() {
+            override fun onComplete() {
+                Flow.get(view).set(PhotocardScreen(photocard))
+            }
+        })
     }
 }
 
