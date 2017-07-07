@@ -2,20 +2,156 @@
 
 <io.github.vladimirmi.photon.features.photocard.PhotocardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="RtlHardcoded, RtlSymmetry, ContentDescription"
     >
 
-    <io.github.vladimirmi.photon.zoom.PullToZoomScrollView
-        android:id="@+id/scroll_view"
+    <io.github.vladimirmi.photon.ui.PullToZoomWrapper
+        android:id="@+id/pull_to_zoom"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:headerView="@layout/view_photocard_header"
-        app:zoomView="@layout/view_photocard_zoom"
-        app:contentView="@layout/view_photocard_content"
         >
 
-    </io.github.vladimirmi.photon.zoom.PullToZoomScrollView>
+        <ScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            >
+
+            <LinearLayout
+                android:id="@+id/root_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+
+                <FrameLayout
+                    android:id="@+id/header_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    >
+
+                    <ImageView
+                        android:id="@+id/photo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:minHeight="280dp"
+                        android:scaleType="centerCrop"
+                        tools:layout_height="280dp"
+                        tools:src="@drawable/splash"
+                        />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/card_gradient"
+                        android:paddingBottom="28dp"
+                        android:paddingLeft="16dp"
+                        >
+
+                        <TextView
+                            android:id="@+id/card_name"
+                            style="@style/CustomText.White"
+                            android:layout_gravity="bottom"
+                            android:textSize="16sp"
+                            tools:text="Черный чай с печеньем макарон"
+                            />
+                    </FrameLayout>
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/content_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    >
+
+                    <RelativeLayout
+                        android:id="@+id/author_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="18dp"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginTop="24dp"
+                        >
+
+                        <ImageView
+                            android:id="@+id/user_avatar"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_centerVertical="true"
+                            tools:src="@color/color_accent"
+                            />
+
+                        <TextView
+                            android:id="@+id/user_name"
+                            style="@style/CustomText.Black"
+                            android:layout_marginBottom="8dp"
+                            android:layout_marginLeft="14dp"
+                            android:layout_toRightOf="@id/user_avatar"
+                            tools:text="Хелена Марчиано"
+                            />
+
+                        <TextView
+                            android:id="@+id/album"
+                            style="@style/CustomText.Black"
+                            android:layout_alignStart="@+id/user_name"
+                            android:layout_below="@id/user_name"
+                            android:layout_marginBottom="4dp"
+                            android:fontFamily="sans-serif-light"
+                            android:text="@string/photocard_album"
+                            />
+
+                        <TextView
+                            android:id="@+id/card"
+                            style="@style/CustomText.Black"
+                            android:layout_below="@id/user_name"
+                            android:layout_marginLeft="12dp"
+                            android:layout_toRightOf="@id/album"
+                            android:fontFamily="sans-serif-light"
+                            android:text="@string/photocard_card"
+                            />
+
+                        <TextView
+                            android:id="@+id/album_count"
+                            style="@style/CustomText.Black"
+                            android:layout_alignStart="@+id/user_name"
+                            android:layout_below="@id/album"
+                            android:fontFamily="sans-serif-medium"
+                            android:textSize="16sp"
+                            tools:text="9"
+                            />
+
+                        <TextView
+                            android:id="@+id/card_count"
+                            style="@style/CustomText.Black"
+                            android:layout_alignStart="@+id/card"
+                            android:layout_below="@id/album"
+                            android:fontFamily="sans-serif-medium"
+                            android:textSize="16sp"
+                            tools:text="22"
+                            />
+                    </RelativeLayout>
+
+                    <FrameLayout
+                        android:id="@+id/photocard_tags_wrapper"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="18dp"
+                        android:layout_marginLeft="18dp"
+                        android:layout_marginRight="18dp"
+                        />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </io.github.vladimirmi.photon.ui.PullToZoomWrapper>
 
 </io.github.vladimirmi.photon.features.photocard.PhotocardView>
