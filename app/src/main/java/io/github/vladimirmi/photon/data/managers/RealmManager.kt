@@ -6,6 +6,7 @@ import io.reactivex.ObservableOnSubscribe
 import io.reactivex.disposables.Disposables
 import io.realm.*
 import timber.log.Timber
+import java.lang.IllegalStateException
 
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
@@ -45,6 +46,7 @@ class RealmManager {
                 .equalTo("id", id)
                 .findAllAsync())
                 .filter { it.isLoaded }
+                //todo попробовать
                 .map { if (it.isNotEmpty()) realm.copyFromRealm(it[0]) else clazz.newInstance() }
                 .doFinally { realm.close() }
     }
@@ -88,12 +90,18 @@ class RealmManager {
 
 enum class RealmOperator {CONTAINS, EQUALTO }
 
-class Query(val fieldName: String, val operator: RealmOperator, val value: String) {
+class Query(val fieldName: String, val operator: RealmOperator, val value: Any) {
 
     fun <T : RealmModel> applyTo(realmQuery: RealmQuery<T>): RealmQuery<T> {
-        when (operator) {
-            RealmOperator.CONTAINS -> realmQuery.contains(fieldName, value)
-            RealmOperator.EQUALTO -> realmQuery.equalTo(fieldName, value)
+        when (value) {
+            is String -> when (operator) {
+                RealmOperator.CONTAINS -> realmQuery.contains(fieldName, value)
+                RealmOperator.EQUALTO -> realmQuery.equalTo(fieldName, value)
+            }
+            is Boolean -> when (operator) {
+                RealmOperator.EQUALTO -> realmQuery.equalTo(fieldName, value)
+                else -> throw IllegalStateException("Not supported operator for boolean value")
+            }
         }
         return realmQuery
     }

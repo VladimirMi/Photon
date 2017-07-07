@@ -19,7 +19,7 @@
         android:id="@+id/album_wrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/album_gradient"
+        android:background="@drawable/gradient_album"
         android:padding="16dp"
         >
 

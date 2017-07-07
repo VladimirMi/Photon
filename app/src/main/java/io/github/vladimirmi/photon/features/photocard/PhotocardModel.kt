@@ -1,10 +1,14 @@
 package io.github.vladimirmi.photon.features.photocard
 
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.managers.Query
+import io.github.vladimirmi.photon.data.managers.RealmOperator
 import io.github.vladimirmi.photon.data.models.SuccessRes
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
@@ -43,11 +47,26 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
     override fun addToFavorite(photocard: Photocard): Observable<SuccessRes> {
         return dataManager.addToFavorite(photocard.id)
                 .doOnComplete {
+                    //todo решить доболять ли фото в альбом в ручную
                     val user = dataManager.getSingleObjFromDb(User::class.java, dataManager.getProfileId())
                     if (user != null) {
                         user.updated = Date(0)
                         dataManager.saveToDB(user)
                     }
                 }
+    }
+
+
+    override fun isFavorite(photocard: Photocard): Single<Boolean> {
+        if (!dataManager.isUserAuth()) return Single.just(false)
+        val query = listOf(
+                Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()),
+                Query("isFavorite", RealmOperator.EQUALTO, true)
+        )
+        return dataManager.search(Album::class.java, query, "id")
+                .map { it[0] }
+                .flatMap { Observable.fromIterable(it.photocards) }
+                .map { it.id }
+                .contains(photocard.id)
     }
 }

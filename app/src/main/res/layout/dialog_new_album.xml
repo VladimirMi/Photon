@@ -47,9 +47,11 @@
         <EditText
             android:id="@+id/description"
             style="@style/InputField"
+            android:lines="3"
+            android:gravity="top"
             android:layout_marginBottom="24dp"
             android:hint="@string/dialog_description"
-            android:inputType="text"
+            android:inputType="textMultiLine"
             />
 
         <LinearLayout

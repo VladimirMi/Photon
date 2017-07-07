@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:app="http://schemas.android.com/apk/res-auto"
-       xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto"
        xmlns:tools="http://schemas.android.com/tools"
+       tools:ignore="RtlHardcoded, ContentDescription"
        tools:showIn="@layout/item_album"
     >
 
@@ -9,6 +10,7 @@
         android:id="@+id/icon_likes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:tint="@color/white"
         app:srcCompat="@drawable/ic_card_like"
         />
 
@@ -25,7 +27,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="22dp"
+        android:tint="@color/white"
         app:srcCompat="@drawable/ic_card_view"
+
         />
 
     <TextView

@@ -34,6 +34,8 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     override fun initToolbar() {
         val builder = rootPresenter.getNewToolbarBuilder()
+                .setToolbarTitleId(R.string.album_title)
+                .setBackNavigationEnabled(true)
 
         if (editMode) builder.addAction(MenuItemHolder("Submit",
                 R.drawable.ic_action_submit, submitAction))

@@ -88,6 +88,6 @@ class AlbumViewHolder(itemView: View, val albumAction: (Album) -> Unit)
     }
 
     fun select(selected: Boolean) {
-        itemView.album_wrapper.setBackgroundResource(if (selected) R.drawable.album_selected else R.drawable.album_gradient)
+        itemView.album_wrapper.setBackgroundResource(if (selected) R.drawable.album_selected else R.drawable.gradient_album)
     }
 }

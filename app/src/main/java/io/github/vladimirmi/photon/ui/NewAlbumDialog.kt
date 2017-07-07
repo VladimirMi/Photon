@@ -32,7 +32,7 @@ class NewAlbumDialog(viewGroup: ViewGroup, newAlbumAction: (NewAlbumReq) -> Unit
 
     private fun listenFields() {
         val nameObs = getValidObs(name, NAME_PATTERN, view.name_error, view.context.getString(R.string.message_err_name))
-        val descriptionObs = getValidObs(description, LOGIN_PATTERN, view.description_error, view.context.getString(R.string.message_err_login))
+        val descriptionObs = getValidObs(description, DESCRIPTION_PATTERN, view.description_error, view.context.getString(R.string.message_err_login))
 
         Observable.combineLatest(nameObs, descriptionObs,
                 BiFunction { t1: Boolean, t2: Boolean -> t1 && t2 })

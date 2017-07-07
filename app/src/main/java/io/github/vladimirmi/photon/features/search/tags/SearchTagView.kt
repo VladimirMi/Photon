@@ -68,7 +68,7 @@ class SearchTagView(context: Context, attrs: AttributeSet)
     }
 
     fun restoreFromQuery(query: List<Query>) {
-        search_field.setText(query.find { it.fieldName == "title" }?.value)
+        search_field.setText(query.find { it.fieldName == "title" }?.value.toString())
     }
 
     fun setTags(tags: List<Tag>, query: List<Query>) {

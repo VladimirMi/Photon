@@ -47,6 +47,7 @@
     <string name="message_err_password">Неверный пароль</string>
     <string name="message_err_name">Неверное имя</string>
     <string name="message_err_login">Неверный login</string>
+    <string name="message_err_description">Неверное описание</string>
     <string name="message_err_net">Нет сети</string>
     <string name="message_err_connect">Невозможно подключиться к серверу</string>
     <string name="message_api_err_login">Пользователь с таким логином уже существует</string>
@@ -104,13 +105,18 @@
     <string name="filters_light_src_2">Два</string>
     <string name="filters_light_src_3">Три</string>
 
+    <string name="photocard_title">Фотокарточка</string>
     <string name="photocard_album">Альбомы</string>
     <string name="photocard_card">Карты</string>
     <string name="photocard_menu_favorite">В избранное</string>
     <string name="photocard_menu_share">Поделиться</string>
     <string name="photocard_menu_download">Скачать</string>
 
-    <string name="profile_not_auth">Авторизуйтесь,\nчтобы посмотреть\nданные профиля</string>
+    <string name="profile_title">Профиль</string>
+    <string name="profile_not_auth">Авторизуйтесь,\n чтобы посмотреть\n данные профиля</string>
+
+    <string name="author_title">Автор</string>
+    <string name="album_title">Альбом</string>
 
     <string name="newcard_choose">Выберите фотокарточку\nиз галлереи и добавьте\nк вашим альбомам</string>
     <string name="newcard_name_hint">Название фотографии</string>

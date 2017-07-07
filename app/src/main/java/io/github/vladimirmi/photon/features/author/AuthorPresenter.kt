@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.features.author
 
 import flow.Flow
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.features.album.AlbumScreen
@@ -12,6 +13,7 @@ class AuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter)
 
     override fun initToolbar() {
         rootPresenter.getNewToolbarBuilder()
+                .setToolbarTitleId(R.string.author_title)
                 .setBackNavigationEnabled(true)
                 .build()
     }

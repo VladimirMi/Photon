@@ -3,13 +3,16 @@
 
     <item
         android:id="@+id/menu_favorite"
+        android:icon="@drawable/ic_card_like"
         android:title="@string/photocard_menu_favorite"/>
 
     <item
         android:id="@+id/menu_share"
+        android:icon="@drawable/ic_card_share"
         android:title="@string/photocard_menu_share"/>
 
     <item
         android:id="@+id/menu_download"
+        android:icon="@drawable/ic_card_download"
         android:title="@string/photocard_menu_download"/>
 </menu>

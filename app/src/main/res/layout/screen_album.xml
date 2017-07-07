@@ -62,10 +62,10 @@
                 android:fontFamily="sans-serif-light"
                 android:imeOptions="actionDone"
                 android:enabled="false"
-                android:inputType="text"
+                android:inputType="textMultiLine"
                 android:lineSpacingMultiplier="1.1"
                 android:textSize="14sp"
-                tools:text="Burguss observare, tanquam fortis solitudo. Nunquam fallere idoleum. Fiscinas favere!"
+                tools:text="Burguss observare, tanquam fortis solitudo. Nunquam fallere idoleum. Fiscinas favere! Nomen raptus rector est."
                 />
         </RelativeLayout>
 

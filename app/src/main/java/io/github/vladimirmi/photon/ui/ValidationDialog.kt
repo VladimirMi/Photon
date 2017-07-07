@@ -25,18 +25,19 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
     private val colorError = ContextCompat.getColor(viewGroup.context, R.color.error)
     private val colorText = ContextCompat.getColor(viewGroup.context, R.color.text_color)
 
-    val LOGIN_PATTERN = Pattern.compile("[a-zA-Z0-9_]{3,}")
+    val LOGIN_PATTERN = Pattern.compile("[a-zA-Z0-9_]{3,20}")
     val EMAIL_PATTERN = Patterns.EMAIL_ADDRESS
-    val NAME_PATTERN = Pattern.compile(".{3,}")
+    val NAME_PATTERN = Pattern.compile(".{3,20}")
     val PASSWORD_PATTERN = Pattern.compile("[a-zA-Z0-9_]{8,}")
+    val DESCRIPTION_PATTERN = Pattern.compile(".{3,400}")
 
     protected fun getValidObs(field: EditText, pattern: Pattern, errorField: TextView, error: String): Observable<Boolean> {
         return field.afterTextChangeEvents()
                 .skipInitialValue()
                 .map { pattern.matcher(it.editable().toString()).matches() }
-                .doOnNext {
+                .doOnNext { matches ->
                     val drawable = field.background as GradientDrawable
-                    if (it == true) {
+                    if (matches) {
                         drawable.setStroke(3, colorNormal)
                         field.setTextColor(colorText)
                         errorField.text = ""

@@ -37,6 +37,7 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
 
     override fun initToolbar() {
         val builder = rootPresenter.getNewToolbarBuilder()
+                .setToolbarTitleId(R.string.profile_title)
 
         if (editMode) builder.addAction(MenuItemHolder("Submit",
                 R.drawable.ic_action_submit, submitAction))

@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.features.photocard
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
@@ -46,7 +47,7 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
     }
 
     private var curImagePath = ""
-    fun setPhotoCard(photocard: Photocard) {
+    fun setPhotocard(photocard: Photocard) {
         if (curImagePath != photocard.photo) {
             setImage(photocard.photo, photo)
             curImagePath = photocard.photo
@@ -59,6 +60,10 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
             flexbox.addView(tag)
         }
         photocard_tags_wrapper.addView(flexbox)
+    }
+
+    fun setFavorite(favorite: Boolean) {
+        ic_favorite.visibility = if (favorite) View.VISIBLE else View.GONE
     }
 }
 
