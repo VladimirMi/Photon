@@ -77,7 +77,7 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     }
 
     fun createNewAlbum(newAlbumReq: NewAlbumReq) {
-        compDisp.add(model.createAlbum(newAlbumReq)
+        compDisp.add(model.createAlbum(newAlbumReq, profile)
                 .subscribeWith(object : ErrorObserver<Unit>() {
                     override fun onComplete() {
                         view.closeNewAlbumDialog()
@@ -93,7 +93,7 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
 
     private fun submit() {
         setEditable(false)
-        val name = view.name.text.toString()
+        val name = view.name.text.removePrefix(view.namePrefix).toString()
         val login = view.login.text.toString()
         var infoChanged = false
         if (profile.name != name || profile.login != login) {

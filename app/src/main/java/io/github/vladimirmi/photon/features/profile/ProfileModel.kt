@@ -5,12 +5,10 @@ import io.github.vladimirmi.photon.data.jobs.UploadAvatarJob
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
-import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 
 class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : IProfileModel {
@@ -41,13 +39,13 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : I
                 })
     }
 
-    override fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Unit> {
-        newAlbumReq.owner = dataManager.getProfileId()
+    override fun createAlbum(newAlbumReq: NewAlbumReq, profile: User): Observable<Unit> {
+        newAlbumReq.owner = profile.id
         return dataManager.createAlbum(newAlbumReq)
-                .zipWith(getProfile(), BiFunction { album: Album, profile: User ->
-                    profile.albums.add(album)
+                .map {
+                    profile.albums.add(it)
                     dataManager.saveToDB(profile)
-                })
+                }
                 .ioToMain()
     }
 

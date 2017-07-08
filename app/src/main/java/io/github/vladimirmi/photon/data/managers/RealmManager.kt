@@ -3,7 +3,6 @@ package io.github.vladimirmi.photon.data.managers
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.ObservableOnSubscribe
-import io.reactivex.disposables.Disposables
 import io.realm.*
 import timber.log.Timber
 import java.lang.IllegalStateException
@@ -46,8 +45,13 @@ class RealmManager {
                 .equalTo("id", id)
                 .findAllAsync())
                 .filter { it.isLoaded }
-                //todo попробовать
-                .map { if (it.isNotEmpty()) realm.copyFromRealm(it[0]) else clazz.newInstance() }
+                .flatMap {
+                    if (it.isNotEmpty()) {
+                        Observable.just(realm.copyFromRealm(it[0]))
+                    } else {
+                        Observable.empty()
+                    }
+                }
                 .doFinally { realm.close() }
     }
 
@@ -133,7 +137,7 @@ class RealmObjectObservable<T : RealmModel> private constructor(private val obje
             }
         }
         RealmObject.addChangeListener(objekt, listener)
-        e.setDisposable(Disposables.fromRunnable { RealmObject.removeAllChangeListeners(objekt) })
+//        e.setDisposable(Disposables.fromRunnable { RealmObject.removeAllChangeListeners(objekt) })
         e.onNext(objekt)
     }
 
@@ -154,7 +158,7 @@ class RealmResultObservable<T : RealmModel>(private val results: RealmResults<T>
             }
         }
         results.addChangeListener(listener)
-        e.setDisposable(Disposables.fromRunnable { results.removeAllChangeListeners() })
+//        e.setDisposable(Disposables.fromRunnable { results.removeAllChangeListeners() })
         e.onNext(results)
     }
 

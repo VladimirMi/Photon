@@ -6,9 +6,4 @@
         android:title="@string/menu_album_edit"
         android:icon="@drawable/ic_action_edit"/>
 
-    <item
-        android:id="@+id/add_photocard"
-        android:title="@string/menu_album_add"
-        android:icon="@drawable/ic_action_add"/>
-
 </menu>

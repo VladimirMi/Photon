@@ -45,18 +45,22 @@ class ProfileView(context: Context, attrs: AttributeSet)
     }
 
     private var curAvatarPath = ""
+    val namePrefix = "/  "
 
     @SuppressLint("SetTextI18n")
     fun setProfile(user: User) {
         login.setText(user.login)
-        name.setText("/  ${user.name}")
-        album_count.text = user.albumCount.toString()
-        card_count.text = user.photocardCount.toString()
+        name.setText(namePrefix + user.name)
         if (user.avatar != curAvatarPath) {
             setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
             curAvatarPath = user.avatar
         }
-        adapter.updateData(user.albums.filter { it.active })
+        val albums = user.albums.filter { it.active }
+        album_count.text = albums.size.toString()
+        card_count.text = albums.fold(0, { acc, album ->
+            acc + album.photocards.count { it.active }
+        }).toString()
+        adapter.updateData(albums)
     }
 
     private fun showAlbum(album: Album) = presenter.showAlbum(album)

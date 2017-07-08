@@ -73,7 +73,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         }
         if (photosForDelete.size > 0) {
             album.photocards.removeAll(photosForDelete)
-            compDisp.add(model.removePhotos(photosForDelete)
+            compDisp.add(model.removePhotos(photosForDelete, album)
                     .subscribeWith(ErrorObserver()))
             photosForDelete.clear()
         }

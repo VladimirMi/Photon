@@ -9,7 +9,7 @@ interface IProfileModel : IModel {
     fun getProfile(): Observable<User>
     fun getUser(userId: String): Observable<User>
     fun isUserAuth(): Boolean
-    fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Unit>
+    fun createAlbum(newAlbumReq: NewAlbumReq, profile: User): Observable<Unit>
     fun editProfile(profile: User): Observable<User>
     fun saveAvatar(uri: String, profile: User)
 }

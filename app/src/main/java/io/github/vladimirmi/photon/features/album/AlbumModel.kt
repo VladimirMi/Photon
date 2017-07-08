@@ -27,15 +27,23 @@ class AlbumModel(private val dataManager: DataManager) : IAlbumModel {
     override fun deleteAlbum(album: Album): Observable<Int> {
         return dataManager.deleteAlbum(album.id)
                 .doOnNext { dataManager.removeFromDb(Album::class.java, album.id) }
+                .flatMap { removePhotos(album.photocards, album) }
                 .ioToMain()
     }
 
-    override fun removePhotos(photosForDelete: List<Photocard>): Observable<Int> {
+    override fun removePhotos(photosForDelete: List<Photocard>, album: Album): Observable<Int> {
         return Observable.fromIterable(photosForDelete)
                 .flatMap { photocard ->
-                    dataManager.deletePhotocard(photocard.id)
-                            //todo если favorites не удалять из бд
-                            .doOnNext { dataManager.removeFromDb(Photocard::class.java, photocard.id) }
+                    if (album.isFavorite) {
+                        dataManager.removeFromFavorite(photocard.id)
+                                .doOnNext {
+                                    album.photocards.remove(photocard)
+                                    dataManager.saveToDB(album)
+                                }
+                    } else {
+                        dataManager.deletePhotocard(photocard.id)
+                                .doOnNext { dataManager.removeFromDb(Photocard::class.java, photocard.id) }
+                    }
                 }
     }
 }

@@ -57,7 +57,7 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
                     // onError
                     if (it is ApiError) {
                         when (it.statusCode) {
-                            404 -> view.showError(R.string.message_api_err_auth)
+                            403 -> view.showError(R.string.message_api_err_auth)
                             else -> view.showError(it.errorResId)
                         }
                     } else view.showError(R.string.message_api_err_unknown)

@@ -92,7 +92,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun login(req: SignInReq) {
         compDisp.add(rootPresenter.login(req)
                 .doOnSubscribe { view.closeLoginDialog() }
-                .subscribeWith(object : ErrorObserver<User>() {
+                .subscribeWith(object : ErrorObserver<Unit>() {
                     override fun onComplete() {
                         view.closeLoginDialog()
                         initToolbar()

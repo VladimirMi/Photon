@@ -115,6 +115,12 @@ constructor(private val restService: RestService,
                 .body()
     }
 
+    fun removeFromFavorite(id: String): Observable<Int> {
+        return restService.removeFromFavorite(getProfileId(), id, getUserToken())
+                .parseStatusCode()
+                .statusCode()
+    }
+
     fun deletePhotocard(id: String): Observable<Int> {
         Timber.e("deletePhotocard: ")
         return restService.deletePhotocard(getProfileId(), id, getUserToken())
@@ -154,7 +160,6 @@ constructor(private val restService: RestService,
                                  query: List<Query>?,
                                  sortBy: String,
                                  order: Sort = Sort.ASCENDING): Observable<List<T>> {
-        Timber.e("search: ")
         return realmManager.search(clazz, query, sortBy, order)
                 .map { list ->
                     if (list.isNotEmpty() && list.first() is Changeable) {
