@@ -10,6 +10,7 @@ import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.flow.FlowLifecycles
 import io.github.vladimirmi.photon.ui.TagView
 import io.github.vladimirmi.photon.ui.setImage
 import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder
@@ -19,7 +20,9 @@ import kotlinx.android.synthetic.main.screen_photocard.view.*
  * Created by Vladimir Mikhalev 14.06.2017.
  */
 
-class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardPresenter, PhotocardView>(context, attrs) {
+class PhotocardView(context: Context, attrs: AttributeSet)
+    : BaseView<PhotocardPresenter, PhotocardView>(context, attrs),
+        FlowLifecycles.PermissionRequestListener {
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<PhotocardScreen.Component>(context).inject(this)
@@ -64,6 +67,10 @@ class PhotocardView(context: Context, attrs: AttributeSet) : BaseView<PhotocardP
 
     fun setFavorite(favorite: Boolean) {
         ic_favorite.visibility = if (favorite) View.VISIBLE else View.GONE
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        presenter.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }
 

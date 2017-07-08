@@ -79,6 +79,10 @@ class RootPresenter(val model: IRootModel) :
         (view as RootActivity).startActivityForResult(intent, requestCode)
     }
 
+    fun startActivity(intent: Intent) {
+        (view as RootActivity).startActivity(intent)
+    }
+
     fun showPermissionSnackBar() {
         view.showPermissionSnackBar()
     }

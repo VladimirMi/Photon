@@ -125,5 +125,6 @@
     <string name="newcard_tag_hint">Имя тега</string>
     <string name="newcard_param_title">Укажите параметры фотографии</string>
     <string name="newcard_album_title">Выберите альбом</string>
+    <string name="send_to">Отправить</string>
 
 </resources>
