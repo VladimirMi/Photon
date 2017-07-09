@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.di
 
 import android.content.Context
+import com.squareup.leakcanary.RefWatcher
 import dagger.Component
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.managers.DataManager
@@ -19,4 +20,5 @@ interface AppComponent {
     fun rootActivityComponentBuilder(): RootActivityComponent.Builder
     fun dataManager(): DataManager
     fun context(): Context
+    fun watcher(): RefWatcher
 }

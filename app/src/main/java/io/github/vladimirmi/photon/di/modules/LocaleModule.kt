@@ -18,15 +18,15 @@ import io.github.vladimirmi.photon.utils.AppConfig
  */
 
 @Module
-class LocaleModule(internal val mContext: Context) {
+class LocaleModule(val context: Context) {
 
     @Provides
     @DaggerScope(App::class)
-    fun provideContext(): Context = mContext
+    fun provideContext() = context
 
     @Provides
     @DaggerScope(App::class)
-    fun providePreferencesManager(context: Context): PreferencesManager = PreferencesManager(context)
+    fun providePreferencesManager(context: Context) = PreferencesManager(context)
 
     @Provides
     @DaggerScope(App::class)
@@ -40,7 +40,7 @@ class LocaleModule(internal val mContext: Context) {
 
     @Provides
     @DaggerScope(App::class)
-    internal fun provideJobManager(context: Context): JobManager {
+    fun provideJobManager(context: Context): JobManager {
         val configuration = Configuration.Builder(context)
                 .minConsumerCount(AppConfig.MIN_CONSUMER_COUNT)
                 .maxConsumerCount(AppConfig.MAX_CONSUMER_COUNT)
@@ -50,4 +50,8 @@ class LocaleModule(internal val mContext: Context) {
 
         return JobManager(configuration)
     }
+
+    @Provides
+    @DaggerScope(App::class)
+    fun provideRefWatcher(context: Context) = App.getRefWatcher(context)
 }

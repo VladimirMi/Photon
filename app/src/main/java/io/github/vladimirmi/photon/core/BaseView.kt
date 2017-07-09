@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.design.widget.Snackbar
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.squareup.leakcanary.RefWatcher
 import io.github.vladimirmi.photon.flow.FlowLifecycles
 import timber.log.Timber
 import javax.inject.Inject
@@ -18,6 +19,7 @@ abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
         IView, FlowLifecycles.BackPressListener, FlowLifecycles.ViewLifecycleListener {
 
     @Inject protected lateinit var presenter: P
+    @Inject protected lateinit var watcher: RefWatcher
 
     init {
         @Suppress("LeakingThis")
@@ -47,6 +49,7 @@ abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
         presenter.dropView(this as V)
         Timber.tag(javaClass.simpleName)
         Timber.d("onViewDestroyed by Flow $removedByFlow")
+        watcher.watch(this)
     }
 
     override fun onBackPressed(): Boolean = false
