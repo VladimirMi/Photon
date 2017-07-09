@@ -37,14 +37,17 @@ class AuthorView(context: Context, attrs: AttributeSet)
     fun setUser(user: User) {
         user_login.setText(user.login)
         user_name.setText("/  ${user.name}")
-        album_count.text = user.albumCount.toString()
-        //todo не учитывать favorite
-        card_count.text = user.photocardCount.toString()
         if (user.avatar != curAvatarPath) {
             setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
             curAvatarPath = user.avatar
         }
-        adapter.updateData(user.albums.filter { it.active })
+
+        val albums = user.albums.filter { it.active }
+        album_count.text = albums.count { !it.isFavorite }.toString()
+        card_count.text = albums.filter { !it.isFavorite }
+                .fold(0, { acc, album -> acc + album.photocards.count { it.active } })
+                .toString()
+        adapter.updateData(albums)
     }
 
     private fun showAlbum(album: Album) = presenter.showAlbum(album)

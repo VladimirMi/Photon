@@ -14,10 +14,11 @@ import kotlinx.android.synthetic.main.dialog_new_album.view.*
 class NewAlbumDialog(viewGroup: ViewGroup, newAlbumAction: (NewAlbumReq) -> Unit)
     : ValidationDialog(R.layout.dialog_new_album, viewGroup) {
 
+    val title = view.dialog_title
     val name = view.name
     val description = view.description
-    val ok = view.ok
-    val cancel = view.cancel
+    private val ok = view.ok
+    private val cancel = view.cancel
 
     init {
         listenFields()

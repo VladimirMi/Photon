@@ -1,8 +1,6 @@
 package io.github.vladimirmi.photon.data.managers
 
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.ObservableOnSubscribe
+import io.reactivex.*
 import io.reactivex.disposables.Disposables
 import io.realm.*
 import timber.log.Timber
@@ -29,7 +27,7 @@ class RealmManager {
 
     fun <T : RealmObject> getObject(clazz: Class<T>, id: String): Observable<T> {
         val realm = Realm.getDefaultInstance()
-        return RealmObjectObservable.from(realm
+        return RealmObjectFlowable.obsFrom(realm
                 .where(clazz)
                 .equalTo("id", id)
                 .findFirstAsync())
@@ -41,7 +39,7 @@ class RealmManager {
 
     fun <T : RealmObject> get(clazz: Class<T>, id: String): Observable<T> {
         val realm = Realm.getDefaultInstance()
-        return RealmResultObservable.from(realm
+        return RealmResultFlowable.obsFrom(realm
                 .where(clazz)
                 .equalTo("id", id)
                 .findAllAsync())
@@ -69,7 +67,7 @@ class RealmManager {
             realmQuery = realmQuery.endGroup()
         }
 
-        return RealmResultObservable.from(realmQuery
+        return RealmResultFlowable.obsFrom(realmQuery
                 .findAllSortedAsync(sortBy, order))
                 .filter { it.isLoaded }
                 .map { realm.copyFromRealm(it) }
@@ -100,7 +98,7 @@ class Query(val fieldName: String, val operator: RealmOperator, val value: Any) 
     fun <T : RealmModel> applyTo(realmQuery: RealmQuery<T>): RealmQuery<T> {
         when (value) {
             is String -> when (operator) {
-                RealmOperator.CONTAINS -> realmQuery.contains(fieldName, value)
+                RealmOperator.CONTAINS -> realmQuery.contains(fieldName, value, Case.INSENSITIVE)
                 RealmOperator.EQUALTO -> realmQuery.equalTo(fieldName, value)
             }
             is Boolean -> when (operator) {
@@ -128,12 +126,12 @@ class Query(val fieldName: String, val operator: RealmOperator, val value: Any) 
     }
 }
 
-class RealmObjectObservable<T : RealmModel> private constructor(private val objekt: T)
-    : ObservableOnSubscribe<T> {
+class RealmObjectFlowable<T : RealmModel> private constructor(private val objekt: T)
+    : FlowableOnSubscribe<T> {
 
-    override fun subscribe(e: ObservableEmitter<T>) {
+    override fun subscribe(e: FlowableEmitter<T>) {
         RealmObject.addChangeListener(objekt, RealmChangeListener {
-            if (!e.isDisposed) {
+            if (!e.isCancelled) {
                 e.onNext(it)
             }
         })
@@ -142,18 +140,22 @@ class RealmObjectObservable<T : RealmModel> private constructor(private val obje
     }
 
     companion object { // factory method
-        fun <T : RealmModel> from(objekt: T): Observable<T> {
-            return Observable.create(RealmObjectObservable(objekt))
+        fun <T : RealmModel> from(objekt: T): Flowable<T> {
+            return Flowable.create(RealmObjectFlowable(objekt), BackpressureStrategy.LATEST)
+        }
+
+        fun <T : RealmModel> obsFrom(objekt: T): Observable<T> {
+            return from(objekt).toObservable()
         }
     }
 }
 
-class RealmResultObservable<T : RealmModel>(private val results: RealmResults<T>)
-    : ObservableOnSubscribe<RealmResults<T>> {
+class RealmResultFlowable<T : RealmModel> private constructor(private val results: RealmResults<T>)
+    : FlowableOnSubscribe<RealmResults<T>> {
 
-    override fun subscribe(e: ObservableEmitter<RealmResults<T>>) {
+    override fun subscribe(e: FlowableEmitter<RealmResults<T>>) {
         results.addChangeListener(RealmChangeListener {
-            if (!e.isDisposed) {
+            if (!e.isCancelled) {
                 Timber.e("RealmResultObservable onNext size ${it.size}")
                 e.onNext(it)
             }
@@ -163,8 +165,12 @@ class RealmResultObservable<T : RealmModel>(private val results: RealmResults<T>
     }
 
     companion object { // factory method
-        fun <T : RealmModel> from(results: RealmResults<T>): Observable<RealmResults<T>> {
-            return Observable.create(RealmResultObservable(results))
+        fun <T : RealmModel> from(results: RealmResults<T>): Flowable<RealmResults<T>> {
+            return Flowable.create(RealmResultFlowable(results), BackpressureStrategy.LATEST)
+        }
+
+        fun <T : RealmModel> obsFrom(results: RealmResults<T>): Observable<RealmResults<T>> {
+            return from(results).toObservable()
         }
     }
 }

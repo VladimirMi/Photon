@@ -21,7 +21,6 @@ import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
 import java.io.File
 
 
@@ -65,7 +64,6 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         return model.getUser(owner)
                 .subscribeWith(object : ErrorObserver<User>() {
                     override fun onNext(it: User) {
-                        Timber.e("onNext: ${it.name}")
                         view.setUser(it)
                     }
                 })
@@ -75,10 +73,11 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         return Observable.just(photocard)
                 .mergeWith(model.getPhotocard(photocard.id, photocard.owner))
                 .subscribeWith(object : ErrorObserver<Photocard>() {
-                    override fun onNext(it: Photocard) = view.setPhotocard(it)
+                    override fun onNext(it: Photocard) {
+                        view.setPhotocard(it)
+                    }
                 })
     }
-
 
     fun showAuthor() {
         Flow.get(view).set(AuthorScreen(photocard.owner))

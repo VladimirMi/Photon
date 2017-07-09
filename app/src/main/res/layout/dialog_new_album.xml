@@ -16,6 +16,7 @@
 
         <TextView
             style="@style/CustomText.Black"
+            android:id="@+id/dialog_title"
             android:layout_marginBottom="20dp"
             android:layout_gravity="center_horizontal"
             android:text="@string/dialog_new_album"

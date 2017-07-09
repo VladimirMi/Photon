@@ -101,13 +101,8 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     fun savePhotocard() {
-        rootPresenter.showLoading()
-        model.uploadPhotocard(doneCallback = {
-            view.post {
-                rootPresenter.hideLoading()
-                clearPhotocard()
-            }
-        })
+        model.uploadPhotocard()
+        clearPhotocard()
     }
 
     fun clearPhotocard() {

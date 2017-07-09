@@ -29,6 +29,7 @@ class UploadAvatarJob(private val profile: User)
 
     override fun onRun() {
         Timber.e("onRun: ")
+        var throwError = false
         val dataManager = DaggerService.appComponent.dataManager()
         val data = getByteArrayFromContent(profile.avatar)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
@@ -47,8 +48,13 @@ class UploadAvatarJob(private val profile: User)
                     override fun onNext(it: User) {
                         dataManager.saveToDB(it)
                     }
-                })
 
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        throwError = true
+                    }
+                })
+        if (throwError) throw Throwable()
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {

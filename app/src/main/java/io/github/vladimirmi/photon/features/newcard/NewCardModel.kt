@@ -1,8 +1,6 @@
 package io.github.vladimirmi.photon.features.newcard
 
-import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.JobManager
-import io.github.vladimirmi.photon.data.jobs.EmptyJobCallback
 import io.github.vladimirmi.photon.data.jobs.UploadPhotoJob
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.Query
@@ -68,18 +66,9 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
         photoCard.photo = uri
     }
 
-    override fun uploadPhotocard(doneCallback: () -> Unit) {
+    override fun uploadPhotocard() {
         photoCard.withId()
         photoCard.owner = dataManager.getProfileId()
-        val uploadPhotoJob = UploadPhotoJob(photoCard)
-        jobManager.addJobInBackground(uploadPhotoJob)
-
-        jobManager.addCallback(object : EmptyJobCallback() {
-            override fun onDone(job: Job) {
-                if (job.id == uploadPhotoJob.id) {
-                    doneCallback()
-                }
-            }
-        })
+        jobManager.addJobInBackground(UploadPhotoJob(photoCard))
     }
 }

@@ -32,8 +32,10 @@ class UploadPhotoJob(private val photocard: Photocard)
         DaggerService.appComponent.dataManager().saveToDB(photocard)
     }
 
+    @Throws(Throwable::class)
     override fun onRun() {
         Timber.e("onRun: ")
+        var throwError = false
         val dataManager = DaggerService.appComponent.dataManager()
         val data = getByteArrayFromContent(photocard.photo)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
@@ -49,12 +51,18 @@ class UploadPhotoJob(private val photocard: Photocard)
                     dataManager.removeFromDb(Photocard::class.java, tempId)
                 }
                 .flatMap { dataManager.getObjectFromDb(Album::class.java, photocard.album) }
-                .map {
-                    it.photocards.add(photocard)
-                    dataManager.saveToDB(it)
-                }
-                .subscribeWith(ErrorObserver<Unit>())
+                .subscribeWith(object : ErrorObserver<Album>() {
+                    override fun onNext(it: Album) {
+                        it.photocards.add(photocard)
+                        dataManager.saveToDB(it)
+                    }
 
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        throwError = true
+                    }
+                })
+        if (throwError) throw Throwable()
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {
@@ -72,5 +80,4 @@ class UploadPhotoJob(private val photocard: Photocard)
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
         return RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
     }
-
 }

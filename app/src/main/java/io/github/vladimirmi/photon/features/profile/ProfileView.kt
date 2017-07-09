@@ -56,10 +56,10 @@ class ProfileView(context: Context, attrs: AttributeSet)
             curAvatarPath = user.avatar
         }
         val albums = user.albums.filter { it.active }
-        album_count.text = albums.size.toString()
-        card_count.text = albums.fold(0, { acc, album ->
-            acc + album.photocards.count { it.active }
-        }).toString()
+        album_count.text = albums.count { !it.isFavorite }.toString()
+        card_count.text = albums.filter { !it.isFavorite }
+                .fold(0, { acc, album -> acc + album.photocards.count { it.active } })
+                .toString()
         adapter.updateData(albums)
     }
 

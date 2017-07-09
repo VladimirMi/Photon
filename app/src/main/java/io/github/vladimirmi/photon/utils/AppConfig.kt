@@ -21,5 +21,5 @@ object AppConfig {
     const val CONSUMER_KEEP_ALIVE = 120
     const val INITIAL_BACK_OFF_IN_MS = 1000L
 
-    const val IMAGE_SIZE_LIMIT = 2 // megabyte
+    const val IMAGE_SIZE_LIMIT = 4 // megabyte
 }
