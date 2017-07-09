@@ -34,6 +34,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         }
     }
 
+    private lateinit var cardsDisposable: Disposable
+
     override fun initToolbar() {
         val popupMenu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth
         else R.menu.submenu_main_screen_not_auth
@@ -52,7 +54,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     override fun initView(view: MainView) {
-        compDisp.add(subscribeOnPhotocards())
+        cardsDisposable = subscribeOnPhotocards()
+        compDisp.add(cardsDisposable)
         if (model.isFiltered()) view.showFilterWarning()
     }
 
@@ -122,15 +125,15 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     fun resetFilter() {
         model.resetFilter()
+        initToolbar()
+        compDisp.remove(cardsDisposable)
         initView(view)
     }
 
+    //todo network operation move to job
     fun showPhotoCard(photocard: Photocard) {
-        model.addView(photocard).subscribeWith(object : ErrorObserver<Unit>() {
-            override fun onComplete() {
-                Flow.get(view).set(PhotocardScreen(photocard))
-            }
-        })
+        model.addView(photocard).subscribeWith(ErrorObserver())
+        Flow.get(view).set(PhotocardScreen(photocard))
     }
 }
 

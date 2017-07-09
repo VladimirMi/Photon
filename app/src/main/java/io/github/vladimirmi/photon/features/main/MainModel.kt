@@ -1,13 +1,12 @@
 package io.github.vladimirmi.photon.features.main
 
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
+import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.realm.Sort
-import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -21,8 +20,8 @@ class MainModel(val dataManager: DataManager) : IMainModel {
 
     private fun pageFilter(query: Query, page: SearchView.Page): Boolean {
         return when (page) {
-            SearchView.Page.TAGS -> query.fieldName == "title" || query.fieldName == "tags.value"
-            SearchView.Page.FILTERS -> query.fieldName != "title" && query.fieldName != "tags.value"
+            SearchView.Page.TAGS -> query.fieldName == "search" || query.fieldName == "tags.value"
+            SearchView.Page.FILTERS -> query.fieldName != "search" && query.fieldName != "tags.value"
         }
     }
 
@@ -33,7 +32,6 @@ class MainModel(val dataManager: DataManager) : IMainModel {
     }
 
     override fun getPhotoCards(): Observable<List<Photocard>> {
-        Timber.e("search with $searchQuery")
         return dataManager.search(Photocard::class.java,
                 query = if (searchQuery.isNotEmpty()) searchQuery.toList() else null,
                 sortBy = "views",

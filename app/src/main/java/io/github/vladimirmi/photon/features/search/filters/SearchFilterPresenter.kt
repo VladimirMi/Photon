@@ -5,7 +5,6 @@ import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.ISearchModel
 import io.github.vladimirmi.photon.features.search.SearchView
-import timber.log.Timber
 
 class SearchFilterPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
         BasePresenter<SearchFilterView, ISearchModel>(model, rootPresenter) {
@@ -17,7 +16,6 @@ class SearchFilterPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
     }
 
     override fun initView(view: SearchFilterView) {
-        Timber.e("initView: $queryChanged")
         view.restoreFilterState(model.getQuery())
         view.setupSubmitBtn(queryChanged)
     }

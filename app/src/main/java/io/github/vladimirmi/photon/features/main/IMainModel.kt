@@ -1,9 +1,9 @@
 package io.github.vladimirmi.photon.features.main
 
 import io.github.vladimirmi.photon.core.IModel
-import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
+import io.github.vladimirmi.photon.utils.Query
 import io.reactivex.Observable
 
 /**

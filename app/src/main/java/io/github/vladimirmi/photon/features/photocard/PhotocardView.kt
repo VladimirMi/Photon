@@ -45,8 +45,11 @@ class PhotocardView(context: Context, attrs: AttributeSet)
             curAvatarPath = user.avatar
         }
         user_name.text = user.name
-        album_count.text = user.albumCount.toString()
-        card_count.text = user.photocardCount.toString()
+        val albums = user.albums.filter { it.active }
+        album_count.text = albums.count { !it.isFavorite }.toString()
+        card_count.text = albums.filter { !it.isFavorite }
+                .fold(0, { acc, album -> acc + album.photocards.count { it.active } })
+                .toString()
     }
 
     private var curImagePath = ""

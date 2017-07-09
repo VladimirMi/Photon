@@ -8,12 +8,12 @@ import com.google.android.flexbox.FlexboxLayout
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.data.models.realm.Search
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.ui.TagView
+import io.github.vladimirmi.photon.utils.Query
 import kotlinx.android.synthetic.main.view_search.view.*
 
 /**
@@ -24,7 +24,10 @@ class SearchTagView(context: Context, attrs: AttributeSet)
     : BaseView<SearchTagPresenter, SearchTagView>(context, attrs) {
 
     val searchObs by lazy { search_field.textChanges() }
-    private val searchAdapter = StringAdapter()
+
+    private val searchAction: (String) -> Unit = { search_field.setText(it) }
+    private val searchAdapter = StringAdapter(searchAction)
+
     private val tagAction: (TagView) -> Unit = { select(it) }
     private val flexbox by lazy {
         LayoutInflater.from(context).inflate(R.layout.view_search_tags, tags_wrapper, false) as FlexboxLayout
@@ -68,7 +71,8 @@ class SearchTagView(context: Context, attrs: AttributeSet)
     }
 
     fun restoreFromQuery(query: List<Query>) {
-        search_field.setText(query.find { it.fieldName == "title" }?.value.toString())
+        val value = query.find { it.fieldName == "search" }?.value as? String
+        search_field.setText(value)
     }
 
     fun setTags(tags: List<Tag>, query: List<Query>) {

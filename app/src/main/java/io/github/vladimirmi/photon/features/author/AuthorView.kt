@@ -41,7 +41,6 @@ class AuthorView(context: Context, attrs: AttributeSet)
             setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
             curAvatarPath = user.avatar
         }
-
         val albums = user.albums.filter { it.active }
         album_count.text = albums.count { !it.isFavorite }.toString()
         card_count.text = albums.filter { !it.isFavorite }

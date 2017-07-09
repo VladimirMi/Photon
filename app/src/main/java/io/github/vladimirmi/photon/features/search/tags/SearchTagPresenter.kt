@@ -27,10 +27,16 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
     }
 
     private fun subscribeOnSearch(): Disposable {
-        return view.searchObs
+        return view.searchObs.skipInitialValue()
                 .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
-                .doOnNext { addQuery(Pair("title", it.toString())) }
-                .flatMap { model.search(it.toString()) }
+                .map { it.toString().toLowerCase() }
+                .doOnNext {
+                    if (it.isNotBlank()) {
+                        model.removeQuery("search")
+                        addQuery(Pair("search", it))
+                    }
+                }
+                .flatMap { model.search(it) }
                 .subscribe { view.setRecentSearches(it) }
     }
 
@@ -49,7 +55,7 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
     }
 
     fun submitSearch(search: String) {
-        model.saveSearchField(search)
+        model.saveSearchField(search.toLowerCase())
         model.makeQuery()
         Flow.get(view).goBack()
     }

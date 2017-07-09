@@ -1,12 +1,12 @@
 package io.github.vladimirmi.photon.features.photocard
 
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.managers.Query
-import io.github.vladimirmi.photon.data.managers.RealmOperator
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.Query
+import io.github.vladimirmi.photon.utils.RealmOperator
 import io.reactivex.Observable
 import io.reactivex.Single
 

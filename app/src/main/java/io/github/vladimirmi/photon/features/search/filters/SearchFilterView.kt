@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.managers.Query
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.ui.FilterElementView
+import io.github.vladimirmi.photon.utils.Query
 import kotlinx.android.synthetic.main.view_filters.view.*
 
 /**

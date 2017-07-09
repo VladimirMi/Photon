@@ -7,10 +7,7 @@ import io.github.vladimirmi.photon.data.models.*
 import io.github.vladimirmi.photon.data.models.realm.*
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
-import io.github.vladimirmi.photon.utils.body
-import io.github.vladimirmi.photon.utils.parseResponse
-import io.github.vladimirmi.photon.utils.parseStatusCode
-import io.github.vladimirmi.photon.utils.statusCode
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.realm.RealmObject
 import io.realm.Sort
@@ -132,13 +129,10 @@ constructor(private val restService: RestService,
 
     //region =============== DataBase ==============
 
-    fun <T : RealmObject> saveToDB(realmObject: T, async: Boolean = false) {
-        if (removedNotActive(realmObject)) return
-        if (async) {
-            realmManager.saveAsync(realmObject)
-        } else {
-            realmManager.save(realmObject)
-        }
+    fun <T : RealmObject> saveToDB(realmObject: T) {
+        if (realmObject is Changeable && !realmObject.active) return
+        if (realmObject is Photocard) realmObject.search = realmObject.title.toLowerCase()
+        realmManager.save(realmObject)
     }
 
     fun <T : RealmObject> getListFromDb(clazz: Class<T>,
