@@ -19,6 +19,7 @@ import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import java.io.File
@@ -30,6 +31,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     private val actions: (MenuItem) -> Unit = {
         when (it.itemId) {
             R.id.menu_favorite -> addToFavorite()
+            R.id.menu_favorite_remove -> removeFromFavorite()
             R.id.menu_share -> share()
             R.id.menu_download -> download()
         }
@@ -84,9 +86,14 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     }
 
     private fun addToFavorite() {
-        //todo предлагать войти или менять меню
         if (rootPresenter.isUserAuth()) {
             compDisp.add(model.addToFavorite(photocard).subscribeWith(ErrorObserver()))
+        }
+    }
+
+    private fun removeFromFavorite() {
+        if (rootPresenter.isUserAuth()) {
+            compDisp.add(model.removeFromFavorite(photocard).subscribeWith(ErrorObserver()))
         }
     }
 
@@ -101,21 +108,30 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     private fun download() {
         val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (rootPresenter.checkAndRequestPermissions(permissions, Constants.REQUEST_WRITE)) {
-            load()
+            downLoadImage()
         }
     }
 
-    private fun load() {
+    private fun downLoadImage() {
         Glide.with(view.context)
                 .load(photocard.photo)
                 .asBitmap()
                 .toBytes(Bitmap.CompressFormat.JPEG, 100)
                 .into(object : SimpleTarget<ByteArray>() {
                     override fun onResourceReady(resource: ByteArray, glideAnimation: GlideAnimation<in ByteArray>) {
-
                         Observable.just(resource)
-                                .doOnNext { createFile()?.writeBytes(it) }
-                                .subscribeWith(ErrorObserver())
+                                .flatMap {
+                                    createFile()?.let {
+                                        file ->
+                                        Observable.just(file.writeBytes(it))
+                                    } ?: Observable.empty()
+                                }
+                                .ioToMain()
+                                .subscribeWith(object : ErrorObserver<Any>() {
+                                    override fun onNext(it: Any) {
+                                        view.showMessage(R.string.photocard_message_download)
+                                    }
+                                })
                     }
                 })
     }
@@ -134,8 +150,8 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         val requestCanceled = grantResults.contains(PackageManager.PERMISSION_DENIED) || grantResults.isEmpty()
         if (requestCanceled) {
             rootPresenter.showPermissionSnackBar()
-        } else if (requestCode == Constants.REQUEST_GALLERY) {
-            load()
+        } else if (requestCode == Constants.REQUEST_WRITE) {
+            downLoadImage()
         }
     }
 }

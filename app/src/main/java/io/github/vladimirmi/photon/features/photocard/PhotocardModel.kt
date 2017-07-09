@@ -50,15 +50,26 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
 
     override fun addToFavorite(photocard: Photocard): Observable<Unit> {
         return dataManager.addToFavorite(photocard.id)
+                .flatMap {
+                    if (it.success) {
+                        getFavoriteAlbum()
+                    } else {
+                        Observable.error(Exception("add to favorite fail"))
+                    }
+                }
                 .map {
-                    val album = dataManager.getSingleObjFromDb(Album::class.java, favAlbum as String)!!
-                    album.photocards.add(photocard)
-                    dataManager.saveToDB(album)
+                    it.photocards.add(photocard)
+                    dataManager.saveToDB(it)
                 }
     }
 
-    fun removeFromFavorite(): Unit {
-        //todo  implement
+    override fun removeFromFavorite(photocard: Photocard): Observable<Unit> {
+        return dataManager.removeFromFavorite(photocard.id)
+                .flatMap { getFavoriteAlbum() }
+                .map {
+                    it.photocards.remove(photocard)
+                    dataManager.saveToDB(it)
+                }
     }
 
 
@@ -71,13 +82,13 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
                 .contains(photocard.id)
     }
 
-    private var favAlbum: String? = null
+    private var favAlbumId: String? = null
 
     private fun getFavoriteAlbum(): Observable<Album> {
-        return if (favAlbum == null) {
+        return if (favAlbumId == null) {
             findFavAlbum()
         } else {
-            dataManager.getObjectFromDb(Album::class.java, favAlbum as String)
+            dataManager.getObjectFromDb(Album::class.java, favAlbumId as String)
         }
     }
 
@@ -88,6 +99,6 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
         )
         return dataManager.search(Album::class.java, query, "id")
                 .map { it[0] }
-                .doOnNext { favAlbum = it.id }
+                .doOnNext { favAlbumId = it.id }
     }
 }

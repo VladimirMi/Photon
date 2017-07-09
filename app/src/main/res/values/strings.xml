@@ -109,8 +109,10 @@
     <string name="photocard_album">Альбомы</string>
     <string name="photocard_card">Карты</string>
     <string name="photocard_menu_favorite">В избранное</string>
+    <string name="photocard_menu_favorite_remove">Из избранного</string>
     <string name="photocard_menu_share">Поделиться</string>
     <string name="photocard_menu_download">Скачать</string>
+    <string name="photocard_message_download">Фото успешно загружено</string>
 
     <string name="profile_title">Профиль</string>
     <string name="profile_not_auth">Авторизуйтесь,\n чтобы посмотреть\n данные профиля</string>

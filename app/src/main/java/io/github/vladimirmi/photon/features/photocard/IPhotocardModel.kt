@@ -11,4 +11,5 @@ interface IPhotocardModel : IModel {
     fun getPhotocard(id: String, ownerId: String): Observable<Photocard>
     fun addToFavorite(photocard: Photocard): Observable<Unit>
     fun isFavorite(photocard: Photocard): Single<Boolean>
+    fun removeFromFavorite(photocard: Photocard): Observable<Unit>
 }
