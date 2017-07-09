@@ -40,11 +40,12 @@ class NewCardView(context: Context, attrs: AttributeSet)
     val nameObs by lazy { name_field.textChanges() }
     val tagObs by lazy { tag_field.textChanges() }
 
-    private val tagsAdapter = StringAdapter()
+
     private val tagAction: (String) -> Unit = {
         tag_field.setText(it)
         tag_field.setSelection(it.length)
     }
+    private val tagsAdapter = StringAdapter(tagAction)
     private val suggestTagAdapter = StringAdapter(tagAction)
 
     private val albumAction: (Album) -> Unit = { presenter.setAlbumId(it.id) }
@@ -60,6 +61,8 @@ class NewCardView(context: Context, attrs: AttributeSet)
         choose_btn.setOnClickListener { presenter.choosePhoto() }
         save.setOnClickListener { presenter.savePhotocard() }
         cancel.setOnClickListener { presenter.clearPhotocard() }
+        ic_clear_name.setOnClickListener { name_field.setText("") }
+        ic_clear_tag.setOnClickListener { tag_field.setText("") }
         initFiltersSection()
         initTagSection()
         album_list.layoutManager = GridLayoutManager(context, 2)
@@ -153,9 +156,11 @@ class NewCardView(context: Context, attrs: AttributeSet)
 
     fun clearView() {
         name_field.setText("")
-        tag_field.setText("")
         filterElements.filter { it.picked }.forEach { it.pick() }
+        tag_field.setText("")
         setTags(emptyList())
+        selectAlbum("")
+        new_card_view.scrollTo(0, 0)
     }
 
     fun showPhotoParams() {

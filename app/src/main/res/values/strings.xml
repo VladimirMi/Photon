@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Фотон</string>
-    <string name="app_description">Онлайн-галерея фуд-фотографии.\n
-        Для вдохновления и обучения.</string>
+    <string name="app_description">Онлайн-галерея фуд-фотографии.\n Для вдохновления и обучения.</string>
 
     <string name="message_wait">Пожалуйста, подождите</string>
     <string name="message_permission_need">Необходимо дать требуемые разрешения</string>
@@ -50,6 +49,7 @@
     <string name="message_err_description">Неверное описание</string>
     <string name="message_err_net">Нет сети</string>
     <string name="message_err_connect">Невозможно подключиться к серверу</string>
+    <string name="message_err_file_size">Размер файла не должен превышать %d мегабайта</string>
     <string name="message_api_err_login">Пользователь с таким логином уже существует</string>
     <string name="message_api_err_mail">Пользователь с такой почтой уже существует</string>
     <string name="message_api_err_unknown">Неизвестная ошибка</string>

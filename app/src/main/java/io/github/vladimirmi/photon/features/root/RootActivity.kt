@@ -115,8 +115,9 @@ class RootActivity : FlowActivity(), IRootView {
         Snackbar.make(root_container, string, Snackbar.LENGTH_LONG).show()
     }
 
-    override fun showError(stringId: Int) {
-        Snackbar.make(root_container, stringId, Snackbar.LENGTH_SHORT).show()
+    override fun showError(stringId: Int, vararg formatArgs: Any) {
+        val string = resources.getString(stringId, *formatArgs)
+        Snackbar.make(root_container, string, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun showPermissionSnackBar() {

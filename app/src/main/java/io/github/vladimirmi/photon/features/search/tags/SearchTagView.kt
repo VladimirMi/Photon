@@ -38,7 +38,7 @@ class SearchTagView(context: Context, attrs: AttributeSet)
         recent_search.layoutManager = LinearLayoutManager(context)
         recent_search.adapter = searchAdapter
         ic_action.setOnClickListener { presenter.submitSearch(search_field.text.toString()) }
-        ic_clear.setOnClickListener { clearAll() }
+        ic_clear_tag.setOnClickListener { clearAll() }
     }
 
     private fun clearAll() {

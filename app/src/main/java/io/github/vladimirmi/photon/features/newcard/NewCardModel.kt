@@ -1,6 +1,8 @@
 package io.github.vladimirmi.photon.features.newcard
 
+import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.JobManager
+import io.github.vladimirmi.photon.data.jobs.EmptyJobCallback
 import io.github.vladimirmi.photon.data.jobs.UploadPhotoJob
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.Query
@@ -11,6 +13,7 @@ import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.reactivex.Observable
 import io.realm.Sort
 import timber.log.Timber
+import java.io.File
 
 class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : INewCardModel {
     override var photoCard = Photocard()
@@ -59,12 +62,24 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
     }
 
     override fun savePhotoUri(uri: String) {
+        Timber.e("savePhotoUri: $uri")
+        val file = File(uri)
+        Timber.e("savePhotoUri: ${file.length()}")
         photoCard.photo = uri
     }
 
-    override fun uploadPhotocard() {
+    override fun uploadPhotocard(doneCallback: () -> Unit) {
         photoCard.withId()
         photoCard.owner = dataManager.getProfileId()
-        jobManager.addJobInBackground(UploadPhotoJob(photoCard))
+        val uploadPhotoJob = UploadPhotoJob(photoCard)
+        jobManager.addJobInBackground(uploadPhotoJob)
+
+        jobManager.addCallback(object : EmptyJobCallback() {
+            override fun onDone(job: Job) {
+                if (job.id == uploadPhotoJob.id) {
+                    doneCallback()
+                }
+            }
+        })
     }
 }

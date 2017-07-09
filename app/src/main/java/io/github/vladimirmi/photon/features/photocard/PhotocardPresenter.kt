@@ -21,6 +21,7 @@ import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 import java.io.File
 
 
@@ -63,7 +64,10 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     private fun subscribeOnUser(owner: String): Disposable {
         return model.getUser(owner)
                 .subscribeWith(object : ErrorObserver<User>() {
-                    override fun onNext(it: User) = view.setUser(it)
+                    override fun onNext(it: User) {
+                        Timber.e("onNext: ${it.name}")
+                        view.setUser(it)
+                    }
                 })
     }
 

@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.data.managers
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.ObservableOnSubscribe
+import io.reactivex.disposables.Disposables
 import io.realm.*
 import timber.log.Timber
 import java.lang.IllegalStateException
@@ -131,13 +132,12 @@ class RealmObjectObservable<T : RealmModel> private constructor(private val obje
     : ObservableOnSubscribe<T> {
 
     override fun subscribe(e: ObservableEmitter<T>) {
-        val listener = { element: T ->
+        RealmObject.addChangeListener(objekt, RealmChangeListener {
             if (!e.isDisposed) {
-                e.onNext(element)
+                e.onNext(it)
             }
-        }
-        RealmObject.addChangeListener(objekt, listener)
-//        e.setDisposable(Disposables.fromRunnable { RealmObject.removeAllChangeListeners(objekt) })
+        })
+        e.setDisposable(Disposables.fromRunnable { RealmObject.removeAllChangeListeners(objekt) })
         e.onNext(objekt)
     }
 
@@ -152,13 +152,13 @@ class RealmResultObservable<T : RealmModel>(private val results: RealmResults<T>
     : ObservableOnSubscribe<RealmResults<T>> {
 
     override fun subscribe(e: ObservableEmitter<RealmResults<T>>) {
-        val listener = { element: RealmResults<T> ->
+        results.addChangeListener(RealmChangeListener {
             if (!e.isDisposed) {
-                e.onNext(element)
+                Timber.e("RealmResultObservable onNext size ${it.size}")
+                e.onNext(it)
             }
-        }
-        results.addChangeListener(listener)
-//        e.setDisposable(Disposables.fromRunnable { results.removeAllChangeListeners() })
+        })
+        e.setDisposable(Disposables.fromRunnable { results.removeAllChangeListeners() })
         e.onNext(results)
     }
 

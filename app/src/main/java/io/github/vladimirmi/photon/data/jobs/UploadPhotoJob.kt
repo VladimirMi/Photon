@@ -21,9 +21,11 @@ import timber.log.Timber
 class UploadPhotoJob(private val photocard: Photocard)
     : Job(Params(JobPriority.HIGH)
         .groupBy("Images")
+        .setSingleId(photocard.id)
         .requireNetwork()) {
 
-    val tempId = photocard.id
+
+    private val tempId = photocard.id
 
     override fun onAdded() {
         Timber.e("onAdded: ")
@@ -42,10 +44,12 @@ class UploadPhotoJob(private val photocard: Photocard)
                     photocard.photo = it.image
                     dataManager.createPhotocard(photocard)
                 }
-                .doOnNext { photocard.id = it.id }
+                .doOnNext {
+                    photocard.id = it.id
+                    dataManager.removeFromDb(Photocard::class.java, tempId)
+                }
                 .flatMap { dataManager.getObjectFromDb(Album::class.java, photocard.album) }
                 .map {
-                    dataManager.removeFromDb(Photocard::class.java, tempId)
                     it.photocards.add(photocard)
                     dataManager.saveToDB(it)
                 }

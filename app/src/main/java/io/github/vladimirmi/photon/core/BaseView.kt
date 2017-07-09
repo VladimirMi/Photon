@@ -59,7 +59,8 @@ abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
         Snackbar.make(this, stringId, Snackbar.LENGTH_LONG).show()
     }
 
-    override fun showError(stringId: Int) {
-        Snackbar.make(this, stringId, Snackbar.LENGTH_SHORT).show()
+    override fun showError(stringId: Int, vararg formatArgs: Any) {
+        val string = resources.getString(stringId, *formatArgs)
+        Snackbar.make(this, string, Snackbar.LENGTH_SHORT).show()
     }
 }

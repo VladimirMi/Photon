@@ -154,6 +154,7 @@ constructor(private val restService: RestService,
 
     fun <T : RealmObject> getSingleObjFromDb(java: Class<T>, id: String): T? {
         return realmManager.getSingle(java, id)
+                .let { if (it != null && !removedNotActive(it)) it else null }
     }
 
     fun <T : RealmObject> search(clazz: Class<T>,
@@ -179,6 +180,7 @@ constructor(private val restService: RestService,
     }
 
     fun <T : RealmObject> removeFromDb(clazz: Class<T>, id: String) {
+        Timber.e("removeFromDb: $clazz with id=$id")
         realmManager.remove(clazz, id)
     }
 

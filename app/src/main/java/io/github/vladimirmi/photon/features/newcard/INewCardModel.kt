@@ -14,5 +14,5 @@ interface INewCardModel : IModel {
     fun addTag(tag: Tag)
     fun getAlbums(): Observable<List<Album>>
     fun savePhotoUri(uri: String)
-    fun uploadPhotocard()
+    fun uploadPhotocard(doneCallback: () -> Unit)
 }

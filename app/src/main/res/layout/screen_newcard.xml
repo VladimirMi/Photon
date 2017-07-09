@@ -10,9 +10,9 @@
         />
 
     <ScrollView
+        android:id="@+id/new_card_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/new_card_view"
         android:visibility="gone"
         >
 
