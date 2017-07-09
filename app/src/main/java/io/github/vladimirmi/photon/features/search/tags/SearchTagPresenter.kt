@@ -31,8 +31,8 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
                 .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .map { it.toString().toLowerCase() }
                 .doOnNext {
+                    model.removeQuery("search")
                     if (it.isNotBlank()) {
-                        model.removeQuery("search")
                         addQuery(Pair("search", it))
                     }
                 }
@@ -55,7 +55,7 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
     }
 
     fun submitSearch(search: String) {
-        model.saveSearchField(search.toLowerCase())
+        if (search.isNotBlank()) model.saveSearchField(search.toLowerCase())
         model.makeQuery()
         Flow.get(view).goBack()
     }

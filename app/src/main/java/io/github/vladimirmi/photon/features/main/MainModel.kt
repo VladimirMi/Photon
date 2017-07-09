@@ -14,35 +14,33 @@ import io.realm.Sort
 
 class MainModel(val dataManager: DataManager) : IMainModel {
 
-    override val query = ArrayList<Query>()
+    var query = ArrayList<Query>()
     override var appliedPage: SearchView.Page = SearchView.Page.TAGS
-    private val searchQuery = ArrayList<Query>()
+    override val tagsQuery = ArrayList<Query>()
+    override val filtersQuery = ArrayList<Query>()
 
-    private fun pageFilter(query: Query, page: SearchView.Page): Boolean {
-        return when (page) {
-            SearchView.Page.TAGS -> query.fieldName == "search" || query.fieldName == "tags.value"
-            SearchView.Page.FILTERS -> query.fieldName != "search" && query.fieldName != "tags.value"
+
+    override fun makeQuery(currentPage: SearchView.Page) {
+        when (currentPage) {
+            SearchView.Page.TAGS -> query = tagsQuery
+            SearchView.Page.FILTERS -> query = filtersQuery
         }
-    }
-
-    override fun makeQuery(queryList: List<Query>, currentPage: SearchView.Page) {
-        searchQuery.clear()
-        searchQuery.addAll(queryList.filter { pageFilter(it, currentPage) })
         appliedPage = currentPage
     }
 
     override fun getPhotoCards(): Observable<List<Photocard>> {
         return dataManager.search(Photocard::class.java,
-                query = if (searchQuery.isNotEmpty()) searchQuery.toList() else null,
+                query = if (query.isNotEmpty()) query.toList() else null,
                 sortBy = "views",
                 order = Sort.DESCENDING)
     }
 
-    override fun isFiltered() = searchQuery.isNotEmpty()
+    override fun isFiltered() = query.isNotEmpty()
 
     override fun resetFilter() {
-        searchQuery.clear()
         query.clear()
+        tagsQuery.clear()
+        filtersQuery.clear()
         appliedPage = SearchView.Page.TAGS
     }
 

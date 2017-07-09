@@ -23,23 +23,26 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
                 .map { it.sortedBy { it.value.toLowerCase() } }
     }
 
-    override fun getQuery(): List<Query> {
-        return mainModel.query
+    override fun getQuery(): MutableList<Query> {
+        return when (page) {
+            SearchView.Page.TAGS -> mainModel.tagsQuery
+            SearchView.Page.FILTERS -> mainModel.filtersQuery
+        }
     }
 
     override fun addQuery(pair: Pair<String, String>) {
-        mainModel.query.add(parseToQuery(pair))
-        Timber.e("addQuery $pair to ${mainModel.query}")
+        Timber.e("addQuery $pair to ${getQuery()}")
+        getQuery().add(parseToQuery(pair))
     }
 
     override fun removeQuery(pair: Pair<String, String>) {
-        mainModel.query.removeAll { it.fieldName == pair.first && it.value == pair.second }
-        Timber.e("removeQuery $pair from ${mainModel.query}")
+        Timber.e("removeQuery $pair from ${getQuery()}")
+        getQuery().removeAll { it.fieldName == pair.first && it.value == pair.second }
     }
 
     override fun removeQuery(fieldName: String) {
-        mainModel.query.removeAll { it.fieldName == fieldName }
-        Timber.e("removeQuery $fieldName from ${mainModel.query}")
+        Timber.e("removeQuery $fieldName from ${getQuery()}")
+        getQuery().removeAll { it.fieldName == fieldName }
     }
 
     private fun parseToQuery(pair: Pair<String, String>): Query {
@@ -53,7 +56,7 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
     }
 
     override fun makeQuery() {
-        mainModel.makeQuery(mainModel.query, page)
+        mainModel.makeQuery(page)
     }
 
     override fun search(string: String): Observable<List<Search>> {

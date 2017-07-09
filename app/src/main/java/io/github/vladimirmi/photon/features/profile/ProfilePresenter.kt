@@ -106,7 +106,6 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
         }
     }
 
-    //todo move to root presenter
     private fun takePhoto() {
         val intent = Intent()
         intent.type = Constants.MIME_TYPE_IMAGE

@@ -130,7 +130,7 @@ constructor(private val restService: RestService,
     //region =============== DataBase ==============
 
     fun <T : RealmObject> saveToDB(realmObject: T) {
-        if (realmObject is Changeable && !realmObject.active) return
+        if (removedNotActive(realmObject)) return
         if (realmObject is Photocard) realmObject.search = realmObject.title.toLowerCase()
         realmManager.save(realmObject)
     }

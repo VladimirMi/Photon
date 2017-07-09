@@ -36,14 +36,21 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
             R.id.menu_download -> download()
         }
     }
+    private var isFavorite = false
 
     override fun initToolbar() {
+        var popup = if (rootPresenter.isUserAuth()) {
+            if (isFavorite) R.menu.submenu_photocard_screen_fav else R.menu.submenu_photocard_screen
+        } else {
+            R.menu.submenu_photocard_screen_not_auth
+        }
+
         rootPresenter.getNewToolbarBuilder()
                 .setToolbarTitleId(R.string.photocard_title)
                 .setBackNavigationEnabled(true)
                 .addAction(MenuItemHolder("Actions",
                         iconResId = R.drawable.ic_action_more,
-                        popupMenu = R.menu.submenu_photocard_screen,
+                        popupMenu = popup,
                         actions = actions))
                 .build()
     }
@@ -59,7 +66,14 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     }
 
     private fun subscribeOnIsFavorite(photocard: Photocard): Disposable {
-        return model.isFavorite(photocard).subscribe(view::setFavorite)
+        return model.isFavorite(photocard).subscribe { favorite ->
+            if (isFavorite != favorite) {
+                isFavorite = favorite
+                initToolbar()
+            }
+            view.setFavorite(isFavorite)
+
+        }
     }
 
     private fun subscribeOnUser(owner: String): Disposable {

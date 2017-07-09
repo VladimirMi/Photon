@@ -13,9 +13,10 @@ import io.reactivex.Observable
 interface IMainModel : IModel {
 
     fun getPhotoCards(): Observable<List<Photocard>>
-    val query: MutableList<Query>
+    val tagsQuery: MutableList<Query>
+    val filtersQuery: MutableList<Query>
     var appliedPage: SearchView.Page
-    fun makeQuery(queryList: List<Query>, currentPage: SearchView.Page)
+    fun makeQuery(currentPage: SearchView.Page)
     fun isFiltered(): Boolean
     fun resetFilter()
     fun addView(photocard: Photocard): Observable<Unit>

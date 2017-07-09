@@ -68,7 +68,6 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                 })
     }
 
-    //todo попробовать использовать AuthPresenter
     fun register(req: SignUpReq) {
         compDisp.add(rootPresenter.register(req)
                 .doOnSubscribe { view.closeRegistrationDialog() }
