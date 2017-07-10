@@ -15,6 +15,7 @@ import io.github.vladimirmi.photon.ui.getDisplayMetrics
 import io.github.vladimirmi.photon.ui.setImage
 import kotlinx.android.synthetic.main.item_photocard.view.*
 import kotlinx.android.synthetic.main.view_likes_views.view.*
+import timber.log.Timber
 import java.util.*
 
 /**
@@ -25,11 +26,6 @@ class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideI
     : RecyclerView.Adapter<CardViewHolder>() {
 
     private var data: List<Photocard> = ArrayList()
-    var longTapAction = false
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
 
     fun updateData(list: List<Photocard>) {
         val diffResult = calculateDiff(object : DiffUtil.Callback() {
@@ -56,11 +52,12 @@ class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideI
         lp.width = getDisplayMetrics(parent.context).widthPixels / spanCount
         lp.height = lp.width
         view.layoutParams = lp
+        view.setOnLongClickListener { Timber.e("onCreateViewHolder: "); true }
         return CardViewHolder(view, cardAction)
     }
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
-        holder.bind(data[position], longTapAction)
+        holder.bind(data[position])
     }
 
     override fun getItemCount(): Int {
@@ -75,15 +72,21 @@ class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideI
 class CardViewHolder(itemView: View?, val cardAction: (Photocard) -> Unit) : RecyclerView.ViewHolder(itemView) {
 
     private var curImagePath = ""
-    fun bind(photoCard: Photocard, longTapAction: Boolean) {
+    fun bind(photoCard: Photocard) {
+        itemView.long_tap_action.visibility = GONE
         itemView.likes.text = photoCard.favorits.toString()
         itemView.views.text = photoCard.views.toString()
-        itemView.photo_card.setOnClickListener { cardAction(photoCard) }
+
         if (curImagePath != photoCard.photo) {
             setImage(photoCard.photo, itemView.photo_card)
             curImagePath = photoCard.photo
         }
-        itemView.long_tap_action.visibility = if (longTapAction) VISIBLE else GONE
+
+        itemView.photo_card.setOnClickListener { cardAction(photoCard) }
+        itemView.photo_card.setOnLongClickListener { (itemView.parent as View).performLongClick(); true }
     }
 
+    fun longTapAction(enabled: Boolean) {
+        itemView.long_tap_action.visibility = if (enabled) VISIBLE else GONE
+    }
 }

@@ -10,6 +10,7 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.CardAdapter
+import io.github.vladimirmi.photon.features.main.CardViewHolder
 import io.github.vladimirmi.photon.ui.EditAlbumDialog
 import io.github.vladimirmi.photon.ui.SimpleDialog
 import kotlinx.android.synthetic.main.screen_album.view.*
@@ -55,6 +56,7 @@ class AlbumView(context: Context, attrs: AttributeSet)
     override fun initView() {
         photocardList.layoutManager = GridLayoutManager(context, 3)
         photocardList.adapter = adapter
+        photocardList.setOnLongClickListener { presenter.setEditable(true); true }
     }
 
     fun setAlbum(album: Album) {
@@ -67,7 +69,10 @@ class AlbumView(context: Context, attrs: AttributeSet)
 
     fun setEditable(editMode: Boolean) {
         this.editMode = editMode
-        adapter.longTapAction = editMode
+        (0..photocardList.adapter.itemCount - 1)
+                .map { photocardList.findViewHolderForAdapterPosition(it) as CardViewHolder }
+                .forEach { it.longTapAction(editMode) }
+
     }
 
     fun showDeleteDialog() = deleteDialog.show()

@@ -80,6 +80,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
                     .subscribeWith(ErrorObserver()))
             photosForDelete.clear()
         }
+        setEditable(false)
     }
 
     private fun albumChange(albumReq: EditAlbumReq): Boolean {
@@ -92,7 +93,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         return albumChanged
     }
 
-    private fun setEditable(boolean: Boolean) {
+    fun setEditable(boolean: Boolean) {
         editMode = boolean
         view.setEditable(editMode)
         initToolbar()
