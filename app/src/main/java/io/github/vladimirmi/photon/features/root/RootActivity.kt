@@ -185,10 +185,10 @@ class RootActivity : FlowActivity(), IRootView {
         }
     }
 
-    private var actionBarMenuItems: List<MenuItemHolder> = ArrayList()
+    private var actionBarMenuItems = ArrayList<MenuItemHolder>()
 
     override fun setMenuItems(menuItems: List<MenuItemHolder>) {
-        actionBarMenuItems = menuItems
+        actionBarMenuItems = menuItems as ArrayList<MenuItemHolder>
         invalidateOptionsMenu()
     }
 

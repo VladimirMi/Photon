@@ -3,7 +3,6 @@ package io.github.vladimirmi.photon.ui
 import android.content.Context
 import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.util.AttributeSet
-import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
@@ -42,14 +41,13 @@ class PullToZoomWrapper(context: Context, attrs: AttributeSet)
         compDisposable.addAll(
                 scrollView.touches().subscribe {
                     scrollView.onTouchEvent(it)
-                    it.source = InputDevice.SOURCE_UNKNOWN
-                    onInterceptTouchEvent(it)
+                    if (onInterceptTouchEvent(it)) onTouchEvent(it)
                 },
                 scrollView.scrollChangeEvents().subscribe { onScrollChange(it) }
         )
     }
 
-    fun unsubscribe() = compDisposable.dispose()
+    fun unsubscribe() = compDisposable.clear()
 
     private fun onScrollChange(event: ViewScrollChangeEvent) {
         val scroll = (PARALLAX * event.scrollY()).toInt()
@@ -81,13 +79,9 @@ class PullToZoomWrapper(context: Context, attrs: AttributeSet)
                         if (yDelta > 0 && Math.abs(yDelta) > touchSlop && Math.abs(yDelta) > Math.abs(xDelta)) {
                             intercepted = true
                         }
-
                     }
                 }
             }
-        }
-        if (intercepted && event.source == InputDevice.SOURCE_UNKNOWN) {
-            onTouchEvent(event)
         }
         return intercepted
     }

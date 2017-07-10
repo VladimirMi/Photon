@@ -30,6 +30,8 @@ class AuthView(context: Context, attrs: AttributeSet)
     override fun initView() {
         login_btn.setOnClickListener { openLoginDialog() }
         registration_btn.setOnClickListener { openRegistrationDialog() }
+        registrationDialog.subscribe()
+        loginDialog.subscribe()
     }
 
     fun openRegistrationDialog() = registrationDialog.show()
@@ -40,5 +42,9 @@ class AuthView(context: Context, attrs: AttributeSet)
 
     fun closeLoginDialog() = loginDialog.hide()
 
-
+    override fun onViewDestroyed(removedByFlow: Boolean) {
+        super.onViewDestroyed(removedByFlow)
+        registrationDialog.unsubscribe()
+        loginDialog.unsubscribe()
+    }
 }

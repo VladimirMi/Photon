@@ -69,11 +69,15 @@ class MainView(context: Context, attrs: AttributeSet) :
     override fun onViewRestored() {
         super.onViewRestored()
         restoreHierarchyState(state)
+        loginDialog.subscribe()
+        registrationDialog.subscribe()
     }
 
     override fun onViewDestroyed(removedByFlow: Boolean) {
         super.onViewDestroyed(removedByFlow)
         saveHierarchyState(state)
+        loginDialog.unsubscribe()
+        registrationDialog.unsubscribe()
     }
 
     override fun onSaveInstanceState(): Parcelable {

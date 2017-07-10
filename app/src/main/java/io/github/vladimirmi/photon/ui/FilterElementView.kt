@@ -76,7 +76,7 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
     fun setAction(filterAction: (FilterElementView) -> Unit) {
         setOnClickListener {
             pick()
-            run(filterAction)
+            filterAction(it as FilterElementView)
         }
     }
 

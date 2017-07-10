@@ -13,7 +13,7 @@ import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.flow.FlowLifecycles
-import io.github.vladimirmi.photon.ui.NewAlbumDialog
+import io.github.vladimirmi.photon.ui.AlbumDialog
 import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder
 import kotlinx.android.synthetic.main.view_profile.view.*
 
@@ -29,7 +29,7 @@ class ProfileView(context: Context, attrs: AttributeSet)
     private val adapter = AlbumAdapter(albumAction)
 
     private val newAlbumAction: (NewAlbumReq) -> Unit = { presenter.createNewAlbum(it) }
-    private val newAlbumDialog = NewAlbumDialog(this, newAlbumAction)
+    private val newAlbumDialog = AlbumDialog(this, newAlbumAction)
 
     val login by lazy { user_login }
     val name by lazy { user_name }
@@ -88,6 +88,16 @@ class ProfileView(context: Context, attrs: AttributeSet)
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         presenter.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onViewRestored() {
+        super.onViewRestored()
+        newAlbumDialog.subscribe()
+    }
+
+    override fun onViewDestroyed(removedByFlow: Boolean) {
+        super.onViewDestroyed(removedByFlow)
+        newAlbumDialog.unsubscribe()
     }
 }
 

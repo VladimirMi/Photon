@@ -13,6 +13,7 @@ import io.github.vladimirmi.photon.core.BaseDialog
 import io.github.vladimirmi.photon.di.DaggerService
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import java.util.regex.Pattern
 
 /**
@@ -25,11 +26,13 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
     private val colorError = ContextCompat.getColor(viewGroup.context, R.color.error)
     private val colorText = ContextCompat.getColor(viewGroup.context, R.color.text_color)
 
-    val LOGIN_PATTERN = Pattern.compile("[a-zA-Z0-9_]{3,20}")
-    val EMAIL_PATTERN = Patterns.EMAIL_ADDRESS
-    val NAME_PATTERN = Pattern.compile(".{3,20}")
-    val PASSWORD_PATTERN = Pattern.compile("[a-zA-Z0-9_]{8,}")
-    val DESCRIPTION_PATTERN = Pattern.compile(".{3,400}")
+    protected val LOGIN_PATTERN = Pattern.compile("[a-zA-Z0-9_]{3,20}")
+    protected val EMAIL_PATTERN = Patterns.EMAIL_ADDRESS
+    protected val NAME_PATTERN = Pattern.compile(".{3,20}")
+    protected val PASSWORD_PATTERN = Pattern.compile("[a-zA-Z0-9_]{8,}")
+    protected val DESCRIPTION_PATTERN = Pattern.compile(".{3,400}")
+
+    protected val compDisp = CompositeDisposable()
 
     protected fun getValidObs(field: EditText, pattern: Pattern, errorField: TextView, error: String): Observable<Boolean> {
         return field.afterTextChangeEvents()

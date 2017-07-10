@@ -12,7 +12,7 @@ import android.view.ViewGroup
 open class BaseDialog(layoutId: Int, val viewGroup: ViewGroup) {
 
     val view: View = LayoutInflater.from(viewGroup.context).inflate(layoutId, null, false)
-    protected val dialog: AlertDialog
+    private val dialog: AlertDialog
 
     init {
         dialog = AlertDialog.Builder(viewGroup.context)
