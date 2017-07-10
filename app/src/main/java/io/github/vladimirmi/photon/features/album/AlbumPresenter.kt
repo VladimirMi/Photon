@@ -5,6 +5,7 @@ import flow.Flow
 import flow.History
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
+import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
@@ -25,7 +26,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     private val moreActions: (MenuItem) -> Unit = {
         when (it.itemId) {
-            R.id.edit -> setEditable(true)
+            R.id.edit -> view.showEditDialog()
             R.id.delete -> view.showDeleteDialog()
             R.id.add_photocard -> addPhotocard()
         }
@@ -40,13 +41,11 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         if (editMode) builder.addAction(MenuItemHolder("Submit",
                 R.drawable.ic_action_submit, submitAction))
 
-        val popupMenu = if (album.isFavorite) R.menu.submenu_album_fav_screen else R.menu.submenu_album_screen
-
-        if (album.owner == model.getProfileId()) {
+        if (album.owner == model.getProfileId() && !album.isFavorite) {
             builder.addAction(MenuItemHolder("Actions",
                     iconResId = R.drawable.ic_action_more,
                     actions = moreActions,
-                    popupMenu = popupMenu))
+                    popupMenu = R.menu.submenu_album_screen))
 
         }
         builder.build()
@@ -66,11 +65,15 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         Flow.get(view).set(PhotocardScreen(photocard))
     }
 
-    private fun submit() {
-        setEditable(false)
-        if (albumChange()) {
-            compDisp.add(model.editAlbum(album).subscribe())
+    fun editAlbum(albumReq: EditAlbumReq) {
+        view.closeEditDialog()
+        if (albumChange(albumReq)) {
+            albumReq.id = album.id
+            compDisp.add(model.editAlbum(albumReq).subscribe())
         }
+    }
+
+    fun submit() {
         if (photosForDelete.size > 0) {
             album.photocards.removeAll(photosForDelete)
             compDisp.add(model.removePhotos(photosForDelete, album)
@@ -79,14 +82,12 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         }
     }
 
-    private fun albumChange(): Boolean {
+    private fun albumChange(albumReq: EditAlbumReq): Boolean {
         val name = view.name.text.toString()
         val description = view.description.text.toString()
         var albumChanged = false
-        if (album.title != name || album.description != description) {
+        if (albumReq.title != name || albumReq.description != description) {
             albumChanged = true
-            album.title = name
-            album.description = description
         }
         return albumChanged
     }

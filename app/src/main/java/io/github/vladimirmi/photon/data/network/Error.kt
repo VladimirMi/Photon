@@ -9,8 +9,9 @@ import okhttp3.ResponseBody
 
 class ApiError(message: String, val statusCode: Int, body: ResponseBody?) : Exception(message) {
 
+    val defaultErr = R.string.message_api_err_unknown
     var readableError: String? = null
-    var errorResId = R.string.message_api_err_unknown
+    var errorResId = defaultErr
 
     init {
         when (statusCode) {

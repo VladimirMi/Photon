@@ -4,6 +4,8 @@ import android.support.annotation.StringRes
 
 interface IRootBuilder {
 
+    fun clearToolbar()
+
     fun setToolbarVisible(visible: Boolean)
 
     fun setToolbarTitle(@StringRes titleId: Int)

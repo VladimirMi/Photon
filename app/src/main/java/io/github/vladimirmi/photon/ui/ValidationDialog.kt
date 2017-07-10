@@ -49,7 +49,7 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
                         field.setTextColor(colorError)
                         errorField.text = error
                     }
-                }.startWith(false)
+                }
     }
 
     protected fun getNetObs(errorMsg: String): Observable<Boolean> {

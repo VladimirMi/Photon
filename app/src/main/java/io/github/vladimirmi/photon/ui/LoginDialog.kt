@@ -15,10 +15,10 @@ import kotlinx.android.synthetic.main.dialog_login.view.*
 class LoginDialog(viewGroup: ViewGroup, val loginAction: (SignInReq) -> Unit)
     : ValidationDialog(R.layout.dialog_login, viewGroup) {
 
-    val email = view.email
-    val password = view.password
-    val ok = view.ok
-    val cancel = view.cancel
+    private val email = view.email
+    private val password = view.password
+    private val ok = view.ok
+    private val cancel = view.cancel
 
     init {
         cancel.setOnClickListener { hide() }
@@ -43,6 +43,7 @@ class LoginDialog(viewGroup: ViewGroup, val loginAction: (SignInReq) -> Unit)
 
         return Observable.combineLatest(emailObs, passwordObs, netObs,
                 Function3 { t1: Boolean, t2: Boolean, t3: Boolean -> t1 && t2 && t3 })
+                .startWith(false)
                 .subscribe {
                     ok.isEnabled = it
                 }

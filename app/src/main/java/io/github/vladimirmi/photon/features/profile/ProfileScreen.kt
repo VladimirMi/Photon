@@ -14,7 +14,7 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
  * Created by Vladimir Mikhalev 15.06.2017.
  */
 
-class ProfileScreen(val userId: String = "") : BaseScreen<RootActivityComponent>() {
+class ProfileScreen : BaseScreen<RootActivityComponent>() {
 
     override val layoutResId = R.layout.screen_profile
 

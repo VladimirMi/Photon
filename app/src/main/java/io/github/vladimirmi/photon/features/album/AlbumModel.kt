@@ -19,8 +19,8 @@ class AlbumModel(private val dataManager: DataManager) : IAlbumModel {
 
     override fun getProfileId() = dataManager.getProfileId()
 
-    override fun editAlbum(album: Album): Observable<Album> {
-        return dataManager.editAlbum(EditAlbumReq(album.id, album.title, album.description))
+    override fun editAlbum(albumReq: EditAlbumReq): Observable<Album> {
+        return dataManager.editAlbum(albumReq)
                 .doOnNext { dataManager.saveToDB(it) }
     }
 

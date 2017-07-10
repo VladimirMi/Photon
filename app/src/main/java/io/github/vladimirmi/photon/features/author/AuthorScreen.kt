@@ -54,4 +54,19 @@ class AuthorScreen(val userId: String) : BaseScreen<RootActivityComponent>() {
     }
 
     //endregion
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+        if (!super.equals(other)) return false
+        other as AuthorScreen
+        if (userId != other.userId) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + userId.hashCode()
+        return result
+    }
 }

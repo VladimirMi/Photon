@@ -9,9 +9,11 @@ import flow.Direction
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
+import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
@@ -23,30 +25,24 @@ import io.reactivex.disposables.Disposable
 class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     : BasePresenter<ProfileView, IProfileModel>(model, rootPresenter) {
 
-    private var editMode = false
     private lateinit var profile: User
 
     private val menuActions: (MenuItem) -> Unit = {
         when (it.itemId) {
             R.id.menu_new_album -> view.openNewAlbumDialog()
-            R.id.menu_edit_profile -> setEditable(true)
+            R.id.menu_edit_profile -> view.openEditProfileDialog()
             R.id.menu_change_avatar -> changeAvatar()
             R.id.menu_logout -> logout()
         }
     }
-    private val submitAction: (MenuItem) -> Unit = { submit() }
 
     override fun initToolbar() {
-        val builder = rootPresenter.getNewToolbarBuilder()
+        rootPresenter.getNewToolbarBuilder()
                 .setToolbarTitleId(R.string.profile_title)
-
-        if (editMode) builder.addAction(MenuItemHolder("Submit",
-                R.drawable.ic_action_submit, submitAction))
-
-        builder.addAction(MenuItemHolder("Actions",
-                iconResId = R.drawable.ic_action_more,
-                actions = menuActions,
-                popupMenu = R.menu.submenu_profile_screen))
+                .addAction(MenuItemHolder("Actions",
+                        iconResId = R.drawable.ic_action_more,
+                        actions = menuActions,
+                        popupMenu = R.menu.submenu_profile_screen))
                 .build()
     }
 
@@ -85,25 +81,25 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                 }))
     }
 
-    private fun setEditable(boolean: Boolean) {
-        editMode = boolean
-        view.setEditable(editMode)
-        initToolbar()
+    private val errCallback: (ApiError?) -> Unit = {
+        if (it != null) {
+            view.showError(it.errorResId)
+        } else {
+            view.showMessage(R.string.profile_edit_success)
+        }
     }
 
-    private fun submit() {
-        setEditable(false)
-        val name = view.name.text.removePrefix(view.namePrefix).toString()
-        val login = view.login.text.toString()
-        var infoChanged = false
-        if (profile.name != name || profile.login != login) {
-            infoChanged = true
-            profile.name = name
-            profile.login = login
-        }
-        if (infoChanged) {
-            compDisp.add(model.editProfile(profile).subscribe())
-        }
+    fun editProfile(profileReq: EditProfileReq, avatarChanged: Boolean = false) {
+        view.closeEditProfileDialog()
+        if (!profileChanged(profileReq)) return
+        profileReq.id = profile.id
+        model.editProfile(profileReq, avatarChanged, errCallback)
+    }
+
+    private fun profileChanged(profileReq: EditProfileReq): Boolean {
+        return profile.name != profileReq.name ||
+                profile.login != profileReq.login ||
+                profile.avatar != profileReq.avatar
     }
 
     private fun takePhoto() {
@@ -126,9 +122,16 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == Constants.REQUEST_GALLERY && data != null && data.data != null) {
-                model.saveAvatar(data.data.toString(), profile)
+                editAvatar(data.data.toString())
             }
         }
+    }
+
+    private fun editAvatar(uri: String) {
+        val profileReq = EditProfileReq(name = profile.name,
+                login = profile.login,
+                avatar = uri)
+        editProfile(profileReq, true)
     }
 }
 

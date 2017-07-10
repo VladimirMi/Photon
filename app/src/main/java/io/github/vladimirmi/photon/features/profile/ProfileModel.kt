@@ -1,11 +1,12 @@
 package io.github.vladimirmi.photon.features.profile
 
 import com.birbit.android.jobqueue.JobManager
-import io.github.vladimirmi.photon.data.jobs.UploadAvatarJob
+import io.github.vladimirmi.photon.data.jobs.EditProfileJob
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
@@ -49,20 +50,7 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : I
                 .ioToMain()
     }
 
-    override fun editProfile(profile: User): Observable<User> {
-        return dataManager.editProfile(
-                EditProfileReq(id = profile.id,
-                        name = profile.name,
-                        login = profile.login,
-                        avatar = profile.avatar))
-                .doOnNext { dataManager.saveToDB(it) }
-                .ioToMain()
-    }
-
-    override fun saveAvatar(uri: String, profile: User) {
-        if (profile.avatar != uri) {
-            profile.avatar = uri
-            jobManager.addJobInBackground(UploadAvatarJob(profile))
-        }
+    override fun editProfile(profileReq: EditProfileReq, avatarChange: Boolean, errCallback: (ApiError?) -> Unit) {
+        jobManager.addJobInBackground(EditProfileJob(profileReq, avatarChange, errCallback))
     }
 }

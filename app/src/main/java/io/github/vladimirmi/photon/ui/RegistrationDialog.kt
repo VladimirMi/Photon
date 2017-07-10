@@ -15,12 +15,12 @@ import kotlinx.android.synthetic.main.dialog_registration.view.*
 class RegistrationDialog(viewGroup: ViewGroup, val registrationAction: (SignUpReq) -> Unit)
     : ValidationDialog(R.layout.dialog_registration, viewGroup) {
 
-    val login = view.login
-    val email = view.email
-    val name = view.name
-    val password = view.password
-    val ok = view.ok
-    val cancel = view.cancel
+    private val login = view.login
+    private val email = view.email
+    private val name = view.name
+    private val password = view.password
+    private val ok = view.ok
+    private val cancel = view.cancel
 
     init {
         cancel.setOnClickListener { hide() }
@@ -47,6 +47,7 @@ class RegistrationDialog(viewGroup: ViewGroup, val registrationAction: (SignUpRe
 
         return Observable.combineLatest(loginObs, emailObs, nameObs, passwordObs, netObs,
                 Function5 { t1: Boolean, t2: Boolean, t3: Boolean, t4: Boolean, t5: Boolean -> t1 && t2 && t3 && t4 && t5 })
+                .startWith(false)
                 .subscribe {
                     ok.isEnabled = it
                 }

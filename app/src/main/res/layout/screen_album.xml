@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:ignore="RtlHardcoded, LabelFor"
+    tools:ignore="RtlHardcoded"
     >
 
     <LinearLayout
@@ -23,15 +23,11 @@
             android:orientation="vertical"
             >
 
-            <EditText
+            <TextView
                 android:id="@+id/album_name"
                 style="@style/CustomText.Black"
                 android:layout_marginBottom="12dp"
                 android:layout_marginRight="24dp"
-                android:background="@drawable/edit_text"
-                android:enabled="false"
-                android:imeOptions="actionNext"
-                android:inputType="text"
                 android:textSize="16sp"
                 tools:text="Закуски"
                 />
@@ -53,16 +49,12 @@
                 tools:text="9"
                 />
 
-            <EditText
+            <TextView
                 android:id="@+id/album_description"
                 style="@style/CustomText.Black"
                 android:layout_alignBaseline="@id/album_name"
                 android:layout_toRightOf="@id/album_name"
-                android:background="@drawable/edit_text"
                 android:fontFamily="sans-serif-light"
-                android:imeOptions="actionDone"
-                android:enabled="false"
-                android:inputType="textMultiLine"
                 android:lineSpacingMultiplier="1.1"
                 android:textSize="14sp"
                 tools:text="Burguss observare, tanquam fortis solitudo. Nunquam fallere idoleum. Fiscinas favere! Nomen raptus rector est."

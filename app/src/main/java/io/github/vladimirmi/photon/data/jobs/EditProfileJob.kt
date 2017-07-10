@@ -6,6 +6,7 @@ import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
@@ -18,7 +19,9 @@ import timber.log.Timber
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class UploadAvatarJob(private val profile: User)
+class EditProfileJob(private val profileReq: EditProfileReq,
+                     private val avatarChange: Boolean = false,
+                     private val errCallback: (ApiError?) -> Unit)
     : Job(Params(JobPriority.HIGH)
         .requireNetwork()) {
 
@@ -31,29 +34,36 @@ class UploadAvatarJob(private val profile: User)
         Timber.e("onRun: ")
         var throwError = false
         val dataManager = DaggerService.appComponent.dataManager()
-        val data = getByteArrayFromContent(profile.avatar)
-        val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
 
-        val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(profile.avatar).lastPathSegment, body)
-        dataManager.uploadPhoto(bodyPart)
-                .flatMap {
-                    profile.avatar = it.image
-                    dataManager.editProfile(
-                            EditProfileReq(id = profile.id,
-                                    name = profile.name,
-                                    login = profile.login,
-                                    avatar = profile.avatar))
+        val editProfileObs = dataManager.editProfile(profileReq)
+
+        val obs = if (avatarChange) {
+            val data = getByteArrayFromContent(profileReq.avatar)
+            val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
+            val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(profileReq.avatar).lastPathSegment, body)
+
+            dataManager.uploadPhoto(bodyPart)
+                    .doOnNext { profileReq.avatar = it.image }
+                    .flatMap { editProfileObs }
+        } else {
+            editProfileObs
+        }
+
+        obs.subscribeWith(object : ErrorObserver<User>() {
+            override fun onNext(it: User) {
+                dataManager.saveToDB(it)
+                errCallback(null)
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                throwError = true
+                if (e is ApiError && e.errorResId != e.defaultErr) {
+                    throwError = false
+                    errCallback(e)
                 }
-                .subscribeWith(object : ErrorObserver<User>() {
-                    override fun onNext(it: User) {
-                        dataManager.saveToDB(it)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        throwError = true
-                    }
-                })
+            }
+        })
         if (throwError) throw Throwable()
     }
 

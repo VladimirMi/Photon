@@ -40,7 +40,9 @@
     <string name="dialog_password">Пароль</string>
     <string name="dialog_description">Описание</string>
     <string name="dialog_new_album">Новый альбом</string>
+    <string name="dialog_edit_album">Редактировать альбом</string>
     <string name="dialog_delete_album">Вы действительно хотите удалить альбом и все его содержимое?</string>
+    <string name="dialog_edit_profile">Редактировать профиль</string>
 
     <string name="message_err_email">Неверный email</string>
     <string name="message_err_password">Неверный пароль</string>
@@ -116,6 +118,7 @@
 
     <string name="profile_title">Профиль</string>
     <string name="profile_not_auth">Авторизуйтесь,\n чтобы посмотреть\n данные профиля</string>
+    <string name="profile_edit_success">Профайл успешно изменен</string>
 
     <string name="author_title">Автор</string>
     <string name="album_title">Альбом</string>

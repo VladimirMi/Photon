@@ -5,10 +5,12 @@ import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
+import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.CardAdapter
+import io.github.vladimirmi.photon.ui.EditAlbumDialog
 import io.github.vladimirmi.photon.ui.SimpleDialog
 import kotlinx.android.synthetic.main.screen_album.view.*
 
@@ -35,6 +37,13 @@ class AlbumView(context: Context, attrs: AttributeSet)
     private val deleteAction: () -> Unit = { presenter.delete() }
     private val deleteDialog = SimpleDialog(this, R.string.dialog_delete_album, deleteAction)
 
+    private val editAction: (EditAlbumReq) -> Unit = { presenter.editAlbum(it) }
+    private val editDialog by lazy {
+        EditAlbumDialog(this, editAction).also {
+            it.initFields(name.text, description.text)
+        }
+    }
+
     override fun initDagger(context: Context) {
         DaggerService.getComponent<AlbumScreen.Component>(context).inject(this)
     }
@@ -46,12 +55,11 @@ class AlbumView(context: Context, attrs: AttributeSet)
     override fun initView() {
         photocardList.layoutManager = GridLayoutManager(context, 3)
         photocardList.adapter = adapter
-        name.requestFocus()
     }
 
     fun setAlbum(album: Album) {
-        name.setText(album.title)
-        description.setText(album.description)
+        name.text = album.title
+        description.text = album.description
         val photocards = album.photocards.filter { it.active }
         cardCount.text = photocards.size.toString()
         adapter.updateData(photocards)
@@ -59,21 +67,26 @@ class AlbumView(context: Context, attrs: AttributeSet)
 
     fun setEditable(editMode: Boolean) {
         this.editMode = editMode
-        name.isEnabled = editMode
-        if (editMode) {
-            name.requestFocus()
-            name.setSelection(name.length())
-            description.setSelection(description.length())
-        }
-        description.isEnabled = editMode
         adapter.longTapAction = editMode
     }
 
     fun showDeleteDialog() = deleteDialog.show()
     fun closeDeleteDialog() = deleteDialog.hide()
+    fun showEditDialog() = editDialog.show()
+    fun closeEditDialog() = editDialog.hide()
 
     fun deletePhotocard(photocard: Photocard) {
         adapter.deletePhotocard(photocard)
+    }
+
+    override fun onViewRestored() {
+        super.onViewRestored()
+        editDialog.subscribe()
+    }
+
+    override fun onViewDestroyed(removedByFlow: Boolean) {
+        super.onViewDestroyed(removedByFlow)
+        editDialog.unsubscribe()
     }
 }
 

@@ -65,6 +65,7 @@ class RootActivity : FlowActivity(), IRootView {
     }
 
     private val popups = ArrayList<MenuPopupHelper>()
+    private val toolBarMenuItems = ArrayList<MenuItemHolder>()
 
     override fun onStop() {
         popups.forEach { it.dismiss() }
@@ -140,6 +141,11 @@ class RootActivity : FlowActivity(), IRootView {
 
     //region =============== IViewBuilder ==============
 
+    override fun clearToolbar() {
+        popups.clear()
+        toolBarMenuItems.clear()
+    }
+
     override fun setBottomMenuVisible(visible: Boolean) {
         if (visible) {
             bottom_menu.visibility = View.VISIBLE
@@ -185,16 +191,14 @@ class RootActivity : FlowActivity(), IRootView {
         }
     }
 
-    private var actionBarMenuItems = ArrayList<MenuItemHolder>()
-
     override fun setMenuItems(menuItems: List<MenuItemHolder>) {
-        actionBarMenuItems = menuItems as ArrayList<MenuItemHolder>
+        toolBarMenuItems.addAll(menuItems)
         invalidateOptionsMenu()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        if (!actionBarMenuItems.isEmpty()) {
-            for (menuItemHolder in actionBarMenuItems) {
+        if (!toolBarMenuItems.isEmpty()) {
+            for (menuItemHolder in toolBarMenuItems) {
                 val item = menu.add(menuItemHolder.itemTitle)
                 if (menuItemHolder.hasPopupMenu()) {
                     configurePopupFor(item, menuItemHolder)

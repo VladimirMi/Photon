@@ -12,9 +12,9 @@ import kotlinx.android.synthetic.main.dialog_simple.view.*
 class SimpleDialog(viewGroup: ViewGroup, stringId: Int, action: () -> Unit)
     : BaseDialog(R.layout.dialog_simple, viewGroup) {
 
-    val message = view.dialog_message
-    val ok = view.ok
-    val cancel = view.cancel
+    private val message = view.dialog_message
+    private val ok = view.ok
+    private val cancel = view.cancel
 
     init {
         message.setText(stringId)
