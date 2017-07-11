@@ -8,8 +8,8 @@ import android.view.View.GONE
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.ui.getDisplayMetrics
-import io.github.vladimirmi.photon.ui.setImage
+import io.github.vladimirmi.photon.utils.getDisplayMetrics
+import io.github.vladimirmi.photon.utils.setImage
 import kotlinx.android.synthetic.main.item_album.view.*
 import kotlinx.android.synthetic.main.view_likes_views.view.*
 import java.util.*

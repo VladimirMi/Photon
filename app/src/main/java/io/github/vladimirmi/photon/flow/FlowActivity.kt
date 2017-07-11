@@ -56,7 +56,7 @@ abstract class FlowActivity : AppCompatActivity() {
 
     override fun onStop() {
         dispatcher.onStop()
-        dispatcher.onViewDestroyed(false)
+        dispatcher.onViewDestroyed(removedByFlow = false)
         super.onStop()
     }
 

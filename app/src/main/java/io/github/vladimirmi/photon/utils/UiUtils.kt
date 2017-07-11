@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.ui
+package io.github.vladimirmi.photon.utils
 
 import android.content.Context
 import android.util.DisplayMetrics
@@ -7,6 +7,7 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import io.github.vladimirmi.photon.R
+import io.github.vladimirmi.photon.ui.CircleTransformation
 
 /**
  * Created by Vladimir Mikhalev 31.05.2017.

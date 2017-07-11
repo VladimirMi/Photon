@@ -1,5 +1,7 @@
 package io.github.vladimirmi.photon.utils
 
+import io.github.vladimirmi.photon.BuildConfig
+
 /**
  * Developer Vladimir Mikhalev 13.03.2017
  */
@@ -22,4 +24,6 @@ object AppConfig {
     const val INITIAL_BACK_OFF_IN_MS = 1000L
 
     const val IMAGE_SIZE_LIMIT = 4 // megabyte
+
+    const val FILE_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider"
 }

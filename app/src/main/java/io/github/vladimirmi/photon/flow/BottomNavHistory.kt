@@ -23,7 +23,6 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
     enum class BottomItem(val id: Int) {
         MAIN(R.id.nav_bottom_main),
         PROFILE(R.id.nav_bottom_profile),
-
         LOAD(R.id.nav_bottom_load);
 
         companion object {
@@ -32,7 +31,6 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
         }
     }
 
-    private var firstStart = true
     lateinit var flow: Flow
     private val dm = DaggerService.appComponent.dataManager()
     var currentItem = MAIN
@@ -74,6 +72,6 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
     }
 
     fun restoreCurrentItem() {
-        dispatch(BottomNavHistory.BottomItem.MAIN, currentItem, false)
+        dispatch(BottomNavHistory.BottomItem.MAIN, currentItem, saveHistory = false)
     }
 }

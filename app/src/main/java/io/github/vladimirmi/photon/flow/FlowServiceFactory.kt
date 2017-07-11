@@ -35,7 +35,7 @@ class FlowServiceFactory : ServicesFactory() {
                 parentScope.buildChild()
                         .withService(DaggerService.SERVICE_NAME, screenComponent)
                         .build(screen.scopeName)
-        Timber.e("Build new scope with nameField ${newScope.name}")
+        Timber.e("Build new scope with name ${newScope.name}")
 
         services.bind(newScope.name, newScope)
     }
@@ -44,7 +44,7 @@ class FlowServiceFactory : ServicesFactory() {
         val scopeName = services.getKey<BaseScreen<*>>().scopeName
         services.getService<MortarScope>(scopeName)?.let {
             it.destroy()
-            Timber.e("Destroy scope with nameField ${it.name}")
+            Timber.e("Destroy scope with name ${it.name}")
         }
         super.tearDownServices(services)
     }

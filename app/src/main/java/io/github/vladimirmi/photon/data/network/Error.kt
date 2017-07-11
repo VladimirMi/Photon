@@ -13,6 +13,9 @@ class ApiError(message: String, val statusCode: Int, body: ResponseBody?) : Exce
     var readableError: String? = null
     var errorResId = defaultErr
 
+    override val message: String?
+        get() = if (readableError != null) readableError else super.message
+
     init {
         when (statusCode) {
             500 -> if (body != null) parse(body)
@@ -21,12 +24,12 @@ class ApiError(message: String, val statusCode: Int, body: ResponseBody?) : Exce
     }
 
     fun parse(body: ResponseBody) {
-        val reader = body.charStream()
-        val result = reader.readText()
-                .substringBefore("_1 dup key")
-                .substringAfterLast("index:")
-                .trim()
-        reader.close()
+        val result = body.charStream().use {
+            it.readText()
+                    .substringBefore("_1 dup key")
+                    .substringAfterLast("index:")
+                    .trim()
+        }
 
         when (result) {
             "login" -> {

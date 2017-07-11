@@ -11,11 +11,10 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.ui.getDisplayMetrics
-import io.github.vladimirmi.photon.ui.setImage
+import io.github.vladimirmi.photon.utils.getDisplayMetrics
+import io.github.vladimirmi.photon.utils.setImage
 import kotlinx.android.synthetic.main.item_photocard.view.*
 import kotlinx.android.synthetic.main.view_likes_views.view.*
-import timber.log.Timber
 import java.util.*
 
 /**
@@ -52,7 +51,6 @@ class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideI
         lp.width = getDisplayMetrics(parent.context).widthPixels / spanCount
         lp.height = lp.width
         view.layoutParams = lp
-        view.setOnLongClickListener { Timber.e("onCreateViewHolder: "); true }
         return CardViewHolder(view, cardAction)
     }
 

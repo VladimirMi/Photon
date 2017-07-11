@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.features.photocard
 
 import android.content.Context
+import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +13,8 @@ import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.flow.FlowLifecycles
 import io.github.vladimirmi.photon.ui.TagView
-import io.github.vladimirmi.photon.ui.setImage
-import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder
+import io.github.vladimirmi.photon.utils.setImage
+import io.github.vladimirmi.photon.utils.setRoundAvatarWithBorder
 import kotlinx.android.synthetic.main.screen_photocard.view.*
 
 /**
@@ -22,7 +23,7 @@ import kotlinx.android.synthetic.main.screen_photocard.view.*
 
 class PhotocardView(context: Context, attrs: AttributeSet)
     : BaseView<PhotocardPresenter, PhotocardView>(context, attrs),
-        FlowLifecycles.PermissionRequestListener {
+        FlowLifecycles.PermissionRequestListener, FlowLifecycles.ActivityResultListener {
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<PhotocardScreen.Component>(context).inject(this)
@@ -74,6 +75,10 @@ class PhotocardView(context: Context, attrs: AttributeSet)
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         presenter.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        presenter.onActivityResult(requestCode, resultCode, data)
     }
 }
 

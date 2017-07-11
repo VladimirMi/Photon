@@ -15,7 +15,7 @@ import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.flow.FlowLifecycles
 import io.github.vladimirmi.photon.ui.EditProfileDialog
 import io.github.vladimirmi.photon.ui.NewAlbumDialog
-import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder
+import io.github.vladimirmi.photon.utils.setRoundAvatarWithBorder
 import kotlinx.android.synthetic.main.view_profile.view.*
 
 /**

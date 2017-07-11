@@ -17,11 +17,11 @@ import kotlinx.android.synthetic.main.screen_auth.view.*
 class AuthView(context: Context, attrs: AttributeSet)
     : BaseView<AuthPresenter, AuthView>(context, attrs) {
 
-    val registrationAction: (SignUpReq) -> Unit = { presenter.register(it) }
-    val loginAction: (SignInReq) -> Unit = { presenter.login(it) }
+    private val registrationAction: (SignUpReq) -> Unit = { presenter.register(it) }
+    private val loginAction: (SignInReq) -> Unit = { presenter.login(it) }
 
-    val registrationDialog = RegistrationDialog(this, registrationAction)
-    val loginDialog = LoginDialog(this, loginAction)
+    private val registrationDialog = RegistrationDialog(this, registrationAction)
+    private val loginDialog = LoginDialog(this, loginAction)
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<AuthScreen.Component>(context).inject(this)
@@ -35,11 +35,8 @@ class AuthView(context: Context, attrs: AttributeSet)
     }
 
     fun openRegistrationDialog() = registrationDialog.show()
-
-    fun openLoginDialog() = loginDialog.show()
-
     fun closeRegistrationDialog() = registrationDialog.hide()
-
+    fun openLoginDialog() = loginDialog.show()
     fun closeLoginDialog() = loginDialog.hide()
 
     override fun onViewDestroyed(removedByFlow: Boolean) {

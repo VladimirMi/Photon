@@ -9,7 +9,7 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
-import io.github.vladimirmi.photon.ui.setRoundAvatarWithBorder
+import io.github.vladimirmi.photon.utils.setRoundAvatarWithBorder
 import kotlinx.android.synthetic.main.view_profile.view.*
 
 /**

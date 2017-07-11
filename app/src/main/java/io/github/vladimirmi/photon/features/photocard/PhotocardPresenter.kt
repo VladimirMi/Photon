@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Environment
+import android.support.v4.content.FileProvider
 import android.view.MenuItem
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.animation.GlideAnimation
@@ -17,11 +18,13 @@ import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.features.author.AuthorScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
+import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 import java.io.File
 
 
@@ -111,22 +114,42 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         }
     }
 
+    private var tempFile: File? = null
+
     private fun share() {
+        tempFile = createTempFile(suffix = ".jpg", directory = view.context.cacheDir)
+        val uri = FileProvider.getUriForFile(view.context, AppConfig.FILE_PROVIDER_AUTHORITY, tempFile)
+
         val shareIntent = Intent()
         shareIntent.action = Intent.ACTION_SEND
-        shareIntent.putExtra(Intent.EXTRA_STREAM, photocard.photo)
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
         shareIntent.type = "image/jpeg"
-        rootPresenter.startActivity(Intent.createChooser(shareIntent, view.resources.getText(R.string.send_to)))
+
+        downloadTo(tempFile as File) {
+            rootPresenter.startActivityForResult(Intent.createChooser(shareIntent, view.resources.getText(R.string.send_to)),
+                    Constants.REQUEST_SHARE)
+        }
     }
 
     private fun download() {
         val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (rootPresenter.checkAndRequestPermissions(permissions, Constants.REQUEST_WRITE)) {
-            downLoadImage()
+            downloadPhoto()
         }
     }
 
-    private fun downLoadImage() {
+    private fun downloadPhoto() {
+        val file = createFile()
+        if (file != null) {
+            downloadTo(file) {
+                view.showMessage(R.string.photocard_message_download)
+            }
+        } else {
+            view.showMessage("Неудалось создать файл") //todo
+        }
+    }
+
+    private fun downloadTo(file: File, doneCallback: () -> Unit) {
         Glide.with(view.context)
                 .load(photocard.photo)
                 .asBitmap()
@@ -134,16 +157,11 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
                 .into(object : SimpleTarget<ByteArray>() {
                     override fun onResourceReady(resource: ByteArray, glideAnimation: GlideAnimation<in ByteArray>) {
                         Observable.just(resource)
-                                .flatMap {
-                                    createFile()?.let {
-                                        file ->
-                                        Observable.just(file.writeBytes(it))
-                                    } ?: Observable.empty()
-                                }
+                                .flatMap { Observable.just(file.writeBytes(it)) }
                                 .ioToMain()
                                 .subscribeWith(object : ErrorObserver<Any>() {
                                     override fun onNext(it: Any) {
-                                        view.showMessage(R.string.photocard_message_download)
+                                        doneCallback()
                                     }
                                 })
                     }
@@ -165,7 +183,17 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         if (requestCanceled) {
             rootPresenter.showPermissionSnackBar()
         } else if (requestCode == Constants.REQUEST_WRITE) {
-            downLoadImage()
+            downloadPhoto()
+        }
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Constants.REQUEST_SHARE) {
+            if (tempFile != null) {
+                Timber.e("onActivityResult: delete file")
+                tempFile?.delete()
+                tempFile = null
+            }
         }
     }
 }

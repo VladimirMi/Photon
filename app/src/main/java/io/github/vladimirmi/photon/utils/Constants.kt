@@ -20,6 +20,7 @@ object Constants {
     const val REQUEST_GALLERY = 100
     const val REQUEST_SETTINGS_INTENT = 101
     const val REQUEST_WRITE = 102
+    const val REQUEST_SHARE = 103
 
     const val MIME_TYPE_IMAGE = "image/*"
 }
