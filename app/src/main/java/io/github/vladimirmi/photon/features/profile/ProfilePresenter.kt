@@ -48,6 +48,7 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
 
     override fun initView(view: ProfileView) {
         compDisp.add(subscribeOnProfile())
+        compDisp.add(subscribeOnAlbums())
     }
 
     private fun subscribeOnProfile(): Disposable {
@@ -56,6 +57,11 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                     profile = it
                     view.setProfile(it)
                 }
+    }
+
+    private fun subscribeOnAlbums(): Disposable {
+        return model.getAlbums()
+                .subscribe { view.setAlbums(it) }
     }
 
     fun showAlbum(album: Album) = Flow.get(view).set(AlbumScreen(album))

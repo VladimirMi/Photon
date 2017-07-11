@@ -5,9 +5,12 @@ import io.github.vladimirmi.photon.data.jobs.EditProfileJob
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.Query
+import io.github.vladimirmi.photon.utils.RealmOperator
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -20,12 +23,13 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : I
 
     override fun getProfile(): Observable<User> {
         val id = dataManager.getProfileId()
-        return getUser(id)
+        updateUser(id)
+        return dataManager.getObjectFromDb(User::class.java, id)
     }
 
-    override fun getUser(userId: String): Observable<User> {
-        updateUser(userId)
-        return dataManager.getObjectFromDb(User::class.java, userId)
+    override fun getAlbums(): Observable<List<Album>> {
+        val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
+        return dataManager.search(Album::class.java, query, sortBy = "id")
     }
 
     private fun updateUser(id: String) {

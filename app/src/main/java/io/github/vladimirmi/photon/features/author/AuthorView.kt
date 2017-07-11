@@ -41,13 +41,17 @@ class AuthorView(context: Context, attrs: AttributeSet)
             setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
             curAvatarPath = user.avatar
         }
-        val albums = user.albums.filter { it.active }
+    }
+
+    fun setAlbums(list: List<Album>) {
+        val albums = list.filter { it.active }
         album_count.text = albums.count { !it.isFavorite }.toString()
         card_count.text = albums.filter { !it.isFavorite }
                 .fold(0, { acc, album -> acc + album.photocards.count { it.active } })
                 .toString()
-        adapter.updateData(albums)
+        adapter.updateData(list)
     }
+
 
     private fun showAlbum(album: Album) = presenter.showAlbum(album)
 }

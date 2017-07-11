@@ -21,11 +21,17 @@ class AuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter)
     override fun initView(view: AuthorView) {
         val userId = Flow.getKey<AuthorScreen>(view)!!.userId
         compDisp.add(subscribeOnUser(userId))
+        compDisp.add(subscribeOnAlbums(userId))
     }
 
     private fun subscribeOnUser(userId: String): Disposable {
         return model.getUser(userId)
                 .subscribe { view.setUser(it) }
+    }
+
+    private fun subscribeOnAlbums(userId: String): Disposable {
+        return model.getAlbums(userId)
+                .subscribe { view.setAlbums(it) }
     }
 
     fun showAlbum(album: Album) = Flow.get(view).set(AlbumScreen(album))
