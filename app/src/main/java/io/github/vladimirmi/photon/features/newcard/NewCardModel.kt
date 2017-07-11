@@ -1,6 +1,8 @@
 package io.github.vladimirmi.photon.features.newcard
 
+import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.JobManager
+import io.github.vladimirmi.photon.data.jobs.EmptyJobCallback
 import io.github.vladimirmi.photon.data.jobs.UploadPhotoJob
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.Album
@@ -9,9 +11,10 @@ import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
 import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.disposables.Disposables
 import io.realm.Sort
 import timber.log.Timber
-import java.io.File
 
 class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : INewCardModel {
     override var photoCard = Photocard()
@@ -61,14 +64,29 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
 
     override fun savePhotoUri(uri: String) {
         Timber.e("savePhotoUri: $uri")
-        val file = File(uri)
-        Timber.e("savePhotoUri: ${file.length()}")
         photoCard.photo = uri
     }
 
-    override fun uploadPhotocard() {
+    override fun uploadPhotocard(): Single<Unit> {
         photoCard.withId()
         photoCard.owner = dataManager.getProfileId()
-        jobManager.addJobInBackground(UploadPhotoJob(photoCard))
+        val uploadJob = UploadPhotoJob(photoCard)
+        jobManager.addJobInBackground(uploadJob)
+
+        return Single.create { e ->
+            val callback = object : EmptyJobCallback() {
+                override fun onDone(job: Job) {
+                    if (!e.isDisposed && uploadJob.id == job.id) e.onSuccess(Unit)
+                }
+
+                override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
+                    if (!e.isDisposed && throwable != null && uploadJob.id == job.id) e.onError(throwable)
+                }
+            }
+
+            jobManager.addCallback(callback)
+            e.setDisposable(Disposables.fromRunnable { jobManager.removeCallback(callback) })
+        }
+
     }
 }

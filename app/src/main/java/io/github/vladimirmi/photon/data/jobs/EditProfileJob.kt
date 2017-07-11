@@ -13,7 +13,6 @@ import io.github.vladimirmi.photon.utils.ErrorObserver
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 25.06.2017.
@@ -26,13 +25,10 @@ class EditProfileJob(private val profileReq: EditProfileReq,
         .requireNetwork()) {
 
 
-    override fun onAdded() {
-        Timber.e("onAdded: ")
-    }
+    override fun onAdded() {}
 
     override fun onRun() {
-        Timber.e("onRun: ")
-        var throwError = false
+        var error: Throwable? = null
         val dataManager = DaggerService.appComponent.dataManager()
 
         val editProfileObs = dataManager.editProfile(profileReq)
@@ -49,22 +45,22 @@ class EditProfileJob(private val profileReq: EditProfileReq,
             editProfileObs
         }
 
-        obs.subscribeWith(object : ErrorObserver<User>() {
-            override fun onNext(it: User) {
-                dataManager.saveToDB(it)
-                errCallback(null)
-            }
+        obs.doOnNext { dataManager.saveToDB(it) }
+                .subscribeWith(object : ErrorObserver<User>() {
+                    override fun onNext(it: User) {
+                        errCallback(null)
+                    }
 
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                throwError = true
-                if (e is ApiError && e.errorResId != e.defaultErr) {
-                    throwError = false
-                    errCallback(e)
-                }
-            }
-        })
-        if (throwError) throw Throwable()
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        if (e is ApiError && e.errorResId != e.defaultErr) {
+                            errCallback(e)
+                        } else {
+                            error = e
+                        }
+                    }
+                })
+        if (error != null) throw error!!
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {
@@ -76,7 +72,7 @@ class EditProfileJob(private val profileReq: EditProfileReq,
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        Timber.e("onCancel: ")
+        logCancel(cancelReason, throwable)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {

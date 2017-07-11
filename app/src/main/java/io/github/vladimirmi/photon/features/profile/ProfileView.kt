@@ -54,8 +54,8 @@ class ProfileView(context: Context, attrs: AttributeSet)
     @SuppressLint("SetTextI18n")
     fun setProfile(user: User) {
         editProfileDialog.initFields(user.login, user.name)
-        login.setText(user.login)
-        name.setText(namePrefix + user.name)
+        login.text = user.login
+        name.text = namePrefix + user.name
         if (user.avatar != curAvatarPath) {
             setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
             curAvatarPath = user.avatar

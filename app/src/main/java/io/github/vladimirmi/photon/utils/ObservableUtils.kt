@@ -4,8 +4,10 @@ import com.crashlytics.android.Crashlytics
 import io.github.vladimirmi.photon.data.models.realm.Changeable
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
+import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
 import java.util.*
@@ -16,6 +18,9 @@ import java.util.concurrent.TimeUnit
  */
 
 fun <T> Observable<T>.ioToMain(): Observable<T> = subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+
+fun <T> Single<T>.ioToMain(): Single<T> = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
 
 fun <T> Observable<Response<T>>.body(): Observable<T> = map { it.body()!! }
@@ -73,6 +78,14 @@ open class ErrorObserver<T> : DisposableObserver<T>() {
     override fun onComplete() {}
 
     override fun onNext(it: T) {}
+
+    override fun onError(e: Throwable) {
+        Crashlytics.logException(e)
+    }
+}
+
+open class ErrorSingleObserver<T> : DisposableSingleObserver<T>() {
+    override fun onSuccess(t: T) {}
 
     override fun onError(e: Throwable) {
         Crashlytics.logException(e)

@@ -40,7 +40,6 @@ class NewCardView(context: Context, attrs: AttributeSet)
     val nameObs by lazy { name_field.textChanges() }
     val tagObs by lazy { tag_field.textChanges() }
 
-
     private val tagAction: (String) -> Unit = {
         tag_field.setText(it)
         tag_field.setSelection(it.length)

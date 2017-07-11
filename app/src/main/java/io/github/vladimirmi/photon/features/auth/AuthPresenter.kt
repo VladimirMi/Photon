@@ -36,8 +36,7 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
                 .doOnSubscribe { view.closeRegistrationDialog() }
                 .subscribeWith(object : ErrorObserver<User>() {
                     override fun onComplete() {
-                        view.closeRegistrationDialog()
-                        initToolbar()
+                        nextScreen()
                     }
 
                     override fun onError(e: Throwable) {
@@ -57,10 +56,9 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
     fun login(req: SignInReq) {
         compDisp.add(rootPresenter.login(req)
                 .doOnSubscribe { view.closeLoginDialog() }
-                .subscribeWith(object : ErrorObserver<Unit>() {
+                .subscribeWith(object : ErrorObserver<User>() {
                     override fun onComplete() {
-                        view.closeLoginDialog()
-                        initToolbar()
+                        nextScreen()
                     }
 
                     override fun onError(e: Throwable) {

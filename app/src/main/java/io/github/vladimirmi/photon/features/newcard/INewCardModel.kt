@@ -5,6 +5,7 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.reactivex.Observable
+import io.reactivex.Single
 
 interface INewCardModel : IModel {
     var photoCard: Photocard
@@ -14,5 +15,5 @@ interface INewCardModel : IModel {
     fun addTag(tag: Tag)
     fun getAlbums(): Observable<List<Album>>
     fun savePhotoUri(uri: String)
-    fun uploadPhotocard()
+    fun uploadPhotocard(): Single<Unit>
 }

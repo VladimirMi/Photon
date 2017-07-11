@@ -56,7 +56,6 @@
                 android:layout_toRightOf="@id/album_name"
                 android:fontFamily="sans-serif-light"
                 android:lineSpacingMultiplier="1.1"
-                android:textSize="14sp"
                 tools:text="Burguss observare, tanquam fortis solitudo. Nunquam fallere idoleum. Fiscinas favere! Nomen raptus rector est."
                 />
         </RelativeLayout>

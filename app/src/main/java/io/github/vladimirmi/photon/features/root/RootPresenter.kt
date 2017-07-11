@@ -51,11 +51,10 @@ class RootPresenter(val model: IRootModel) :
                 .doAfterTerminate { hideLoading() }
     }
 
-    fun login(req: SignInReq): Observable<Unit> {
+    fun login(req: SignInReq): Observable<User> {
         return model.login(req)
                 .doOnSubscribe { showLoading() }
                 .doAfterTerminate { hideLoading() }
-                .map {}
     }
     fun logout() = model.logout()
 

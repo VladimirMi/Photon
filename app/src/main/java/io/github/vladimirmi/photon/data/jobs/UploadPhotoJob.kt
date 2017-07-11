@@ -12,7 +12,6 @@ import io.github.vladimirmi.photon.utils.ErrorObserver
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 25.06.2017.
@@ -28,14 +27,12 @@ class UploadPhotoJob(private val photocard: Photocard)
     private val tempId = photocard.id
 
     override fun onAdded() {
-        Timber.e("onAdded: ")
         DaggerService.appComponent.dataManager().saveToDB(photocard)
     }
 
     @Throws(Throwable::class)
     override fun onRun() {
-        Timber.e("onRun: ")
-        var throwError = false
+        var error: Throwable? = null
         val dataManager = DaggerService.appComponent.dataManager()
         val data = getByteArrayFromContent(photocard.photo)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
@@ -49,20 +46,17 @@ class UploadPhotoJob(private val photocard: Photocard)
                 .doOnNext {
                     photocard.id = it.id
                     dataManager.removeFromDb(Photocard::class.java, tempId)
+                    val album = dataManager.getSingleObjFromDb(Album::class.java, photocard.album)!!
+                    album.photocards.add(photocard)
+                    dataManager.saveToDB(album)
                 }
-                .flatMap { dataManager.getObjectFromDb(Album::class.java, photocard.album) }
-                .subscribeWith(object : ErrorObserver<Album>() {
-                    override fun onNext(it: Album) {
-                        it.photocards.add(photocard)
-                        dataManager.saveToDB(it)
-                    }
-
+                .subscribeWith(object : ErrorObserver<Photocard>() {
                     override fun onError(e: Throwable) {
                         super.onError(e)
-                        throwError = true
+                        error = e
                     }
                 })
-        if (throwError) throw Throwable()
+        if (error != null) throw error!!
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {
@@ -74,7 +68,7 @@ class UploadPhotoJob(private val photocard: Photocard)
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        Timber.e("onCancel: ")
+        logCancel(cancelReason, throwable)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {

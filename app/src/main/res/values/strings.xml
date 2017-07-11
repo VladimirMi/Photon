@@ -57,6 +57,7 @@
     <string name="message_api_err_unknown">Неизвестная ошибка</string>
     <string name="message_api_err_auth">"Неправильный логин или пароль"</string>
 
+
     <string name="main_message_filter">Применен фильтр</string>
     <string name="main_message_filter_action">Сбросить</string>
 
@@ -130,6 +131,9 @@
     <string name="newcard_tag_hint">Имя тега</string>
     <string name="newcard_param_title">Укажите параметры фотографии</string>
     <string name="newcard_album_title">Выберите альбом</string>
+    <string name="newcard_create_success">Фотокарточка успешно добавлена</string>
+
+
     <string name="send_to">Отправить</string>
 
 </resources>

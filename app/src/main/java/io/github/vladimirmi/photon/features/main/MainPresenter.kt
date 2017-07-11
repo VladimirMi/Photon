@@ -73,7 +73,6 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                 .doOnSubscribe { view.closeRegistrationDialog() }
                 .subscribeWith(object : ErrorObserver<User>() {
                     override fun onComplete() {
-                        view.closeRegistrationDialog()
                         initToolbar()
                     }
 
@@ -94,9 +93,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun login(req: SignInReq) {
         compDisp.add(rootPresenter.login(req)
                 .doOnSubscribe { view.closeLoginDialog() }
-                .subscribeWith(object : ErrorObserver<Unit>() {
+                .subscribeWith(object : ErrorObserver<User>() {
                     override fun onComplete() {
-                        view.closeLoginDialog()
                         initToolbar()
                     }
 

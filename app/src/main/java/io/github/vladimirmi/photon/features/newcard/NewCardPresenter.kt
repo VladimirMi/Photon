@@ -9,22 +9,23 @@ import android.provider.OpenableColumns
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.PROFILE
-import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.Constants
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 
 class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     : BasePresenter<NewCardView, INewCardModel>(model, rootPresenter) {
 
-    private var returnToProfile: Boolean = false
+    private var returnToAlbum: Boolean = false
     private var startAction: (() -> Unit)? = null
 
     override fun initToolbar() {
@@ -34,7 +35,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     override fun initView(view: NewCardView) {
         startAction?.invoke()
         Flow.getKey<NewCardScreen>(view)?.albumId?.let {
-            returnToProfile = true
+            returnToAlbum = true
             setAlbumId(it)
         }
         compDisp.add(subscribeInTitleField())
@@ -58,12 +59,16 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
             clearPhotocard()
             return true
         }
-        if (returnToProfile) {
-            Flow.getKey<NewCardScreen>(view)?.albumId = null
-            rootPresenter.navigateTo(PROFILE)
+        if (returnToAlbum) {
+            returnToAlbum()
             return true
         }
         return false
+    }
+
+    fun returnToAlbum() {
+        Flow.getKey<NewCardScreen>(view)?.albumId = null
+        rootPresenter.navigateTo(PROFILE)
     }
 
     private fun subscribeInTitleField(): Disposable {
@@ -81,9 +86,11 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
 
     private fun subscribeOnAlbums(): Disposable {
         return model.getAlbums()
-                .subscribe {
-                    view.setAlbums(it)
-                }
+                .subscribeWith(object : ErrorObserver<List<Album>>() {
+                    override fun onNext(list: List<Album>) {
+                        view.setAlbums(list.filter { it.active })
+                    }
+                })
     }
 
     fun addFilter(filter: Pair<String, String>) = model.addFilter(filter)
@@ -101,8 +108,21 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     fun savePhotocard() {
-        model.uploadPhotocard()
-        clearPhotocard()
+        compDisp.add(model.uploadPhotocard()
+                .ioToMain()
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onSuccess(t: Unit) {
+                        if (returnToAlbum) returnToAlbum() else {
+                            view.showError(R.string.newcard_create_success)
+                            view.postDelayed({ clearPhotocard() }, 2000)
+                        }
+                    }
+
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        view.showError(R.string.message_api_err_unknown)
+                    }
+                }))
     }
 
     fun clearPhotocard() {
@@ -144,22 +164,27 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     private fun checkMetaAndSave(uri: Uri) {
-        DaggerService.appComponent.context().contentResolver
-                .query(uri, null, null, null, null, null).use { cursor ->
-            if (cursor != null && cursor.moveToFirst()) {
-                val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
-                val size = if (!cursor.isNull(sizeIndex)) cursor.getInt(sizeIndex) else null
-
-                val limit = AppConfig.IMAGE_SIZE_LIMIT * 1024 * 1024 // bytes
-                if (size != null && size < limit) {
-                    model.savePhotoUri(uri.toString())
-                    startAction = null
-                } else {
-                    startAction = { view.showError(R.string.message_err_file_size, AppConfig.IMAGE_SIZE_LIMIT) }
+        val limit = AppConfig.IMAGE_SIZE_LIMIT * 1024 * 1024 // bytes
+        var fileSize: Int? = null
+        when (uri.scheme) {
+            "file" -> fileSize = File(uri.path).length().toInt()
+            else -> {
+                DaggerService.appComponent.context().contentResolver
+                        .query(uri, null, null, null, null, null).use { cursor ->
+                    if (cursor != null && cursor.moveToFirst()) {
+                        val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                        fileSize = if (!cursor.isNull(sizeIndex)) cursor.getInt(sizeIndex) else null
+                    }
                 }
             }
         }
 
+        if (fileSize != null && (fileSize as Int) < limit) {
+            model.savePhotoUri(uri.toString())
+            startAction = null
+        } else {
+            startAction = { view.showError(R.string.message_err_file_size, AppConfig.IMAGE_SIZE_LIMIT) }
+        }
     }
 }
 
