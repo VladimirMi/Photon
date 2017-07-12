@@ -49,7 +49,7 @@ class AuthorView(context: Context, attrs: AttributeSet)
         card_count.text = albums.filter { !it.isFavorite }
                 .fold(0, { acc, album -> acc + album.photocards.count { it.active } })
                 .toString()
-        adapter.updateData(list)
+        adapter.updateData(albums)
     }
 
 

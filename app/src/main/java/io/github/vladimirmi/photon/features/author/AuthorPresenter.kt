@@ -7,6 +7,7 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.reactivex.disposables.Disposable
+import io.realm.Realm
 
 class AuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter)
     : BasePresenter<AuthorView, IAuthorModel>(model, rootPresenter) {
@@ -34,6 +35,10 @@ class AuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter)
                 .subscribe { view.setAlbums(it) }
     }
 
-    fun showAlbum(album: Album) = Flow.get(view).set(AlbumScreen(album))
+    fun showAlbum(album: Album) {
+        Realm.getDefaultInstance().use {
+            Flow.get(view).set(AlbumScreen(it.copyFromRealm(album)))
+        }
+    }
 }
 

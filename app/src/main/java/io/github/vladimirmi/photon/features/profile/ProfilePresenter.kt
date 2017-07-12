@@ -21,6 +21,7 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
+import io.realm.Realm
 
 class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     : BasePresenter<ProfileView, IProfileModel>(model, rootPresenter) {
@@ -64,7 +65,11 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                 .subscribe { view.setAlbums(it) }
     }
 
-    fun showAlbum(album: Album) = Flow.get(view).set(AlbumScreen(album))
+    fun showAlbum(album: Album) {
+        Realm.getDefaultInstance().use {
+            Flow.get(view).set(AlbumScreen(it.copyFromRealm(album)))
+        }
+    }
 
     private fun logout() {
         rootPresenter.logout()

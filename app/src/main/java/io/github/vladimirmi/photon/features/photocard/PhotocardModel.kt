@@ -48,8 +48,8 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
                 })
     }
 
-    override fun addToFavorite(photocard: Photocard): Observable<Unit> {
-        return dataManager.addToFavorite(photocard.id)
+    override fun addToFavorite(id: String): Observable<Unit> {
+        return dataManager.addToFavorite(id)
                 .flatMap {
                     if (it.success) {
                         getFavoriteAlbum()
@@ -58,28 +58,28 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
                     }
                 }
                 .map {
-                    it.photocards.add(photocard)
+                    it.photocards.add(dataManager.getSingleObjFromDb(Photocard::class.java, id))
                     dataManager.saveToDB(it)
                 }
     }
 
-    override fun removeFromFavorite(photocard: Photocard): Observable<Unit> {
-        return dataManager.removeFromFavorite(photocard.id)
+    override fun removeFromFavorite(id: String): Observable<Unit> {
+        return dataManager.removeFromFavorite(id)
                 .flatMap { getFavoriteAlbum() }
                 .map {
-                    it.photocards.remove(photocard)
+                    it.photocards.removeAll { it.id == id }
                     dataManager.saveToDB(it)
                 }
     }
 
 
-    override fun isFavorite(photocard: Photocard): Single<Boolean> {
+    override fun isFavorite(id: String): Single<Boolean> {
         if (!dataManager.isUserAuth()) return Single.just(false)
 
         return getFavoriteAlbum()
                 .flatMap { Observable.fromIterable(it.photocards) }
                 .map { it.id }
-                .contains(photocard.id)
+                .contains(id)
     }
 
     private var favAlbumId: String? = null

@@ -14,9 +14,6 @@ import io.github.vladimirmi.photon.features.profile.ProfileScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import java.util.concurrent.TimeUnit
 
 /**
  * Created by Vladimir Mikhalev 25.06.2017.
@@ -46,9 +43,7 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
                             view.showError(R.string.message_api_err_unknown)
                             super.onError(e)
                         }
-                        Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
-                            view.openRegistrationDialog()
-                        }
+                        view.postDelayed({ view.openRegistrationDialog() }, 2000)
                     }
                 }))
     }
@@ -71,9 +66,7 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
                             view.showError(R.string.message_api_err_unknown)
                             super.onError(e)
                         }
-                        Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
-                            view.openLoginDialog()
-                        }
+                        view.postDelayed({ view.openLoginDialog() }, 2000)
                     }
                 }))
     }

@@ -42,7 +42,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     private var isFavorite = false
 
     override fun initToolbar() {
-        var popup = if (rootPresenter.isUserAuth()) {
+        val popup = if (rootPresenter.isUserAuth()) {
             if (isFavorite) R.menu.submenu_photocard_screen_fav else R.menu.submenu_photocard_screen
         } else {
             R.menu.submenu_photocard_screen_not_auth
@@ -58,29 +58,28 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
                 .build()
     }
 
-    lateinit var photocard: Photocard
+    private lateinit var photocard: Photocard
 
     override fun initView(view: PhotocardView) {
-        val photocard = Flow.getKey<PhotocardScreen>(view)?.photocard!!
-        this.photocard = photocard
-        compDisp.add(subscribeOnUser(photocard.owner))
-        compDisp.add(subscribeOnPhotocard(photocard))
-        compDisp.add(subscribeOnIsFavorite(photocard))
+        val id = Flow.getKey<PhotocardScreen>(view)?.photocardId!!
+        val ownerId = Flow.getKey<PhotocardScreen>(view)?.ownerId!!
+        compDisp.add(subscribeOnUser(ownerId))
+        compDisp.add(subscribeOnPhotocard(id, ownerId))
+        compDisp.add(subscribeOnIsFavorite(id))
     }
 
-    private fun subscribeOnIsFavorite(photocard: Photocard): Disposable {
-        return model.isFavorite(photocard).subscribe { favorite ->
+    private fun subscribeOnIsFavorite(id: String): Disposable {
+        return model.isFavorite(id).subscribe { favorite ->
             if (isFavorite != favorite) {
                 isFavorite = favorite
                 initToolbar()
             }
             view.setFavorite(isFavorite)
-
         }
     }
 
-    private fun subscribeOnUser(owner: String): Disposable {
-        return model.getUser(owner)
+    private fun subscribeOnUser(ownerId: String): Disposable {
+        return model.getUser(ownerId)
                 .subscribeWith(object : ErrorObserver<User>() {
                     override fun onNext(it: User) {
                         view.setUser(it)
@@ -88,11 +87,11 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
                 })
     }
 
-    private fun subscribeOnPhotocard(photocard: Photocard): Disposable {
-        return Observable.just(photocard)
-                .mergeWith(model.getPhotocard(photocard.id, photocard.owner))
+    private fun subscribeOnPhotocard(id: String, ownerId: String): Disposable {
+        return model.getPhotocard(id, ownerId)
                 .subscribeWith(object : ErrorObserver<Photocard>() {
                     override fun onNext(it: Photocard) {
+                        photocard = it
                         view.setPhotocard(it)
                     }
                 })
@@ -104,13 +103,13 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private fun addToFavorite() {
         if (rootPresenter.isUserAuth()) {
-            compDisp.add(model.addToFavorite(photocard).subscribeWith(ErrorObserver()))
+            compDisp.add(model.addToFavorite(photocard.id).subscribeWith(ErrorObserver()))
         }
     }
 
     private fun removeFromFavorite() {
         if (rootPresenter.isUserAuth()) {
-            compDisp.add(model.removeFromFavorite(photocard).subscribeWith(ErrorObserver()))
+            compDisp.add(model.removeFromFavorite(photocard.id).subscribeWith(ErrorObserver()))
         }
     }
 

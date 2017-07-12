@@ -14,10 +14,7 @@ import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import java.util.concurrent.TimeUnit
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -83,9 +80,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                             view.showError(R.string.message_api_err_unknown)
                             super.onError(e)
                         }
-                        Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
-                            view.openRegistrationDialog()
-                        }
+                        view.postDelayed({ view.openRegistrationDialog() }, 2000)
                     }
                 }))
     }
@@ -108,9 +103,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                             view.showError(R.string.message_api_err_unknown)
                             super.onError(e)
                         }
-                        Observable.just(1).delay(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe {
-                            view.openLoginDialog()
-                        }
+                        view.postDelayed({ view.openLoginDialog() }, 2000)
                     }
                 }))
     }
@@ -130,7 +123,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     //todo network operation move to job
     fun showPhotoCard(photocard: Photocard) {
         model.addView(photocard).subscribeWith(ErrorObserver())
-        Flow.get(view).set(PhotocardScreen(photocard))
+        Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
     }
 }
 

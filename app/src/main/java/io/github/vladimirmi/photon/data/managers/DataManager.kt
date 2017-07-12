@@ -156,13 +156,7 @@ constructor(private val restService: RestService,
                                  sortBy: String,
                                  order: Sort = Sort.ASCENDING): Observable<List<T>> {
         return realmManager.search(clazz, query, sortBy, order)
-                .map { list ->
-                    if (list.isNotEmpty() && list.first() is Changeable) {
-                        val cleanList = list.toMutableList()
-                        cleanList.removeAll { removedNotActive(it) }
-                        cleanList
-                    } else list
-                }
+                .map { ArrayList<T>().apply { addAll(it) } }
     }
 
     private fun <T : RealmObject> removedNotActive(realmObject: T): Boolean {

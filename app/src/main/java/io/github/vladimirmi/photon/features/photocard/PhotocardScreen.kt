@@ -5,7 +5,6 @@ import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -14,9 +13,9 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
  * Created by Vladimir Mikhalev 14.06.2017.
  */
 
-data class PhotocardScreen(val photocard: Photocard) : BaseScreen<RootActivityComponent>() {
+data class PhotocardScreen(val photocardId: String, val ownerId: String) : BaseScreen<RootActivityComponent>() {
     override val layoutResId = R.layout.screen_photocard
-    override val scopeName = super.scopeName + photocard.id
+    override val scopeName = super.scopeName + photocardId
 
     //region =============== DI ==============
 
@@ -24,24 +23,6 @@ data class PhotocardScreen(val photocard: Photocard) : BaseScreen<RootActivityCo
         return parentComponent.photocardComponentBuilder()
                 .module(Module())
                 .build()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        if (!super.equals(other)) return false
-
-        other as PhotocardScreen
-
-        if (photocard != other.photocard) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + photocard.hashCode()
-        return result
     }
 
     @dagger.Module

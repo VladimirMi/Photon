@@ -62,7 +62,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     fun showPhotoCard(photocard: Photocard) {
-        Flow.get(view).set(PhotocardScreen(photocard))
+        Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
     }
 
     fun editAlbum(albumReq: EditAlbumReq) {

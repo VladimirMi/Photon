@@ -32,8 +32,12 @@ class ProfileView(context: Context, attrs: AttributeSet)
     private val newAlbumAction: (NewAlbumReq) -> Unit = { presenter.createNewAlbum(it) }
     private val newAlbumDialog = NewAlbumDialog(this, newAlbumAction)
 
-    private val login by lazy { user_login }
-    private val name by lazy { user_name }
+    private val loginView by lazy { user_login }
+    private val nameView by lazy { user_name }
+    private val albumsView by lazy { album_list }
+    private val albumCountView by lazy { album_count }
+    private val cardCountView by lazy { card_count }
+    private val avatarView by lazy { user_avatar }
 
     private val editProfileAction: (EditProfileReq) -> Unit = { presenter.editProfile(it) }
     private val editProfileDialog = EditProfileDialog(this, editProfileAction)
@@ -44,8 +48,8 @@ class ProfileView(context: Context, attrs: AttributeSet)
 
     override fun initView() {
         @Suppress("UsePropertyAccessSyntax")
-        album_list.setLayoutManager(GridLayoutManager(context, 2))
-        album_list.adapter = adapter
+        albumsView.setLayoutManager(GridLayoutManager(context, 2))
+        albumsView.adapter = adapter
     }
 
     private var curAvatarPath = ""
@@ -54,10 +58,10 @@ class ProfileView(context: Context, attrs: AttributeSet)
     @SuppressLint("SetTextI18n")
     fun setProfile(user: User) {
         editProfileDialog.initFields(user.login, user.name)
-        login.text = user.login
-        name.text = namePrefix + user.name
+        loginView.text = user.login
+        nameView.text = namePrefix + user.name
         if (user.avatar != curAvatarPath) {
-            user_avatar.setRoundAvatarWithBorder(user.avatar, 0f)
+            avatarView.setRoundAvatarWithBorder(user.avatar, 0f)
             curAvatarPath = user.avatar
         }
     }
@@ -65,11 +69,11 @@ class ProfileView(context: Context, attrs: AttributeSet)
 
     fun setAlbums(list: List<Album>) {
         val albums = list.filter { it.active }
-        album_count.text = albums.count { !it.isFavorite }.toString()
-        card_count.text = albums.filter { !it.isFavorite }
+        albumCountView.text = albums.count { !it.isFavorite }.toString()
+        cardCountView.text = albums.filter { !it.isFavorite }
                 .fold(0, { acc, album -> acc + album.photocards.count { it.active } })
                 .toString()
-        adapter.updateData(list)
+        adapter.updateData(albums)
     }
 
     private fun showAlbum(album: Album) = presenter.showAlbum(album)

@@ -42,29 +42,37 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
         val newView = layoutInflater.inflate(newScreenLayout, viewContainer, false)
 
         if (previousView != null) {
-            prepareTransition(activityContainer, previousView, newView, traversal.direction)
+            prepareTransition(viewContainer, previousView, newView, traversal.direction)
+        }
 
+        viewContainer.addView(newView)
+
+        if (previousView != null) {
+            viewContainer.removeView(previousView)
             if (previousScreen != null && previousView.javaClass != newView.javaClass) {
                 previousView.saveToState(traversal)
                 previousView.notifyRemoval()
             }
-            viewContainer.removeView(previousView)
         }
 
-        viewContainer.addView(newView)
         newView.restoreFromState(traversal)
+
 
         callback.onTraversalCompleted()
     }
 
-    private fun prepareTransition(container: ViewGroup, previousView: View, newView: View, direction: Direction) {
+    private fun prepareTransition(container: ViewGroup,
+                                  previousView: View,
+                                  newView: View,
+                                  direction: Direction) {
         if (direction == Direction.REPLACE) {
             return
         }
-        val slideIn = Slide()
-        slideIn.addTarget(newView)
 
+        val slideIn = Slide()
         val slideOut = Slide()
+
+        slideIn.addTarget(newView)
         slideOut.addTarget(previousView)
 
         if (direction == Direction.FORWARD) {
