@@ -108,19 +108,6 @@ class RootActivity : FlowActivity(), IRootView {
         }
     }
 
-    override fun showMessage(stringId: Int) {
-        showMessage(getString(stringId))
-    }
-
-    override fun showMessage(string: String) {
-        Snackbar.make(root_container, string, Snackbar.LENGTH_LONG).show()
-    }
-
-    override fun showError(stringId: Int, vararg formatArgs: Any) {
-        val string = resources.getString(stringId, *formatArgs)
-        Snackbar.make(root_container, string, Snackbar.LENGTH_SHORT).show()
-    }
-
     override fun showPermissionSnackBar() {
         Snackbar.make(root_container, R.string.message_permission_need, Snackbar.LENGTH_LONG)
                 .setAction(R.string.message_permission_need_action, { openApplicationSettings() })
@@ -139,7 +126,7 @@ class RootActivity : FlowActivity(), IRootView {
 
     //endregion
 
-    //region =============== IViewBuilder ==============
+    //region =============== IToolbarBuilder ==============
 
     override fun clearToolbar() {
         popups.clear()

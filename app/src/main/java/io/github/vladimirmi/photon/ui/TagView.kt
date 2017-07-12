@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.google.android.flexbox.FlexboxLayout
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.utils.getDensity
+import io.github.vladimirmi.photon.utils.dp
 
 class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
         TextView(context) {
@@ -25,7 +25,7 @@ class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
                 run(action)
             })
         }
-        val padding: Int = (getDensity(context) * 8).toInt()
+        val padding = (8 * context.dp).toInt()
         setPadding(padding, padding, padding, padding)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         text = if (tag.startsWith("#")) tag else "#$tag"
@@ -35,7 +35,7 @@ class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
         if (params is FlexboxLayout.LayoutParams) {
-            val margin: Int = (getDensity(context) * 6).toInt()
+            val margin = (6 * context.dp).toInt()
             params.setMargins(margin, margin, margin, margin)
         }
         super.setLayoutParams(params)

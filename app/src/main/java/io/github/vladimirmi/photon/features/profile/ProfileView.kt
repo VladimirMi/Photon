@@ -57,7 +57,7 @@ class ProfileView(context: Context, attrs: AttributeSet)
         login.text = user.login
         name.text = namePrefix + user.name
         if (user.avatar != curAvatarPath) {
-            setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
+            user_avatar.setRoundAvatarWithBorder(user.avatar, 0f)
             curAvatarPath = user.avatar
         }
     }

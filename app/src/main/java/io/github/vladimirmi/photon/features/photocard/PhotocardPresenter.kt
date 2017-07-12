@@ -145,7 +145,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
                 view.showMessage(R.string.photocard_message_download)
             }
         } else {
-            view.showMessage("Неудалось создать файл") //todo
+            view.showMessage(R.string.message_err_create_file)
         }
     }
 

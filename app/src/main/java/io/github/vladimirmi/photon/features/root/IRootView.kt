@@ -8,7 +8,7 @@ import io.github.vladimirmi.photon.flow.BottomNavHistory
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-interface IRootView : IView, IRootBuilder {
+interface IRootView : IView, IToolbarBuilder {
 
     fun showLoading()
     fun hideLoading()

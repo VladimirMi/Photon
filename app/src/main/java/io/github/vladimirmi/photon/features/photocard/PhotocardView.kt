@@ -42,7 +42,7 @@ class PhotocardView(context: Context, attrs: AttributeSet)
     private var curAvatarPath = ""
     fun setUser(user: User) {
         if (user.avatar != curAvatarPath) {
-            setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
+            user_avatar.setRoundAvatarWithBorder(user.avatar, 0f)
             curAvatarPath = user.avatar
         }
         user_name.text = user.name
@@ -56,7 +56,7 @@ class PhotocardView(context: Context, attrs: AttributeSet)
     private var curImagePath = ""
     fun setPhotocard(photocard: Photocard) {
         if (curImagePath != photocard.photo) {
-            setImage(photocard.photo, photo)
+            photo.setImage(photocard.photo)
             curImagePath = photocard.photo
         }
         card_name.text = photocard.title

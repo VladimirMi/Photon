@@ -14,7 +14,7 @@ import timber.log.Timber
 
 class FlowServiceFactory : ServicesFactory() {
     override fun bindServices(services: Services.Binder) {
-        val screen: BaseScreen<Any?>
+        val screen: BaseScreen<Any>
         if (services.getKey<Any>() is BaseScreen<*>) {
             screen = services.getKey()
         } else {

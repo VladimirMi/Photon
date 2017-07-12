@@ -13,7 +13,7 @@ object AppConfig {
     const val WRITE_TIMEOUT = 5000 //ms
     const val UPDATE_TIMEOUT = 300_000 //ms
 
-    const val PHOTOCARD_UPDATE_DELAY = 5L //minutes
+    const val PHOTOCARD_UPDATE_DELAY = 5L //min
     const val RETRY_REQUEST_BASE_DELAY = 500L //ms
     const val RETRY_REQUEST_COUNT = 5
 
@@ -26,4 +26,7 @@ object AppConfig {
     const val IMAGE_SIZE_LIMIT = 4 // megabyte
 
     const val FILE_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider"
+
+    const val SPLASH_UPDATE_PHOTOCARDS = 60
+    const val SPLASH_TIMEOUT = 3000L // ms
 }

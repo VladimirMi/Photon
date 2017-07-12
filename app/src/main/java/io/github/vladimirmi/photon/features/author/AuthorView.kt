@@ -35,10 +35,10 @@ class AuthorView(context: Context, attrs: AttributeSet)
     private var curAvatarPath = ""
     @SuppressLint("SetTextI18n")
     fun setUser(user: User) {
-        user_login.setText(user.login)
-        user_name.setText("/  ${user.name}")
+        user_login.text = user.login
+        user_name.text = "/  ${user.name}"
         if (user.avatar != curAvatarPath) {
-            setRoundAvatarWithBorder(user.avatar, user_avatar, 0f)
+            user_avatar.setRoundAvatarWithBorder(user.avatar, 0f)
             curAvatarPath = user.avatar
         }
     }

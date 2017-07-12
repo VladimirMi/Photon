@@ -3,20 +3,24 @@ package io.github.vladimirmi.photon.flow
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.ViewGroup
 import flow.Flow
+import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.core.IView
 import io.github.vladimirmi.photon.di.DaggerService
+import kotlinx.android.synthetic.main.activity_root.*
 import mortar.bundler.BundleServiceRunner
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-abstract class FlowActivity : AppCompatActivity() {
+abstract class FlowActivity : AppCompatActivity(), IView {
 
-    private lateinit var dispatcher: FlowDispatcher
+    private lateinit var dispatcher: FlowDispatcher<BaseScreen<*>>
 
     override fun attachBaseContext(base: Context) {
         dispatcher = FlowDispatcher(this)
@@ -83,5 +87,18 @@ abstract class FlowActivity : AppCompatActivity() {
         } else {
             return super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun showMessage(stringId: Int) {
+        showMessage(getString(stringId))
+    }
+
+    override fun showMessage(string: String) {
+        Snackbar.make(root_container, string, Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun showError(stringId: Int, vararg formatArgs: Any) {
+        val string = resources.getString(stringId, *formatArgs)
+        Snackbar.make(root_container, string, Snackbar.LENGTH_SHORT).show()
     }
 }

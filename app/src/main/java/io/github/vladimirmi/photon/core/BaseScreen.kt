@@ -1,6 +1,5 @@
 package io.github.vladimirmi.photon.core
 
-import android.support.annotation.LayoutRes
 import flow.ClassKey
 
 /**
@@ -13,6 +12,5 @@ abstract class BaseScreen<in T> : ClassKey() {
 
     abstract fun createScreenComponent(parentComponent: T): Any
 
-    @get:LayoutRes
     abstract val layoutResId: Int
 }

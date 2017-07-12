@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.features.root
 
 import android.support.annotation.StringRes
 
-interface IRootBuilder {
+interface IToolbarBuilder {
 
     fun clearToolbar()
 

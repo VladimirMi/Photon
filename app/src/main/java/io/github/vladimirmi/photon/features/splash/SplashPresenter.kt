@@ -6,6 +6,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
+import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
 import java.net.ConnectException
@@ -30,7 +31,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     }
 
     private fun updatePhotos(): Disposable {
-        return model.updateLimitPhotoCards(60, 3000) //todo в AppConfig
+        return model.updateLimitPhotoCards(AppConfig.SPLASH_UPDATE_PHOTOCARDS, AppConfig.SPLASH_TIMEOUT)
                 .subscribeWith(object : ErrorObserver<Any>() {
                     override fun onComplete() {
                         openMainScreen()

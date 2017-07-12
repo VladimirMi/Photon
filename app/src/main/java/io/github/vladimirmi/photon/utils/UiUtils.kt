@@ -13,36 +13,32 @@ import io.github.vladimirmi.photon.ui.CircleTransformation
  * Created by Vladimir Mikhalev 31.05.2017.
  */
 
-fun setImage(path: String, view: ImageView) {
-    Glide.with(view.context)
+fun ImageView.setImage(path: String) {
+    Glide.with(context)
             .load(path)
             .centerCrop()
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.RESULT)
             .placeholder(R.drawable.ic_placeholder_image)
-            .into(view)
+            .into(this)
 }
 
-fun setRoundAvatarWithBorder(path: String, view: ImageView, border: Float) {
-    Glide.with(view.context)
+fun ImageView.setRoundAvatarWithBorder(path: String, border: Float) {
+    Glide.with(context)
             .load(path)
-            .bitmapTransform(CircleTransformation(view.context, border))
+            .bitmapTransform(CircleTransformation(context, border))
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.RESULT)
             .placeholder(R.drawable.ic_placeholder_avatar)
-            .into(view)
+            .into(this)
 }
 
-fun getDensity(context: Context): Float {
-    return getDisplayMetrics(context).density
-}
+val Context.dp get() = getDisplayMetrics().density
 
-fun getScaledDensity(context: Context): Float {
-    return getDisplayMetrics(context).scaledDensity
-}
+val Context.sp get() = getDisplayMetrics().scaledDensity
 
-fun getDisplayMetrics(context: Context): DisplayMetrics {
+fun Context.getDisplayMetrics(): DisplayMetrics {
     val displayMetrics = DisplayMetrics()
-    (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getMetrics(displayMetrics)
+    (this.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getMetrics(displayMetrics)
     return displayMetrics
 }

@@ -38,13 +38,13 @@ abstract class BasePresenter<V : BaseView<*, V>, out M : IModel>
         compDisp.clear()
         Timber.tag(javaClass.simpleName)
         Timber.d("dropView")
-        DaggerService.appComponent.watcher().watch(this)
     }
 
     override fun onExitScope() {
         super.onExitScope()
         Timber.tag(javaClass.simpleName)
         Timber.d("onExitScope")
+        DaggerService.appComponent.watcher().watch(this)
     }
 
     protected abstract fun initToolbar()

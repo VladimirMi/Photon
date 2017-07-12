@@ -49,7 +49,7 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
         val view = inflater.inflate(R.layout.item_album, parent, false)
         if (authorMode) view.likesNViews.visibility = GONE else view.menu_share.visibility = GONE
         val lp = view.layoutParams
-        lp.width = getDisplayMetrics(parent.context).widthPixels / 2
+        lp.width = parent.context.getDisplayMetrics().widthPixels / 2
         lp.height = lp.width
         view.layoutParams = lp
         return AlbumViewHolder(view, albumAction)
@@ -84,10 +84,10 @@ class AlbumViewHolder(itemView: View, val albumAction: (Album) -> Unit)
         itemView.views.text = photocards.fold(0, { acc, photocard -> acc + photocard.views }).toString()
 
         if (photocards.isNotEmpty() && curImagePath != photocards[0].photo) {
-            setImage(photocards[0].photo, itemView.preview)
+            itemView.preview.setImage(photocards[0].photo)
             curImagePath = photocards[0].photo
         } else {
-            setImage("", itemView.preview)
+            itemView.preview.setImage("")
         }
     }
 

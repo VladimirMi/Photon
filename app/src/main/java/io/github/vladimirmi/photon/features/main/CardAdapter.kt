@@ -48,7 +48,7 @@ class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideI
         if (hideInfo) view.info.visibility = GONE
         val lp = view.layoutParams
         val spanCount = (((parent as RecyclerView).layoutManager) as GridLayoutManager).spanCount
-        lp.width = getDisplayMetrics(parent.context).widthPixels / spanCount
+        lp.width = parent.context.getDisplayMetrics().widthPixels / spanCount
         lp.height = lp.width
         view.layoutParams = lp
         return CardViewHolder(view, cardAction)
@@ -76,7 +76,7 @@ class CardViewHolder(itemView: View?, val cardAction: (Photocard) -> Unit) : Rec
         itemView.views.text = photoCard.views.toString()
 
         if (curImagePath != photoCard.photo) {
-            setImage(photoCard.photo, itemView.photo_card)
+            itemView.photo_card.setImage(photoCard.photo)
             curImagePath = photoCard.photo
         }
 

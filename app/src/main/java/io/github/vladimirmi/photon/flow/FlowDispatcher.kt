@@ -1,7 +1,6 @@
 package io.github.vladimirmi.photon.flow
 
 import android.content.Context
-import android.support.annotation.LayoutRes
 import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -21,22 +20,21 @@ import mortar.MortarScope
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-class FlowDispatcher(baseContext: Context) : BaseDispatcher(baseContext) {
-
-    var activityContainer: ViewGroup? = null
+class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(baseContext) {
 
     override fun dispatch(traversal: Traversal, callback: TraversalCallback) {
-        if (isPreviousKeySameAsNewKey(traversal.origin, traversal.destination)) {
+        val previousScreen = traversal.getPreviousKey<S>()
+        val newScreen = traversal.getNewKey<S>()
+        if (previousScreen == newScreen) {
             callback.onTraversalCompleted()
             return
         }
 
-        val newKey: BaseScreen<*> = getNewKey(traversal)
-        @LayoutRes val newScreenLayout = newKey.layoutResId
+        val newScreenLayout = newScreen.layoutResId
 
-        val flowContext = traversal.createContext(newKey, baseContext)
-        val mortarScope = Flow.getService<Any>(newKey.scopeName, flowContext) as MortarScope
-        val mortarContext = mortarScope.createContext(flowContext)
+        val flowContext = traversal.createContext(newScreen, baseContext)
+        val mortarScope = Flow.getService<MortarScope>(newScreen.scopeName, flowContext)
+        val mortarContext = mortarScope?.createContext(flowContext)
 
         val layoutInflater = LayoutInflater.from(mortarContext)
 
@@ -44,17 +42,17 @@ class FlowDispatcher(baseContext: Context) : BaseDispatcher(baseContext) {
         val newView = layoutInflater.inflate(newScreenLayout, viewContainer, false)
 
         if (previousView != null) {
-            prepareTransition(activityContainer!!, previousView, newView, traversal.direction)
+            prepareTransition(activityContainer, previousView, newView, traversal.direction)
 
-            if (traversal.origin != null && previousView.javaClass != newView.javaClass) {
-                persistViewToStateAndNotifyRemoval(traversal, previousView)
+            if (previousScreen != null && previousView.javaClass != newView.javaClass) {
+                previousView.saveToState(traversal)
+                previousView.notifyRemoval()
             }
+            viewContainer.removeView(previousView)
         }
 
-        viewContainer?.removeView(previousView)
-
-        viewContainer?.addView(newView)
-        restoreViewFromState(traversal, newView)
+        viewContainer.addView(newView)
+        newView.restoreFromState(traversal)
 
         callback.onTraversalCompleted()
     }

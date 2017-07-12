@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
-import flow.*
+import flow.Dispatcher
+import flow.Flow
+import flow.Traversal
+import flow.TraversalCallback
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -17,84 +20,68 @@ abstract class BaseDispatcher(val baseContext: Context) : Dispatcher,
 
     abstract override fun dispatch(traversal: Traversal, callback: TraversalCallback)
 
-    var viewContainer: ViewGroup? = null
+    lateinit var viewContainer: ViewGroup
+    lateinit var activityContainer: ViewGroup
 
-    fun getActiveView(): View? {
-        return viewContainer?.getChildAt(0)
-    }
+    fun getActiveView(): View? = viewContainer.getChildAt(0)
 
     override fun onStart() {
-        FlowLifecycleProvider.onStart(getActiveView() ?: return)
+        FlowLifecycleProvider.onStart(getActiveView())
     }
 
     override fun onStop() {
-        FlowLifecycleProvider.onStop(getActiveView() ?: return)
+        FlowLifecycleProvider.onStop(getActiveView())
     }
 
     override fun onViewRestored() {
-        FlowLifecycleProvider.onViewRestored(getActiveView() ?: return)
+        FlowLifecycleProvider.onViewRestored(getActiveView())
     }
 
     override fun onViewDestroyed(removedByFlow: Boolean) {
-        FlowLifecycleProvider.onViewDestroyed(getActiveView() ?: return, removedByFlow)
+        FlowLifecycleProvider.onViewDestroyed(getActiveView(), removedByFlow)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        FlowLifecycleProvider.onActivityResult(getActiveView() ?: return, requestCode, resultCode, data)
+        FlowLifecycleProvider.onActivityResult(getActiveView(), requestCode, resultCode, data)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        FlowLifecycleProvider.onRequestPermissionsResult(getActiveView() ?: return, requestCode, permissions, grantResults)
+        FlowLifecycleProvider.onRequestPermissionsResult(getActiveView(), requestCode, permissions, grantResults)
     }
 
     override fun preSaveViewState() {
-        FlowLifecycleProvider.preSaveViewState(getActiveView() ?: return)
+        FlowLifecycleProvider.preSaveViewState(getActiveView())
     }
 
     override fun onBackPressed(): Boolean {
-        if (FlowLifecycleProvider.onBackPressed(getActiveView() ?: return canGoBack())) {
+        if (FlowLifecycleProvider.onBackPressed(getActiveView())) {
             return true
         }
-        return canGoBack()
+        return Flow.get(baseContext).goBack()
     }
 
-    private fun canGoBack() = Flow.get(baseContext).goBack()
+    fun <T> Traversal.getNewKey() = this.destination.top<T>()
+    fun <T> Traversal.getPreviousKey() = this.origin?.top<T?>()
 
-    fun isPreviousKeySameAsNewKey(origin: History?, destination: History) =
-            origin?.top<Any>() == destination.top<Any>()
-
-    fun <T> getNewKey(traversal: Traversal): T = traversal.destination.top()
-
-    fun <T> getPreviousKey(traversal: Traversal): T? = traversal.origin?.top()
-
-    fun persistViewToStateAndNotifyRemoval(traversal: Traversal, view: View) {
-        persistViewToState(traversal, view)
-        notifyViewForFlowRemoval(view)
-    }
-
-    fun restoreViewFromState(traversal: Traversal, view: View?) {
-        if (view != null) {
-            if (view is FlowLifecycles.ViewLifecycleListener) {
-                onViewRestored()
-            }
-            val incomingState = traversal.getState(Flow.getKey<Any>(view.context) ?: return)
-            incomingState.restore(view)
+    fun View.restoreFromState(traversal: Traversal) {
+        if (this is FlowLifecycles.ViewLifecycleListener) {
+            onViewRestored()
         }
+        val state = traversal.getState(Flow.getKey<Any>(context) ?: return)
+        state.restore(this)
     }
 
-    private fun persistViewToState(traversal: Traversal, view: View?) {
-        if (view != null) {
-            if (view is FlowLifecycles.PreSaveViewStateListener) {
-                preSaveViewState()
-            }
-            val outgoingState = traversal.getState(Flow.getKey<Any>(view.context) ?: return)
-            outgoingState.save(view)
+    fun View.saveToState(traversal: Traversal) {
+        if (this is FlowLifecycles.PreSaveViewStateListener) {
+            preSaveViewState()
         }
+        val state = traversal.getState(Flow.getKey<Any>(context) ?: return)
+        state.save(this)
     }
 
-    private fun notifyViewForFlowRemoval(view: View?) {
-        if (view is FlowLifecycles.ViewLifecycleListener) {
-            onViewDestroyed(true)
+    fun View.notifyRemoval() {
+        if (this is FlowLifecycles.ViewLifecycleListener) {
+            onViewDestroyed(removedByFlow = true)
         }
     }
 }

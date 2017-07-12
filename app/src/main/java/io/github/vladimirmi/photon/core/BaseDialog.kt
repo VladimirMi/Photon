@@ -20,11 +20,7 @@ open class BaseDialog(layoutId: Int, val viewGroup: ViewGroup) {
                 .create()
     }
 
-    fun show() {
-        dialog.show()
-    }
+    fun show() = dialog.show()
 
-    fun hide() {
-        dialog.dismiss()
-    }
+    fun hide() = dialog.dismiss()
 }
