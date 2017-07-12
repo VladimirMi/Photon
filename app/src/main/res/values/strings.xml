@@ -116,6 +116,7 @@
     <string name="photocard_menu_share">Поделиться</string>
     <string name="photocard_menu_download">Скачать</string>
     <string name="photocard_message_download">Фото успешно загружен</string>
+    <string name="photocard_message_download_open">Открыть</string>
 
     <string name="profile_title">Профиль</string>
     <string name="profile_not_auth">Авторизуйтесь,\n чтобы посмотреть\n данные профиля</string>

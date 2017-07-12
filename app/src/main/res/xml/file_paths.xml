@@ -3,4 +3,8 @@
     <cache-path
         name="temp_files"
         path="."/>
+
+    <external-path
+        name="photocards"
+        path="Photon/"/>
 </paths>

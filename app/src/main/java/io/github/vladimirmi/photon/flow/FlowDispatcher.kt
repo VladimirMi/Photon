@@ -57,7 +57,6 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
 
         newView.restoreFromState(traversal)
 
-
         callback.onTraversalCompleted()
     }
 

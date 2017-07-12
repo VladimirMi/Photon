@@ -2,6 +2,7 @@ package io.github.vladimirmi.photon.features.photocard
 
 import android.content.Context
 import android.content.Intent
+import android.support.design.widget.Snackbar
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -79,6 +80,12 @@ class PhotocardView(context: Context, attrs: AttributeSet)
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         presenter.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun showLoadSnackbar(callback: () -> Unit) {
+        Snackbar.make(this, R.string.photocard_message_download, Snackbar.LENGTH_LONG)
+                .setAction(R.string.photocard_message_download_open) { callback() }
+                .show()
     }
 }
 

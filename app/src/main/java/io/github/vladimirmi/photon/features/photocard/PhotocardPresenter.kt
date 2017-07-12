@@ -117,7 +117,8 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private fun share() {
         tempFile = createTempFile(suffix = ".jpg", directory = view.context.cacheDir)
-        val uri = FileProvider.getUriForFile(view.context, AppConfig.FILE_PROVIDER_AUTHORITY, tempFile)
+        val uri = FileProvider.getUriForFile(view.context,
+                AppConfig.FILE_PROVIDER_AUTHORITY, tempFile)
 
         val shareIntent = Intent()
         shareIntent.action = Intent.ACTION_SEND
@@ -141,11 +142,22 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         val file = createFile()
         if (file != null) {
             downloadTo(file) {
-                view.showMessage(R.string.photocard_message_download)
+                view.showLoadSnackbar { showLoadedPhoto(file) }
             }
         } else {
             view.showMessage(R.string.message_err_create_file)
         }
+    }
+
+    fun showLoadedPhoto(file: File) {
+        val uri = FileProvider.getUriForFile(view.context,
+                AppConfig.FILE_PROVIDER_AUTHORITY, file)
+        val intent = Intent().apply {
+            action = Intent.ACTION_VIEW
+            setDataAndType(uri, "image/jpeg")
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+        rootPresenter.startActivity(intent)
     }
 
     private fun downloadTo(file: File, doneCallback: () -> Unit) {
@@ -176,6 +188,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         }
         return file
     }
+
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         val requestCanceled = grantResults.contains(PackageManager.PERMISSION_DENIED) || grantResults.isEmpty()
