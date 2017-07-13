@@ -8,6 +8,6 @@ import io.reactivex.Observable
  */
 
 interface ISplashModel : IModel {
-    fun updateLimitPhotoCards(limit: Int, minDelay: Long): Observable<Any>
+    fun updateLimitPhotoCards(limit: Int, minDelay: Long): Observable<Boolean>
     fun dbIsNotEmpty(): Boolean
 }

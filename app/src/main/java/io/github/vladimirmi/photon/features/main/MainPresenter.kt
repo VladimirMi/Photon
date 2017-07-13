@@ -15,6 +15,7 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -124,6 +125,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun showPhotoCard(photocard: Photocard) {
         model.addView(photocard).subscribeWith(ErrorObserver())
         Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
+    }
+
+    fun loadMore(page: Int, limit: Int) {
+        Timber.e("loadMore: ")
+        model.updatePhotocards(page * limit, limit)
     }
 }
 

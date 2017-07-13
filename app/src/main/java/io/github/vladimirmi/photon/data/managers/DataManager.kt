@@ -30,7 +30,7 @@ constructor(private val restService: RestService,
 
     //region =============== Network ==============
 
-    fun getPhotocardsFromNet(limit: Int, offset: Int): Observable<List<Photocard>> {
+    fun getPhotocardsFromNet(offset: Int, limit: Int): Observable<List<Photocard>> {
         val tag = Photocard::class.java.simpleName
         return restService.getPhotocards(limit, offset, getLastModified(tag))
                 .parseResponse { saveLastUpdate(tag, it) }
@@ -135,10 +135,12 @@ constructor(private val restService: RestService,
         realmManager.save(realmObject)
     }
 
+    //todo sort may be null
     fun <T : RealmObject> getListFromDb(clazz: Class<T>,
-                                        sortBy: String,
-                                        order: Sort = Sort.ASCENDING): Observable<List<T>> {
-        return search(clazz, null, sortBy, order)
+                                        sortBy: String? = null,
+                                        order: Sort = Sort.ASCENDING,
+                                        async: Boolean = true): Observable<List<T>> {
+        return search(clazz, null, sortBy, order, async)
     }
 
     fun <T : RealmObject> getObjectFromDb(clazz: Class<T>, id: String): Observable<T> {
@@ -151,9 +153,10 @@ constructor(private val restService: RestService,
 
     fun <T : RealmObject> search(clazz: Class<T>,
                                  query: List<Query>?,
-                                 sortBy: String,
-                                 order: Sort = Sort.ASCENDING): Observable<List<T>> {
-        return realmManager.search(clazz, query, sortBy, order)
+                                 sortBy: String? = null,
+                                 order: Sort = Sort.ASCENDING,
+                                 async: Boolean = true): Observable<List<T>> {
+        return realmManager.search(clazz, query, sortBy, order, async)
                 .map { ArrayList<T>().apply { addAll(it) } }
     }
 

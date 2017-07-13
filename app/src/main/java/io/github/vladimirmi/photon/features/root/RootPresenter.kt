@@ -15,6 +15,7 @@ import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.reactivex.Observable
 import mortar.Presenter
 import mortar.bundler.BundleService
+
 /**
  * Developer Vladimir Mikhalev 30.05.2017
  */
@@ -56,6 +57,7 @@ class RootPresenter(val model: IRootModel) :
                 .doOnSubscribe { showLoading() }
                 .doAfterTerminate { hideLoading() }
     }
+
     fun logout() = model.logout()
 
 
@@ -88,6 +90,10 @@ class RootPresenter(val model: IRootModel) :
 
     fun navigateTo(bottomItem: BottomNavHistory.BottomItem) {
         view.navigateTo(bottomItem)
+    }
+
+    fun showMessage(stringId: Int) {
+        view.showMessage(stringId)
     }
 }
 

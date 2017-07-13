@@ -6,6 +6,7 @@ import android.os.Parcelable
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import flow.Flow
 import io.github.vladimirmi.photon.R
@@ -14,6 +15,7 @@ import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.ui.EndlessRecyclerViewScrollListener
 import io.github.vladimirmi.photon.ui.LoginDialog
 import io.github.vladimirmi.photon.ui.RegistrationDialog
 import kotlinx.android.synthetic.main.screen_main.view.*
@@ -44,14 +46,19 @@ class MainView(context: Context, attrs: AttributeSet) :
     override fun initView() {
         photocard_list.layoutManager = GridLayoutManager(context, 2)
         photocard_list.adapter = adapter
-    }
-
-    fun setData(data: List<Photocard>) {
-        adapter.updateData(data.filter { it.active })
         if (scroll != 0) {
             photocard_list.scrollToPosition(scroll)
             scroll = 0
         }
+        photocard_list.addOnScrollListener(object : EndlessRecyclerViewScrollListener(photocard_list.layoutManager as GridLayoutManager) {
+            override fun onLoadMore(page: Int, limit: Int, view: RecyclerView) {
+                presenter.loadMore(page, limit)
+            }
+        })
+    }
+
+    fun setData(data: List<Photocard>) {
+        adapter.updateData(data)
     }
 
     fun openRegistrationDialog() = registrationDialog.show()

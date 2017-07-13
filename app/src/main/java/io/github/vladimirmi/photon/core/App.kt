@@ -28,15 +28,13 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return
-        }
+        if (LeakCanary.isInAnalyzerProcess(this)) return
+
         refWatcher = LeakCanary.install(this)
 
         Realm.init(this)
-        DaggerService.createAppComponent(applicationContext, Realm.getDefaultInstance())
+
+        DaggerService.createAppComponent(applicationContext)
 
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
 

@@ -54,4 +54,10 @@ class MainModel(val dataManager: DataManager) : IMainModel {
                 }
                 .ioToMain()
     }
+
+    override fun updatePhotocards(offset: Int, limit: Int): Observable<List<Photocard>> {
+        return dataManager.getPhotocardsFromNet(offset, limit)
+                .doOnNext { it.forEach { dataManager.saveToDB(it) } }
+                .ioToMain()
+    }
 }

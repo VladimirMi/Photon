@@ -9,8 +9,6 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
-import java.net.ConnectException
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -32,16 +30,25 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     }
 
     private fun updatePhotos(): Disposable {
-        return model.updateLimitPhotoCards(AppConfig.SPLASH_UPDATE_PHOTOCARDS, AppConfig.SPLASH_TIMEOUT)
-                .subscribeWith(object : ErrorObserver<Any>() {
+        var slowNet = false
+
+        return model.updateLimitPhotoCards(AppConfig.PHOTOCARDS_PAGE_SIZE, AppConfig.SPLASH_TIMEOUT)
+                .subscribeWith(object : ErrorObserver<Boolean>() {
+                    override fun onNext(loaded: Boolean) {
+                        if (slowNet) view.showMessage(R.string.message_err_connect)
+                        if (!loaded) slowNet = true
+                    }
+
                     override fun onComplete() {
-                        Timber.e("onComplete: ")
                         openMainScreen()
                     }
 
                     override fun onError(e: Throwable) {
+                        if (e is NoSuchElementException) {
+                            openMainScreen() //304 empty
+                            return
+                        }
                         super.onError(e)
-                        Timber.e(e)
                         handleError(e)
                     }
                 })
@@ -49,9 +56,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
 
 
     private fun handleError(error: Throwable) {
-        if (error is ConnectException) {
-            view.showMessage(R.string.message_err_connect)
-        }
+        rootPresenter.showMessage(R.string.message_api_err_unknown)
         if (model.dbIsNotEmpty()) openMainScreen()
     }
 

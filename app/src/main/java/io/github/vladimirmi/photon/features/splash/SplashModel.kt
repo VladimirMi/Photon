@@ -2,28 +2,35 @@ package io.github.vladimirmi.photon.features.splash
 
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.features.root.IRootModel
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-class SplashModel(val dataManager: DataManager, val rootModel: IRootModel) : ISplashModel {
+class SplashModel(val dataManager: DataManager) : ISplashModel {
 
-    override fun updateLimitPhotoCards(limit: Int, minDelay: Long): Observable<Any> {  // delay in milliseconds
-        return Observable.merge(Observable.timer(minDelay, TimeUnit.MILLISECONDS)
-                .doOnComplete { Timber.e("timer complete") },
-                rootModel.updatePhotocards()
-                        .doOnComplete { Timber.e("update complete") }
-                        .filter { i -> i < limit })
+    @Suppress("SimplifyBooleanWithConstants")
+    override fun updateLimitPhotoCards(limit: Int, minDelay: Long): Observable<Boolean> {
+        val updateObs = dataManager.isNetworkAvailable()
+                .filter { it != false }
+                .firstOrError().toObservable()
+                .flatMap { dataManager.getPhotocardsFromNet(0, limit) }
+                .doOnNext { it.forEach { dataManager.saveToDB(it) } }
+                .map { true }
+                .firstOrError().toObservable()
+
+        val delayObs = Observable.interval(minDelay, TimeUnit.MILLISECONDS)
+                .take(2).map { false }
+
+        return Observable.mergeDelayError(updateObs, delayObs)
                 .ioToMain()
     }
 
     override fun dbIsNotEmpty(): Boolean {
-        return dataManager.getListFromDb(Photocard::class.java, "id").blockingFirst().isNotEmpty()
+        return dataManager.getListFromDb(Photocard::class.java, async = false)
+                .blockingFirst().isNotEmpty()
     }
 }

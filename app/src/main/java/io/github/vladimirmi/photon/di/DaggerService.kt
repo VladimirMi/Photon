@@ -6,7 +6,6 @@ import io.github.vladimirmi.photon.di.modules.NetworkModule
 import io.github.vladimirmi.photon.features.root.RootActivity
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootActivityModule
-import io.realm.Realm
 import mortar.MortarScope
 import mortar.bundler.BundleServiceRunner
 
@@ -25,9 +24,9 @@ object DaggerService {
         createRootActivityComponent()
     }
 
-    fun createAppComponent(context: Context, realm: Realm) {
+    fun createAppComponent(context: Context) {
         appComponent = DaggerAppComponent.builder()
-                .localeModule(LocaleModule(context, realm))
+                .localeModule(LocaleModule(context))
                 .networkModule(NetworkModule())
                 .build()
     }

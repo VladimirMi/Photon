@@ -12,14 +12,13 @@ import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.utils.AppConfig
-import io.realm.Realm
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
 @Module
-class LocaleModule(val context: Context, val realm: Realm) {
+class LocaleModule(val context: Context) {
 
     @Provides
     @DaggerScope(App::class)
@@ -27,20 +26,16 @@ class LocaleModule(val context: Context, val realm: Realm) {
 
     @Provides
     @DaggerScope(App::class)
-    fun provideRealm() = realm
-
-    @Provides
-    @DaggerScope(App::class)
     fun providePreferencesManager(context: Context) = PreferencesManager(context)
 
     @Provides
     @DaggerScope(App::class)
-    fun provideRealmManager(context: Context, realm: Realm): RealmManager {
+    fun provideRealmManager(context: Context): RealmManager {
         Stetho.initialize(Stetho.newInitializerBuilder(context)
                 .enableDumpapp(Stetho.defaultDumperPluginsProvider(context))
                 .enableWebKitInspector(RealmInspectorModulesProvider.builder(context).build())
                 .build())
-        return RealmManager(realm)
+        return RealmManager()
     }
 
     @Provides

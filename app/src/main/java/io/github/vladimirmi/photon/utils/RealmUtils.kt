@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.utils
 import io.reactivex.*
 import io.reactivex.disposables.Disposables
 import io.realm.*
+import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 09.07.2017.
@@ -73,6 +74,7 @@ class RealmResultFlowable<T : RealmModel> private constructor(private val result
     override fun subscribe(e: FlowableEmitter<RealmResults<T>>) {
         results.addChangeListener(RealmChangeListener {
             if (!e.isCancelled) {
+                Timber.e("subscribe: results $it")
                 e.onNext(it)
             }
         })
@@ -89,4 +91,21 @@ class RealmResultFlowable<T : RealmModel> private constructor(private val result
             return from(results).toObservable()
         }
     }
+}
+
+fun <T : RealmObject> Realm.prepareQuery(clazz: Class<T>, query: List<Query>?)
+        : RealmQuery<T> {
+    var realmQuery = where(clazz)
+
+    query?.groupBy { it.fieldName }?.forEach { (_, list) ->
+        Timber.e("search: group $list")
+        realmQuery = realmQuery.beginGroup()
+        list.forEachIndexed { idx, qry ->
+            realmQuery = qry.applyTo(realmQuery)
+            if (idx < list.size - 1) realmQuery = realmQuery.or()
+        }
+        realmQuery = realmQuery.endGroup()
+    }
+
+    return realmQuery
 }

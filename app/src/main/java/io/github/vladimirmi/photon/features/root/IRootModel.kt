@@ -11,7 +11,6 @@ import io.reactivex.Observable
  */
 
 interface IRootModel : IModel {
-    fun updatePhotocards(): Observable<Int>
     fun isUserAuth(): Boolean
     fun logout()
     fun login(req: SignInReq): Observable<User>
