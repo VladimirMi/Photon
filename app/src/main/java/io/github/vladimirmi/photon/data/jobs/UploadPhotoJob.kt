@@ -23,7 +23,6 @@ class UploadPhotoJob(private val photocard: Photocard)
         .setSingleId(photocard.id)
         .requireNetwork()) {
 
-
     private val tempId = photocard.id
 
     override fun onAdded() {
@@ -34,10 +33,11 @@ class UploadPhotoJob(private val photocard: Photocard)
     override fun onRun() {
         var error: Throwable? = null
         val dataManager = DaggerService.appComponent.dataManager()
+
         val data = getByteArrayFromContent(photocard.photo)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
-
         val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(photocard.photo).lastPathSegment, body)
+
         dataManager.uploadPhoto(bodyPart)
                 .flatMap {
                     photocard.photo = it.image

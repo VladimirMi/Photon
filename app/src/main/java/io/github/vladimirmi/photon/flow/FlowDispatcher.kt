@@ -43,19 +43,15 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
 
         if (previousView != null) {
             prepareTransition(viewContainer, previousView, newView, traversal.direction)
-        }
-
-        viewContainer.addView(newView)
-
-        if (previousView != null) {
-            viewContainer.removeView(previousView)
             if (previousScreen != null && previousView.javaClass != newView.javaClass) {
                 previousView.saveToState(traversal)
                 previousView.notifyRemoval()
             }
+            viewContainer.removeView(previousView)
         }
 
         newView.restoreFromState(traversal)
+        viewContainer.addView(newView)
 
         callback.onTraversalCompleted()
     }
@@ -64,9 +60,7 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
                                   previousView: View,
                                   newView: View,
                                   direction: Direction) {
-        if (direction == Direction.REPLACE) {
-            return
-        }
+        if (direction == Direction.REPLACE) return
 
         val slideIn = Slide()
         val slideOut = Slide()

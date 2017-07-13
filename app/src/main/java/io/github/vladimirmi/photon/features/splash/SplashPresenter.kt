@@ -9,6 +9,7 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 import java.net.ConnectException
 
 /**
@@ -34,11 +35,13 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
         return model.updateLimitPhotoCards(AppConfig.SPLASH_UPDATE_PHOTOCARDS, AppConfig.SPLASH_TIMEOUT)
                 .subscribeWith(object : ErrorObserver<Any>() {
                     override fun onComplete() {
+                        Timber.e("onComplete: ")
                         openMainScreen()
                     }
 
                     override fun onError(e: Throwable) {
                         super.onError(e)
+                        Timber.e(e)
                         handleError(e)
                     }
                 })

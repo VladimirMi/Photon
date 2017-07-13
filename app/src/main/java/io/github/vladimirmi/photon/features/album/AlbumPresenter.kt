@@ -115,7 +115,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     private fun addPhotocard() {
-        rootPresenter.bottomHistory?.historyMap?.set(LOAD, History.single(NewCardScreen(album.id)))
+        rootPresenter.bottomHistory?.historyMap?.set(LOAD, History.single(NewCardScreen(album)))
         rootPresenter.navigateTo(LOAD)
     }
 

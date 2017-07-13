@@ -1,8 +1,5 @@
 package io.github.vladimirmi.photon.di
 
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-
 import javax.inject.Scope
 import kotlin.reflect.KClass
 
@@ -11,5 +8,5 @@ import kotlin.reflect.KClass
  */
 
 @Scope
-@Retention(RetentionPolicy.SOURCE)
+@Retention(AnnotationRetention.SOURCE)
 annotation class DaggerScope(val value: KClass<*>)

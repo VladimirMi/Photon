@@ -36,11 +36,10 @@ class App : Application() {
         refWatcher = LeakCanary.install(this)
 
         Realm.init(this)
-        DaggerService.createAppComponent(applicationContext)
+        DaggerService.createAppComponent(applicationContext, Realm.getDefaultInstance())
 
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
 
         Fabric.with(this, Crashlytics())
     }
-
 }

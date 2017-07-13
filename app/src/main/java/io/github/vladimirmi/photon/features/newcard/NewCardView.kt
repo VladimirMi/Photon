@@ -47,7 +47,7 @@ class NewCardView(context: Context, attrs: AttributeSet)
     private val tagsAdapter = StringAdapter(tagAction)
     private val suggestTagAdapter = StringAdapter(tagAction)
 
-    private val albumAction: (Album) -> Unit = { presenter.setAlbumId(it.id) }
+    private val albumAction: (Album) -> Unit = { presenter.setAlbum(it) }
     private val albumAdapter = AlbumAdapter(albumAction)
 
     override fun initDagger(context: Context) {

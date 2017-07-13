@@ -13,7 +13,9 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
+import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.PROFILE
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,7 +27,7 @@ import java.util.concurrent.TimeUnit
 class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     : BasePresenter<NewCardView, INewCardModel>(model, rootPresenter) {
 
-    private var returnToAlbum: Boolean = false
+    private var returnToAlbum: Album? = null
     private var startAction: (() -> Unit)? = null
 
     override fun initToolbar() {
@@ -34,9 +36,9 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
 
     override fun initView(view: NewCardView) {
         startAction?.invoke()
-        Flow.getKey<NewCardScreen>(view)?.albumId?.let {
-            returnToAlbum = true
-            setAlbumId(it)
+        Flow.getKey<NewCardScreen>(view)?.album?.let {
+            returnToAlbum = it
+            setAlbum(it)
         }
         compDisp.add(subscribeInTitleField())
         compDisp.add(subscribeOnTagField())
@@ -59,7 +61,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
             clearPhotocard()
             return true
         }
-        if (returnToAlbum) {
+        if (returnToAlbum != null) {
             returnToAlbum()
             return true
         }
@@ -67,7 +69,13 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     fun returnToAlbum() {
-        Flow.getKey<NewCardScreen>(view)?.albumId = null
+        Flow.getKey<NewCardScreen>(view)?.album = null
+        val history = rootPresenter.bottomHistory!!.historyMap[BottomNavHistory.BottomItem.PROFILE]
+        val newHistory = history!!.buildUpon().apply {
+            pop()
+            push(AlbumScreen(returnToAlbum!!))
+        }.build()
+        rootPresenter.bottomHistory?.historyMap?.set(BottomNavHistory.BottomItem.PROFILE, newHistory)
         rootPresenter.navigateTo(PROFILE)
     }
 
@@ -102,9 +110,9 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
         view.setTags(model.photoCard.tags)
     }
 
-    fun setAlbumId(albumId: String) {
-        model.photoCard.album = albumId
-        view.selectAlbum(albumId)
+    fun setAlbum(album: Album) {
+        model.photoCard.album = album.id
+        view.selectAlbum(album.id)
     }
 
     fun savePhotocard() {
@@ -112,7 +120,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
                 .ioToMain()
                 .subscribeWith(object : ErrorSingleObserver<Unit>() {
                     override fun onSuccess(t: Unit) {
-                        if (returnToAlbum) returnToAlbum() else {
+                        if (returnToAlbum != null) returnToAlbum() else {
                             view.showError(R.string.newcard_create_success)
                             view.postDelayed({ clearPhotocard() }, 2000)
                         }
