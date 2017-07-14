@@ -69,8 +69,8 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun onStop() {
         popups.forEach { it.dismiss() }
-        presenter.dropView(this)
         super.onStop()
+        presenter.dropView(this)
     }
 
     //endregion

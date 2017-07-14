@@ -41,7 +41,7 @@ class SearchView(context: Context, attrs: AttributeSet)
     }
 
     fun setPage(page: Page) {
-        Timber.e("setPage: ${page.position}")
+        Timber.e("setQueryPage: ${page.position}")
         search_pager.currentItem = page.position
     }
 }

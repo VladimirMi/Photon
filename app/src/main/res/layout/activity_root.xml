@@ -20,29 +20,31 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:titleTextColor="@color/black"
             app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:titleTextColor="@color/black"
             >
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
+
     <FrameLayout
         android:id="@+id/view_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/appbar"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/bottom_menu"
+        android:layout_below="@+id/appbar"
         />
+
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         app:itemBackground="@color/color_primary"
         app:itemIconTint="@color/sel_bottom_menu"
         app:itemTextColor="@color/sel_bottom_menu"
-        android:layout_alignParentBottom="true"
         app:menu="@menu/bottom_navigation"
         />
 

@@ -30,7 +30,6 @@ open class Photocard(
         if (id.isEmpty()) id = UUID.randomUUID().toString()
         filters.generateId()
         return this
-
     }
 }
 

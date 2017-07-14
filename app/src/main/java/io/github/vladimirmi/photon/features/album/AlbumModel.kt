@@ -35,14 +35,14 @@ class AlbumModel(private val dataManager: DataManager) : IAlbumModel {
         return Observable.fromIterable(photosForDelete)
                 .flatMap { photocard ->
                     if (album.isFavorite) {
-                        dataManager.removeFromFavorite(photocard.id)
-                                .doOnNext {
+                        dataManager.removeFromFavorite(photocard.id).ioToMain()
+                                .doOnComplete {
                                     album.photocards.remove(photocard)
                                     dataManager.saveToDB(album)
                                 }
                     } else {
-                        dataManager.deletePhotocard(photocard.id)
-                                .doOnNext { dataManager.removeFromDb(Photocard::class.java, photocard.id) }
+                        dataManager.deletePhotocard(photocard.id).ioToMain()
+                                .doOnComplete { dataManager.removeFromDb(Photocard::class.java, photocard.id) }
                     }
                 }
     }

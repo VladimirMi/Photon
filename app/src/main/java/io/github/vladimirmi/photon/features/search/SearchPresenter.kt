@@ -18,11 +18,11 @@ class SearchPresenter(model: ISearchModel, rootPresenter: RootPresenter)
     }
 
     override fun initView(view: SearchView) {
-        view.setPage(model.page)
+        view.setPage(model.queryPage)
     }
 
     fun savePageType(page: SearchView.Page) {
-        model.page = page
+        model.queryPage = page
     }
 }
 

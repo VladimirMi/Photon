@@ -12,7 +12,7 @@ interface ISearchModel : IModel {
     fun removeQuery(pair: Pair<String, String>)
     fun makeQuery()
     fun getQuery(): List<Query>
-    var page: SearchView.Page
+    var queryPage: SearchView.Page
     fun search(string: String): Observable<List<Search>>
     fun saveSearchField(search: String)
     fun removeQuery(fieldName: String)

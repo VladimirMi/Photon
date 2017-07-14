@@ -2,12 +2,16 @@ package io.github.vladimirmi.photon.features.newcard
 
 import android.content.Context
 import android.content.Intent
+import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import com.jakewharton.rxbinding2.widget.textChanges
+import com.transitionseverywhere.ChangeBounds
+import com.transitionseverywhere.TransitionManager
+import com.transitionseverywhere.TransitionSet
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
@@ -66,6 +70,12 @@ class NewCardView(context: Context, attrs: AttributeSet)
         initTagSection()
         album_list.layoutManager = GridLayoutManager(context, 2)
         album_list.adapter = albumAdapter
+
+        val set = TransitionSet()
+        set.addTransition(ChangeBounds())
+                .setDuration(300)
+                .interpolator = FastOutSlowInInterpolator()
+        TransitionManager.beginDelayedTransition(this, set)
     }
 
     private fun initFiltersSection() {
@@ -126,17 +136,11 @@ class NewCardView(context: Context, attrs: AttributeSet)
         ic_action.setImageResource(if (submit) R.drawable.ic_action_submit else R.drawable.ic_action_back_arrow)
     }
 
-    fun setTagSuggestions(tags: List<Tag>) {
-        suggestTagAdapter.updateData(tags.map { it.value })
-    }
+    fun setTagSuggestions(tags: List<Tag>) = suggestTagAdapter.updateData(tags.map { it.value })
 
-    fun setTags(tags: List<Tag>) {
-        tagsAdapter.updateData(tags.map { it.value })
-    }
+    fun setTags(tags: List<Tag>) = tagsAdapter.updateData(tags.map { it.value })
 
-    fun setAlbums(list: List<Album>) {
-        albumAdapter.updateData(list)
-    }
+    fun setAlbums(list: List<Album>) = albumAdapter.updateData(list)
 
     fun selectAlbum(albumId: String) {
         if (albumId == albumAdapter.selectedAlbum) return

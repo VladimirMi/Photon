@@ -19,7 +19,6 @@ import io.github.vladimirmi.photon.ui.EndlessRecyclerViewScrollListener
 import io.github.vladimirmi.photon.ui.LoginDialog
 import io.github.vladimirmi.photon.ui.RegistrationDialog
 import kotlinx.android.synthetic.main.screen_main.view.*
-import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -94,7 +93,6 @@ class MainView(context: Context, attrs: AttributeSet) :
         val bundle = Bundle()
         bundle.putParcelable("SUPER", super.onSaveInstanceState())
         val lm = photocardList.layoutManager as GridLayoutManager
-        Timber.e("onSaveInstanceState: save ${lm.findFirstVisibleItemPosition()}")
         bundle.putInt("SCROLL", lm.findFirstVisibleItemPosition())
         return bundle
     }

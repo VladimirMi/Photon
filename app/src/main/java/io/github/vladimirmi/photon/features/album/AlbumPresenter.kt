@@ -75,7 +75,6 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     fun submit() {
         if (photosForDelete.size > 0) {
-            album.photocards.removeAll(photosForDelete)
             compDisp.add(model.removePhotos(photosForDelete, album)
                     .subscribeWith(ErrorObserver()))
             photosForDelete.clear()

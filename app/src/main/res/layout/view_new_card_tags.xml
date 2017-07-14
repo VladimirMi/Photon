@@ -21,6 +21,7 @@
         />
 
     <LinearLayout
+        android:id="@+id/tag_field_container"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:gravity="center_vertical"
@@ -67,7 +68,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/suggestion_tag_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="162dp"
         />
 
     <View

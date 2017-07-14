@@ -15,7 +15,6 @@ import io.reactivex.Observable
 import io.realm.RealmObject
 import io.realm.Sort
 import okhttp3.MultipartBody
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -122,7 +121,6 @@ constructor(private val restService: RestService,
     }
 
     fun deletePhotocard(id: String): Observable<Int> {
-        Timber.e("deletePhotocard: ")
         return restService.deletePhotocard(getProfileId(), id, getUserToken())
                 .parseStatusCode()
                 .statusCode()
@@ -133,7 +131,10 @@ constructor(private val restService: RestService,
     //region =============== DataBase ==============
 
     fun <T : RealmObject> saveToDB(realmObject: T) {
-        if (realmObject is Photocard) realmObject.search = realmObject.title.toLowerCase()
+        if (realmObject is Photocard) {
+            realmObject.withId()
+            realmObject.search = realmObject.title.toLowerCase()
+        }
         realmManager.save(realmObject)
     }
 

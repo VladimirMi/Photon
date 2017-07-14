@@ -16,7 +16,7 @@ import timber.log.Timber
 
 class SearchModel(private val dataManager: DataManager, private val mainModel: IMainModel) : ISearchModel {
 
-    override var page = mainModel.appliedPage
+    override var queryPage = mainModel.queryPage
 
     override fun getTags(): Observable<List<Tag>> {
         return dataManager.getListFromDb(Tag::class.java, "value")
@@ -24,7 +24,7 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
     }
 
     override fun getQuery(): MutableList<Query> {
-        return when (page) {
+        return when (queryPage) {
             SearchView.Page.TAGS -> mainModel.tagsQuery
             SearchView.Page.FILTERS -> mainModel.filtersQuery
         }
@@ -56,7 +56,7 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
     }
 
     override fun makeQuery() {
-        mainModel.makeQuery(page)
+        mainModel.makeQuery(queryPage)
     }
 
     override fun search(string: String): Observable<List<Search>> {

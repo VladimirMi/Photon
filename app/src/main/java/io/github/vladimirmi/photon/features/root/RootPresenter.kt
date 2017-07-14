@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.realm.User
@@ -94,6 +93,10 @@ class RootPresenter(val model: IRootModel) :
 
     fun showMessage(stringId: Int) {
         view.showMessage(stringId)
+    }
+
+    fun clearMenu() {
+        view.clearToolbar()
     }
 }
 

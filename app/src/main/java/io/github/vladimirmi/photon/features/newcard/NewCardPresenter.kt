@@ -113,6 +113,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     fun setAlbum(album: Album) {
         model.photoCard.album = album.id
         view.selectAlbum(album.id)
+        if (returnToAlbum != null) returnToAlbum = album
     }
 
     fun savePhotocard() {

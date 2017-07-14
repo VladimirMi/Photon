@@ -9,25 +9,27 @@ import io.github.vladimirmi.photon.features.search.SearchView
 class SearchFilterPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
         BasePresenter<SearchFilterView, ISearchModel>(model, rootPresenter) {
 
-    var queryChanged = model.page != SearchView.Page.FILTERS
-
     override fun initToolbar() {
         // do nothing
     }
 
     override fun initView(view: SearchFilterView) {
         view.restoreFilterState(model.getQuery())
+        setupSubmitBtn(model.queryPage != SearchView.Page.FILTERS)
+    }
+
+    private fun setupSubmitBtn(queryChanged: Boolean) {
         view.setupSubmitBtn(queryChanged)
     }
 
     fun addQuery(query: Pair<String, String>) {
         model.addQuery(query)
-        queryChanged = true
+        setupSubmitBtn(true)
     }
 
     fun removeQuery(query: Pair<String, String>) {
         model.removeQuery(query)
-        queryChanged = true
+        setupSubmitBtn(true)
     }
 
     fun submit() {
@@ -37,7 +39,6 @@ class SearchFilterPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
 
     fun submitChange() {
         model.makeQuery()
-        queryChanged = true
-        initView(view)
+        setupSubmitBtn(true)
     }
 }

@@ -15,7 +15,7 @@ interface IMainModel : IModel {
     fun getPhotoCards(): Observable<List<Photocard>>
     val tagsQuery: MutableList<Query>
     val filtersQuery: MutableList<Query>
-    var appliedPage: SearchView.Page
+    var queryPage: SearchView.Page
     fun makeQuery(currentPage: SearchView.Page)
     fun isFiltered(): Boolean
     fun resetFilter()

@@ -34,6 +34,7 @@ abstract class BasePresenter<V : BaseView<*, V>, out M : IModel>
     }
 
     override fun dropView(view: V) {
+        rootPresenter.clearMenu()
         super.dropView(view)
         compDisp.clear()
         Timber.tag(javaClass.simpleName)

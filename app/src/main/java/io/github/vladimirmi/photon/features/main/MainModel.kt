@@ -15,7 +15,7 @@ import io.realm.Sort
 class MainModel(val dataManager: DataManager) : IMainModel {
 
     var query = ArrayList<Query>()
-    override var appliedPage: SearchView.Page = SearchView.Page.TAGS
+    override var queryPage: SearchView.Page = SearchView.Page.TAGS
     override val tagsQuery = ArrayList<Query>()
     override val filtersQuery = ArrayList<Query>()
 
@@ -25,7 +25,7 @@ class MainModel(val dataManager: DataManager) : IMainModel {
             SearchView.Page.TAGS -> query = tagsQuery
             SearchView.Page.FILTERS -> query = filtersQuery
         }
-        appliedPage = currentPage
+        queryPage = currentPage
     }
 
     override fun getPhotoCards(): Observable<List<Photocard>> {
@@ -41,7 +41,7 @@ class MainModel(val dataManager: DataManager) : IMainModel {
         query.clear()
         tagsQuery.clear()
         filtersQuery.clear()
-        appliedPage = SearchView.Page.TAGS
+        queryPage = SearchView.Page.TAGS
     }
 
     override fun addView(photocard: Photocard): Observable<Unit> {
