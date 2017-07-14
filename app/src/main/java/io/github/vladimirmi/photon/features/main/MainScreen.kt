@@ -17,7 +17,7 @@ import io.github.vladimirmi.photon.features.search.SearchScreen
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class MainScreen : BaseScreen<RootActivityComponent>() {
+class MainScreen(var updated: Int = 0) : BaseScreen<RootActivityComponent>() {
 
     val state = SparseArray<Parcelable>()
 

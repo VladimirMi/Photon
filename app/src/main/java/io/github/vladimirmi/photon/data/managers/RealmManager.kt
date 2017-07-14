@@ -18,26 +18,29 @@ import timber.log.Timber
 
 class RealmManager {
 
+    private val mainRealm = Realm.getDefaultInstance()
+
     fun save(realmObject: RealmObject) {
+        if (realmObject is Changeable && !realmObject.active) {
+            remove(realmObject::class.java, realmObject.id)
+            return
+        }
         val realm = Realm.getDefaultInstance()
         realm.executeTransaction { realm.insertOrUpdate(realmObject) }
         realm.close()
     }
 
     fun <T : RealmObject> getObject(clazz: Class<T>, id: String): Observable<T> {
-        val realm = Realm.getDefaultInstance()
-        return RealmObjectFlowable.obsFrom(realm
+        return RealmObjectFlowable.obsFrom(mainRealm
                 .where(clazz)
                 .equalTo("id", id)
                 .findFirstAsync())
                 .filter { it.isLoaded }
-                .doFinally { realm.close() }
     }
 
     fun <T : RealmObject> get(clazz: Class<T>, id: String): Observable<T> {
         removeAllNotActive(clazz)
-        val realm = Realm.getDefaultInstance()
-        return RealmResultFlowable.obsFrom(realm
+        return RealmResultFlowable.obsFrom(mainRealm
                 .where(clazz)
                 .equalTo("id", id)
                 .findAllAsync())
@@ -49,7 +52,6 @@ class RealmManager {
                         Observable.empty()
                     }
                 }
-                .doFinally { realm.close() }
     }
 
     fun <T : RealmObject> search(clazz: Class<T>,
@@ -57,15 +59,14 @@ class RealmManager {
                                  sortBy: String?,
                                  order: Sort,
                                  async: Boolean): Observable<RealmResults<T>> {
-        val realm = Realm.getDefaultInstance()
-        val realmQuery = realm.prepareQuery(clazz, query)
+        removeAllNotActive(clazz)
+        val realmQuery = mainRealm.prepareQuery(clazz, query)
 
         val result = realmQuery.let { if (async) it.findAllAsync() else it.findAll() }
                 .let { if (sortBy != null) it.sort(sortBy, order) else it }
 
         return RealmResultFlowable.obsFrom(result)
                 .filter { it.isLoaded }
-                .doFinally { realm.close() }
     }
 
     fun <T : RealmObject> remove(clazz: Class<T>, id: String) {
@@ -88,7 +89,7 @@ class RealmManager {
 
     fun <T : RealmObject> getSingle(java: Class<T>, id: String): T? {
         val realm = Realm.getDefaultInstance()
-        val result = realm.where(java).equalTo("id", id).findFirst().let { realm.copyFromRealm(it) }
+        val result = realm.where(java).equalTo("id", id).findFirst()?.let { realm.copyFromRealm(it) }
         realm.close()
         return result
     }

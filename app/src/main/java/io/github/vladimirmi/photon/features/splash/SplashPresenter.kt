@@ -8,7 +8,10 @@ import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.ioToMain
+import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -30,13 +33,20 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     }
 
     private fun updatePhotos(): Disposable {
-        var slowNet = false
+        var loaded = false
 
-        return model.updateLimitPhotoCards(AppConfig.PHOTOCARDS_PAGE_SIZE, AppConfig.SPLASH_TIMEOUT)
+        val obs = model.updateLimitPhotoCards(AppConfig.PHOTOCARDS_PAGE_SIZE, AppConfig.SPLASH_TIMEOUT)
+                .doOnNext { loaded = true }
+                .doOnError { if (it is NoSuchElementException) loaded = true } //304 empty
+                .map { false } // ended
+
+        return Observable.mergeDelayError(Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS)
+                .map { true } // ended
+                , obs)
+                .ioToMain()
                 .subscribeWith(object : ErrorObserver<Boolean>() {
-                    override fun onNext(loaded: Boolean) {
-                        if (slowNet) view.showMessage(R.string.message_err_connect)
-                        if (!loaded) slowNet = true
+                    override fun onNext(ended: Boolean) {
+                        if (ended && !loaded) view.showMessage(R.string.message_err_connect)
                     }
 
                     override fun onComplete() {
@@ -44,14 +54,15 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
                     }
 
                     override fun onError(e: Throwable) {
-                        if (e is NoSuchElementException) {
-                            openMainScreen() //304 empty
+                        if (loaded) {
+                            openMainScreen()
                             return
                         }
                         super.onError(e)
                         handleError(e)
                     }
                 })
+
     }
 
 
@@ -61,6 +72,6 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     }
 
     private fun openMainScreen() {
-        Flow.get(view).replaceTop(MainScreen(), Direction.FORWARD)
+        Flow.get(view).replaceTop(MainScreen(updated = AppConfig.PHOTOCARDS_PAGE_SIZE), Direction.FORWARD)
     }
 }

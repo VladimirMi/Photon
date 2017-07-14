@@ -4,7 +4,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.models.*
-import io.github.vladimirmi.photon.data.models.realm.*
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.Tag
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.utils.*
@@ -130,12 +133,10 @@ constructor(private val restService: RestService,
     //region =============== DataBase ==============
 
     fun <T : RealmObject> saveToDB(realmObject: T) {
-        if (removedNotActive(realmObject)) return
         if (realmObject is Photocard) realmObject.search = realmObject.title.toLowerCase()
         realmManager.save(realmObject)
     }
 
-    //todo sort may be null
     fun <T : RealmObject> getListFromDb(clazz: Class<T>,
                                         sortBy: String? = null,
                                         order: Sort = Sort.ASCENDING,
@@ -158,14 +159,6 @@ constructor(private val restService: RestService,
                                  async: Boolean = true): Observable<List<T>> {
         return realmManager.search(clazz, query, sortBy, order, async)
                 .map { ArrayList<T>().apply { addAll(it) } }
-    }
-
-    private fun <T : RealmObject> removedNotActive(realmObject: T): Boolean {
-        if (realmObject is Changeable && !realmObject.active) {
-            removeFromDb(realmObject::class.java, realmObject.id)
-            return true
-        }
-        return false
     }
 
     fun <T : RealmObject> removeFromDb(clazz: Class<T>, id: String) {

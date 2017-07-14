@@ -31,7 +31,7 @@ class MainModel(val dataManager: DataManager) : IMainModel {
     override fun getPhotoCards(): Observable<List<Photocard>> {
         return dataManager.search(Photocard::class.java,
                 query = if (query.isNotEmpty()) query.toList() else null,
-                sortBy = "views",
+                sortBy = "updated",
                 order = Sort.DESCENDING)
     }
 

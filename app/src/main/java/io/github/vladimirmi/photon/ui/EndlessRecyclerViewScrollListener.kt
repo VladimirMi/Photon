@@ -3,7 +3,6 @@ package io.github.vladimirmi.photon.ui
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import io.github.vladimirmi.photon.utils.AppConfig
-import timber.log.Timber
 
 
 /**
@@ -24,8 +23,6 @@ abstract class EndlessRecyclerViewScrollListener(private val layoutManager: Grid
     override fun onScrolled(view: RecyclerView, dx: Int, dy: Int) {
         val totalItemCount = layoutManager.itemCount
         val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
-        Timber.e("onScrolled: total= $totalItemCount")
-        Timber.e("onScrolled: last= $lastVisibleItemPosition")
 
         if (loading && totalItemCount > previousTotalItemCount) {
             loading = false

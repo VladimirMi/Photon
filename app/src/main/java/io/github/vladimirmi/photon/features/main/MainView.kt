@@ -19,6 +19,7 @@ import io.github.vladimirmi.photon.ui.EndlessRecyclerViewScrollListener
 import io.github.vladimirmi.photon.ui.LoginDialog
 import io.github.vladimirmi.photon.ui.RegistrationDialog
 import kotlinx.android.synthetic.main.screen_main.view.*
+import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -36,29 +37,31 @@ class MainView(context: Context, attrs: AttributeSet) :
     private val registrationDialog = RegistrationDialog(this, registrationAction)
     private val loginDialog = LoginDialog(this, loginAction)
 
-    private var scroll = 0
+    private var scrollPosition = 0
     private val state = Flow.getKey<MainScreen>(context)!!.state
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<MainScreen.Component>(context).inject(this)
     }
 
+    private val photocardList by lazy { photocard_list }
+
     override fun initView() {
-        photocard_list.layoutManager = GridLayoutManager(context, 2)
-        photocard_list.adapter = adapter
-        if (scroll != 0) {
-            photocard_list.scrollToPosition(scroll)
-            scroll = 0
-        }
-        photocard_list.addOnScrollListener(object : EndlessRecyclerViewScrollListener(photocard_list.layoutManager as GridLayoutManager) {
+        photocardList.layoutManager = GridLayoutManager(context, 2)
+        photocardList.adapter = adapter
+        photocardList.addOnScrollListener(object : EndlessRecyclerViewScrollListener(photocardList.layoutManager as GridLayoutManager) {
             override fun onLoadMore(page: Int, limit: Int, view: RecyclerView) {
                 presenter.loadMore(page, limit)
             }
         })
     }
 
-    fun setData(data: List<Photocard>) {
-        adapter.updateData(data)
+    fun setData(data: List<Photocard>, updated: Int) {
+        adapter.updateData(data.take(updated))
+        if (scrollPosition != 0) {
+            photocardList.scrollToPosition(scrollPosition)
+            scrollPosition = 0
+        }
     }
 
     fun openRegistrationDialog() = registrationDialog.show()
@@ -90,7 +93,8 @@ class MainView(context: Context, attrs: AttributeSet) :
     override fun onSaveInstanceState(): Parcelable {
         val bundle = Bundle()
         bundle.putParcelable("SUPER", super.onSaveInstanceState())
-        val lm = photocard_list.layoutManager as GridLayoutManager
+        val lm = photocardList.layoutManager as GridLayoutManager
+        Timber.e("onSaveInstanceState: save ${lm.findFirstVisibleItemPosition()}")
         bundle.putInt("SCROLL", lm.findFirstVisibleItemPosition())
         return bundle
     }
@@ -98,7 +102,7 @@ class MainView(context: Context, attrs: AttributeSet) :
     override fun onRestoreInstanceState(state: Parcelable) {
         val bundle = state as Bundle
         super.onRestoreInstanceState(bundle.getParcelable("SUPER"))
-        scroll = bundle.getInt("SCROLL")
+        scrollPosition = bundle.getInt("SCROLL")
     }
 
     fun showFilterWarning() {

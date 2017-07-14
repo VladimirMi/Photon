@@ -30,8 +30,6 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
             return
         }
 
-        val newScreenLayout = newScreen.layoutResId
-
         val flowContext = traversal.createContext(newScreen, baseContext)
         val mortarScope = Flow.getService<MortarScope>(newScreen.scopeName, flowContext)
         val mortarContext = mortarScope?.createContext(flowContext)
@@ -39,7 +37,7 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
         val layoutInflater = LayoutInflater.from(mortarContext)
 
         val previousView = getActiveView()
-        val newView = layoutInflater.inflate(newScreenLayout, viewContainer, false)
+        val newView = layoutInflater.inflate(newScreen.layoutResId, viewContainer, false)
 
         if (previousView != null) {
             prepareTransition(viewContainer, previousView, newView, traversal.direction)
@@ -50,8 +48,8 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
             viewContainer.removeView(previousView)
         }
 
-        newView.restoreFromState(traversal)
         viewContainer.addView(newView)
+        newView.restoreFromState(traversal)
 
         callback.onTraversalCompleted()
     }

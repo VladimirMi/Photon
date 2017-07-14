@@ -13,6 +13,7 @@ import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
+import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
@@ -33,6 +34,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     private lateinit var cardsDisposable: Disposable
+    private var updated = AppConfig.PHOTOCARDS_PAGE_SIZE
 
     override fun initToolbar() {
         val popupMenu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth
@@ -49,9 +51,17 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                         popupMenu = popupMenu,
                         actions = menuActions))
                 .build()
+
     }
 
     override fun initView(view: MainView) {
+        updated = Flow.getKey<MainScreen>(view)?.updated ?: 0
+        if (updated == 0) {
+            loadMore(0, AppConfig.PHOTOCARDS_PAGE_SIZE)
+        } else {
+            Flow.getKey<MainScreen>(view)?.updated = 0
+        }
+
         cardsDisposable = subscribeOnPhotocards()
         compDisp.add(cardsDisposable)
         if (model.isFiltered()) view.showFilterWarning()
@@ -61,7 +71,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         return model.getPhotoCards()
                 .subscribeWith(object : ErrorObserver<List<Photocard>>() {
                     override fun onNext(it: List<Photocard>) {
-                        view.setData(it)
+                        view.setData(it.sortedByDescending { it.views }, updated)
                     }
                 })
     }
@@ -117,8 +127,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun resetFilter() {
         model.resetFilter()
         initToolbar()
-        compDisp.remove(cardsDisposable)
-        initView(view)
+        resubscribeCards()
     }
 
     //todo network operation move to job
@@ -128,8 +137,20 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     fun loadMore(page: Int, limit: Int) {
-        Timber.e("loadMore: ")
+        Timber.e("loadMore: offset ${page * limit} limit $limit")
         model.updatePhotocards(page * limit, limit)
+                .subscribeWith(object : ErrorObserver<List<Photocard>>() {
+                    override fun onComplete() {
+                        updated += limit
+                        resubscribeCards()
+                    }
+                })
+    }
+
+    private fun resubscribeCards() {
+        compDisp.remove(cardsDisposable)
+        cardsDisposable = subscribeOnPhotocards()
+        compDisp.add(cardsDisposable)
     }
 }
 

@@ -74,7 +74,6 @@ class RealmResultFlowable<T : RealmModel> private constructor(private val result
     override fun subscribe(e: FlowableEmitter<RealmResults<T>>) {
         results.addChangeListener(RealmChangeListener {
             if (!e.isCancelled) {
-                Timber.e("subscribe: results $it")
                 e.onNext(it)
             }
         })

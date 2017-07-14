@@ -13,7 +13,7 @@ object AppConfig {
     const val WRITE_TIMEOUT = 5000 //ms
     const val UPDATE_TIMEOUT = 300_000 //ms
 
-    const val PHOTOCARDS_PAGE_SIZE = 12
+    const val PHOTOCARDS_PAGE_SIZE = 60
 
     const val PHOTOCARD_UPDATE_DELAY = 5L //min
     const val RETRY_REQUEST_BASE_DELAY = 500L //ms
