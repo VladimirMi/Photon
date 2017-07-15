@@ -13,8 +13,8 @@ import com.bumptech.glide.request.target.SimpleTarget
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
+import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.features.author.AuthorScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -58,7 +58,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
                 .build()
     }
 
-    private lateinit var photocard: Photocard
+    private lateinit var photocard: PhotocardDto
 
     override fun initView(view: PhotocardView) {
         val id = Flow.getKey<PhotocardScreen>(view)?.photocardId!!
@@ -80,8 +80,8 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private fun subscribeOnUser(ownerId: String): Disposable {
         return model.getUser(ownerId)
-                .subscribeWith(object : ErrorObserver<User>() {
-                    override fun onNext(it: User) {
+                .subscribeWith(object : ErrorObserver<UserDto>() {
+                    override fun onNext(it: UserDto) {
                         view.setUser(it)
                     }
                 })
@@ -89,8 +89,8 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private fun subscribeOnPhotocard(id: String, ownerId: String): Disposable {
         return model.getPhotocard(id, ownerId)
-                .subscribeWith(object : ErrorObserver<Photocard>() {
-                    override fun onNext(it: Photocard) {
+                .subscribeWith(object : ErrorObserver<PhotocardDto>() {
+                    override fun onNext(it: PhotocardDto) {
                         photocard = it
                         view.setPhotocard(it)
                     }

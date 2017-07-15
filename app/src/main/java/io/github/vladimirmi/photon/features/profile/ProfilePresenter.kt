@@ -11,8 +11,8 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
+import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.auth.AuthScreen
@@ -21,12 +21,11 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
-import io.realm.Realm
 
 class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     : BasePresenter<ProfileView, IProfileModel>(model, rootPresenter) {
 
-    private lateinit var profile: User
+    private lateinit var profile: UserDto
 
     private val menuActions: (MenuItem) -> Unit = {
         when (it.itemId) {
@@ -65,10 +64,8 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                 .subscribe { view.setAlbums(it) }
     }
 
-    fun showAlbum(album: Album) {
-        Realm.getDefaultInstance().use {
-            Flow.get(view).set(AlbumScreen(it.copyFromRealm(album)))
-        }
+    fun showAlbum(album: AlbumDto) {
+        Flow.get(view).set(AlbumScreen(album))
     }
 
     private fun logout() {
@@ -84,7 +81,7 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     }
 
     fun createNewAlbum(newAlbumReq: NewAlbumReq) {
-        compDisp.add(model.createAlbum(newAlbumReq, profile)
+        compDisp.add(model.createAlbum(newAlbumReq)
                 .subscribeWith(object : ErrorObserver<Unit>() {
                     override fun onComplete() {
                         view.closeNewAlbumDialog()

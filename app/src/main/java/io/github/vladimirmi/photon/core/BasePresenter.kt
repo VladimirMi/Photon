@@ -31,6 +31,7 @@ abstract class BasePresenter<V : BaseView<*, V>, out M : IModel>
         initView(view)
         Timber.tag(javaClass.simpleName)
         Timber.d("onLoad")
+        if (!rootPresenter.isNetAvailable()) view.showNetError()
     }
 
     override fun dropView(view: V) {

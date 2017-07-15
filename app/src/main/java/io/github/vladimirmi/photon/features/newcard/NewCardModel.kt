@@ -5,6 +5,7 @@ import com.birbit.android.jobqueue.JobManager
 import io.github.vladimirmi.photon.data.jobs.EmptyJobCallback
 import io.github.vladimirmi.photon.data.jobs.UploadPhotoJob
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
@@ -45,21 +46,23 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
         }
     }
 
-    override fun search(tag: String): Observable<List<Tag>> {
+    override fun search(tag: String): Observable<List<String>> {
         val query = Query("value", RealmOperator.CONTAINS, tag)
         return dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
                 .map { if (it.size > 3) it.subList(0, 3) else it }
+                .map { it.map { it.value } }
     }
 
-    override fun addTag(tag: Tag) {
-        if (!photoCard.tags.contains(tag)) {
-            photoCard.tags.add(tag)
+    override fun addTag(tag: String) {
+        if (photoCard.tags.count { it.value == tag } == 0) {
+            photoCard.tags.add(Tag(tag))
         }
     }
 
-    override fun getAlbums(): Observable<List<Album>> {
+    override fun getAlbums(): Observable<List<AlbumDto>> {
         val query = Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId())
         return dataManager.search(Album::class.java, listOf(query), sortBy = "views", order = Sort.DESCENDING)
+                .map { it.filter { it.active }.map { AlbumDto(it) } }
     }
 
     override fun savePhotoUri(uri: String) {
@@ -73,6 +76,7 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
         val uploadJob = UploadPhotoJob(photoCard)
         jobManager.addJobInBackground(uploadJob)
 
+        //todo to ext
         return Single.create { e ->
             val callback = object : EmptyJobCallback() {
                 override fun onDone(job: Job) {

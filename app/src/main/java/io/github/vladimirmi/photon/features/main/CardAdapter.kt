@@ -10,7 +10,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.utils.getDisplayMetrics
 import io.github.vladimirmi.photon.utils.setImage
 import kotlinx.android.synthetic.main.item_photocard.view.*
@@ -21,12 +21,12 @@ import java.util.*
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideInfo: Boolean = false)
+class CardAdapter(private val cardAction: (PhotocardDto) -> Unit, private val hideInfo: Boolean = false)
     : RecyclerView.Adapter<CardViewHolder>() {
 
-    private var data: List<Photocard> = ArrayList()
+    private var data: List<PhotocardDto> = ArrayList()
 
-    fun updateData(list: List<Photocard>) {
+    fun updateData(list: List<PhotocardDto>) {
         val diffResult = calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize() = data.size
 
@@ -62,15 +62,15 @@ class CardAdapter(private val cardAction: (Photocard) -> Unit, private val hideI
         return data.size
     }
 
-    fun deletePhotocard(photocard: Photocard) {
+    fun deletePhotocard(photocard: PhotocardDto) {
         updateData(data.filter { it.id != photocard.id })
     }
 }
 
-class CardViewHolder(itemView: View?, val cardAction: (Photocard) -> Unit) : RecyclerView.ViewHolder(itemView) {
+class CardViewHolder(itemView: View?, val cardAction: (PhotocardDto) -> Unit) : RecyclerView.ViewHolder(itemView) {
 
     private var curImagePath = ""
-    fun bind(photoCard: Photocard) {
+    fun bind(photoCard: PhotocardDto) {
         itemView.long_tap_action.visibility = GONE
         itemView.likes.text = photoCard.favorits.toString()
         itemView.views.text = photoCard.views.toString()

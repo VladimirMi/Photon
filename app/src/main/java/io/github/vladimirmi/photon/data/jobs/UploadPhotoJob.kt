@@ -46,7 +46,7 @@ class UploadPhotoJob(private val photocard: Photocard)
                 .doOnNext {
                     photocard.id = it.id
                     dataManager.removeFromDb(Photocard::class.java, tempId)
-                    val album = dataManager.getSingleObjFromDb(Album::class.java, photocard.album)!!
+                    val album = dataManager.getDetachedObjFromDb(Album::class.java, photocard.album)!!
                     album.photocards.add(photocard)
                     dataManager.saveToDB(album)
                 }

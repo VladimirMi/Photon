@@ -1,7 +1,6 @@
 package io.github.vladimirmi.photon.ui
 
 import android.graphics.drawable.GradientDrawable
-import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.util.Patterns
 import android.view.ViewGroup
@@ -54,9 +53,9 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
 
     protected fun getNetObs(errorMsg: String): Observable<Boolean> {
         return DaggerService.appComponent.dataManager().isNetworkAvailable()
-                .doOnNext {
-                    if (!it) Snackbar.make(viewGroup, errorMsg, Snackbar.LENGTH_LONG).show()
-                }
+//                .doOnNext {
+//                    if (!it) Snackbar.make(viewGroup, errorMsg, Snackbar.LENGTH_LONG).show()
+//                }
                 .observeOn(AndroidSchedulers.mainThread())
     }
 }

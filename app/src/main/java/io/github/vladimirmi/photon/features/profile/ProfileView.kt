@@ -8,8 +8,8 @@ import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
+import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.flow.FlowLifecycles
@@ -26,7 +26,7 @@ class ProfileView(context: Context, attrs: AttributeSet)
     : BaseView<ProfilePresenter, ProfileView>(context, attrs),
         FlowLifecycles.ActivityResultListener, FlowLifecycles.PermissionRequestListener {
 
-    private val albumAction: (Album) -> Unit = { showAlbum(it) }
+    private val albumAction: (AlbumDto) -> Unit = { showAlbum(it) }
     private val adapter = AlbumAdapter(albumAction)
 
     private val newAlbumAction: (NewAlbumReq) -> Unit = { presenter.createNewAlbum(it) }
@@ -56,7 +56,7 @@ class ProfileView(context: Context, attrs: AttributeSet)
     val namePrefix = "/  "
 
     @SuppressLint("SetTextI18n")
-    fun setProfile(user: User) {
+    fun setProfile(user: UserDto) {
         editProfileDialog.initFields(user.login, user.name)
         loginView.text = user.login
         nameView.text = namePrefix + user.name
@@ -67,16 +67,15 @@ class ProfileView(context: Context, attrs: AttributeSet)
     }
 
 
-    fun setAlbums(list: List<Album>) {
-        val albums = list.filter { it.active }
+    fun setAlbums(albums: List<AlbumDto>) {
         albumCountView.text = albums.count { !it.isFavorite }.toString()
         cardCountView.text = albums.filter { !it.isFavorite }
-                .fold(0, { acc, album -> acc + album.photocards.count { it.active } })
+                .fold(0, { acc, album -> acc + album.photocards.size })
                 .toString()
         adapter.updateData(albums)
     }
 
-    private fun showAlbum(album: Album) = presenter.showAlbum(album)
+    private fun showAlbum(album: AlbumDto) = presenter.showAlbum(album)
 
     fun openNewAlbumDialog() = newAlbumDialog.show()
     fun closeNewAlbumDialog() = newAlbumDialog.hide()

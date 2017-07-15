@@ -27,9 +27,12 @@ class AuthView(context: Context, attrs: AttributeSet)
         DaggerService.getComponent<AuthScreen.Component>(context).inject(this)
     }
 
+    private val loginBtn by lazy { login_btn }
+    private val registrationBtn by lazy { registration_btn }
+
     override fun initView() {
-        login_btn.setOnClickListener { openLoginDialog() }
-        registration_btn.setOnClickListener { openRegistrationDialog() }
+        loginBtn.setOnClickListener { openLoginDialog() }
+        registrationBtn.setOnClickListener { openRegistrationDialog() }
     }
 
     fun openRegistrationDialog() = registrationDialog.show()
@@ -47,5 +50,10 @@ class AuthView(context: Context, attrs: AttributeSet)
         super.onViewDestroyed(removedByFlow)
         registrationDialog.unsubscribe()
         loginDialog.unsubscribe()
+    }
+
+    fun enableButtons(enabled: Boolean) {
+        loginBtn.isEnabled = enabled
+        registrationBtn.isEnabled = enabled
     }
 }

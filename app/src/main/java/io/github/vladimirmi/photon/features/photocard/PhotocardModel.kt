@@ -1,6 +1,8 @@
 package io.github.vladimirmi.photon.features.photocard
 
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
+import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
@@ -16,13 +18,14 @@ import io.reactivex.Single
 
 class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
 
-    override fun getUser(id: String): Observable<User> {
+    override fun getUser(id: String): Observable<UserDto> {
         updateUser(id)
         return dataManager.getObjectFromDb(User::class.java, id)
+                .map { UserDto(it) }
     }
 
     private fun updateUser(id: String) {
-        val user = dataManager.getSingleObjFromDb(User::class.java, id)
+        val user = dataManager.getDetachedObjFromDb(User::class.java, id)
 
         dataManager.getUserFromNet(id, getUpdated(user).toString())
                 .subscribeWith(object : ErrorObserver<User>() {
@@ -32,13 +35,14 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
                 })
     }
 
-    override fun getPhotocard(id: String, ownerId: String): Observable<Photocard> {
+    override fun getPhotocard(id: String, ownerId: String): Observable<PhotocardDto> {
         updatePhotocard(id, ownerId)
         return dataManager.getObjectFromDb(Photocard::class.java, id)
+                .map { PhotocardDto(it) }
     }
 
     private fun updatePhotocard(id: String, ownerId: String) {
-        val photocard = dataManager.getSingleObjFromDb(Photocard::class.java, id)
+        val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, id)
 
         dataManager.getPhotocardFromNet(id, ownerId, getUpdated(photocard).toString())
                 .subscribeWith(object : ErrorObserver<Photocard>() {
@@ -58,7 +62,7 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
                     }
                 }
                 .map {
-                    it.photocards.add(dataManager.getSingleObjFromDb(Photocard::class.java, id))
+                    it.photocards.add(dataManager.getDetachedObjFromDb(Photocard::class.java, id))
                     dataManager.saveToDB(it)
                 }
     }

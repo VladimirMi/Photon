@@ -15,8 +15,7 @@ import com.transitionseverywhere.TransitionSet
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.Tag
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.features.main.AlbumViewHolder
@@ -51,7 +50,7 @@ class NewCardView(context: Context, attrs: AttributeSet)
     private val tagsAdapter = StringAdapter(tagAction)
     private val suggestTagAdapter = StringAdapter(tagAction)
 
-    private val albumAction: (Album) -> Unit = { presenter.setAlbum(it) }
+    private val albumAction: (AlbumDto) -> Unit = { presenter.setAlbum(it) }
     private val albumAdapter = AlbumAdapter(albumAction)
 
     override fun initDagger(context: Context) {
@@ -136,11 +135,11 @@ class NewCardView(context: Context, attrs: AttributeSet)
         ic_action.setImageResource(if (submit) R.drawable.ic_action_submit else R.drawable.ic_action_back_arrow)
     }
 
-    fun setTagSuggestions(tags: List<Tag>) = suggestTagAdapter.updateData(tags.map { it.value })
+    fun setTagSuggestions(tags: List<String>) = suggestTagAdapter.updateData(tags)
 
-    fun setTags(tags: List<Tag>) = tagsAdapter.updateData(tags.map { it.value })
+    fun setTags(tags: List<String>) = tagsAdapter.updateData(tags)
 
-    fun setAlbums(list: List<Album>) = albumAdapter.updateData(list)
+    fun setAlbums(list: List<AlbumDto>) = albumAdapter.updateData(list)
 
     fun selectAlbum(albumId: String) {
         if (albumId == albumAdapter.selectedAlbum) return

@@ -13,7 +13,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
-import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.ui.EndlessRecyclerViewScrollListener
 import io.github.vladimirmi.photon.ui.LoginDialog
@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.screen_main.view.*
 class MainView(context: Context, attrs: AttributeSet) :
         BaseView<MainPresenter, MainView>(context, attrs) {
 
-    private val cardAction: (Photocard) -> Unit = { presenter.showPhotoCard(it) }
+    private val cardAction: (PhotocardDto) -> Unit = { presenter.showPhotoCard(it) }
     private val adapter = CardAdapter(cardAction)
 
     private val registrationAction: (SignUpReq) -> Unit = { register(it) }
@@ -55,7 +55,7 @@ class MainView(context: Context, attrs: AttributeSet) :
         })
     }
 
-    fun setData(data: List<Photocard>, updated: Int) {
+    fun setData(data: List<PhotocardDto>, updated: Int) {
         adapter.updateData(data.take(updated))
         if (scrollPosition != 0) {
             photocardList.scrollToPosition(scrollPosition)

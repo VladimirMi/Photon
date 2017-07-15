@@ -1,7 +1,6 @@
 package io.github.vladimirmi.photon.features.splash
 
 import io.github.vladimirmi.photon.core.IModel
-import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.reactivex.Observable
 
 /**
@@ -9,6 +8,6 @@ import io.reactivex.Observable
  */
 
 interface ISplashModel : IModel {
-    fun updateLimitPhotoCards(limit: Int, minDelay: Long): Observable<List<Photocard>>
+    fun updateLimitPhotoCards(limit: Int): Observable<Int>
     fun dbIsNotEmpty(): Boolean
 }

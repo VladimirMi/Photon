@@ -7,7 +7,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.utils.getDisplayMetrics
 import io.github.vladimirmi.photon.utils.setImage
 import kotlinx.android.synthetic.main.item_album.view.*
@@ -18,15 +18,15 @@ import java.util.*
  * Developer Vladimir Mikhalev, 18.06.2017.
  */
 
-class AlbumAdapter(val albumAction: (Album) -> Unit)
+class AlbumAdapter(val albumAction: (AlbumDto) -> Unit)
     : RecyclerView.Adapter<AlbumViewHolder>() {
 
     var authorMode = false
     var selectedAlbum = ""
 
-    private var data: List<Album> = ArrayList()
+    private var data: List<AlbumDto> = ArrayList()
 
-    fun updateData(list: List<Album>) {
+    fun updateData(list: List<AlbumDto>) {
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize() = data.size
 
@@ -70,22 +70,21 @@ class AlbumAdapter(val albumAction: (Album) -> Unit)
     }
 }
 
-class AlbumViewHolder(itemView: View, val albumAction: (Album) -> Unit)
+class AlbumViewHolder(itemView: View, val albumAction: (AlbumDto) -> Unit)
     : RecyclerView.ViewHolder(itemView) {
 
     private var curImagePath = ""
-    fun bind(album: Album) {
+    fun bind(album: AlbumDto) {
         itemView.preview.setOnClickListener { albumAction(album) }
         itemView.album_name.text = album.title
 
-        val photocards = album.photocards.filter { it.active }
-        itemView.card_count.text = photocards.size.toString()
-        itemView.likes.text = photocards.fold(0, { acc, photocard -> acc + photocard.favorits }).toString()
-        itemView.views.text = photocards.fold(0, { acc, photocard -> acc + photocard.views }).toString()
+        itemView.card_count.text = album.photocards.size.toString()
+        itemView.likes.text = album.photocards.fold(0, { acc, photocard -> acc + photocard.favorits }).toString()
+        itemView.views.text = album.photocards.fold(0, { acc, photocard -> acc + photocard.views }).toString()
 
-        if (photocards.isNotEmpty() && curImagePath != photocards[0].photo) {
-            itemView.preview.setImage(photocards[0].photo)
-            curImagePath = photocards[0].photo
+        if (album.photocards.isNotEmpty() && curImagePath != album.photocards[0].photo) {
+            itemView.preview.setImage(album.photocards[0].photo)
+            curImagePath = album.photocards[0].photo
         } else {
             itemView.preview.setImage("")
         }

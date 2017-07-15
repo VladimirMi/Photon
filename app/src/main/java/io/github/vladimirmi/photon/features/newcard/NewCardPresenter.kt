@@ -9,9 +9,8 @@ import android.provider.OpenableColumns
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -27,7 +26,7 @@ import java.util.concurrent.TimeUnit
 class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     : BasePresenter<NewCardView, INewCardModel>(model, rootPresenter) {
 
-    private var returnToAlbum: Album? = null
+    private var returnToAlbum: AlbumDto? = null
     private var startAction: (() -> Unit)? = null
 
     override fun initToolbar() {
@@ -40,10 +39,11 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
             returnToAlbum = it
             setAlbum(it)
         }
-        compDisp.add(subscribeInTitleField())
+        compDisp.add(subscribeOnTitleField())
         compDisp.add(subscribeOnTagField())
-        view.setTags(model.photoCard.tags)
         compDisp.add(subscribeOnAlbums())
+
+        view.setTags(model.photoCard.tags.map { it.value })
 
         chooseWhatShow()
     }
@@ -79,7 +79,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
         rootPresenter.navigateTo(PROFILE)
     }
 
-    private fun subscribeInTitleField(): Disposable {
+    private fun subscribeOnTitleField(): Disposable {
         return view.nameObs
                 .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .subscribe { model.photoCard.title = it.toString() }
@@ -94,9 +94,9 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
 
     private fun subscribeOnAlbums(): Disposable {
         return model.getAlbums()
-                .subscribeWith(object : ErrorObserver<List<Album>>() {
-                    override fun onNext(list: List<Album>) {
-                        view.setAlbums(list.filter { it.active })
+                .subscribeWith(object : ErrorObserver<List<AlbumDto>>() {
+                    override fun onNext(it: List<AlbumDto>) {
+                        view.setAlbums(it)
                     }
                 })
     }
@@ -106,11 +106,11 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     fun removeFilter(filter: Pair<String, String>) = model.removeFilter(filter)
 
     fun saveTag(tag: String) {
-        model.addTag(Tag(tag))
-        view.setTags(model.photoCard.tags)
+        model.addTag(tag)
+        view.setTags(model.photoCard.tags.map { it.value })
     }
 
-    fun setAlbum(album: Album) {
+    fun setAlbum(album: AlbumDto) {
         model.photoCard.album = album.id
         view.selectAlbum(album.id)
         if (returnToAlbum != null) returnToAlbum = album

@@ -8,7 +8,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
-import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.reactivex.Observable
@@ -45,13 +44,13 @@ class RootPresenter(val model: IRootModel) :
         view.hideLoading()
     }
 
-    fun register(req: SignUpReq): Observable<User> {
+    fun register(req: SignUpReq): Observable<Unit> {
         return model.register(req)
                 .doOnSubscribe { showLoading() }
                 .doAfterTerminate { hideLoading() }
     }
 
-    fun login(req: SignInReq): Observable<User> {
+    fun login(req: SignInReq): Observable<Unit> {
         return model.login(req)
                 .doOnSubscribe { showLoading() }
                 .doAfterTerminate { hideLoading() }
@@ -98,6 +97,8 @@ class RootPresenter(val model: IRootModel) :
     fun clearMenu() {
         view.clearToolbar()
     }
+
+    fun isNetAvailable() = model.isNetAvail()
 }
 
 

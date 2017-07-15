@@ -13,6 +13,7 @@ import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.realm.RealmObject
+import io.realm.RealmResults
 import io.realm.Sort
 import okhttp3.MultipartBody
 import java.util.concurrent.TimeUnit
@@ -141,7 +142,7 @@ constructor(private val restService: RestService,
     fun <T : RealmObject> getListFromDb(clazz: Class<T>,
                                         sortBy: String? = null,
                                         order: Sort = Sort.ASCENDING,
-                                        async: Boolean = true): Observable<List<T>> {
+                                        async: Boolean = true): Observable<RealmResults<T>> {
         return search(clazz, null, sortBy, order, async)
     }
 
@@ -149,7 +150,7 @@ constructor(private val restService: RestService,
         return realmManager.get(clazz, id)
     }
 
-    fun <T : RealmObject> getSingleObjFromDb(java: Class<T>, id: String): T? {
+    fun <T : RealmObject> getDetachedObjFromDb(java: Class<T>, id: String): T? {
         return realmManager.getSingle(java, id)
     }
 
@@ -157,9 +158,8 @@ constructor(private val restService: RestService,
                                  query: List<Query>?,
                                  sortBy: String? = null,
                                  order: Sort = Sort.ASCENDING,
-                                 async: Boolean = true): Observable<List<T>> {
+                                 async: Boolean = true): Observable<RealmResults<T>> {
         return realmManager.search(clazz, query, sortBy, order, async)
-                .map { ArrayList<T>().apply { addAll(it) } }
     }
 
     fun <T : RealmObject> removeFromDb(clazz: Class<T>, id: String) {

@@ -3,7 +3,6 @@ package io.github.vladimirmi.photon.features.root
 import io.github.vladimirmi.photon.core.IModel
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
-import io.github.vladimirmi.photon.data.models.realm.User
 import io.reactivex.Observable
 
 /**
@@ -13,6 +12,7 @@ import io.reactivex.Observable
 interface IRootModel : IModel {
     fun isUserAuth(): Boolean
     fun logout()
-    fun login(req: SignInReq): Observable<User>
-    fun register(req: SignUpReq): Observable<User>
+    fun login(req: SignInReq): Observable<Unit>
+    fun register(req: SignUpReq): Observable<Unit>
+    fun isNetAvail(): Boolean
 }

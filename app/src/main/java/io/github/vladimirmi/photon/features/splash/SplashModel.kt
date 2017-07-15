@@ -11,12 +11,13 @@ import io.reactivex.Observable
 class SplashModel(val dataManager: DataManager) : ISplashModel {
 
     @Suppress("SimplifyBooleanWithConstants")
-    override fun updateLimitPhotoCards(limit: Int, minDelay: Long): Observable<List<Photocard>> {
+    override fun updateLimitPhotoCards(limit: Int): Observable<Int> {
         return dataManager.isNetworkAvailable()
                 .filter { it != false }
                 .firstOrError().toObservable()
                 .flatMap { dataManager.getPhotocardsFromNet(0, limit) }
                 .doOnNext { it.forEach { dataManager.saveToDB(it) } }
+                .map { it.size }
                 .firstOrError().toObservable()
     }
 

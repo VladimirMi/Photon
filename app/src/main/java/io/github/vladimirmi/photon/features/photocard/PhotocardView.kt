@@ -9,8 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
+import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.flow.FlowLifecycles
 import io.github.vladimirmi.photon.ui.TagView
@@ -41,21 +41,20 @@ class PhotocardView(context: Context, attrs: AttributeSet)
     }
 
     private var curAvatarPath = ""
-    fun setUser(user: User) {
+    fun setUser(user: UserDto) {
         if (user.avatar != curAvatarPath) {
             user_avatar.setRoundAvatarWithBorder(user.avatar, 0f)
             curAvatarPath = user.avatar
         }
         user_name.text = user.name
-        val albums = user.albums.filter { it.active }
-        album_count.text = albums.count { !it.isFavorite }.toString()
-        card_count.text = albums.filter { !it.isFavorite }
-                .fold(0, { acc, album -> acc + album.photocards.count { it.active } })
+        album_count.text = user.albums.count { !it.isFavorite }.toString()
+        card_count.text = user.albums.filter { !it.isFavorite }
+                .fold(0, { acc, album -> acc + album.photocards.size })
                 .toString()
     }
 
     private var curImagePath = ""
-    fun setPhotocard(photocard: Photocard) {
+    fun setPhotocard(photocard: PhotocardDto) {
         if (curImagePath != photocard.photo) {
             photo.setImage(photocard.photo)
             curImagePath = photocard.photo

@@ -26,7 +26,9 @@ class RealmManager {
             return
         }
         val realm = Realm.getDefaultInstance()
-        realm.executeTransaction { realm.insertOrUpdate(realmObject) }
+        realm.executeTransaction {
+            it.insertOrUpdate(realmObject)
+        }
         realm.close()
     }
 
@@ -80,6 +82,7 @@ class RealmManager {
 
     fun <T : RealmObject> removeAllNotActive(clazz: Class<T>) {
         if (!Changeable::class.java.isAssignableFrom(clazz)) return
+        Timber.e("remove not active ${clazz.simpleName}")
         val realm = Realm.getDefaultInstance()
         realm.executeTransaction {
             it.where(clazz).equalTo("active", false).findAll()?.deleteAllFromRealm()

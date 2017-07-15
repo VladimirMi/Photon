@@ -18,9 +18,9 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
 
     override var queryPage = mainModel.queryPage
 
-    override fun getTags(): Observable<List<Tag>> {
+    override fun getTags(): Observable<List<String>> {
         return dataManager.getListFromDb(Tag::class.java, "value")
-                .map { it.sortedBy { it.value.toLowerCase() } }
+                .map { it.map { it.value } }
     }
 
     override fun getQuery(): MutableList<Query> {
@@ -59,11 +59,12 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
         mainModel.makeQuery(queryPage)
     }
 
-    override fun search(string: String): Observable<List<Search>> {
+    override fun search(string: String): Observable<List<String>> {
         val query = Query("value", RealmOperator.CONTAINS, string)
         return dataManager.search(Search::class.java, listOf(query),
                 sortBy = "date", order = Sort.DESCENDING)
                 .map { if (it.size > 5) it.subList(0, 5) else it }
+                .map { it.map { it.value } }
     }
 
     override fun saveSearchField(search: String) {

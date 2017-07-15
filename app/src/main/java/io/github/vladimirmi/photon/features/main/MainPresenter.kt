@@ -6,8 +6,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
-import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
@@ -15,6 +14,7 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.afterNetCheck
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
 
@@ -27,14 +27,14 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     private val menuActions: (MenuItem) -> Unit = {
         when (it.itemId) {
-            R.id.menu_signIn -> view.openLoginDialog()
-            R.id.menu_signUp -> view.openRegistrationDialog()
+            R.id.menu_signIn -> view.afterNetCheck<MainView> { openLoginDialog() }
+            R.id.menu_signUp -> view.afterNetCheck<MainView> { openRegistrationDialog() }
             R.id.menu_logout -> logout()
         }
     }
 
     private lateinit var cardsDisposable: Disposable
-    private var updated = AppConfig.PHOTOCARDS_PAGE_SIZE
+    private var updated = 0
 
     override fun initToolbar() {
         val popupMenu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth
@@ -55,11 +55,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     override fun initView(view: MainView) {
-        updated = Flow.getKey<MainScreen>(view)?.updated ?: 0
+        updated = Flow.getKey<MainScreen>(view)!!.updated
         if (updated == 0) {
             loadMore(0, AppConfig.PHOTOCARDS_PAGE_SIZE)
         } else {
-            Flow.getKey<MainScreen>(view)?.updated = 0
+            Flow.getKey<MainScreen>(view)!!.updated = 0
         }
 
         cardsDisposable = subscribeOnPhotocards()
@@ -69,9 +69,10 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     private fun subscribeOnPhotocards(): Disposable {
         return model.getPhotoCards()
-                .subscribeWith(object : ErrorObserver<List<Photocard>>() {
-                    override fun onNext(it: List<Photocard>) {
-                        view.setData(it.sortedByDescending { it.views }, updated)
+                .subscribeWith(object : ErrorObserver<List<PhotocardDto>>() {
+                    override fun onNext(it: List<PhotocardDto>) {
+                        val update = if (updated == 0) it.size else updated
+                        view.setData(it.sortedByDescending { it.views }, update)
                     }
                 })
     }
@@ -79,7 +80,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun register(req: SignUpReq) {
         compDisp.add(rootPresenter.register(req)
                 .doOnSubscribe { view.closeRegistrationDialog() }
-                .subscribeWith(object : ErrorObserver<User>() {
+                .subscribeWith(object : ErrorObserver<Unit>() {
                     override fun onComplete() {
                         initToolbar()
                     }
@@ -99,7 +100,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun login(req: SignInReq) {
         compDisp.add(rootPresenter.login(req)
                 .doOnSubscribe { view.closeLoginDialog() }
-                .subscribeWith(object : ErrorObserver<User>() {
+                .subscribeWith(object : ErrorObserver<Unit>() {
                     override fun onComplete() {
                         initToolbar()
                     }
@@ -130,18 +131,20 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         resubscribeCards()
     }
 
-    //todo network operation move to job
-    fun showPhotoCard(photocard: Photocard) {
-        model.addView(photocard).subscribeWith(ErrorObserver())
-        Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
+    //todo move to job
+    fun showPhotoCard(photocard: PhotocardDto) {
+        view.afterNetCheck<MainView> {
+            model.addView(photocard.id).subscribeWith(ErrorObserver())
+            Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
+        }
     }
 
     fun loadMore(page: Int, limit: Int) {
         Timber.e("loadMore: offset ${page * limit} limit $limit")
         model.updatePhotocards(page * limit, limit)
-                .subscribeWith(object : ErrorObserver<List<Photocard>>() {
-                    override fun onComplete() {
-                        updated += limit
+                .subscribeWith(object : ErrorObserver<Int>(view) {
+                    override fun onNext(it: Int) {
+                        updated += it
                         resubscribeCards()
                     }
                 })

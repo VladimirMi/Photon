@@ -16,16 +16,16 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
 
     override fun isUserAuth() = dataManager.isUserAuth()
 
-    override fun register(req: SignUpReq): Observable<User> {
+    override fun register(req: SignUpReq): Observable<Unit> {
         return dataManager.signUp(req)
-                .doOnNext { saveUser(it) }
+                .map { saveUser(it) }
                 .delay(1000, TimeUnit.MILLISECONDS, true)
                 .ioToMain()
     }
 
-    override fun login(req: SignInReq): Observable<User> {
+    override fun login(req: SignInReq): Observable<Unit> {
         return dataManager.signIn(req)
-                .doOnNext { saveUser(it) }
+                .map { saveUser(it) }
                 .delay(1000, TimeUnit.MILLISECONDS, true)
                 .ioToMain()
     }
@@ -37,4 +37,6 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
         dataManager.saveUserId(user.id)
         dataManager.saveUserToken(user.token)
     }
+
+    override fun isNetAvail(): Boolean = dataManager.isNetworkAvailable().blockingFirst()
 }

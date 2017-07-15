@@ -35,7 +35,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     private fun updatePhotos(): Disposable {
         var loaded = false
 
-        val obs = model.updateLimitPhotoCards(AppConfig.PHOTOCARDS_PAGE_SIZE, AppConfig.SPLASH_TIMEOUT)
+        val obs = model.updateLimitPhotoCards(AppConfig.PHOTOCARDS_PAGE_SIZE)
                 .doOnNext { loaded = true }
                 .doOnError { if (it is NoSuchElementException) loaded = true } //304 empty
                 .map { false } // ended
@@ -47,15 +47,16 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
                 .subscribeWith(object : ErrorObserver<Boolean>() {
                     override fun onNext(ended: Boolean) {
                         if (ended && !loaded) view.showMessage(R.string.message_err_connect)
+                        if (model.dbIsNotEmpty()) openMainScreen()
                     }
 
                     override fun onComplete() {
-                        openMainScreen()
+                        openMainScreen(AppConfig.PHOTOCARDS_PAGE_SIZE)
                     }
 
                     override fun onError(e: Throwable) {
                         if (loaded) {
-                            openMainScreen()
+                            openMainScreen(AppConfig.PHOTOCARDS_PAGE_SIZE)
                             return
                         }
                         super.onError(e)
@@ -71,7 +72,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
         if (model.dbIsNotEmpty()) openMainScreen()
     }
 
-    private fun openMainScreen() {
-        Flow.get(view).replaceTop(MainScreen(updated = AppConfig.PHOTOCARDS_PAGE_SIZE), Direction.FORWARD)
+    private fun openMainScreen(updated: Int = 0) {
+        Flow.get(view).replaceTop(MainScreen(updated), Direction.FORWARD)
     }
 }

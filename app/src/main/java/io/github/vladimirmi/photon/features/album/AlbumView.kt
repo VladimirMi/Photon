@@ -6,8 +6,8 @@ import android.util.AttributeSet
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.EditAlbumReq
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.CardAdapter
 import io.github.vladimirmi.photon.features.main.CardViewHolder
@@ -30,7 +30,7 @@ class AlbumView(context: Context, attrs: AttributeSet)
 
     private var editMode: Boolean = false
 
-    private val cardAction: (Photocard) -> Unit = {
+    private val cardAction: (PhotocardDto) -> Unit = {
         if (editMode) presenter.deletePhotocard(it) else presenter.showPhotoCard(it)
     }
     private val adapter = CardAdapter(cardAction, hideInfo = true)
@@ -59,12 +59,11 @@ class AlbumView(context: Context, attrs: AttributeSet)
         photocardList.setOnLongClickListener { presenter.setEditable(true); true }
     }
 
-    fun setAlbum(album: Album) {
+    fun setAlbum(album: AlbumDto) {
         name.text = album.title
         description.text = album.description
-        val photocards = album.photocards.filter { it.active }
-        cardCount.text = photocards.size.toString()
-        adapter.updateData(photocards)
+        cardCount.text = album.photocards.size.toString()
+        adapter.updateData(album.photocards)
     }
 
     fun setEditable(editMode: Boolean) {
@@ -80,7 +79,7 @@ class AlbumView(context: Context, attrs: AttributeSet)
     fun showEditDialog() = editDialog.show()
     fun closeEditDialog() = editDialog.hide()
 
-    fun deletePhotocard(photocard: Photocard) {
+    fun deletePhotocard(photocard: PhotocardDto) {
         adapter.deletePhotocard(photocard)
     }
 

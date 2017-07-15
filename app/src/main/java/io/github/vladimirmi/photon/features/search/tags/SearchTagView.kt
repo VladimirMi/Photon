@@ -8,8 +8,6 @@ import com.google.android.flexbox.FlexboxLayout
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.realm.Search
-import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.ui.TagView
@@ -62,8 +60,8 @@ class SearchTagView(context: Context, attrs: AttributeSet)
         }
     }
 
-    fun setRecentSearches(list: List<Search>) {
-        searchAdapter.updateData(list.map { it.value })
+    fun setRecentSearches(list: List<String>) {
+        searchAdapter.updateData(list)
     }
 
     fun enableSubmit(enable: Boolean) {
@@ -75,11 +73,11 @@ class SearchTagView(context: Context, attrs: AttributeSet)
         search_field.setText(value)
     }
 
-    fun setTags(tags: List<Tag>, query: List<Query>) {
+    fun setTags(tags: List<String>, query: List<Query>) {
         val queryTags = query.filter { it.fieldName == "tags.value" }
         tags.forEach { tag ->
-            val view = TagView(context, tag.value, tagAction)
-            if (queryTags.find { it.value == tag.value } != null) view.pick()
+            val view = TagView(context, tag, tagAction)
+            if (queryTags.find { it.value == tag } != null) view.pick()
             flexbox.addView(view)
         }
         tags_wrapper.addView(flexbox)

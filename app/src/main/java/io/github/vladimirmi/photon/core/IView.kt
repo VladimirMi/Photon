@@ -8,4 +8,5 @@ interface IView {
     fun showMessage(string: String)
     fun showMessage(stringId: Int)
     fun showError(stringId: Int, vararg formatArgs: Any = emptyArray())
+    fun showNetError()
 }

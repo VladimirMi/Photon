@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.features.main
 
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
 import io.github.vladimirmi.photon.utils.Query
@@ -28,11 +29,12 @@ class MainModel(val dataManager: DataManager) : IMainModel {
         queryPage = currentPage
     }
 
-    override fun getPhotoCards(): Observable<List<Photocard>> {
+    override fun getPhotoCards(): Observable<List<PhotocardDto>> {
         return dataManager.search(Photocard::class.java,
                 query = if (query.isNotEmpty()) query.toList() else null,
                 sortBy = "updated",
                 order = Sort.DESCENDING)
+                .map { it.filter { it.active }.map { PhotocardDto(it) } }
     }
 
     override fun isFiltered() = query.isNotEmpty()
@@ -44,20 +46,23 @@ class MainModel(val dataManager: DataManager) : IMainModel {
         queryPage = SearchView.Page.TAGS
     }
 
-    override fun addView(photocard: Photocard): Observable<Unit> {
-        return dataManager.addView(photocard.id)
+    override fun addView(photocardId: String): Observable<Unit> {
+        return dataManager.addView(photocardId)
+                .map { if (it.success) it else throw Throwable("Add view to photo fails") }
                 .map {
-                    if (it.success) {
-                        photocard.views++
-                        dataManager.saveToDB(photocard)
-                    }
+                    val photo = dataManager.getDetachedObjFromDb(Photocard::class.java, photocardId)!!
+                    photo.views++
+                    dataManager.saveToDB(photo)
                 }
                 .ioToMain()
     }
 
-    override fun updatePhotocards(offset: Int, limit: Int): Observable<List<Photocard>> {
+    override fun updatePhotocards(offset: Int, limit: Int): Observable<Int> {
         return dataManager.getPhotocardsFromNet(offset, limit)
                 .doOnNext { it.forEach { dataManager.saveToDB(it) } }
+                .map { it.size }
                 .ioToMain()
     }
+
+
 }

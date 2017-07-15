@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.ViewGroup
 import flow.Flow
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.core.IView
 import io.github.vladimirmi.photon.di.DaggerService
@@ -100,5 +101,9 @@ abstract class FlowActivity : AppCompatActivity(), IView {
     override fun showError(stringId: Int, vararg formatArgs: Any) {
         val string = resources.getString(stringId, *formatArgs)
         Snackbar.make(root_container, string, Snackbar.LENGTH_SHORT).show()
+    }
+
+    override fun showNetError() {
+        Snackbar.make(root_container, R.string.message_err_net, Snackbar.LENGTH_SHORT).show()
     }
 }

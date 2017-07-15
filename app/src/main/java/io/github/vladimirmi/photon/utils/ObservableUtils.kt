@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.utils
 
 import com.crashlytics.android.Crashlytics
+import io.github.vladimirmi.photon.core.IView
 import io.github.vladimirmi.photon.data.models.realm.Changeable
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.reactivex.Observable
@@ -10,6 +11,7 @@ import io.reactivex.observers.DisposableObserver
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
+import java.net.ConnectException
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -22,6 +24,8 @@ fun <T> Observable<T>.ioToMain(): Observable<T> = subscribeOn(Schedulers.io())
 
 fun <T> Single<T>.ioToMain(): Single<T> = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
+
+fun <T> Observable<T>.unit(): Observable<Unit> = map {}
 
 fun <T> Observable<Response<T>>.body(): Observable<T> = map { it.body()!! }
 
@@ -74,20 +78,28 @@ fun <T> Observable<T>.retryExp(): Observable<T> {
     }
 }
 
-open class ErrorObserver<T> : DisposableObserver<T>() {
+open class ErrorObserver<T>(private val view: IView? = null) : DisposableObserver<T>() {
     override fun onComplete() {}
 
     override fun onNext(it: T) {}
 
     override fun onError(e: Throwable) {
-        Crashlytics.logException(e)
+        if (e is ConnectException) {
+            view?.showNetError()
+        } else {
+            Crashlytics.logException(e)
+        }
     }
 }
 
-open class ErrorSingleObserver<T> : DisposableSingleObserver<T>() {
+open class ErrorSingleObserver<T>(private val view: IView? = null) : DisposableSingleObserver<T>() {
     override fun onSuccess(t: T) {}
 
     override fun onError(e: Throwable) {
-        Crashlytics.logException(e)
+        if (e is ConnectException) {
+            view?.showNetError()
+        } else {
+            Crashlytics.logException(e)
+        }
     }
 }

@@ -5,8 +5,8 @@ import android.content.Context
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
+import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.utils.setRoundAvatarWithBorder
@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.view_profile.view.*
 class AuthorView(context: Context, attrs: AttributeSet)
     : BaseView<AuthorPresenter, AuthorView>(context, attrs) {
 
-    private val albumAction: (Album) -> Unit = { showAlbum(it) }
+    private val albumAction: (AlbumDto) -> Unit = { showAlbum(it) }
     private val adapter = AlbumAdapter(albumAction)
 
     override fun initDagger(context: Context) {
@@ -34,7 +34,7 @@ class AuthorView(context: Context, attrs: AttributeSet)
 
     private var curAvatarPath = ""
     @SuppressLint("SetTextI18n")
-    fun setUser(user: User) {
+    fun setUser(user: UserDto) {
         user_login.text = user.login
         user_name.text = "/  ${user.name}"
         if (user.avatar != curAvatarPath) {
@@ -43,16 +43,15 @@ class AuthorView(context: Context, attrs: AttributeSet)
         }
     }
 
-    fun setAlbums(list: List<Album>) {
-        val albums = list.filter { it.active }
+    fun setAlbums(albums: List<AlbumDto>) {
         album_count.text = albums.count { !it.isFavorite }.toString()
         card_count.text = albums.filter { !it.isFavorite }
-                .fold(0, { acc, album -> acc + album.photocards.count { it.active } })
+                .fold(0, { acc, album -> acc + album.photocards.size })
                 .toString()
         adapter.updateData(albums)
     }
 
 
-    private fun showAlbum(album: Album) = presenter.showAlbum(album)
+    private fun showAlbum(album: AlbumDto) = presenter.showAlbum(album)
 }
 

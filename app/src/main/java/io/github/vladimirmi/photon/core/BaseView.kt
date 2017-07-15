@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.squareup.leakcanary.RefWatcher
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.flow.FlowLifecycles
 import timber.log.Timber
 import javax.inject.Inject
@@ -66,4 +67,11 @@ abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
         val string = resources.getString(stringId, *formatArgs)
         Snackbar.make(this, string, Snackbar.LENGTH_SHORT).show()
     }
+
+    override fun showNetError() {
+        Snackbar.make(this, R.string.message_err_net, Snackbar.LENGTH_SHORT).show()
+    }
 }
+
+
+

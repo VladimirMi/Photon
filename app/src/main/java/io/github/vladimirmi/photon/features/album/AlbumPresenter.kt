@@ -6,8 +6,8 @@ import flow.History
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.EditAlbumReq
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
@@ -22,7 +22,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     private var editMode: Boolean = false
     private val album by lazy { Flow.getKey<AlbumScreen>(view)?.album!! }
-    private val photosForDelete = ArrayList<Photocard>()
+    private val photosForDelete = ArrayList<PhotocardDto>()
 
     private val moreActions: (MenuItem) -> Unit = {
         when (it.itemId) {
@@ -55,13 +55,13 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         compDisp.add(subscribeOnAlbum(album))
     }
 
-    private fun subscribeOnAlbum(album: Album): Disposable {
+    private fun subscribeOnAlbum(album: AlbumDto): Disposable {
         return Observable.just(album)
                 .mergeWith(model.getAlbum(album.id))
                 .subscribe { view.setAlbum(it) }
     }
 
-    fun showPhotoCard(photocard: Photocard) {
+    fun showPhotoCard(photocard: PhotocardDto) {
         Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
     }
 
@@ -99,8 +99,8 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     fun delete() {
-        compDisp.add(model.deleteAlbum(album)
-                .subscribeWith(object : ErrorObserver<Int>() {
+        compDisp.add(model.deleteAlbum(album.id)
+                .subscribeWith(object : ErrorObserver<Unit>() {
                     override fun onComplete() {
                         view.closeDeleteDialog()
                         Flow.get(view).goBack()
@@ -108,7 +108,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
                 }))
     }
 
-    fun deletePhotocard(photocard: Photocard) {
+    fun deletePhotocard(photocard: PhotocardDto) {
         photosForDelete.add(photocard)
         view.deletePhotocard(photocard)
     }
