@@ -20,5 +20,5 @@ interface IMainModel : IModel {
     fun isFiltered(): Boolean
     fun resetFilter()
     fun addView(photocardId: String): Observable<Unit>
-    fun updatePhotocards(offset: Int, limit: Int): Observable<Int>
+    fun updatePhotocards(offset: Int, limit: Int): Observable<Unit>
 }

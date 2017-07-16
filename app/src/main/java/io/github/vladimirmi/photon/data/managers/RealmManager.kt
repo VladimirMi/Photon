@@ -18,7 +18,7 @@ import timber.log.Timber
 
 class RealmManager {
 
-    private val mainRealm = Realm.getDefaultInstance()
+    private val mainRealm by lazy { Realm.getDefaultInstance() }
 
     fun save(realmObject: RealmObject) {
         if (realmObject is Changeable && !realmObject.active) {
@@ -41,11 +41,13 @@ class RealmManager {
     }
 
     fun <T : RealmObject> get(clazz: Class<T>, id: String): Observable<T> {
-        removeAllNotActive(clazz)
-        return RealmResultFlowable.obsFrom(mainRealm
-                .where(clazz)
-                .equalTo("id", id)
-                .findAllAsync())
+        return Observable.just(removeAllNotActive(clazz))
+                .flatMap {
+                    RealmResultFlowable.obsFrom(mainRealm
+                            .where(clazz)
+                            .equalTo("id", id)
+                            .findAllAsync())
+                }
                 .filter { it.isLoaded }
                 .flatMap {
                     if (it.isNotEmpty()) {
@@ -59,17 +61,18 @@ class RealmManager {
     fun <T : RealmObject> search(clazz: Class<T>,
                                  query: List<Query>?,
                                  sortBy: String?,
-                                 order: Sort,
-                                 async: Boolean): Observable<RealmResults<T>> {
-        removeAllNotActive(clazz)
-        val realmQuery = mainRealm.prepareQuery(clazz, query)
+                                 order: Sort = Sort.ASCENDING,
+                                 async: Boolean = false): Observable<RealmResults<T>> {
 
-        val result = realmQuery.let { if (async) it.findAllAsync() else it.findAll() }
-                .let { if (sortBy != null) it.sort(sortBy, order) else it }
-
-        return RealmResultFlowable.obsFrom(result)
+        return Observable.just(removeAllNotActive(clazz))
+                .map { mainRealm }
+                .map { it.prepareQuery(clazz, query) }
+                .map { if (async) it.findAllAsync() else it.findAll() }
+                .map { if (sortBy != null) it.sort(sortBy, order) else it }
+                .flatMap { RealmResultFlowable.obsFrom(it) }
                 .filter { it.isLoaded }
     }
+
 
     fun <T : RealmObject> remove(clazz: Class<T>, id: String) {
         Timber.e("remove: ${clazz.simpleName} with id=$id")

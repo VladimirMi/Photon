@@ -23,6 +23,7 @@ class SplashModel(val dataManager: DataManager) : ISplashModel {
 
     override fun dbIsNotEmpty(): Boolean {
         return dataManager.getListFromDb(Photocard::class.java, async = false)
-                .blockingFirst().isNotEmpty()
+                .map { it.size }
+                .blockingFirst() > 0
     }
 }

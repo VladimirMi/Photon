@@ -17,7 +17,7 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class UploadPhotoJob(private val photocard: Photocard)
+class CreatePhotoJob(private val photocard: Photocard)
     : Job(Params(JobPriority.HIGH)
         .groupBy("Images")
         .setSingleId(photocard.id)
@@ -26,6 +26,7 @@ class UploadPhotoJob(private val photocard: Photocard)
     private val tempId = photocard.id
 
     override fun onAdded() {
+        //todo убрать фото, сохранять снаружи
         DaggerService.appComponent.dataManager().saveToDB(photocard)
     }
 

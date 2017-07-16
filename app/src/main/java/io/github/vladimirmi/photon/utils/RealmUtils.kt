@@ -74,6 +74,7 @@ class RealmResultFlowable<T : RealmModel> private constructor(private val result
     override fun subscribe(e: FlowableEmitter<RealmResults<T>>) {
         results.addChangeListener(RealmChangeListener {
             if (!e.isCancelled) {
+                Timber.e("next ${results.size}")
                 e.onNext(it)
             }
         })
@@ -96,8 +97,9 @@ fun <T : RealmObject> Realm.prepareQuery(clazz: Class<T>, query: List<Query>?)
         : RealmQuery<T> {
     var realmQuery = where(clazz)
 
+    if (query != null) Timber.e("prepareQuery for ${clazz.simpleName}")
     query?.groupBy { it.fieldName }?.forEach { (_, list) ->
-        Timber.e("search: group $list")
+        Timber.e("group $list")
         realmQuery = realmQuery.beginGroup()
         list.forEachIndexed { idx, qry ->
             realmQuery = qry.applyTo(realmQuery)

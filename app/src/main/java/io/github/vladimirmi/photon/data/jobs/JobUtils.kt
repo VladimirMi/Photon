@@ -2,7 +2,12 @@ package io.github.vladimirmi.photon.data.jobs
 
 import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
+import com.birbit.android.jobqueue.JobManager
+import com.birbit.android.jobqueue.callback.JobManagerCallback
 import com.crashlytics.android.Crashlytics
+import io.reactivex.Single
+import io.reactivex.disposables.Disposables
+import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 25.06.2017.
@@ -12,6 +17,18 @@ object JobPriority {
     const val LOW = 0
     const val MID = 500
     const val HIGH = 1000
+}
+
+open class EmptyJobCallback : JobManagerCallback {
+    override fun onJobRun(job: Job, resultCode: Int) {}
+
+    override fun onDone(job: Job) {}
+
+    override fun onAfterJobRun(job: Job, resultCode: Int) {}
+
+    override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {}
+
+    override fun onJobAdded(job: Job) {}
 }
 
 fun Job.logCancel(cancelReason: Int, throwable: Throwable?) {
@@ -26,4 +43,25 @@ fun Job.logCancel(cancelReason: Int, throwable: Throwable?) {
     }
     Crashlytics.log(reason)
     Crashlytics.logException(throwable)
+}
+
+fun <T : Job> JobManager.singleResultFor(localJob: T): Single<Unit> {
+    return Single.create { e ->
+        val callback = object : EmptyJobCallback() {
+            override fun onDone(job: Job) {
+                if (!e.isDisposed && localJob.id == job.id) e.onSuccess(Unit)
+            }
+
+            override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
+                if (!e.isDisposed && throwable != null && localJob.id == job.id) e.onError(throwable)
+            }
+
+            override fun onAfterJobRun(job: Job, resultCode: Int) {
+                Timber.e("onAfterJobRun: $resultCode")
+            }
+        }
+
+        addCallback(callback)
+        e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
+    }
 }

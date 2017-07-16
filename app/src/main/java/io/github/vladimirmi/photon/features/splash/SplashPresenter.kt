@@ -35,14 +35,14 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     private fun updatePhotos(): Disposable {
         var loaded = false
 
-        val obs = model.updateLimitPhotoCards(AppConfig.PHOTOCARDS_PAGE_SIZE)
+        val updateObs = model.updateLimitPhotoCards(AppConfig.PHOTOCARDS_PAGE_SIZE)
                 .doOnNext { loaded = true }
                 .doOnError { if (it is NoSuchElementException) loaded = true } //304 empty
                 .map { false } // ended
 
         return Observable.mergeDelayError(Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS)
                 .map { true } // ended
-                , obs)
+                , updateObs)
                 .ioToMain()
                 .subscribeWith(object : ErrorObserver<Boolean>() {
                     override fun onNext(ended: Boolean) {

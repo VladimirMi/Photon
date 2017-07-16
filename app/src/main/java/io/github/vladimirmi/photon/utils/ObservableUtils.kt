@@ -11,6 +11,7 @@ import io.reactivex.observers.DisposableObserver
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
+import timber.log.Timber
 import java.net.ConnectException
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -21,6 +22,9 @@ import java.util.concurrent.TimeUnit
 
 fun <T> Observable<T>.ioToMain(): Observable<T> = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
+
+fun <T> Observable<T>.mainToIo(): Observable<T> = subscribeOn(AndroidSchedulers.mainThread())
+        .observeOn(Schedulers.io())
 
 fun <T> Single<T>.ioToMain(): Single<T> = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
@@ -84,8 +88,9 @@ open class ErrorObserver<T>(private val view: IView? = null) : DisposableObserve
     override fun onNext(it: T) {}
 
     override fun onError(e: Throwable) {
-        if (e is ConnectException) {
-            view?.showNetError()
+        Timber.e(e, e.localizedMessage)
+        if (view != null && e is ConnectException) {
+            view.showNetError()
         } else {
             Crashlytics.logException(e)
         }
@@ -96,6 +101,7 @@ open class ErrorSingleObserver<T>(private val view: IView? = null) : DisposableS
     override fun onSuccess(t: T) {}
 
     override fun onError(e: Throwable) {
+        Timber.e(e, e.localizedMessage)
         if (e is ConnectException) {
             view?.showNetError()
         } else {

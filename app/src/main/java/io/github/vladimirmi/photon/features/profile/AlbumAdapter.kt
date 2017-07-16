@@ -12,7 +12,6 @@ import io.github.vladimirmi.photon.utils.getDisplayMetrics
 import io.github.vladimirmi.photon.utils.setImage
 import kotlinx.android.synthetic.main.item_album.view.*
 import kotlinx.android.synthetic.main.view_likes_views.view.*
-import java.util.*
 
 /**
  * Developer Vladimir Mikhalev, 18.06.2017.
@@ -73,7 +72,8 @@ class AlbumAdapter(val albumAction: (AlbumDto) -> Unit)
 class AlbumViewHolder(itemView: View, val albumAction: (AlbumDto) -> Unit)
     : RecyclerView.ViewHolder(itemView) {
 
-    private var curImagePath = ""
+    //todo fid
+
     fun bind(album: AlbumDto) {
         itemView.preview.setOnClickListener { albumAction(album) }
         itemView.album_name.text = album.title
@@ -82,12 +82,7 @@ class AlbumViewHolder(itemView: View, val albumAction: (AlbumDto) -> Unit)
         itemView.likes.text = album.photocards.fold(0, { acc, photocard -> acc + photocard.favorits }).toString()
         itemView.views.text = album.photocards.fold(0, { acc, photocard -> acc + photocard.views }).toString()
 
-        if (album.photocards.isNotEmpty() && curImagePath != album.photocards[0].photo) {
-            itemView.preview.setImage(album.photocards[0].photo)
-            curImagePath = album.photocards[0].photo
-        } else {
-            itemView.preview.setImage("")
-        }
+        itemView.preview.setImage(album.photocards.getOrNull(0)?.photo)
     }
 
     fun select(selected: Boolean) {

@@ -32,7 +32,7 @@ class MainModel(val dataManager: DataManager) : IMainModel {
     override fun getPhotoCards(): Observable<List<PhotocardDto>> {
         return dataManager.search(Photocard::class.java,
                 query = if (query.isNotEmpty()) query.toList() else null,
-                sortBy = "updated",
+                sortBy = "views",
                 order = Sort.DESCENDING)
                 .map { it.filter { it.active }.map { PhotocardDto(it) } }
     }
@@ -57,10 +57,9 @@ class MainModel(val dataManager: DataManager) : IMainModel {
                 .ioToMain()
     }
 
-    override fun updatePhotocards(offset: Int, limit: Int): Observable<Int> {
+    override fun updatePhotocards(offset: Int, limit: Int): Observable<Unit> {
         return dataManager.getPhotocardsFromNet(offset, limit)
-                .doOnNext { it.forEach { dataManager.saveToDB(it) } }
-                .map { it.size }
+                .map { it.forEach { dataManager.saveToDB(it) } }
                 .ioToMain()
     }
 

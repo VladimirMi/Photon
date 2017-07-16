@@ -5,7 +5,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Function3
+import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.dialog_edit_profile.view.*
 
 /**
@@ -39,10 +39,9 @@ class EditProfileDialog(viewGroup: ViewGroup, val editProfileAction: (EditProfil
     private fun listenFields(): Disposable {
         val loginObs = getValidObs(loginField, LOGIN_PATTERN, view.login_error, view.context.getString(R.string.message_err_login))
         val nameObs = getValidObs(nameField, NAME_PATTERN, view.name_error, view.context.getString(R.string.message_err_name))
-        val netObs = getNetObs(view.context.getString(R.string.message_err_net))
 
-        return Observable.combineLatest(loginObs, nameObs, netObs,
-                Function3 { t1: Boolean, t2: Boolean, t3: Boolean -> t1 && t2 && t3 })
+        return Observable.combineLatest(loginObs, nameObs,
+                BiFunction { t1: Boolean, t2: Boolean -> t1 && t2 })
                 .subscribe { ok.isEnabled = it }
     }
 

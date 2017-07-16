@@ -15,7 +15,7 @@ import io.github.vladimirmi.photon.ui.CircleTransformation
  * Created by Vladimir Mikhalev 31.05.2017.
  */
 
-fun ImageView.setImage(path: String) {
+fun ImageView.setImage(path: String?) {
     Glide.with(context)
             .load(path)
             .centerCrop()
@@ -25,7 +25,7 @@ fun ImageView.setImage(path: String) {
             .into(this)
 }
 
-fun ImageView.setRoundAvatarWithBorder(path: String, border: Float) {
+fun ImageView.setRoundAvatarWithBorder(path: String?, border: Float) {
     Glide.with(context)
             .load(path)
             .bitmapTransform(CircleTransformation(context, border))

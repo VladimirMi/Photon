@@ -5,11 +5,9 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.EditProfileReq
-import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.ErrorObserver
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -19,21 +17,20 @@ import okhttp3.RequestBody
  */
 
 class EditProfileJob(private val profileReq: EditProfileReq,
-                     private val avatarChange: Boolean = false,
-                     private val errCallback: (ApiError?) -> Unit)
+                     private val avatarLoad: Boolean = false)
     : Job(Params(JobPriority.HIGH)
-        .requireNetwork()) {
+        .requireNetwork()
+        .persist()) {
 
 
     override fun onAdded() {}
 
     override fun onRun() {
-        var error: Throwable? = null
         val dataManager = DaggerService.appComponent.dataManager()
 
         val editProfileObs = dataManager.editProfile(profileReq)
 
-        val obs = if (avatarChange) {
+        val observable = if (avatarLoad) {
             val data = getByteArrayFromContent(profileReq.avatar)
             val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
             val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(profileReq.avatar).lastPathSegment, body)
@@ -45,22 +42,9 @@ class EditProfileJob(private val profileReq: EditProfileReq,
             editProfileObs
         }
 
-        obs.doOnNext { dataManager.saveToDB(it) }
-                .subscribeWith(object : ErrorObserver<User>() {
-                    override fun onNext(it: User) {
-                        errCallback(null)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        if (e is ApiError && e.errorResId != e.defaultErr) {
-                            errCallback(e)
-                        } else {
-                            error = e
-                        }
-                    }
-                })
-        if (error != null) throw error!!
+        var error: Throwable? = null
+        observable.blockingSubscribe({ dataManager.saveToDB(it) }, { error = it })
+        error?.let { throw it }
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {
@@ -76,6 +60,9 @@ class EditProfileJob(private val profileReq: EditProfileReq,
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
+        if (throwable is ApiError && throwable.errorResId != throwable.defaultErr) {
+            return RetryConstraint.CANCEL
+        }
         return RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
     }
 

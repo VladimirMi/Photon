@@ -20,6 +20,7 @@ import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.ErrorSingleObserver
 import io.reactivex.disposables.Disposable
 
 class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
@@ -89,19 +90,21 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                 }))
     }
 
-    private val errCallback: (ApiError?) -> Unit = {
-        if (it != null) {
-            view.showError(it.errorResId)
-        } else {
-            view.showMessage(R.string.profile_edit_success)
-        }
-    }
-
     fun editProfile(profileReq: EditProfileReq, avatarChanged: Boolean = false) {
         view.closeEditProfileDialog()
         if (!profileChanged(profileReq)) return
-        profileReq.id = profile.id
-        model.editProfile(profileReq, avatarChanged, errCallback)
+
+        compDisp.add(model.editProfile(profileReq, avatarChanged)
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onSuccess(t: Unit) {
+                        view.showMessage(R.string.profile_edit_success)
+                    }
+
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        if (e is ApiError) view.showError(e.errorResId)
+                    }
+                }))
     }
 
     private fun profileChanged(profileReq: EditProfileReq): Boolean {
