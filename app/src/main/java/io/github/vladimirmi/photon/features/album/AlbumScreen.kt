@@ -4,6 +4,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -31,8 +32,8 @@ data class AlbumScreen(val album: AlbumDto) : BaseScreen<RootActivityComponent>(
     class Module {
         @Provides
         @DaggerScope(AlbumScreen::class)
-        fun provideAlbumModel(dataManager: DataManager): IAlbumModel {
-            return AlbumModel(dataManager)
+        fun provideAlbumModel(dataManager: DataManager, cache: Cache): IAlbumModel {
+            return AlbumModel(dataManager, cache)
         }
 
         @Provides

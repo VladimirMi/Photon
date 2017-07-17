@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.features.profile
 import com.birbit.android.jobqueue.JobManager
 import io.github.vladimirmi.photon.data.jobs.EditProfileJob
 import io.github.vladimirmi.photon.data.jobs.singleResultFor
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
@@ -10,15 +11,13 @@ import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.RealmOperator
-import io.github.vladimirmi.photon.utils.ioToMain
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
-class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : IProfileModel {
+class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache)
+    : IProfileModel {
 
     override fun isUserAuth(): Boolean {
         return dataManager.isUserAuth()
@@ -27,16 +26,20 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : I
     override fun getProfile(): Observable<UserDto> {
         val id = dataManager.getProfileId()
         updateUser(id)
-        return dataManager.getObjectFromDb(User::class.java, id)
-                .map { UserDto(it) }
-                .ioToMain()
+        val profile = dataManager.getObjectFromDb(User::class.java, id)
+                .map { cache.cacheUser(it) }
+                .flatMap { justOrEmpty(cache.user(id)) }
+
+        return Observable.merge(justOrEmpty(cache.user(id)), profile).notNull().ioToMain()
     }
 
     override fun getAlbums(): Observable<List<AlbumDto>> {
         val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
-        return dataManager.search(Album::class.java, query, sortBy = "id")
-                .map { it.filter { it.active }.map { AlbumDto(it) } }
-                .ioToMain()
+        val albums = dataManager.search(Album::class.java, query, sortBy = "id")
+                .map { cache.cacheAlbums(it) }
+                .map { cache.albums }
+
+        return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
     }
 
     private fun updateUser(id: String) {

@@ -32,12 +32,16 @@ fun <T> Single<T>.ioToMain(): Single<T> = subscribeOn(Schedulers.io())
 
 fun <T> Observable<T>.unit(): Observable<Unit> = map {}
 
-fun <T> Observable<Response<T>>.body(): Observable<T> = map { it.body()!! }
-
-fun <T> Observable<Response<T>>.statusCode(): Observable<Int> = map { it.code() }
+fun <T> justOrEmpty(it: T): Observable<T> {
+    return if (it == null) Observable.empty() else Observable.just(it)
+}
 
 fun <T> Observable<T?>.notNull(): Observable<T> = filter { it != null }
         .map { it!! }
+
+fun <T> Observable<Response<T>>.body(): Observable<T> = map { it.body()!! }
+
+fun <T> Observable<Response<T>>.statusCode(): Observable<Int> = map { it.code() }
 
 fun <T> Observable<Response<T>>.parseStatusCode(): Observable<Response<T>> {
     return flatMap {

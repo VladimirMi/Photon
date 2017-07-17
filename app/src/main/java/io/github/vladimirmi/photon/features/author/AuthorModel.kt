@@ -1,23 +1,23 @@
 package io.github.vladimirmi.photon.features.author
 
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.RealmOperator
-import io.github.vladimirmi.photon.utils.ioToMain
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 
-class AuthorModel(private val dataManager: DataManager) : IAuthorModel {
+class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel {
 
     override fun getUser(userId: String): Observable<UserDto> {
         updateUser(userId)
-        return dataManager.getObjectFromDb(User::class.java, userId)
-                .map { UserDto(it) }
-                .ioToMain()
+        val user = dataManager.getObjectFromDb(User::class.java, userId)
+                .map { cache.cacheUser(it) }
+                .flatMap { justOrEmpty(cache.user(userId)) }
+
+        return Observable.merge(justOrEmpty(cache.user(userId)), user).notNull().ioToMain()
     }
 
     private fun updateUser(id: String) {
@@ -32,9 +32,11 @@ class AuthorModel(private val dataManager: DataManager) : IAuthorModel {
     }
 
     override fun getAlbums(ownerId: String): Observable<List<AlbumDto>> {
-        val query = listOf(Query("owner", RealmOperator.EQUALTO, ownerId))
-        return dataManager.search(Album::class.java, query, sortBy = "id")
-                .map { it.filter { it.active }.map { AlbumDto(it) } }
-                .ioToMain()
+        val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
+        val albums = dataManager.search(Album::class.java, query, sortBy = "id")
+                .map { cache.cacheAlbums(it) }
+                .map { cache.albums }
+
+        return Observable.merge(Observable.just(cache.albums), albums).notNull().ioToMain()
     }
 }

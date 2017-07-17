@@ -5,6 +5,7 @@ import dagger.Subcomponent
 import flow.TreeKey
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.main.IMainModel
@@ -38,8 +39,8 @@ class SearchScreen : BaseScreen<MainScreen.Component>(), TreeKey {
     class Module {
         @Provides
         @DaggerScope(SearchScreen::class)
-        fun provideSearchModel(dataManager: DataManager, mainModel: IMainModel): ISearchModel {
-            return SearchModel(dataManager, mainModel)
+        fun provideSearchModel(dataManager: DataManager, mainModel: IMainModel, cache: Cache): ISearchModel {
+            return SearchModel(dataManager, mainModel, cache)
         }
 
         @Provides

@@ -8,6 +8,7 @@ import com.uphyca.stetho_realm.RealmInspectorModulesProvider
 import dagger.Module
 import dagger.Provides
 import io.github.vladimirmi.photon.core.App
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -27,6 +28,10 @@ class LocaleModule(val context: Context) {
     @Provides
     @DaggerScope(App::class)
     fun providePreferencesManager(context: Context) = PreferencesManager(context)
+
+    @Provides
+    @DaggerScope(App::class)
+    fun provideCaacheManager() = Cache()
 
     @Provides
     @DaggerScope(App::class)

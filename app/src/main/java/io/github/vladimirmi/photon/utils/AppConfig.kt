@@ -15,7 +15,6 @@ object AppConfig {
 
     const val PHOTOCARDS_PAGE_SIZE = 60
 
-    const val PHOTOCARD_UPDATE_DELAY = 5L //min
     const val RETRY_REQUEST_BASE_DELAY = 500L //ms
     const val RETRY_REQUEST_COUNT = 5
 
@@ -30,4 +29,6 @@ object AppConfig {
     const val FILE_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider"
 
     const val SPLASH_TIMEOUT = 3000L // ms
+
+    const val CHANGE_SCREEN_ANIMATION = 300L //ms
 }

@@ -64,12 +64,12 @@ inline fun <T : RealmObject> AtomicReference<Realm>.asFlowable(crossinline query
         set(realm)
         val listener = { result: RealmResults<T> ->
             if (!emitter.isCancelled && result.isLoaded && result.isValid) {
-                emitter.onNext(realm.copyFromRealm(result))
+                emitter.onNext(result)
             }
         }
         val result = query(realm)
         if (!emitter.isCancelled && result.isLoaded && result.isValid) {
-            emitter.onNext(realm.copyFromRealm(result))
+            emitter.onNext(result)
         }
 
         result.addChangeListener(listener)

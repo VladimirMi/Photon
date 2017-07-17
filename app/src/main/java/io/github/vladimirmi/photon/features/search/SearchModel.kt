@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.features.search
 
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.Search
 import io.github.vladimirmi.photon.data.models.realm.Tag
@@ -15,14 +16,16 @@ import timber.log.Timber
  * Developer Vladimir Mikhalev, 06.06.2017.
  */
 
-class SearchModel(private val dataManager: DataManager, private val mainModel: IMainModel) : ISearchModel {
+class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val cache: Cache) : ISearchModel {
 
     override var queryPage = mainModel.queryPage
 
     override fun getTags(): Observable<List<String>> {
-        return dataManager.getListFromDb(Tag::class.java, "value")
-                .map { it.map { it.value } }
-                .ioToMain()
+        val tags = dataManager.getListFromDb(Tag::class.java, "value")
+                .map { cache.cacheTags(it) }
+                .map { cache.tags }
+
+        return Observable.merge(Observable.just(cache.tags), tags).ioToMain()
     }
 
     override fun getQuery(): MutableList<Query> {
@@ -63,10 +66,13 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
 
     override fun search(string: String): Observable<List<String>> {
         val query = Query("value", RealmOperator.CONTAINS, string)
-        return dataManager.search(Search::class.java, listOf(query),
+        val searches = dataManager.search(Search::class.java, listOf(query),
                 sortBy = "date", order = Sort.DESCENDING)
+                .map { cache.cacheSearches(it) }
+                .map { cache.searches }
+
+        return Observable.merge(Observable.just(cache.searches), searches)
                 .map { if (it.size > 5) it.subList(0, 5) else it }
-                .map { it.map { it.value } }
                 .ioToMain()
     }
 

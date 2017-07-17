@@ -73,7 +73,9 @@ class SearchTagView(context: Context, attrs: AttributeSet)
         search_field.setText(value)
     }
 
+    //todo optimize , also on the PhotocardScreen
     fun setTags(tags: List<String>, query: List<Query>) {
+        tags_wrapper.removeAllViews()
         val queryTags = query.filter { it.fieldName == "tags.value" }
         tags.forEach { tag ->
             val view = TagView(context, tag, tagAction)

@@ -4,6 +4,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
@@ -30,8 +31,8 @@ class AuthorScreen(val userId: String) : BaseScreen<RootActivityComponent>() {
 
         @Provides
         @DaggerScope(AuthorScreen::class)
-        fun provideAuthorModel(dataManager: DataManager): IAuthorModel {
-            return AuthorModel(dataManager)
+        fun provideAuthorModel(dataManager: DataManager, cache: Cache): IAuthorModel {
+            return AuthorModel(dataManager, cache)
         }
 
         @Provides

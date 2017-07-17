@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
@@ -31,8 +32,8 @@ class ProfileScreen : BaseScreen<RootActivityComponent>() {
 
         @Provides
         @DaggerScope(ProfileScreen::class)
-        fun provideProfileModel(dataManager: DataManager, jobManager: JobManager): IProfileModel {
-            return ProfileModel(dataManager, jobManager)
+        fun provideProfileModel(dataManager: DataManager, jobManager: JobManager, cache: Cache): IProfileModel {
+            return ProfileModel(dataManager, jobManager, cache)
         }
 
         @Provides

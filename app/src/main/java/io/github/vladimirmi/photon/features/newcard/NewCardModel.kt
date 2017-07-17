@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.features.newcard
 import com.birbit.android.jobqueue.JobManager
 import io.github.vladimirmi.photon.data.jobs.CreatePhotoJob
 import io.github.vladimirmi.photon.data.jobs.singleResultFor
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.realm.Album
@@ -16,7 +17,7 @@ import io.reactivex.Single
 import io.realm.Sort
 import timber.log.Timber
 
-class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : INewCardModel {
+class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache) : INewCardModel {
     override var photoCard = Photocard()
 
     override fun addFilter(filter: Pair<String, String>) {
@@ -47,9 +48,12 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
 
     override fun search(tag: String): Observable<List<String>> {
         val query = Query("value", RealmOperator.CONTAINS, tag)
-        return dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
+        val tags = dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
+                .map { cache.cacheTags(it) }
+                .map { cache.tags }
+
+        return Observable.merge(Observable.just(cache.tags), tags)
                 .map { if (it.size > 3) it.subList(0, 3) else it }
-                .map { it.map { it.value } }
                 .ioToMain()
     }
 
@@ -61,9 +65,11 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
 
     override fun getAlbums(): Observable<List<AlbumDto>> {
         val query = Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId())
-        return dataManager.search(Album::class.java, listOf(query), sortBy = "views", order = Sort.DESCENDING)
-                .map { it.filter { it.active }.map { AlbumDto(it) } }
-                .ioToMain()
+        val albums = dataManager.search(Album::class.java, listOf(query), sortBy = "views", order = Sort.DESCENDING)
+                .map { cache.cacheAlbums(it) }
+                .map { cache.albums }
+
+        return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
     }
 
     override fun savePhotoUri(uri: String) {

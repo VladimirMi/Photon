@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.features.main
 
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Photocard
@@ -13,7 +14,7 @@ import io.realm.Sort
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class MainModel(val dataManager: DataManager) : IMainModel {
+class MainModel(val dataManager: DataManager, val cache: Cache) : IMainModel {
 
     var query = ArrayList<Query>()
     override var queryPage: SearchView.Page = SearchView.Page.TAGS
@@ -30,12 +31,15 @@ class MainModel(val dataManager: DataManager) : IMainModel {
     }
 
     override fun getPhotoCards(): Observable<List<PhotocardDto>> {
-        return dataManager.search(Photocard::class.java,
+        val photocards = dataManager.search(Photocard::class.java,
                 query = if (query.isNotEmpty()) query.toList() else null,
                 sortBy = "views",
                 order = Sort.DESCENDING)
-                .map { it.filter { it.active }.map { PhotocardDto(it) } }
-                .ioToMain()
+                .map { cache.cachePhotos(it) }
+                .map { cache.photocards }
+
+        return Observable.merge(Observable.just(cache.photocards), photocards).ioToMain()
+
     }
 
     override fun isFiltered() = query.isNotEmpty()

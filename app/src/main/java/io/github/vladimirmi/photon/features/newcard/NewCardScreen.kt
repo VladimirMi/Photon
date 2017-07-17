@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -33,8 +34,8 @@ class NewCardScreen(var album: AlbumDto? = null) : BaseScreen<RootActivityCompon
     class Module {
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardModel(dataManager: DataManager, jobManager: JobManager): INewCardModel {
-            return NewCardModel(dataManager, jobManager)
+        fun provideNewCardModel(dataManager: DataManager, jobManager: JobManager, cache: Cache): INewCardModel {
+            return NewCardModel(dataManager, jobManager, cache)
         }
 
         @Provides

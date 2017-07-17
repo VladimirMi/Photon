@@ -1,15 +1,13 @@
 package io.github.vladimirmi.photon.features.photocard
 
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.RealmOperator
-import io.github.vladimirmi.photon.utils.ioToMain
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.reactivex.Single
 
@@ -17,13 +15,15 @@ import io.reactivex.Single
  * Created by Vladimir Mikhalev 14.06.2017.
  */
 
-class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
+class PhotocardModel(val dataManager: DataManager, val cache: Cache) : IPhotocardModel {
 
     override fun getUser(id: String): Observable<UserDto> {
         updateUser(id)
-        return dataManager.getObjectFromDb(User::class.java, id)
-                .map { UserDto(it) }
-                .ioToMain()
+        val user = dataManager.getObjectFromDb(User::class.java, id)
+                .map { cache.cacheUser(it) }
+                .flatMap { justOrEmpty(cache.user(id)) }
+
+        return Observable.merge(justOrEmpty(cache.user(id)), user).notNull().ioToMain()
     }
 
     private fun updateUser(id: String) {
@@ -39,9 +39,11 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
 
     override fun getPhotocard(id: String, ownerId: String): Observable<PhotocardDto> {
         updatePhotocard(id, ownerId)
-        return dataManager.getObjectFromDb(Photocard::class.java, id)
-                .map { PhotocardDto(it) }
-                .ioToMain()
+        val photocard = dataManager.getObjectFromDb(Photocard::class.java, id)
+                .map { cache.cachePhotocard(it) }
+                .flatMap { justOrEmpty(cache.photocard(id)) }
+
+        return Observable.merge(justOrEmpty(cache.photocard(id)), photocard).notNull().ioToMain()
     }
 
     private fun updatePhotocard(id: String, ownerId: String) {
@@ -80,6 +82,7 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
     }
 
 
+    //todo try find in cache
     override fun isFavorite(id: String): Single<Boolean> {
         if (!dataManager.isUserAuth()) return Single.just(false)
 

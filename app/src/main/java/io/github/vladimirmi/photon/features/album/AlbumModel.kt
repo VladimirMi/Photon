@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.features.album
 
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
@@ -7,6 +8,7 @@ import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.utils.ioToMain
+import io.github.vladimirmi.photon.utils.justOrEmpty
 import io.github.vladimirmi.photon.utils.unit
 import io.reactivex.Observable
 
@@ -14,12 +16,16 @@ import io.reactivex.Observable
  * Created by Vladimir Mikhalev 19.06.2017.
  */
 
-class AlbumModel(private val dataManager: DataManager) : IAlbumModel {
+class AlbumModel(val dataManager: DataManager, val cache: Cache) : IAlbumModel {
 
     override fun getAlbum(id: String): Observable<AlbumDto> {
-        return dataManager.getObjectFromDb(Album::class.java, id)
-                .map { AlbumDto(it) }
+        val album = dataManager.getObjectFromDb(Album::class.java, id)
+                .map { cache.cacheAlbum(it) }
+                .flatMap { justOrEmpty(cache.album(id)) }
                 .ioToMain()
+
+        return Observable.merge(justOrEmpty(cache.album(id)), album)
+
     }
 
     override fun getProfileId() = dataManager.getProfileId()
