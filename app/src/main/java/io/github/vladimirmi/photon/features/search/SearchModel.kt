@@ -6,6 +6,7 @@ import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.features.main.IMainModel
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
+import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.realm.Sort
 import timber.log.Timber
@@ -21,6 +22,7 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
     override fun getTags(): Observable<List<String>> {
         return dataManager.getListFromDb(Tag::class.java, "value")
                 .map { it.map { it.value } }
+                .ioToMain()
     }
 
     override fun getQuery(): MutableList<Query> {
@@ -65,6 +67,7 @@ class SearchModel(private val dataManager: DataManager, private val mainModel: I
                 sortBy = "date", order = Sort.DESCENDING)
                 .map { if (it.size > 5) it.subList(0, 5) else it }
                 .map { it.map { it.value } }
+                .ioToMain()
     }
 
     override fun saveSearchField(search: String) {

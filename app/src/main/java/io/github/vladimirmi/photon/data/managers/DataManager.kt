@@ -13,7 +13,6 @@ import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.realm.RealmObject
-import io.realm.RealmResults
 import io.realm.Sort
 import okhttp3.MultipartBody
 import java.util.concurrent.TimeUnit
@@ -131,35 +130,27 @@ constructor(private val restService: RestService,
 
     //region =============== DataBase ==============
 
-    fun <T : RealmObject> saveToDB(realmObject: T) {
-        if (realmObject is Photocard) {
-            realmObject.withId()
-            realmObject.search = realmObject.title.toLowerCase()
-        }
-        realmManager.save(realmObject)
-    }
+    fun <T : RealmObject> saveToDB(realmObject: T) = realmManager.save(realmObject)
 
     fun <T : RealmObject> getListFromDb(clazz: Class<T>,
                                         sortBy: String? = null,
-                                        order: Sort = Sort.ASCENDING,
-                                        async: Boolean = true): Observable<RealmResults<T>> {
-        return search(clazz, null, sortBy, order, async)
+                                        order: Sort = Sort.ASCENDING): Observable<List<T>> {
+        return search(clazz, null, sortBy, order)
     }
 
     fun <T : RealmObject> getObjectFromDb(clazz: Class<T>, id: String): Observable<T> {
-        return realmManager.get(clazz, id)
+        return realmManager.getObject(clazz, id)
     }
 
     fun <T : RealmObject> getDetachedObjFromDb(java: Class<T>, id: String): T? {
-        return realmManager.getSingle(java, id)
+        return realmManager.getDetachedObject(java, id)
     }
 
     fun <T : RealmObject> search(clazz: Class<T>,
                                  query: List<Query>?,
                                  sortBy: String? = null,
-                                 order: Sort = Sort.ASCENDING,
-                                 async: Boolean = true): Observable<RealmResults<T>> {
-        return realmManager.search(clazz, query, sortBy, order, async)
+                                 order: Sort = Sort.ASCENDING): Observable<List<T>> {
+        return realmManager.search(clazz, query, sortBy, order)
     }
 
     fun <T : RealmObject> removeFromDb(clazz: Class<T>, id: String) {

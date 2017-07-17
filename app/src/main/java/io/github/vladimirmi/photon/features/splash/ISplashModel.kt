@@ -2,6 +2,7 @@ package io.github.vladimirmi.photon.features.splash
 
 import io.github.vladimirmi.photon.core.IModel
 import io.reactivex.Observable
+import io.reactivex.Single
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -9,5 +10,5 @@ import io.reactivex.Observable
 
 interface ISplashModel : IModel {
     fun updateLimitPhotoCards(limit: Int): Observable<Int>
-    fun dbIsNotEmpty(): Boolean
+    fun dbIsNotEmpty(): Single<Boolean>
 }

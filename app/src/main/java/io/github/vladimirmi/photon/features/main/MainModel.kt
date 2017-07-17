@@ -35,6 +35,7 @@ class MainModel(val dataManager: DataManager) : IMainModel {
                 sortBy = "views",
                 order = Sort.DESCENDING)
                 .map { it.filter { it.active }.map { PhotocardDto(it) } }
+                .ioToMain()
     }
 
     override fun isFiltered() = query.isNotEmpty()

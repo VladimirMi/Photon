@@ -10,6 +10,7 @@ import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
+import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.realm.Sort
@@ -49,6 +50,7 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
         return dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
                 .map { if (it.size > 3) it.subList(0, 3) else it }
                 .map { it.map { it.value } }
+                .ioToMain()
     }
 
     override fun addTag(tag: String) {
@@ -61,6 +63,7 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager) : I
         val query = Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId())
         return dataManager.search(Album::class.java, listOf(query), sortBy = "views", order = Sort.DESCENDING)
                 .map { it.filter { it.active }.map { AlbumDto(it) } }
+                .ioToMain()
     }
 
     override fun savePhotoUri(uri: String) {

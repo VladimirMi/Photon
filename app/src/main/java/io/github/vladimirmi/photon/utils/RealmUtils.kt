@@ -1,9 +1,14 @@
 package io.github.vladimirmi.photon.utils
 
-import io.reactivex.*
-import io.reactivex.disposables.Disposables
+import android.os.HandlerThread
+import android.os.Process.THREAD_PRIORITY_BACKGROUND
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.*
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicReference
+
 
 /**
  * Created by Vladimir Mikhalev 09.07.2017.
@@ -11,7 +16,7 @@ import timber.log.Timber
 
 enum class RealmOperator {CONTAINS, EQUALTO }
 
-class Query(val fieldName: String, val operator: RealmOperator, val value: Any) {
+data class Query(val fieldName: String, val operator: RealmOperator, val value: Any) {
 
     fun <T : RealmModel> applyTo(realmQuery: RealmQuery<T>): RealmQuery<T> {
         when (value) {
@@ -27,86 +32,53 @@ class Query(val fieldName: String, val operator: RealmOperator, val value: Any) 
         return realmQuery
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-        other as Query
-        if (fieldName != other.fieldName) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return fieldName.hashCode()
-    }
-
     override fun toString(): String {
         return "($fieldName $operator $value)"
     }
 }
 
-class RealmObjectFlowable<T : RealmModel> private constructor(private val objekt: T)
-    : FlowableOnSubscribe<T> {
 
-    override fun subscribe(e: FlowableEmitter<T>) {
-        RealmObject.addChangeListener(objekt, RealmChangeListener {
-            if (!e.isCancelled) {
-                e.onNext(it)
-            }
-        })
-        e.setDisposable(Disposables.fromRunnable { RealmObject.removeAllChangeListeners(objekt) })
-        e.onNext(objekt)
-    }
-
-    companion object { // factory methods
-        fun <T : RealmModel> from(objekt: T): Flowable<T> {
-            return Flowable.create(RealmObjectFlowable(objekt), BackpressureStrategy.LATEST)
-        }
-
-        fun <T : RealmModel> obsFrom(objekt: T): Observable<T> {
-            return from(objekt).toObservable()
-        }
-    }
-}
-
-class RealmResultFlowable<T : RealmModel> private constructor(private val results: RealmResults<T>)
-    : FlowableOnSubscribe<RealmResults<T>> {
-
-    override fun subscribe(e: FlowableEmitter<RealmResults<T>>) {
-        results.addChangeListener(RealmChangeListener {
-            if (!e.isCancelled) {
-                Timber.e("next ${results.size}")
-                e.onNext(it)
-            }
-        })
-        e.setDisposable(Disposables.fromRunnable { results.removeAllChangeListeners() })
-        e.onNext(results)
-    }
-
-    companion object { // factory methods
-        fun <T : RealmModel> from(results: RealmResults<T>): Flowable<RealmResults<T>> {
-            return Flowable.create(RealmResultFlowable(results), BackpressureStrategy.LATEST)
-        }
-
-        fun <T : RealmModel> obsFrom(results: RealmResults<T>): Observable<RealmResults<T>> {
-            return from(results).toObservable()
-        }
-    }
-}
-
-fun <T : RealmObject> Realm.prepareQuery(clazz: Class<T>, query: List<Query>?)
+fun <T : RealmObject> RealmQuery<T>.prepareQuery(query: List<Query>?)
         : RealmQuery<T> {
-    var realmQuery = where(clazz)
 
-    if (query != null) Timber.e("prepareQuery for ${clazz.simpleName}")
+    if (query != null) Timber.e("prepareQuery")
     query?.groupBy { it.fieldName }?.forEach { (_, list) ->
         Timber.e("group $list")
-        realmQuery = realmQuery.beginGroup()
+        beginGroup()
         list.forEachIndexed { idx, qry ->
-            realmQuery = qry.applyTo(realmQuery)
-            if (idx < list.size - 1) realmQuery = realmQuery.or()
+            qry.applyTo(this)
+            if (idx < list.size - 1) or()
         }
-        realmQuery = realmQuery.endGroup()
+        endGroup()
     }
+    return this
+}
 
-    return realmQuery
+inline fun <T : RealmObject> AtomicReference<Realm>.asFlowable(crossinline query: (Realm) -> RealmResults<T>)
+        : Flowable<List<T>> {
+    val handler = HandlerThread("RealmQueryThread", THREAD_PRIORITY_BACKGROUND).apply { start() }
+    val scheduler = AndroidSchedulers.from(handler.looper)
+
+    return Flowable.create<List<T>>({ emitter ->
+        val realm = Realm.getDefaultInstance()
+        set(realm)
+        val listener = { result: RealmResults<T> ->
+            if (!emitter.isCancelled && result.isLoaded && result.isValid) {
+                emitter.onNext(realm.copyFromRealm(result))
+            }
+        }
+        val result = query(realm)
+        if (!emitter.isCancelled && result.isLoaded && result.isValid) {
+            emitter.onNext(realm.copyFromRealm(result))
+        }
+
+        result.addChangeListener(listener)
+        emitter.setCancellable {
+            result.removeChangeListener(listener)
+            realm.close()
+            handler.quitSafely()
+        }
+    }, BackpressureStrategy.LATEST)
+            .subscribeOn(scheduler)
+            .unsubscribeOn(scheduler)
 }

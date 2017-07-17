@@ -9,6 +9,7 @@ import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
+import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.reactivex.Single
 
@@ -22,6 +23,7 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
         updateUser(id)
         return dataManager.getObjectFromDb(User::class.java, id)
                 .map { UserDto(it) }
+                .ioToMain()
     }
 
     private fun updateUser(id: String) {
@@ -39,6 +41,7 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
         updatePhotocard(id, ownerId)
         return dataManager.getObjectFromDb(Photocard::class.java, id)
                 .map { PhotocardDto(it) }
+                .ioToMain()
     }
 
     private fun updatePhotocard(id: String, ownerId: String) {
@@ -84,6 +87,7 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
                 .flatMap { Observable.fromIterable(it.photocards) }
                 .map { it.id }
                 .contains(id)
+                .ioToMain()
     }
 
     private var favAlbumId: String? = null
@@ -92,7 +96,7 @@ class PhotocardModel(private val dataManager: DataManager) : IPhotocardModel {
         return if (favAlbumId == null) {
             findFavAlbum()
         } else {
-            dataManager.getObjectFromDb(Album::class.java, favAlbumId as String)
+            dataManager.getObjectFromDb(Album::class.java, favAlbumId as String).take(1)
         }
     }
 

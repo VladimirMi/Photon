@@ -19,6 +19,7 @@ class AlbumModel(private val dataManager: DataManager) : IAlbumModel {
     override fun getAlbum(id: String): Observable<AlbumDto> {
         return dataManager.getObjectFromDb(Album::class.java, id)
                 .map { AlbumDto(it) }
+                .ioToMain()
     }
 
     override fun getProfileId() = dataManager.getProfileId()

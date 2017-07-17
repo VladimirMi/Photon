@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by Vladimir Mikhalev 28.06.2017.
  */
+fun <T> Observable<T>.observeOnMainThread(): Observable<T> = observeOn(AndroidSchedulers.mainThread())
 
 fun <T> Observable<T>.ioToMain(): Observable<T> = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())

@@ -8,9 +8,11 @@ import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.github.vladimirmi.photon.utils.ioToMain
+import io.github.vladimirmi.photon.utils.ErrorSingleObserver
+import io.github.vladimirmi.photon.utils.observeOnMainThread
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 /**
@@ -43,18 +45,23 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
         return Observable.mergeDelayError(Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS)
                 .map { true } // ended
                 , updateObs)
-                .ioToMain()
+                .observeOnMainThread()
                 .subscribeWith(object : ErrorObserver<Boolean>() {
                     override fun onNext(ended: Boolean) {
-                        if (ended && !loaded) view.showMessage(R.string.message_err_connect)
-                        if (model.dbIsNotEmpty()) openMainScreen()
+                        Timber.e("onNext: $loaded")
+                        if (ended) {
+                            if (!loaded) view.showMessage(R.string.message_err_connect)
+                            chooseCanOpen()
+                        }
                     }
 
                     override fun onComplete() {
+                        Timber.e("onComplete: $loaded")
                         openMainScreen(AppConfig.PHOTOCARDS_PAGE_SIZE)
                     }
 
                     override fun onError(e: Throwable) {
+                        Timber.e("onError: $loaded")
                         if (loaded) {
                             openMainScreen(AppConfig.PHOTOCARDS_PAGE_SIZE)
                             return
@@ -69,8 +76,17 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
 
     private fun handleError(error: Throwable) {
         rootPresenter.showMessage(R.string.message_api_err_unknown)
-        if (model.dbIsNotEmpty()) openMainScreen()
+        chooseCanOpen()
     }
+
+    private fun chooseCanOpen() {
+        compDisp.add(model.dbIsNotEmpty().subscribeWith(object : ErrorSingleObserver<Boolean>() {
+            override fun onSuccess(notEmpty: Boolean) {
+                if (notEmpty) openMainScreen()
+            }
+        }))
+    }
+
 
     private fun openMainScreen(updated: Int = 0) {
         Flow.get(view).replaceTop(MainScreen(updated), Direction.FORWARD)

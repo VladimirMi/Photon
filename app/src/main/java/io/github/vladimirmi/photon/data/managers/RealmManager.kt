@@ -1,16 +1,17 @@
 package io.github.vladimirmi.photon.data.managers
 
 import io.github.vladimirmi.photon.data.models.realm.Changeable
+import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.RealmObjectFlowable
-import io.github.vladimirmi.photon.utils.RealmResultFlowable
+import io.github.vladimirmi.photon.utils.RealmOperator
+import io.github.vladimirmi.photon.utils.asFlowable
 import io.github.vladimirmi.photon.utils.prepareQuery
 import io.reactivex.Observable
 import io.realm.Realm
 import io.realm.RealmObject
-import io.realm.RealmResults
 import io.realm.Sort
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
@@ -18,12 +19,15 @@ import timber.log.Timber
 
 class RealmManager {
 
-    private val mainRealm by lazy { Realm.getDefaultInstance() }
-
     fun save(realmObject: RealmObject) {
+        Timber.e("save: ${realmObject::class.java.simpleName}")
         if (realmObject is Changeable && !realmObject.active) {
             remove(realmObject::class.java, realmObject.id)
             return
+        }
+        if (realmObject is Photocard) {
+            realmObject.withId()
+            realmObject.search = realmObject.title.toLowerCase()
         }
         val realm = Realm.getDefaultInstance()
         realm.executeTransaction {
@@ -33,44 +37,23 @@ class RealmManager {
     }
 
     fun <T : RealmObject> getObject(clazz: Class<T>, id: String): Observable<T> {
-        return RealmObjectFlowable.obsFrom(mainRealm
-                .where(clazz)
-                .equalTo("id", id)
-                .findFirstAsync())
-                .filter { it.isLoaded }
-    }
-
-    fun <T : RealmObject> get(clazz: Class<T>, id: String): Observable<T> {
-        return Observable.just(removeAllNotActive(clazz))
-                .flatMap {
-                    RealmResultFlowable.obsFrom(mainRealm
-                            .where(clazz)
-                            .equalTo("id", id)
-                            .findAllAsync())
-                }
-                .filter { it.isLoaded }
-                .flatMap {
-                    if (it.isNotEmpty()) {
-                        Observable.just(it[0])
-                    } else {
-                        Observable.empty()
-                    }
-                }
+        val query = listOf(Query("id", RealmOperator.EQUALTO, id))
+        return search(clazz, query)
+                .map { it.first() }
+                .onErrorResumeNext(Observable.empty())
     }
 
     fun <T : RealmObject> search(clazz: Class<T>,
-                                 query: List<Query>?,
-                                 sortBy: String?,
-                                 order: Sort = Sort.ASCENDING,
-                                 async: Boolean = false): Observable<RealmResults<T>> {
+                                 query: List<Query>? = null,
+                                 sortBy: String? = null,
+                                 order: Sort = Sort.ASCENDING): Observable<List<T>> {
 
-        return Observable.just(removeAllNotActive(clazz))
-                .map { mainRealm }
-                .map { it.prepareQuery(clazz, query) }
-                .map { if (async) it.findAllAsync() else it.findAll() }
-                .map { if (sortBy != null) it.sort(sortBy, order) else it }
-                .flatMap { RealmResultFlowable.obsFrom(it) }
-                .filter { it.isLoaded }
+        return AtomicReference<Realm>().asFlowable {
+            it.where(clazz).prepareQuery(query)
+                    .let { if (sortBy != null) it.findAllSorted(sortBy, order) else it.findAll() }
+        }
+                .doOnSubscribe { removeAllNotActive(clazz) }
+                .toObservable()
     }
 
 
@@ -93,7 +76,7 @@ class RealmManager {
         realm.close()
     }
 
-    fun <T : RealmObject> getSingle(java: Class<T>, id: String): T? {
+    fun <T : RealmObject> getDetachedObject(java: Class<T>, id: String): T? {
         val realm = Realm.getDefaultInstance()
         val result = realm.where(java).equalTo("id", id).findFirst()?.let { realm.copyFromRealm(it) }
         realm.close()

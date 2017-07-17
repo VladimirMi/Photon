@@ -2,7 +2,9 @@ package io.github.vladimirmi.photon.features.splash
 
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
+import io.reactivex.Single
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -21,9 +23,10 @@ class SplashModel(val dataManager: DataManager) : ISplashModel {
                 .firstOrError().toObservable()
     }
 
-    override fun dbIsNotEmpty(): Boolean {
-        return dataManager.getListFromDb(Photocard::class.java, async = false)
-                .map { it.size }
-                .blockingFirst() > 0
+    override fun dbIsNotEmpty(): Single<Boolean> {
+        return dataManager.getListFromDb(Photocard::class.java)
+                .map { it.isNotEmpty() }
+                .firstOrError()
+                .ioToMain()
     }
 }

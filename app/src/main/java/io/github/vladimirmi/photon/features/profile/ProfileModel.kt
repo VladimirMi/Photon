@@ -29,12 +29,14 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager) : I
         updateUser(id)
         return dataManager.getObjectFromDb(User::class.java, id)
                 .map { UserDto(it) }
+                .ioToMain()
     }
 
     override fun getAlbums(): Observable<List<AlbumDto>> {
         val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
-        return dataManager.search(Album::class.java, query, sortBy = "id", async = false)
+        return dataManager.search(Album::class.java, query, sortBy = "id")
                 .map { it.filter { it.active }.map { AlbumDto(it) } }
+                .ioToMain()
     }
 
     private fun updateUser(id: String) {
