@@ -54,6 +54,11 @@ constructor(private val restService: RestService,
                 .parseResponse()
     }
 
+    fun getAlbumFromNet(id: String, lastModified: String): Observable<Album> {
+        return restService.getAlbum(id, getProfileId(), lastModified)
+                .parseResponse()
+    }
+
     fun signIn(req: SignInReq): Observable<User> {
         return restService.signIn(req)
                 .parseStatusCode()

@@ -64,6 +64,13 @@ class EditProfileJob(private val profileReq: EditProfileReq,
         return result
     }
 
+    override fun onCancel(cancelReason: Int, throwable: Throwable?) {
+        logCancel(cancelReason, throwable)
+        if (cancelReason == CancelReason.CANCELLED_VIA_SHOULD_RE_RUN) {
+            updateProfile()
+        }
+    }
+
     private fun updateProfile() {
         val dataManager = DaggerService.appComponent.dataManager()
 
@@ -74,13 +81,6 @@ class EditProfileJob(private val profileReq: EditProfileReq,
                         dataManager.saveToDB(it)
                     }
                 })
-    }
-
-    override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        logCancel(cancelReason, throwable)
-        if (cancelReason == CancelReason.CANCELLED_VIA_SHOULD_RE_RUN) {
-            updateProfile()
-        }
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {

@@ -8,6 +8,7 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
+import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -21,6 +22,7 @@ class CreatePhotoJob(private val photocard: Photocard)
     : Job(Params(JobPriority.HIGH)
         .groupBy("Images")
         .setSingleId(photocard.id)
+        .addTags(Constants.CREATE_PHOTOCART_JOB_TAG)
         .requireNetwork()) {
 
     private val tempId = photocard.id

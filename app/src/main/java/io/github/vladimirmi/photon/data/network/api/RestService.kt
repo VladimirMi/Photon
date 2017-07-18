@@ -45,6 +45,12 @@ interface RestService {
                      @Header(HEADER_IF_MODIFIED_SINCE) lastModified: String)
             : Observable<Response<Photocard>>
 
+    @GET("user/{userId}/album/{id}")
+    fun getAlbum(@Path("id") id: String,
+                 @Path("userId") userId: String,
+                 @Header(HEADER_IF_MODIFIED_SINCE) lastModified: String)
+            : Observable<Response<Album>>
+
     @POST("user/{userId}/album")
     fun createAlbum(@Path("userId") userId: String,
                     @Body req: NewAlbumReq,

@@ -1,22 +1,29 @@
 package io.github.vladimirmi.photon.features.album
 
+import com.birbit.android.jobqueue.JobManager
+import com.birbit.android.jobqueue.TagConstraint
+import io.github.vladimirmi.photon.data.jobs.DeleteAlbumJob
+import io.github.vladimirmi.photon.data.jobs.DeletePhotocardJob
+import io.github.vladimirmi.photon.data.jobs.singleCancelJobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.github.vladimirmi.photon.utils.justOrEmpty
 import io.github.vladimirmi.photon.utils.unit
 import io.reactivex.Observable
+import io.reactivex.Single
+import java.util.*
 
 /**
  * Created by Vladimir Mikhalev 19.06.2017.
  */
 
-class AlbumModel(val dataManager: DataManager, val cache: Cache) : IAlbumModel {
+class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache) : IAlbumModel {
 
     override fun getAlbum(id: String): Observable<AlbumDto> {
         val album = dataManager.getObjectFromDb(Album::class.java, id)
@@ -35,12 +42,18 @@ class AlbumModel(val dataManager: DataManager, val cache: Cache) : IAlbumModel {
                 .map { dataManager.saveToDB(it) }
     }
 
-    override fun deleteAlbum(albumId: String): Observable<Unit> {
-        return dataManager.deleteAlbum(albumId)
-                .map { dataManager.getDetachedObjFromDb(Album::class.java, albumId)!! }
-                .map {
-                    it.photocards.forEach { dataManager.removeFromDb(Photocard::class.java, it.id) }
-                    dataManager.removeFromDb(Album::class.java, it.id)
+    override fun deleteAlbum(albumId: String): Single<Unit> {
+        val album = dataManager.getDetachedObjFromDb(Album::class.java, albumId)!!
+
+        return cancelCreateOrRemovePhotos(album.photocards.map { it.id })
+                .flatMap { jobManager.singleCancelJobs(TagConstraint.ALL, Constants.CREATE_ALBUM_JOB_TAG + albumId) }
+                .map { cancelResult ->
+                    if (cancelResult.cancelledJobs.isNotEmpty()) {
+                        cache.removeAlbum(albumId)
+                        dataManager.removeFromDb(Album::class.java, albumId)
+                    } else {
+                        jobManager.addJobInBackground(DeleteAlbumJob(albumId))
+                    }
                 }
                 .ioToMain()
     }
@@ -49,11 +62,20 @@ class AlbumModel(val dataManager: DataManager, val cache: Cache) : IAlbumModel {
         if (album.isFavorite) {
             return removeFromFavorite(photosForDelete, album)
         }
-        return Observable.fromIterable(photosForDelete)
-                .flatMap { photocard ->
-                    dataManager.deletePhotocard(photocard.id).ioToMain()
-                            .doOnComplete { dataManager.removeFromDb(Photocard::class.java, photocard.id) }
-                }.unit()
+        return cancelCreateOrRemovePhotos(photosForDelete.map { it.id })
+                .toObservable()
+                .unit()
+    }
+
+    private fun cancelCreateOrRemovePhotos(photocardsId: List<String>): Single<Unit> {
+        if (photocardsId.isEmpty()) return Single.just(Unit)
+        val createPhotoJobTags = photocardsId.mapTo(ArrayList()) { Constants.CREATE_PHOTOCART_JOB_TAG + it }
+
+        return jobManager.singleCancelJobs(TagConstraint.ANY, *createPhotoJobTags.toTypedArray())
+                .doOnSuccess { it.cancelledJobs.forEach { it.tags?.forEach { createPhotoJobTags.remove(it) } } }
+                .flatMapObservable { Observable.fromIterable(createPhotoJobTags) }
+                .map { jobManager.addJobInBackground(DeletePhotocardJob(it.removePrefix(Constants.CREATE_PHOTOCART_JOB_TAG))) }
+                .last(Unit)
     }
 
     private fun removeFromFavorite(photosForDelete: List<PhotocardDto>, album: AlbumDto): Observable<Unit> {

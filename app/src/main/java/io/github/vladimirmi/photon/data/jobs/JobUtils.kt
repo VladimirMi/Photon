@@ -1,8 +1,6 @@
 package io.github.vladimirmi.photon.data.jobs
 
-import com.birbit.android.jobqueue.CancelReason
-import com.birbit.android.jobqueue.Job
-import com.birbit.android.jobqueue.JobManager
+import com.birbit.android.jobqueue.*
 import com.birbit.android.jobqueue.callback.JobManagerCallback
 import com.crashlytics.android.Crashlytics
 import io.reactivex.Single
@@ -67,4 +65,15 @@ fun <T : Job> JobManager.singleResultFor(localJob: T): Single<Unit> {
         addCallback(callback)
         e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
     }
+}
+
+fun JobManager.singleCancelJobs(constraint: TagConstraint, vararg tags: String)
+        : Single<CancelResult> {
+
+    return Single.create { e ->
+        cancelJobsInBackground(CancelResult.AsyncCancelCallback {
+            if (!e.isDisposed) e.onSuccess(it)
+        }, constraint, *tags)
+    }
+
 }

@@ -7,6 +7,7 @@ import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.Constants
 
 /**
  * Created by Vladimir Mikhalev 17.07.2017.
@@ -15,6 +16,7 @@ import io.github.vladimirmi.photon.di.DaggerService
 class CreateAlbumJob(private val request: NewAlbumReq)
     : Job(Params(JobPriority.MID)
         .setGroupId("CreateAlbum")
+        .addTags(Constants.CREATE_ALBUM_JOB_TAG + request.id)
         .requireNetwork()
         .persist()) {
     override fun onAdded() {}

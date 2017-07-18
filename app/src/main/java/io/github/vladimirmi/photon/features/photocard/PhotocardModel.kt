@@ -10,6 +10,7 @@ import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by Vladimir Mikhalev 14.06.2017.
@@ -47,14 +48,11 @@ class PhotocardModel(val dataManager: DataManager, val cache: Cache) : IPhotocar
     }
 
     private fun updatePhotocard(id: String, ownerId: String) {
-        val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, id)
-
-        dataManager.getPhotocardFromNet(id, ownerId, getUpdated(photocard).toString())
-                .subscribeWith(object : ErrorObserver<Photocard>() {
-                    override fun onNext(it: Photocard) {
-                        dataManager.saveToDB(it)
-                    }
-                })
+        Observable.just(dataManager.getDetachedObjFromDb(Photocard::class.java, id))
+                .flatMap { dataManager.getPhotocardFromNet(id, ownerId, getUpdated(it).toString()) }
+                .doOnNext { dataManager.saveToDB(it) }
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(ErrorObserver())
     }
 
     override fun addToFavorite(id: String): Observable<Unit> {
