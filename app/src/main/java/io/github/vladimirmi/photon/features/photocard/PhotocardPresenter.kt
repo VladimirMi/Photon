@@ -120,10 +120,11 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         val uri = FileProvider.getUriForFile(view.context,
                 AppConfig.FILE_PROVIDER_AUTHORITY, tempFile)
 
-        val shareIntent = Intent()
-        shareIntent.action = Intent.ACTION_SEND
-        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-        shareIntent.type = "image/jpeg"
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = "image/jpeg"
+        }
 
         downloadTo(tempFile as File) {
             rootPresenter.startActivityForResult(Intent.createChooser(shareIntent, view.resources.getText(R.string.send_to)),

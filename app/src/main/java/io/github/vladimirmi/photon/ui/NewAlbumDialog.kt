@@ -5,7 +5,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Function3
+import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.dialog_new_album.view.*
 
 /**
@@ -37,10 +37,9 @@ class NewAlbumDialog(viewGroup: ViewGroup, newAlbumAction: (NewAlbumReq) -> Unit
     private fun listenFields(): Disposable {
         val nameObs = getValidObs(name, NAME_PATTERN, view.name_error, view.context.getString(R.string.message_err_name))
         val descriptionObs = getValidObs(description, DESCRIPTION_PATTERN, view.description_error, view.context.getString(R.string.message_err_description))
-        val netObs = getNetObs(view.context.getString(R.string.message_err_net))
 
-        return Observable.combineLatest(nameObs, descriptionObs, netObs,
-                Function3 { t1: Boolean, t2: Boolean, t3: Boolean -> t1 && t2 && t3 })
+        return Observable.combineLatest(nameObs, descriptionObs,
+                BiFunction { t1: Boolean, t2: Boolean -> t1 && t2 })
                 .startWith(false)
                 .subscribe { ok.isEnabled = it }
     }

@@ -29,4 +29,5 @@ class SplashModel(val dataManager: DataManager) : ISplashModel {
                 .firstOrError()
                 .ioToMain()
     }
+    //todo update also profile if exists
 }

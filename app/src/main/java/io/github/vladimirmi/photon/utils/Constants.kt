@@ -23,4 +23,6 @@ object Constants {
     const val REQUEST_SHARE = 103
 
     const val MIME_TYPE_IMAGE = "image/*"
+
+    const val EDIT_PROFILE_JOB_TAG = "EditProfileTag"
 }

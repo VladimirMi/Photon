@@ -11,7 +11,6 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory
@@ -174,21 +173,20 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
 
     private fun checkMetaAndSave(uri: Uri) {
         val limit = AppConfig.IMAGE_SIZE_LIMIT * 1024 * 1024 // bytes
-        var fileSize: Int? = null
-        when (uri.scheme) {
-            "file" -> fileSize = File(uri.path).length().toInt()
+        val fileSize = when (uri.scheme) {
+            "file" -> File(uri.path).length().toInt()
             else -> {
-                DaggerService.appComponent.context().contentResolver
+                view.context.contentResolver
                         .query(uri, null, null, null, null, null).use { cursor ->
                     if (cursor != null && cursor.moveToFirst()) {
                         val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
-                        fileSize = if (!cursor.isNull(sizeIndex)) cursor.getInt(sizeIndex) else null
-                    }
+                        if (!cursor.isNull(sizeIndex)) cursor.getInt(sizeIndex) else null
+                    } else null
                 }
             }
         }
 
-        if (fileSize != null && (fileSize as Int) < limit) {
+        if (fileSize != null && fileSize < limit) {
             model.savePhotoUri(uri.toString())
             startAction = null
         } else {

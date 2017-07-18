@@ -124,6 +124,7 @@
 
     <string name="author_title">Автор</string>
     <string name="album_title">Альбом</string>
+    <string name="album_create_success">Альбом успешно создан</string>
 
     <string name="newcard_choose">Выберите фотокарточку\nиз галлереи и добавьте\nк вашим альбомам</string>
     <string name="newcard_name_hint">Название фотографии</string>

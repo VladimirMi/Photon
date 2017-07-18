@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.ui
 
 import android.graphics.drawable.GradientDrawable
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.util.Patterns
 import android.view.ViewGroup
@@ -29,7 +30,7 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
     protected val EMAIL_PATTERN = Patterns.EMAIL_ADDRESS
     protected val NAME_PATTERN = Pattern.compile(".{3,20}")
     protected val PASSWORD_PATTERN = Pattern.compile("[a-zA-Z0-9_]{8,}")
-    protected val DESCRIPTION_PATTERN = Pattern.compile(".{3,400}")
+    protected val DESCRIPTION_PATTERN = Pattern.compile(".{3,400}", Pattern.DOTALL)
 
     protected val compDisp = CompositeDisposable()
 
@@ -53,9 +54,7 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
 
     protected fun getNetObs(errorMsg: String): Observable<Boolean> {
         return DaggerService.appComponent.dataManager().isNetworkAvailable()
-//                .doOnNext {
-//                    if (!it) Snackbar.make(viewGroup, errorMsg, Snackbar.LENGTH_LONG).show()
-//                }
+                .doOnNext { if (!it) Snackbar.make(viewGroup, errorMsg, Snackbar.LENGTH_LONG).show() }
                 .observeOn(AndroidSchedulers.mainThread())
     }
 }

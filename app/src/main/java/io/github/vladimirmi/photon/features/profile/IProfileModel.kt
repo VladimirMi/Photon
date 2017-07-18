@@ -12,6 +12,6 @@ interface IProfileModel : IModel {
     fun getProfile(): Observable<UserDto>
     fun getAlbums(): Observable<List<AlbumDto>>
     fun isUserAuth(): Boolean
-    fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Unit>
+    fun createAlbum(newAlbumReq: NewAlbumReq): Single<Unit>
     fun editProfile(profileReq: EditProfileReq, loadAvatar: Boolean): Single<Unit>
 }

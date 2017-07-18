@@ -19,7 +19,6 @@ import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.Constants
-import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ErrorSingleObserver
 import io.reactivex.disposables.Disposable
 
@@ -83,9 +82,15 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
 
     fun createNewAlbum(newAlbumReq: NewAlbumReq) {
         compDisp.add(model.createAlbum(newAlbumReq)
-                .subscribeWith(object : ErrorObserver<Unit>() {
-                    override fun onComplete() {
-                        view.closeNewAlbumDialog()
+                .doOnSubscribe { view.closeNewAlbumDialog() }
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onSuccess(t: Unit) {
+                        view.showMessage(R.string.album_create_success)
+                    }
+
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        if (e is ApiError) view.showError(e.errorResId)
                     }
                 }))
     }

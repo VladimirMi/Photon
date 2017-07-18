@@ -1,6 +1,8 @@
 package io.github.vladimirmi.photon.features.profile
 
 import com.birbit.android.jobqueue.JobManager
+import com.birbit.android.jobqueue.TagConstraint
+import io.github.vladimirmi.photon.data.jobs.CreateAlbumJob
 import io.github.vladimirmi.photon.data.jobs.EditProfileJob
 import io.github.vladimirmi.photon.data.jobs.singleResultFor
 import io.github.vladimirmi.photon.data.managers.Cache
@@ -15,6 +17,7 @@ import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache)
     : IProfileModel {
@@ -42,10 +45,10 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
         return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
     }
 
-    private fun updateUser(id: String) {
+    private fun updateUser(id: String, updated: String? = null) {
         val user = dataManager.getDetachedObjFromDb(User::class.java, id)
 
-        dataManager.getUserFromNet(id, getUpdated(user).toString())
+        dataManager.getUserFromNet(id, updated ?: getUpdated(user).toString())
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(object : ErrorObserver<User>() {
                     override fun onNext(it: User) {
@@ -54,16 +57,23 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
                 })
     }
 
-    override fun createAlbum(newAlbumReq: NewAlbumReq): Observable<Unit> {
+    override fun createAlbum(newAlbumReq: NewAlbumReq): Single<Unit> {
+        newAlbumReq.id = UUID.randomUUID().toString()
         newAlbumReq.owner = dataManager.getProfileId()
-        return dataManager.createAlbum(newAlbumReq)
-                .map {
-                    val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
-                    profile.albums.add(it)
+        val job = CreateAlbumJob(newAlbumReq)
+
+        return Single.just(dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!)
+                .doOnSuccess { profile ->
+                    val album = Album(id = newAlbumReq.id, owner = newAlbumReq.owner,
+                            title = newAlbumReq.title, description = newAlbumReq.description)
+                    profile.albums.add(album)
                     dataManager.saveToDB(profile)
+                    jobManager.addJobInBackground(job)
                 }
+                .flatMap { jobManager.singleResultFor(job) }
                 .ioToMain()
     }
+
 
     override fun editProfile(profileReq: EditProfileReq, loadAvatar: Boolean): Single<Unit> {
         val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
@@ -72,28 +82,17 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
         val job = EditProfileJob(profileReq, avatarLoad = profile.avatar != profileReq.avatar)
 
         return Single.just(profile)
-                .map { changeProfile(it, profileReq) }
-                .map { dataManager.saveToDB(it) }
-                .map { jobManager.addJobInBackground(job) }
+                .doOnSuccess {
+                    profile.apply {
+                        login = profileReq.login
+                        name = profileReq.name
+                        avatar = profileReq.avatar
+                    }
+                    dataManager.saveToDB(profile)
+                    jobManager.cancelJobs(TagConstraint.ALL, Constants.EDIT_PROFILE_JOB_TAG)
+                    jobManager.addJobInBackground(job)
+                }
                 .flatMap { jobManager.singleResultFor(job) }
-                .doOnError { rollBack(profile) }
                 .ioToMain()
-    }
-
-    private lateinit var backup: EditProfileReq
-
-    private fun changeProfile(profile: User, profileReq: EditProfileReq): User {
-        backup = EditProfileReq(name = profile.name,
-                login = profile.login,
-                avatar = profile.avatar)
-        return profile.apply {
-            login = profileReq.login
-            name = profileReq.name
-            avatar = profileReq.avatar
-        }
-    }
-
-    private fun rollBack(profile: User) {
-        dataManager.saveToDB(changeProfile(profile, backup))
     }
 }

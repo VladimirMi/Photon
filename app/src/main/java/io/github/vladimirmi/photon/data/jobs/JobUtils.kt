@@ -31,7 +31,7 @@ open class EmptyJobCallback : JobManagerCallback {
     override fun onJobAdded(job: Job) {}
 }
 
-fun Job.logCancel(cancelReason: Int, throwable: Throwable?) {
+fun logCancel(cancelReason: Int, throwable: Throwable?) {
     val reason = when (cancelReason) {
         CancelReason.SINGLE_INSTANCE_ID_QUEUED -> "Cancel via: job with the same single id was already queued"
         CancelReason.REACHED_RETRY_LIMIT -> "Cancel via: reached retry limit"
@@ -41,6 +41,7 @@ fun Job.logCancel(cancelReason: Int, throwable: Throwable?) {
         CancelReason.REACHED_DEADLINE -> "Cancel via: hitting its deadline"
         else -> "Cancel via: unknown reason"
     }
+    Timber.e(reason)
     Crashlytics.log(reason)
     Crashlytics.logException(throwable)
 }
@@ -53,6 +54,8 @@ fun <T : Job> JobManager.singleResultFor(localJob: T): Single<Unit> {
             }
 
             override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
+                Timber.e("onJobCancelled byCancelRequest $byCancelRequest ")
+                Timber.e(throwable, throwable?.localizedMessage)
                 if (!e.isDisposed && throwable != null && localJob.id == job.id) e.onError(throwable)
             }
 

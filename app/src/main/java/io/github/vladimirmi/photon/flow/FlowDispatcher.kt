@@ -16,7 +16,6 @@ import flow.TraversalCallback
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.utils.AppConfig
 import mortar.MortarScope
-import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -60,7 +59,6 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
                                   previousView: View,
                                   newView: View,
                                   direction: Direction) {
-        Timber.e("prepareTransition: ")
         if (direction == Direction.REPLACE) return
 
         val slideIn = Slide()
