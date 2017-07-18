@@ -73,16 +73,19 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val
     }
 
     override fun savePhotoUri(uri: String) {
-        Timber.e("savePhotoUri: $uri")
         photoCard.photo = uri
     }
 
     override fun uploadPhotocard(): Single<Unit> {
-        photoCard.withId()
-        photoCard.owner = dataManager.getProfileId()
-        val uploadJob = CreatePhotoJob(photoCard)
-        jobManager.addJobInBackground(uploadJob)
-        return jobManager.singleResultFor(uploadJob)
+        return Single.just(photoCard)
+                .map { it.apply { withId(); owner = dataManager.getProfileId() } }
+                .doOnSuccess { dataManager.saveToDB(it) }
+                .flatMap {
+                    val uploadJob = CreatePhotoJob(it.id)
+                    jobManager.addJobInBackground(uploadJob)
+                    jobManager.singleResultFor(uploadJob)
+                }
+                .ioToMain()
     }
 }
 

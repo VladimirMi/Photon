@@ -9,7 +9,6 @@ import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.Constants
-import io.github.vladimirmi.photon.utils.ErrorObserver
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -18,24 +17,21 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class CreatePhotoJob(private val photocard: Photocard)
+class CreatePhotoJob(private val photocardId: String)
     : Job(Params(JobPriority.HIGH)
         .groupBy("Images")
-        .setSingleId(photocard.id)
-        .addTags(Constants.CREATE_PHOTOCART_JOB_TAG)
-        .requireNetwork()) {
+        .setSingleId(photocardId)
+        .addTags(Constants.CREATE_PHOTOCART_JOB_TAG + photocardId)
+        .requireNetwork()
+        .persist()) {
 
-    private val tempId = photocard.id
-
-    override fun onAdded() {
-        //todo убрать фото, сохранять снаружи
-        DaggerService.appComponent.dataManager().saveToDB(photocard)
-    }
+    override fun onAdded() {}
 
     @Throws(Throwable::class)
     override fun onRun() {
         var error: Throwable? = null
         val dataManager = DaggerService.appComponent.dataManager()
+        val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, photocardId)!!
 
         val data = getByteArrayFromContent(photocard.photo)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
@@ -48,18 +44,14 @@ class CreatePhotoJob(private val photocard: Photocard)
                 }
                 .doOnNext {
                     photocard.id = it.id
-                    dataManager.removeFromDb(Photocard::class.java, tempId)
+                    dataManager.removeFromDb(Photocard::class.java, photocardId)
                     val album = dataManager.getDetachedObjFromDb(Album::class.java, photocard.album)!!
                     album.photocards.add(photocard)
                     dataManager.saveToDB(album)
                 }
-                .subscribeWith(object : ErrorObserver<Photocard>() {
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        error = e
-                    }
-                })
-        if (error != null) throw error!!
+                .blockingSubscribe({}, { error = it })
+
+        error?.let { throw it }
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {

@@ -187,7 +187,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
         }
 
         if (fileSize != null && fileSize < limit) {
-            model.savePhotoUri(uri.toString())
+            model.photoCard.photo = uri.toString()
             startAction = null
         } else {
             startAction = { view.showError(R.string.message_err_file_size, AppConfig.IMAGE_SIZE_LIMIT) }

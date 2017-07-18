@@ -26,6 +26,8 @@ import java.util.*
 class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache) : IAlbumModel {
 
     override fun getAlbum(id: String): Observable<AlbumDto> {
+        //todo update album
+
         val album = dataManager.getObjectFromDb(Album::class.java, id)
                 .map { cache.cacheAlbum(it) }
                 .flatMap { justOrEmpty(cache.album(id)) }

@@ -19,6 +19,7 @@ class CreateAlbumJob(private val request: NewAlbumReq)
         .addTags(Constants.CREATE_ALBUM_JOB_TAG + request.id)
         .requireNetwork()
         .persist()) {
+
     override fun onAdded() {}
 
     override fun onRun() {
