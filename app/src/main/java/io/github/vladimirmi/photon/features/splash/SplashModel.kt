@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.features.splash
 
+import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.utils.ioToMain
@@ -10,7 +11,7 @@ import io.reactivex.Single
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-class SplashModel(val dataManager: DataManager) : ISplashModel {
+class SplashModel(val dataManager: DataManager, val cache: Cache) : ISplashModel {
 
     @Suppress("SimplifyBooleanWithConstants")
     override fun updateLimitPhotoCards(limit: Int): Observable<Int> {
@@ -19,6 +20,7 @@ class SplashModel(val dataManager: DataManager) : ISplashModel {
                 .firstOrError().toObservable()
                 .flatMap { dataManager.getPhotocardsFromNet(0, limit) }
                 .doOnNext { it.forEach { dataManager.saveToDB(it) } }
+                .doOnNext { cache.cachePhotos(it) }
                 .map { it.size }
                 .firstOrError().toObservable()
     }

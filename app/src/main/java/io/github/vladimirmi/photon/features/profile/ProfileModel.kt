@@ -30,8 +30,7 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
         val id = dataManager.getProfileId()
         updateUser(id)
         val profile = dataManager.getObjectFromDb(User::class.java, id)
-                .map { cache.cacheUser(it) }
-                .flatMap { justOrEmpty(cache.user(id)) }
+                .flatMap { justOrEmpty(cache.cacheUser(it)) }
 
         return Observable.merge(justOrEmpty(cache.user(id)), profile).notNull().ioToMain()
     }
@@ -40,7 +39,6 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
         val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
         val albums = dataManager.search(Album::class.java, query, sortBy = "id")
                 .map { cache.cacheAlbums(it) }
-                .map { cache.albums }
 
         return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
     }

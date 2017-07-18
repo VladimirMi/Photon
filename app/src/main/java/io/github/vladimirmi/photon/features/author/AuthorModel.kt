@@ -14,8 +14,7 @@ class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel
     override fun getUser(userId: String): Observable<UserDto> {
         updateUser(userId)
         val user = dataManager.getObjectFromDb(User::class.java, userId)
-                .map { cache.cacheUser(it) }
-                .flatMap { justOrEmpty(cache.user(userId)) }
+                .flatMap { justOrEmpty(cache.cacheUser(it)) }
 
         return Observable.merge(justOrEmpty(cache.user(userId)), user).notNull().ioToMain()
     }
@@ -35,7 +34,6 @@ class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel
         val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
         val albums = dataManager.search(Album::class.java, query, sortBy = "id")
                 .map { cache.cacheAlbums(it) }
-                .map { cache.albums }
 
         return Observable.merge(Observable.just(cache.albums), albums).notNull().ioToMain()
     }

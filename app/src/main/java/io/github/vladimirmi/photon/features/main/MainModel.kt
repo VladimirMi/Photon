@@ -36,7 +36,6 @@ class MainModel(val dataManager: DataManager, val cache: Cache) : IMainModel {
                 sortBy = "views",
                 order = Sort.DESCENDING)
                 .map { cache.cachePhotos(it) }
-                .map { cache.photocards }
 
         return Observable.merge(Observable.just(cache.photocards), photocards).ioToMain()
 

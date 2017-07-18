@@ -29,8 +29,7 @@ class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val c
         //todo update album
 
         val album = dataManager.getObjectFromDb(Album::class.java, id)
-                .map { cache.cacheAlbum(it) }
-                .flatMap { justOrEmpty(cache.album(id)) }
+                .flatMap { justOrEmpty(cache.cacheAlbum(it)) }
                 .ioToMain()
 
         return Observable.merge(justOrEmpty(cache.album(id)), album)

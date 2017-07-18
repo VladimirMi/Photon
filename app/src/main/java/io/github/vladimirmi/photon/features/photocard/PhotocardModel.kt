@@ -21,8 +21,7 @@ class PhotocardModel(val dataManager: DataManager, val cache: Cache) : IPhotocar
     override fun getUser(id: String): Observable<UserDto> {
         updateUser(id)
         val user = dataManager.getObjectFromDb(User::class.java, id)
-                .map { cache.cacheUser(it) }
-                .flatMap { justOrEmpty(cache.user(id)) }
+                .flatMap { justOrEmpty(cache.cacheUser(it)) }
 
         return Observable.merge(justOrEmpty(cache.user(id)), user).notNull().ioToMain()
     }
@@ -41,8 +40,7 @@ class PhotocardModel(val dataManager: DataManager, val cache: Cache) : IPhotocar
     override fun getPhotocard(id: String, ownerId: String): Observable<PhotocardDto> {
         updatePhotocard(id, ownerId)
         val photocard = dataManager.getObjectFromDb(Photocard::class.java, id)
-                .map { cache.cachePhotocard(it) }
-                .flatMap { justOrEmpty(cache.photocard(id)) }
+                .flatMap { justOrEmpty(cache.cachePhotocard(it)) }
 
         return Observable.merge(justOrEmpty(cache.photocard(id)), photocard).notNull().ioToMain()
     }

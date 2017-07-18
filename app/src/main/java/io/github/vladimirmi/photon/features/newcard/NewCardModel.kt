@@ -50,7 +50,6 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val
         val query = Query("value", RealmOperator.CONTAINS, tag)
         val tags = dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
                 .map { cache.cacheTags(it) }
-                .map { cache.tags }
 
         return Observable.merge(Observable.just(cache.tags), tags)
                 .map { if (it.size > 3) it.subList(0, 3) else it }

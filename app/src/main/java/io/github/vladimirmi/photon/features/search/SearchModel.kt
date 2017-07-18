@@ -23,7 +23,6 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
     override fun getTags(): Observable<List<String>> {
         val tags = dataManager.getListFromDb(Tag::class.java, "value")
                 .map { cache.cacheTags(it) }
-                .map { cache.tags }
 
         return Observable.merge(Observable.just(cache.tags), tags).ioToMain()
     }
@@ -69,7 +68,6 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
         val searches = dataManager.search(Search::class.java, listOf(query),
                 sortBy = "date", order = Sort.DESCENDING)
                 .map { cache.cacheSearches(it) }
-                .map { cache.searches }
 
         return Observable.merge(Observable.just(cache.searches), searches)
                 .map { if (it.size > 5) it.subList(0, 5) else it }
