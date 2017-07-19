@@ -1,7 +1,13 @@
 package io.github.vladimirmi.photon.utils
 
+import android.content.Context
+import android.graphics.Bitmap
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.animation.GlideAnimation
+import com.bumptech.glide.request.target.SimpleTarget
 import com.crashlytics.android.Crashlytics
 import io.github.vladimirmi.photon.core.IView
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Changeable
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.reactivex.Observable
@@ -12,6 +18,7 @@ import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
 import timber.log.Timber
+import java.io.File
 import java.net.ConnectException
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -112,5 +119,25 @@ open class ErrorSingleObserver<T>(private val view: IView? = null) : DisposableS
         } else {
             Crashlytics.logException(e)
         }
+    }
+}
+
+
+fun PhotocardDto.downloadTo(file: File, context: Context): Single<Unit> {
+    return Single.create<Unit> { e ->
+        Glide.with(context)
+                .load(photo)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, 100)
+                .into(object : SimpleTarget<ByteArray>() {
+                    override fun onResourceReady(resource: ByteArray, glideAnimation: GlideAnimation<in ByteArray>) {
+                        try {
+                            file.writeBytes(resource)
+                            if (!e.isDisposed) e.onSuccess(Unit)
+                        } catch (exp: Exception) {
+                            if (!e.isDisposed) e.onError(exp)
+                        }
+                    }
+                })
     }
 }

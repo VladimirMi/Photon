@@ -11,7 +11,7 @@ interface ISearchModel : IModel {
     fun makeQuery()
     fun getQuery(): List<Query>
     var queryPage: SearchView.Page
-    fun search(string: String): Observable<List<String>>
+    fun searchRecents(string: String): Observable<List<String>>
     fun saveSearchField(search: String)
     fun removeQuery(fieldName: String)
 }

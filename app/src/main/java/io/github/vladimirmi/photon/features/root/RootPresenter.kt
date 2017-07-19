@@ -4,15 +4,18 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Environment
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import io.github.vladimirmi.photon.data.models.SignInReq
 import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.reactivex.Observable
 import mortar.Presenter
 import mortar.bundler.BundleService
+import java.io.File
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -22,7 +25,7 @@ import mortar.bundler.BundleService
 class RootPresenter(val model: IRootModel) :
         Presenter<IRootView>() {
 
-    var bottomHistory: BottomNavHistory? = null
+    val bottomHistory = BottomNavHistory()
 
     override fun extractBundleService(view: IRootView?): BundleService {
         return BundleService.getBundleService(view as Context)
@@ -32,17 +35,11 @@ class RootPresenter(val model: IRootModel) :
 
     fun getNewToolbarBuilder(): ToolbarBuilder = ToolbarBuilder(view)
 
-    fun isUserAuth(): Boolean {
-        return model.isUserAuth()
-    }
+    fun isUserAuth(): Boolean = model.isUserAuth()
 
-    fun showLoading() {
-        view.showLoading()
-    }
+    fun showLoading() = view.showLoading()
 
-    fun hideLoading() {
-        view.hideLoading()
-    }
+    fun hideLoading() = view.hideLoading()
 
     fun register(req: SignUpReq): Observable<Unit> {
         return model.register(req)
@@ -74,29 +71,27 @@ class RootPresenter(val model: IRootModel) :
         return allGranted
     }
 
-    fun startActivityForResult(intent: Intent, requestCode: Int) {
-        (view as RootActivity).startActivityForResult(intent, requestCode)
+    fun createFileForPhotocard(photocard: PhotocardDto): File? {
+        val folder = Environment.getExternalStorageDirectory()
+        val file = File(folder, "/Photon/${photocard.title}.jpg")
+        val dir = file.parentFile
+        if (!dir.mkdirs() && (!dir.exists() || !dir.isDirectory)) {
+            return null
+        }
+        return file
     }
 
-    fun startActivity(intent: Intent) {
-        (view as RootActivity).startActivity(intent)
-    }
+    fun startActivityForResult(intent: Intent, requestCode: Int) = (view as RootActivity).startActivityForResult(intent, requestCode)
 
-    fun showPermissionSnackBar() {
-        view.showPermissionSnackBar()
-    }
+    fun startActivity(intent: Intent) = (view as RootActivity).startActivity(intent)
 
-    fun navigateTo(bottomItem: BottomNavHistory.BottomItem) {
-        view.navigateTo(bottomItem)
-    }
+    fun showPermissionSnackBar() = view.showPermissionSnackBar()
 
-    fun showMessage(stringId: Int) {
-        view.showMessage(stringId)
-    }
+    fun navigateTo(bottomItem: BottomNavHistory.BottomItem) = view.navigateTo(bottomItem)
 
-    fun clearMenu() {
-        view.clearToolbar()
-    }
+    fun showMessage(stringId: Int) = view.showMessage(stringId)
+
+    fun clearMenu() = view.clearToolbar()
 
     fun isNetAvailable() = model.isNetAvail()
 }

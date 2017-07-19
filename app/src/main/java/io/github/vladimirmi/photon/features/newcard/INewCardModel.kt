@@ -10,7 +10,7 @@ interface INewCardModel : IModel {
     var photoCard: Photocard
     fun addFilter(filter: Pair<String, String>)
     fun removeFilter(filter: Pair<String, String>)
-    fun search(tag: String): Observable<List<String>>
+    fun searchTag(tag: String): Observable<List<String>>
     fun addTag(tag: String)
     fun getAlbums(): Observable<List<AlbumDto>>
     fun savePhotoUri(uri: String)

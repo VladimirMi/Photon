@@ -71,7 +71,7 @@ class SearchTagView(context: Context, attrs: AttributeSet)
     }
 
     fun restoreFromQuery(query: List<Query>) {
-        val value = query.find { it.fieldName == "search" }?.value as? String
+        val value = query.find { it.fieldName == "searchTag" }?.value as? String
         search_field.setText(value)
     }
 

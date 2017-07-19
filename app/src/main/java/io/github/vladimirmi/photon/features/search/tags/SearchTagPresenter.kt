@@ -31,12 +31,12 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
                 .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .map { it.toString().toLowerCase() }
                 .doOnNext {
-                    model.removeQuery("search")
+                    model.removeQuery("searchTag")
                     if (it.isNotBlank()) {
-                        addQuery(Pair("search", it))
+                        addQuery(Pair("searchTag", it))
                     }
                 }
-                .flatMap { model.search(it) }
+                .flatMap { model.searchRecents(it) }
                 .subscribe { view.setRecentSearches(it) }
     }
 

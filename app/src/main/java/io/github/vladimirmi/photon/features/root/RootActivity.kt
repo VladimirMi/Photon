@@ -53,8 +53,7 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        if (presenter.bottomHistory == null) presenter.bottomHistory = BottomNavHistory()
-        val history = presenter.bottomHistory!!
+        val history = presenter.bottomHistory
         history.flow = Flow.get(this)
         history.restoreCurrentItem()
         navigateTo(history.currentItem)

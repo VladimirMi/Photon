@@ -9,7 +9,6 @@ import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.realm.Sort
-import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -36,16 +35,8 @@ class MainModel(val dataManager: DataManager, val cache: Cache) : IMainModel {
                 query = if (query.isNotEmpty()) query.toList() else null,
                 sortBy = "views",
                 order = Sort.DESCENDING)
-                .doOnNext { Timber.e("getPhotoCards: ${it.size}") }
                 .map { cache.cachePhotos(it) }
-                .doOnNext { Timber.e("getPhotoCards: ${it.size}") }
                 .ioToMain()
-
-//        return if (query.isNotEmpty()) {
-//            photocards.ioToMain()
-//        }
-//        else Observable.merge(Observable.just(cache.photocards), photocards).ioToMain()
-
     }
 
     override fun isFiltered() = query.isNotEmpty()
@@ -73,6 +64,4 @@ class MainModel(val dataManager: DataManager, val cache: Cache) : IMainModel {
                 .map { it.forEach { dataManager.saveToDB(it) } }
                 .ioToMain()
     }
-
-
 }

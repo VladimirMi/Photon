@@ -46,12 +46,10 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val
         }
     }
 
-    override fun search(tag: String): Observable<List<String>> {
+    override fun searchTag(tag: String): Observable<List<String>> {
         val query = Query("value", RealmOperator.CONTAINS, tag)
-        val tags = dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
+        return dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
                 .map { cache.cacheTags(it) }
-
-        return Observable.merge(Observable.just(cache.tags), tags)
                 .map { if (it.size > 3) it.subList(0, 3) else it }
                 .ioToMain()
     }

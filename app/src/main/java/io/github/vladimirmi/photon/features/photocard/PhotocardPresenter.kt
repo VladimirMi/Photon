@@ -3,13 +3,8 @@ package io.github.vladimirmi.photon.features.photocard
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.os.Environment
 import android.support.v4.content.FileProvider
 import android.view.MenuItem
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.animation.GlideAnimation
-import com.bumptech.glide.request.target.SimpleTarget
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
@@ -18,11 +13,7 @@ import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.features.author.AuthorScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.Constants
-import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.github.vladimirmi.photon.utils.ioToMain
-import io.reactivex.Observable
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
 import java.io.File
@@ -126,10 +117,13 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
             type = "image/jpeg"
         }
 
-        downloadTo(tempFile as File) {
-            rootPresenter.startActivityForResult(Intent.createChooser(shareIntent, view.resources.getText(R.string.send_to)),
-                    Constants.REQUEST_SHARE)
-        }
+        photocard.downloadTo(tempFile!!, view.context)
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onSuccess(t: Unit) {
+                        val intent = Intent.createChooser(shareIntent, view.resources.getText(R.string.send_to))
+                        rootPresenter.startActivityForResult(intent, Constants.REQUEST_SHARE)
+                    }
+                })
     }
 
     private fun download() {
@@ -140,11 +134,14 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     }
 
     private fun downloadPhoto() {
-        val file = createFile()
+        val file = rootPresenter.createFileForPhotocard(photocard)
         if (file != null) {
-            downloadTo(file) {
-                view.showLoadSnackbar { showLoadedPhoto(file) }
-            }
+            photocard.downloadTo(file, view.context)
+                    .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                        override fun onSuccess(t: Unit) {
+                            view.showLoadSnackbar { showLoadedPhoto(file) }
+                        }
+                    })
         } else {
             view.showMessage(R.string.message_err_create_file)
         }
@@ -161,36 +158,6 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         rootPresenter.startActivity(intent)
     }
 
-    private fun downloadTo(file: File, doneCallback: () -> Unit) {
-        Glide.with(view.context)
-                .load(photocard.photo)
-                .asBitmap()
-                .toBytes(Bitmap.CompressFormat.JPEG, 100)
-                .into(object : SimpleTarget<ByteArray>() {
-                    override fun onResourceReady(resource: ByteArray, glideAnimation: GlideAnimation<in ByteArray>) {
-                        Observable.just(resource)
-                                .flatMap { Observable.just(file.writeBytes(it)) }
-                                .ioToMain()
-                                .subscribeWith(object : ErrorObserver<Any>() {
-                                    override fun onNext(it: Any) {
-                                        doneCallback()
-                                    }
-                                })
-                    }
-                })
-    }
-
-    private fun createFile(): File? {
-        val folder = Environment.getExternalStorageDirectory()
-        val file = File(folder, "/Photon/${photocard.title}.jpg")
-        val dir = file.parentFile
-        if (!dir.mkdirs() && (!dir.exists() || !dir.isDirectory)) {
-            return null
-        }
-        return file
-    }
-
-
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         val requestCanceled = grantResults.contains(PackageManager.PERMISSION_DENIED) || grantResults.isEmpty()
         if (requestCanceled) {
@@ -202,9 +169,9 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Constants.REQUEST_SHARE) {
-            if (tempFile != null) {
-                Timber.e("onActivityResult: delete file")
-                tempFile?.delete()
+            tempFile?.run {
+                Timber.e("onActivityResult: delete temp file")
+                delete()
                 tempFile = null
             }
         }

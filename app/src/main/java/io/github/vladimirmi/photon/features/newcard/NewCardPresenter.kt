@@ -13,7 +13,6 @@ import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.PROFILE
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -69,12 +68,12 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
 
     fun returnToAlbum() {
         Flow.getKey<NewCardScreen>(view)?.album = null
-        val history = rootPresenter.bottomHistory!!.historyMap[BottomNavHistory.BottomItem.PROFILE]
+        val history = rootPresenter.bottomHistory.historyMap[PROFILE]
         val newHistory = history!!.buildUpon().apply {
             pop()
-            push(AlbumScreen(returnToAlbum!!))
+            returnToAlbum?.let { push(AlbumScreen(it)) }
         }.build()
-        rootPresenter.bottomHistory?.historyMap?.set(BottomNavHistory.BottomItem.PROFILE, newHistory)
+        rootPresenter.bottomHistory.historyMap[PROFILE] = newHistory
         rootPresenter.navigateTo(PROFILE)
     }
 
@@ -87,7 +86,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     private fun subscribeOnTagField(): Disposable {
         return view.tagObs.doOnNext { view.setTagActionIcon(it.isNotEmpty()) }
                 .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
-                .flatMap { model.search(it.toString()) }
+                .flatMap { model.searchTag(it.toString()) }
                 .subscribe { view.setTagSuggestions(it) }
     }
 
@@ -176,8 +175,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
         val fileSize = when (uri.scheme) {
             "file" -> File(uri.path).length().toInt()
             else -> {
-                view.context.contentResolver
-                        .query(uri, null, null, null, null, null).use { cursor ->
+                view.context.contentResolver.query(uri, null, null, null, null, null).use { cursor ->
                     if (cursor != null && cursor.moveToFirst()) {
                         val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
                         if (!cursor.isNull(sizeIndex)) cursor.getInt(sizeIndex) else null
