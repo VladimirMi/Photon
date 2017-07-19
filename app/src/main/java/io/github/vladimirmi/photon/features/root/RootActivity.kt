@@ -36,6 +36,8 @@ import javax.inject.Inject
 class RootActivity : FlowActivity(), IRootView {
 
     @Inject internal lateinit var presenter: RootPresenter
+    private val popups = ArrayList<MenuPopupHelper>()
+    private val toolBarMenuItems = ArrayList<MenuItemHolder>()
 
     //region =============== Life cycle ==============
 
@@ -63,9 +65,6 @@ class RootActivity : FlowActivity(), IRootView {
         if (!presenter.hasActiveView()) presenter.takeView(this)
         super.onStart()
     }
-
-    private val popups = ArrayList<MenuPopupHelper>()
-    private val toolBarMenuItems = ArrayList<MenuItemHolder>()
 
     override fun onStop() {
         popups.forEach { it.dismiss() }
@@ -129,8 +128,8 @@ class RootActivity : FlowActivity(), IRootView {
     //region =============== IToolbarBuilder ==============
 
     override fun clearToolbar() {
-        popups.clear()
         toolBarMenuItems.clear()
+        supportActionBar?.invalidateOptionsMenu()
     }
 
     override fun setBottomMenuVisible(visible: Boolean) {
@@ -184,6 +183,8 @@ class RootActivity : FlowActivity(), IRootView {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        menu.clear()
+        popups.clear()
         if (!toolBarMenuItems.isEmpty()) {
             for (menuItemHolder in toolBarMenuItems) {
                 val item = menu.add(menuItemHolder.itemTitle)
@@ -192,17 +193,12 @@ class RootActivity : FlowActivity(), IRootView {
                 } else {
                     item.setIcon(menuItemHolder.iconResId)
                     item.setOnMenuItemClickListener {
-                        kotlin.run {
-                            menuItemHolder.actions(it)
-                            return@run true
-                        }
+                        menuItemHolder.actions(it)
+                        true
                     }
                 }
                 item.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
             }
-        } else {
-            menu.clear()
-            popups.clear()
         }
         return super.onPrepareOptionsMenu(menu)
     }
@@ -215,10 +211,8 @@ class RootActivity : FlowActivity(), IRootView {
         val popup = PopupMenu(this, actionView)
         popup.inflate(menuItemHolder.popupMenu!!)
         popup.setOnMenuItemClickListener {
-            kotlin.run {
-                menuItemHolder.actions(it)
-                return@run true
-            }
+            menuItemHolder.actions(it)
+            true
         }
         val menuHelper = MenuPopupHelper(this, popup.menu as MenuBuilder, actionView)
         (0..popup.menu.size() - 1)

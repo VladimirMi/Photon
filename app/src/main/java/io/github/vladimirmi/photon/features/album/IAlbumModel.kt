@@ -12,5 +12,5 @@ interface IAlbumModel : IModel {
     fun getProfileId(): String
     fun editAlbum(albumReq: EditAlbumReq): Observable<Unit>
     fun deleteAlbum(albumId: String): Single<Unit>
-    fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Observable<Unit>
+    fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Single<Unit>
 }

@@ -39,8 +39,7 @@ class RealmManager {
     fun <T : RealmObject> getObject(clazz: Class<T>, id: String): Observable<T> {
         val query = listOf(Query("id", RealmOperator.EQUALTO, id))
         return search(clazz, query)
-                .map { it.first() }
-                .onErrorResumeNext(Observable.empty())
+                .flatMap { if (it.isEmpty()) Observable.empty() else Observable.just(it.first()) }
     }
 
     fun <T : RealmObject> search(clazz: Class<T>,

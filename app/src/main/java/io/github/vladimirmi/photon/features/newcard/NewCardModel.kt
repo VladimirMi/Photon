@@ -66,7 +66,6 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val
         val query = Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId())
         val albums = dataManager.search(Album::class.java, listOf(query), sortBy = "views", order = Sort.DESCENDING)
                 .map { cache.cacheAlbums(it) }
-                .map { cache.albums }
 
         return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
     }

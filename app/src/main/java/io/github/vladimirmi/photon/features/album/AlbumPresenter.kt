@@ -13,7 +13,6 @@ import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.LOAD
-import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ErrorSingleObserver
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -77,7 +76,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     fun submit() {
         if (photosForDelete.size > 0) {
             compDisp.add(model.removePhotos(photosForDelete, album)
-                    .subscribeWith(ErrorObserver()))
+                    .subscribeWith(ErrorSingleObserver()))
             photosForDelete.clear()
         }
         setEditable(false)

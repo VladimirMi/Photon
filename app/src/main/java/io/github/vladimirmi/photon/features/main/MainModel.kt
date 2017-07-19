@@ -9,6 +9,7 @@ import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.realm.Sort
+import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -31,13 +32,19 @@ class MainModel(val dataManager: DataManager, val cache: Cache) : IMainModel {
     }
 
     override fun getPhotoCards(): Observable<List<PhotocardDto>> {
-        val photocards = dataManager.search(Photocard::class.java,
+        return dataManager.search(Photocard::class.java,
                 query = if (query.isNotEmpty()) query.toList() else null,
                 sortBy = "views",
                 order = Sort.DESCENDING)
+                .doOnNext { Timber.e("getPhotoCards: ${it.size}") }
                 .map { cache.cachePhotos(it) }
+                .doOnNext { Timber.e("getPhotoCards: ${it.size}") }
+                .ioToMain()
 
-        return Observable.merge(Observable.just(cache.photocards), photocards).ioToMain()
+//        return if (query.isNotEmpty()) {
+//            photocards.ioToMain()
+//        }
+//        else Observable.merge(Observable.just(cache.photocards), photocards).ioToMain()
 
     }
 

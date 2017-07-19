@@ -35,9 +35,11 @@ class SearchTagView(context: Context, attrs: AttributeSet)
         DaggerService.getComponent<SearchScreen.Component>(context).inject(this)
     }
 
+    private val recentSearches by lazy { recent_search }
+
     override fun initView() {
-        recent_search.layoutManager = LinearLayoutManager(context)
-        recent_search.adapter = searchAdapter
+        recentSearches.layoutManager = LinearLayoutManager(context)
+        recentSearches.adapter = searchAdapter
         ic_action.setOnClickListener { presenter.submitSearch(search_field.text.toString()) }
         ic_clear_tag.setOnClickListener { clearAll() }
     }
@@ -83,6 +85,11 @@ class SearchTagView(context: Context, attrs: AttributeSet)
             flexbox.addView(view)
         }
         tags_wrapper.addView(flexbox)
+    }
+
+    override fun onViewDestroyed(removedByFlow: Boolean) {
+        super.onViewDestroyed(removedByFlow)
+        recentSearches.adapter = null
     }
 }
 

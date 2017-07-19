@@ -59,13 +59,11 @@ class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val c
                 .ioToMain()
     }
 
-    override fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Observable<Unit> {
+    override fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Single<Unit> {
         if (album.isFavorite) {
-            return removeFromFavorite(photosForDelete, album)
+            return removeFromFavorite(photosForDelete, album).lastOrError() //todo refactor to job
         }
         return cancelCreateOrRemovePhotos(photosForDelete.map { it.id })
-                .toObservable()
-                .unit()
     }
 
     private fun cancelCreateOrRemovePhotos(photocardsId: List<String>): Single<Unit> {
