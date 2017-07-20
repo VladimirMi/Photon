@@ -31,16 +31,18 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
         updateUser(id)
         val profile = dataManager.getObjectFromDb(User::class.java, id)
                 .flatMap { justOrEmpty(cache.cacheUser(it)) }
+                .ioToMain()
 
-        return Observable.merge(justOrEmpty(cache.user(id)), profile).notNull().ioToMain()
+        return Observable.merge(justOrEmpty(cache.user(id)), profile)
     }
 
     override fun getAlbums(): Observable<List<AlbumDto>> {
         val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
         val albums = dataManager.search(Album::class.java, query, sortBy = "id")
                 .map { cache.cacheAlbums(it) }
+                .ioToMain()
 
-        return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
+        return Observable.merge(Observable.just(cache.albums), albums)
     }
 
     private fun updateUser(id: String, updated: String? = null) {

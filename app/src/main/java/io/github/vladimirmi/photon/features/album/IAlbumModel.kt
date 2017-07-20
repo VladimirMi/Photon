@@ -10,7 +10,7 @@ import io.reactivex.Single
 interface IAlbumModel : IModel {
     fun getAlbum(id: String): Observable<AlbumDto>
     fun getProfileId(): String
-    fun editAlbum(albumReq: EditAlbumReq): Observable<Unit>
+    fun editAlbum(albumReq: EditAlbumReq): Single<Unit>
     fun deleteAlbum(albumId: String): Single<Unit>
     fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Single<Unit>
 }

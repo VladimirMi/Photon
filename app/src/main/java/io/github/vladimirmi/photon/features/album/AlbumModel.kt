@@ -2,21 +2,17 @@ package io.github.vladimirmi.photon.features.album
 
 import com.birbit.android.jobqueue.JobManager
 import com.birbit.android.jobqueue.TagConstraint
-import io.github.vladimirmi.photon.data.jobs.DeleteAlbumJob
-import io.github.vladimirmi.photon.data.jobs.DeletePhotocardJob
-import io.github.vladimirmi.photon.data.jobs.singleCancelJobs
+import io.github.vladimirmi.photon.data.jobs.*
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.utils.Constants
-import io.github.vladimirmi.photon.utils.ioToMain
-import io.github.vladimirmi.photon.utils.justOrEmpty
-import io.github.vladimirmi.photon.utils.unit
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -26,8 +22,7 @@ import java.util.*
 class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache) : IAlbumModel {
 
     override fun getAlbum(id: String): Observable<AlbumDto> {
-        //todo update album
-
+        updateAlbum(id)
         val album = dataManager.getObjectFromDb(Album::class.java, id)
                 .flatMap { justOrEmpty(cache.cacheAlbum(it)) }
                 .ioToMain()
@@ -36,18 +31,38 @@ class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val c
 
     }
 
+    private fun updateAlbum(id: String) {
+        //todo refactor all entities update
+        Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, id))
+                .flatMap { dataManager.getAlbumFromNet(it.id, getUpdated(it).toString()) }
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(object : ErrorObserver<Album>() {
+                    override fun onNext(it: Album) {
+                        dataManager.saveToDB(it)
+                    }
+                })
+    }
+
     override fun getProfileId() = dataManager.getProfileId()
 
-    override fun editAlbum(albumReq: EditAlbumReq): Observable<Unit> {
-        return dataManager.editAlbum(albumReq)
-                .map { dataManager.saveToDB(it) }
+    override fun editAlbum(albumReq: EditAlbumReq): Single<Unit> {
+        val job = EditAlbumJob(albumReq)
+        return Single.just(dataManager.getDetachedObjFromDb(Album::class.java, albumReq.id))
+                .doOnSuccess { album ->
+                    album.apply { title = albumReq.title; description = albumReq.description }
+                    dataManager.saveToDB(album)
+                }
+                .flatMap { jobManager.singleCancelJobs(TagConstraint.ANY, job.tag) }
+                .doOnSuccess { jobManager.addJobInBackground(job) }
+                .flatMap { jobManager.singleResultFor(job) }
+                .ioToMain()
     }
 
     override fun deleteAlbum(albumId: String): Single<Unit> {
         val album = dataManager.getDetachedObjFromDb(Album::class.java, albumId)!!
 
         return cancelCreateOrRemovePhotos(album.photocards.map { it.id })
-                .flatMap { jobManager.singleCancelJobs(TagConstraint.ALL, Constants.CREATE_ALBUM_JOB_TAG + albumId) }
+                .flatMap { jobManager.singleCancelJobs(TagConstraint.ANY, Constants.CREATE_ALBUM_JOB_TAG + albumId) }
                 .map { cancelResult ->
                     if (cancelResult.cancelledJobs.isNotEmpty()) {
                         cache.removeAlbum(albumId)
@@ -68,12 +83,12 @@ class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val c
 
     private fun cancelCreateOrRemovePhotos(photocardsId: List<String>): Single<Unit> {
         if (photocardsId.isEmpty()) return Single.just(Unit)
-        val createPhotoJobTags = photocardsId.mapTo(ArrayList()) { Constants.CREATE_PHOTOCART_JOB_TAG + it }
+        val createPhotoJobTags = photocardsId.mapTo(ArrayList()) { Constants.CREATE_PHOTOCARD_JOB_TAG + it }
 
         return jobManager.singleCancelJobs(TagConstraint.ANY, *createPhotoJobTags.toTypedArray())
                 .doOnSuccess { it.cancelledJobs.forEach { it.tags?.forEach { createPhotoJobTags.remove(it) } } }
                 .flatMapObservable { Observable.fromIterable(createPhotoJobTags) }
-                .map { jobManager.addJobInBackground(DeletePhotocardJob(it.removePrefix(Constants.CREATE_PHOTOCART_JOB_TAG))) }
+                .map { jobManager.addJobInBackground(DeletePhotocardJob(it.removePrefix(Constants.CREATE_PHOTOCARD_JOB_TAG))) }
                 .last(Unit)
     }
 

@@ -21,7 +21,7 @@ class CreatePhotoJob(private val photocardId: String)
     : Job(Params(JobPriority.HIGH)
         .groupBy("Images")
         .setSingleId(photocardId)
-        .addTags(Constants.CREATE_PHOTOCART_JOB_TAG + photocardId)
+        .addTags(Constants.CREATE_PHOTOCARD_JOB_TAG + photocardId)
         .requireNetwork()
         .persist()) {
 

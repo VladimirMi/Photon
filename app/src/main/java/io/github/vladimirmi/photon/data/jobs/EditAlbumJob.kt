@@ -1,0 +1,65 @@
+package io.github.vladimirmi.photon.data.jobs
+
+import com.birbit.android.jobqueue.CancelReason
+import com.birbit.android.jobqueue.Job
+import com.birbit.android.jobqueue.Params
+import com.birbit.android.jobqueue.RetryConstraint
+import io.github.vladimirmi.photon.data.models.EditAlbumReq
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.reactivex.schedulers.Schedulers
+import java.util.*
+
+/**
+ * Created by Vladimir Mikhalev 20.07.2017.
+ */
+
+class EditAlbumJob(private val albumReq: EditAlbumReq)
+    : Job(Params(JobPriority.HIGH)
+        .addTags(TAG + albumReq.id)
+        .requireNetwork()
+        .persist()) {
+
+    companion object {
+        const val TAG = "EditAlbumJobTag"
+    }
+
+    val tag = EditAlbumJob.TAG + albumReq.id
+
+    override fun onAdded() {}
+
+    override fun onRun() {
+        val dataManager = DaggerService.appComponent.dataManager()
+
+        var error: Throwable? = null
+        dataManager.editAlbum(albumReq)
+                .doOnNext { dataManager.saveToDB(it) }
+                .blockingSubscribe({}, { error = it })
+
+        error?.let { throw it }
+    }
+
+    override fun onCancel(cancelReason: Int, throwable: Throwable?) {
+        logCancel(cancelReason, throwable)
+        if (cancelReason == CancelReason.CANCELLED_VIA_SHOULD_RE_RUN) {
+            updateAlbum()
+        }
+    }
+
+    private fun updateAlbum() {
+        val dataManager = DaggerService.appComponent.dataManager()
+
+        dataManager.getAlbumFromNet(albumReq.id, Date(0).toString())
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(object : ErrorObserver<Album>() {
+                    override fun onNext(it: Album) {
+                        dataManager.saveToDB(it)
+                    }
+                })
+    }
+
+    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
+        return RetryConstraint.CANCEL
+    }
+}

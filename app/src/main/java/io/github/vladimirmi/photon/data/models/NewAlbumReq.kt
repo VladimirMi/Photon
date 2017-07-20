@@ -6,7 +6,7 @@ import java.io.Serializable
  * Created by Vladimir Mikhalev 23.06.2017.
  */
 
-class NewAlbumReq(@field:Transient var id: String = "",
+class NewAlbumReq(var id: String = "",
                   var owner: String = "",
                   val title: String,
                   val description: String) : Serializable

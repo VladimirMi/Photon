@@ -4,9 +4,12 @@ import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
+import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
+import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 
 class AuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter)
     : BasePresenter<AuthorView, IAuthorModel>(model, rootPresenter) {
@@ -26,12 +29,21 @@ class AuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter)
 
     private fun subscribeOnUser(userId: String): Disposable {
         return model.getUser(userId)
-                .subscribe { view.setUser(it) }
+                .subscribeWith(object : ErrorObserver<UserDto>() {
+                    override fun onNext(it: UserDto) {
+                        view.setUser(it)
+                    }
+                })
     }
 
     private fun subscribeOnAlbums(userId: String): Disposable {
         return model.getAlbums(userId)
-                .subscribe { view.setAlbums(it) }
+                .subscribeWith(object : ErrorObserver<List<AlbumDto>>() {
+                    override fun onNext(it: List<AlbumDto>) {
+                        Timber.e("onNext: ${it.size}")
+                        view.setAlbums(it)
+                    }
+                })
     }
 
     fun showAlbum(album: AlbumDto) {

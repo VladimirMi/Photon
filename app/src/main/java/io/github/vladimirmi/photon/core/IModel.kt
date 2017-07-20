@@ -9,6 +9,7 @@ import java.util.*
  */
 
 interface IModel {
+    //todo return string
     fun getUpdated(obj: Changeable?): Date {
         var updated = obj?.updated ?: Date(0)
         if (updated.time != 0L && Date().time - AppConfig.UPDATE_TIMEOUT > updated.time) updated = Date(0)

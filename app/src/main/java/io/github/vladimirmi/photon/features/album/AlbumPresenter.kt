@@ -69,7 +69,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         view.closeEditDialog()
         if (albumChange(albumReq)) {
             albumReq.id = album.id
-            compDisp.add(model.editAlbum(albumReq).subscribe())
+            compDisp.add(model.editAlbum(albumReq).subscribeWith(ErrorSingleObserver()))
         }
     }
 
@@ -114,7 +114,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     private fun addPhotocard() {
-        rootPresenter.bottomHistory?.historyMap?.set(LOAD, History.single(NewCardScreen(album)))
+        rootPresenter.bottomHistory.historyMap.set(LOAD, History.single(NewCardScreen(album)))
         rootPresenter.navigateTo(LOAD)
     }
 

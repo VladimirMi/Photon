@@ -15,8 +15,9 @@ class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel
         updateUser(userId)
         val user = dataManager.getObjectFromDb(User::class.java, userId)
                 .flatMap { justOrEmpty(cache.cacheUser(it)) }
+                .ioToMain()
 
-        return Observable.merge(justOrEmpty(cache.user(userId)), user).notNull().ioToMain()
+        return Observable.merge(justOrEmpty(cache.user(userId)), user)
     }
 
     private fun updateUser(id: String) {
@@ -31,10 +32,9 @@ class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel
     }
 
     override fun getAlbums(ownerId: String): Observable<List<AlbumDto>> {
-        val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
-        val albums = dataManager.search(Album::class.java, query, sortBy = "id")
+        val query = listOf(Query("owner", RealmOperator.EQUALTO, ownerId))
+        return dataManager.search(Album::class.java, query, sortBy = "id")
                 .map { cache.cacheAlbums(it) }
-
-        return Observable.merge(Observable.just(cache.albums), albums).notNull().ioToMain()
+                .ioToMain()
     }
 }
