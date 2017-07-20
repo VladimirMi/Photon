@@ -9,7 +9,10 @@ import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.utils.*
+import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.ioToMain
+import io.github.vladimirmi.photon.utils.justOrEmpty
+import io.github.vladimirmi.photon.utils.unit
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -32,15 +35,11 @@ class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val c
     }
 
     private fun updateAlbum(id: String) {
-        //todo refactor all entities update
         Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, id))
                 .flatMap { dataManager.getAlbumFromNet(it.id, getUpdated(it).toString()) }
+                .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
-                .subscribeWith(object : ErrorObserver<Album>() {
-                    override fun onNext(it: Album) {
-                        dataManager.saveToDB(it)
-                    }
-                })
+                .subscribeWith(ErrorObserver())
     }
 
     override fun getProfileId() = dataManager.getProfileId()
@@ -62,7 +61,7 @@ class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val c
         val album = dataManager.getDetachedObjFromDb(Album::class.java, albumId)!!
 
         return cancelCreateOrRemovePhotos(album.photocards.map { it.id })
-                .flatMap { jobManager.singleCancelJobs(TagConstraint.ANY, Constants.CREATE_ALBUM_JOB_TAG + albumId) }
+                .flatMap { jobManager.singleCancelJobs(TagConstraint.ANY, CreateAlbumJob.TAG + albumId) }
                 .map { cancelResult ->
                     if (cancelResult.cancelledJobs.isNotEmpty()) {
                         cache.removeAlbum(albumId)
@@ -83,12 +82,12 @@ class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val c
 
     private fun cancelCreateOrRemovePhotos(photocardsId: List<String>): Single<Unit> {
         if (photocardsId.isEmpty()) return Single.just(Unit)
-        val createPhotoJobTags = photocardsId.mapTo(ArrayList()) { Constants.CREATE_PHOTOCARD_JOB_TAG + it }
+        val createPhotoJobTags = photocardsId.mapTo(ArrayList()) { CreatePhotoJob.TAG + it }
 
         return jobManager.singleCancelJobs(TagConstraint.ANY, *createPhotoJobTags.toTypedArray())
                 .doOnSuccess { it.cancelledJobs.forEach { it.tags?.forEach { createPhotoJobTags.remove(it) } } }
                 .flatMapObservable { Observable.fromIterable(createPhotoJobTags) }
-                .map { jobManager.addJobInBackground(DeletePhotocardJob(it.removePrefix(Constants.CREATE_PHOTOCARD_JOB_TAG))) }
+                .map { jobManager.addJobInBackground(DeletePhotocardJob(it.removePrefix(CreatePhotoJob.TAG))) }
                 .last(Unit)
     }
 

@@ -52,12 +52,9 @@ class DeleteAlbumJob(private val albumId: String)
         val dataManager = DaggerService.appComponent.dataManager()
 
         dataManager.getAlbumFromNet(albumId, Date(0).toString())
+                .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
-                .subscribeWith(object : ErrorObserver<Album>() {
-                    override fun onNext(it: Album) {
-                        dataManager.saveToDB(it)
-                    }
-                })
+                .subscribeWith(ErrorObserver())
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {

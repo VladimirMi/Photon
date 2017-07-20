@@ -8,7 +8,6 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.Constants
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -21,9 +20,15 @@ class CreatePhotoJob(private val photocardId: String)
     : Job(Params(JobPriority.HIGH)
         .groupBy("Images")
         .setSingleId(photocardId)
-        .addTags(Constants.CREATE_PHOTOCARD_JOB_TAG + photocardId)
+        .addTags(TAG + photocardId)
         .requireNetwork()
         .persist()) {
+
+    companion object {
+        val TAG = "CreatePhotoJobTag"
+    }
+
+    val tag = TAG + photocardId
 
     override fun onAdded() {}
 

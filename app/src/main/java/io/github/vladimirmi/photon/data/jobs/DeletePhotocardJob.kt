@@ -7,6 +7,7 @@ import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 /**
@@ -49,6 +50,7 @@ class DeletePhotocardJob(private val photocardId: String)
 
         dataManager.getPhotocardFromNet(photocardId, dataManager.getProfileId(), Date(0).toString())
                 .doOnNext { dataManager.saveToDB(it) }
+                .subscribeOn(Schedulers.io())
                 .subscribeWith(ErrorObserver())
     }
 

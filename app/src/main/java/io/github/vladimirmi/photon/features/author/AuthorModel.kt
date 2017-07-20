@@ -8,6 +8,7 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 
 class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel {
 
@@ -21,14 +22,11 @@ class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel
     }
 
     private fun updateUser(id: String) {
-        val user = dataManager.getDetachedObjFromDb(User::class.java, id)
-
-        dataManager.getUserFromNet(id, getUpdated(user).toString())
-                .subscribeWith(object : ErrorObserver<User>() {
-                    override fun onNext(it: User) {
-                        dataManager.saveToDB(it)
-                    }
-                })
+        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id))
+                .flatMap { dataManager.getUserFromNet(id, getUpdated(dataManager.getDetachedObjFromDb(User::class.java, id)).toString()) }
+                .doOnNext { dataManager.saveToDB(it) }
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(ErrorObserver())
     }
 
     override fun getAlbums(ownerId: String): Observable<List<AlbumDto>> {

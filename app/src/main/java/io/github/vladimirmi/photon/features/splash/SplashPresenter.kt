@@ -12,7 +12,6 @@ import io.github.vladimirmi.photon.utils.ErrorSingleObserver
 import io.github.vladimirmi.photon.utils.observeOnMainThread
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 /**
@@ -42,26 +41,27 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
                 .doOnError { if (it is NoSuchElementException) loaded = true } //304 empty
                 .map { false } // ended
 
-        return Observable.mergeDelayError(Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS)
-                .map { true } // ended
-                , updateObs)
+        return Observable.mergeDelayError(
+                Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS).map { true }, // ended
+                updateObs)
                 .observeOnMainThread()
                 .subscribeWith(object : ErrorObserver<Boolean>() {
                     override fun onNext(ended: Boolean) {
-                        Timber.e("onNext: $loaded")
                         if (ended) {
-                            if (!loaded) view.showMessage(R.string.message_err_connect)
-                            chooseCanOpen()
+                            if (loaded) {
+                                openMainScreen()
+                            } else {
+                                view.showMessage(R.string.message_err_connect)
+                                chooseCanOpen()
+                            }
                         }
                     }
 
                     override fun onComplete() {
-                        Timber.e("onComplete: $loaded")
                         openMainScreen(AppConfig.PHOTOCARDS_PAGE_SIZE)
                     }
 
                     override fun onError(e: Throwable) {
-                        Timber.e("onError: $loaded")
                         if (loaded) {
                             openMainScreen(AppConfig.PHOTOCARDS_PAGE_SIZE)
                             return
@@ -86,7 +86,6 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
             }
         }))
     }
-
 
     private fun openMainScreen(updated: Int = 0) {
         Flow.get(view).replaceTop(MainScreen(updated), Direction.FORWARD)

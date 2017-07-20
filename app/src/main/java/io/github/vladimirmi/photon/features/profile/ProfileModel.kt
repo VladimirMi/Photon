@@ -46,15 +46,11 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
     }
 
     private fun updateUser(id: String, updated: String? = null) {
-        val user = dataManager.getDetachedObjFromDb(User::class.java, id)
-
-        dataManager.getUserFromNet(id, updated ?: getUpdated(user).toString())
+        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id))
+                .flatMap { dataManager.getUserFromNet(id, getUpdated(it).toString()) }
+                .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
-                .subscribeWith(object : ErrorObserver<User>() {
-                    override fun onNext(it: User) {
-                        dataManager.saveToDB(it)
-                    }
-                })
+                .subscribeWith(ErrorObserver())
     }
 
     override fun createAlbum(newAlbumReq: NewAlbumReq): Single<Unit> {
@@ -89,7 +85,7 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
                         avatar = profileReq.avatar
                     }
                     dataManager.saveToDB(profile)
-                    jobManager.cancelJobs(TagConstraint.ALL, Constants.EDIT_PROFILE_JOB_TAG)
+                    jobManager.cancelJobs(TagConstraint.ALL, job.tag)
                     jobManager.addJobInBackground(job)
                 }
                 .flatMap { jobManager.singleResultFor(job) }

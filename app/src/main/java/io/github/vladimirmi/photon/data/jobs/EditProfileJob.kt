@@ -6,11 +6,9 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.EditProfileReq
-import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.Constants.EDIT_PROFILE_JOB_TAG
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType
@@ -25,10 +23,15 @@ import java.util.*
 class EditProfileJob(private val profileReq: EditProfileReq,
                      private val avatarLoad: Boolean = false)
     : Job(Params(JobPriority.HIGH)
-        .addTags(EDIT_PROFILE_JOB_TAG)
+        .addTags(TAG + profileReq.id)
         .requireNetwork()
         .persist()) {
 
+    companion object {
+        const val TAG = "EditProfileJobTag"
+    }
+
+    val tag = TAG + profileReq.id
 
     override fun onAdded() {}
 
@@ -75,12 +78,9 @@ class EditProfileJob(private val profileReq: EditProfileReq,
         val dataManager = DaggerService.appComponent.dataManager()
 
         dataManager.getUserFromNet(dataManager.getProfileId(), Date(0).toString())
+                .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
-                .subscribeWith(object : ErrorObserver<User>() {
-                    override fun onNext(it: User) {
-                        dataManager.saveToDB(it)
-                    }
-                })
+                .subscribeWith(ErrorObserver())
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {

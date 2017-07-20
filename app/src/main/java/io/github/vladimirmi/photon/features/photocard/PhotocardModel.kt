@@ -27,14 +27,11 @@ class PhotocardModel(val dataManager: DataManager, val cache: Cache) : IPhotocar
     }
 
     private fun updateUser(id: String) {
-        val user = dataManager.getDetachedObjFromDb(User::class.java, id)
-
-        dataManager.getUserFromNet(id, getUpdated(user).toString())
-                .subscribeWith(object : ErrorObserver<User>() {
-                    override fun onNext(it: User) {
-                        dataManager.saveToDB(it)
-                    }
-                })
+        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id))
+                .flatMap { dataManager.getUserFromNet(id, getUpdated(dataManager.getDetachedObjFromDb(User::class.java, id)).toString()) }
+                .doOnNext { dataManager.saveToDB(it) }
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(ErrorObserver())
     }
 
     override fun getPhotocard(id: String, ownerId: String): Observable<PhotocardDto> {
