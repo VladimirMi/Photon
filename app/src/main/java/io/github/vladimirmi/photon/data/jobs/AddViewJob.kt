@@ -5,13 +5,12 @@ import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
-import io.reactivex.Observable
 
 /**
  * Created by Vladimir Mikhalev 21.07.2017.
  */
 
-class AddViewJob(id: String) :
+class AddViewJob(private val photocardId: String) :
         Job(Params(JobPriority.HIGH)
                 .setGroupId(TAG)
                 .requireNetwork()
@@ -25,12 +24,7 @@ class AddViewJob(id: String) :
         val dataManager = DaggerService.appComponent.dataManager()
         var error: Throwable? = null
 
-        Observable.just(dataManager.getDetachedObjFromDb(Photocard::class.java, id))
-                .doOnNext {
-                    it.views++
-                    dataManager.saveToDB(it)
-                }
-                .flatMap { dataManager.addView(id) }
+        dataManager.addView(photocardId)
                 .blockingSubscribe({}, { error = it })
 
         error?.let { throw it }
@@ -40,7 +34,11 @@ class AddViewJob(id: String) :
         return RetryConstraint.CANCEL
     }
 
-    override fun onAdded() {}
+    override fun onAdded() {
+        val dataManager = DaggerService.appComponent.dataManager()
+        val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, photocardId)!!
+        dataManager.saveToDB(photocard.apply { views++ })
+    }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)

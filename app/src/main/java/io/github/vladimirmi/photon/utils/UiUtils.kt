@@ -53,6 +53,12 @@ inline fun <V : IView> IView.afterNetCheck(block: V.() -> Unit) {
     if (netAvail) block(this as V) else showNetError()
 }
 
+@Suppress("UNCHECKED_CAST")
+inline fun <V : IView> IView.afterAuthCheck(block: V.() -> Unit) {
+    val profileId = DaggerService.appComponent.dataManager().getProfileId()
+    if (profileId.isNotEmpty()) block(this as V) else showAuthError()
+}
+
 inline fun View.waitForMeasure(crossinline block: () -> Unit) {
     if (width > 0 && height > 0) {
         block()

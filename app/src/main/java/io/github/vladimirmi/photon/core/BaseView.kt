@@ -71,6 +71,10 @@ abstract class BaseView<P : BasePresenter<V, *>, V : BaseView<P, V>>
     override fun showNetError() {
         Snackbar.make(this, R.string.message_err_net, Snackbar.LENGTH_SHORT).show()
     }
+
+    override fun showAuthError() {
+        Snackbar.make(this, R.string.message_err_auth, Snackbar.LENGTH_SHORT).show()
+    }
 }
 
 

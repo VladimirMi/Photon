@@ -9,4 +9,5 @@ interface IView {
     fun showMessage(stringId: Int)
     fun showError(stringId: Int, vararg formatArgs: Any = emptyArray())
     fun showNetError()
+    fun showAuthError()
 }

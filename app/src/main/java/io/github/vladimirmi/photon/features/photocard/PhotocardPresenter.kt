@@ -15,7 +15,6 @@ import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
 import java.io.File
 
 
@@ -24,8 +23,8 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private val actions: (MenuItem) -> Unit = {
         when (it.itemId) {
-            R.id.menu_favorite -> addToFavorite()
-            R.id.menu_favorite_remove -> removeFromFavorite()
+            R.id.menu_favorite -> view.afterAuthCheck<PhotocardView> { addToFavorite() }
+            R.id.menu_favorite_remove -> view.afterAuthCheck<PhotocardView> { removeFromFavorite() }
             R.id.menu_share -> view.afterNetCheck<PhotocardView> { share() }
             R.id.menu_download -> view.afterNetCheck<PhotocardView> { download() }
         }
@@ -89,21 +88,16 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     }
 
     fun showAuthor() {
-        view.afterNetCheck<PhotocardView> {
-            Flow.get(view).set(AuthorScreen(photocard.owner))
-        }
+        Flow.get(view).set(AuthorScreen(photocard.owner))
     }
 
+
     private fun addToFavorite() {
-        if (rootPresenter.isUserAuth()) {
-            compDisp.add(model.addToFavorite(photocard.id).subscribeWith(ErrorObserver()))
-        }
+        compDisp.add(model.addToFavorite(photocard.id).subscribeWith(ErrorSingleObserver()))
     }
 
     private fun removeFromFavorite() {
-        if (rootPresenter.isUserAuth()) {
-            compDisp.add(model.removeFromFavorite(photocard.id).subscribeWith(ErrorObserver()))
-        }
+        compDisp.add(model.removeFromFavorite(photocard.id).subscribeWith(ErrorSingleObserver()))
     }
 
     private var tempFile: File? = null
@@ -173,7 +167,6 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Constants.REQUEST_SHARE) {
             tempFile?.run {
-                Timber.e("onActivityResult: delete temp file")
                 delete()
                 tempFile = null
             }

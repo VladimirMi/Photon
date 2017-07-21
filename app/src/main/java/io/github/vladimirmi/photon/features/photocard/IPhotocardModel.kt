@@ -9,7 +9,7 @@ import io.reactivex.Single
 interface IPhotocardModel : IModel {
     fun getUser(id: String): Observable<UserDto>
     fun getPhotocard(id: String, ownerId: String): Observable<PhotocardDto>
-    fun addToFavorite(id: String): Observable<Unit>
-    fun isFavorite(id: String): Single<Boolean>
-    fun removeFromFavorite(id: String): Observable<Unit>
+    fun addToFavorite(id: String): Single<Unit>
+    fun isFavorite(id: String): Observable<Boolean>
+    fun removeFromFavorite(id: String): Single<Unit>
 }

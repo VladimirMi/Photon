@@ -106,4 +106,8 @@ abstract class FlowActivity : AppCompatActivity(), IView {
     override fun showNetError() {
         Snackbar.make(root_container, R.string.message_err_net, Snackbar.LENGTH_SHORT).show()
     }
+
+    override fun showAuthError() {
+        Snackbar.make(root_container, R.string.message_err_auth, Snackbar.LENGTH_SHORT).show()
+    }
 }
