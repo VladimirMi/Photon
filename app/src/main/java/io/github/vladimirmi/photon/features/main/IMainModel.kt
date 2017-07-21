@@ -19,6 +19,6 @@ interface IMainModel : IModel {
     fun makeQuery(currentPage: SearchView.Page)
     fun isFiltered(): Boolean
     fun resetFilter()
-    fun addView(photocardId: String): Observable<Unit>
+    fun addView(photocardId: String)
     fun updatePhotocards(offset: Int, limit: Int): Observable<Unit>
 }

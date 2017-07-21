@@ -26,8 +26,8 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         when (it.itemId) {
             R.id.menu_favorite -> addToFavorite()
             R.id.menu_favorite_remove -> removeFromFavorite()
-            R.id.menu_share -> share()
-            R.id.menu_download -> download()
+            R.id.menu_share -> view.afterNetCheck<PhotocardView> { share() }
+            R.id.menu_download -> view.afterNetCheck<PhotocardView> { download() }
         }
     }
     private var isFavorite = false
@@ -89,7 +89,9 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     }
 
     fun showAuthor() {
-        Flow.get(view).set(AuthorScreen(photocard.owner))
+        view.afterNetCheck<PhotocardView> {
+            Flow.get(view).set(AuthorScreen(photocard.owner))
+        }
     }
 
     private fun addToFavorite() {
@@ -106,6 +108,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private var tempFile: File? = null
 
+    //todo share url without net
     private fun share() {
         tempFile = createTempFile(suffix = ".jpg", directory = view.context.cacheDir)
         val uri = FileProvider.getUriForFile(view.context,

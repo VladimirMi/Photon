@@ -1,5 +1,7 @@
 package io.github.vladimirmi.photon.features.main
 
+import com.birbit.android.jobqueue.JobManager
+import io.github.vladimirmi.photon.data.jobs.AddViewJob
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
@@ -14,7 +16,7 @@ import io.realm.Sort
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class MainModel(val dataManager: DataManager, val cache: Cache) : IMainModel {
+class MainModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache) : IMainModel {
 
     var query = ArrayList<Query>()
     override var queryPage: SearchView.Page = SearchView.Page.TAGS
@@ -48,16 +50,8 @@ class MainModel(val dataManager: DataManager, val cache: Cache) : IMainModel {
         queryPage = SearchView.Page.TAGS
     }
 
-    //todo to job
-    override fun addView(photocardId: String): Observable<Unit> {
-        return dataManager.addView(photocardId)
-                .map { if (it.success) it else throw Throwable("Add view to photo fails") }
-                .map {
-                    val photo = dataManager.getDetachedObjFromDb(Photocard::class.java, photocardId)!!
-                    photo.views++
-                    dataManager.saveToDB(photo)
-                }
-                .ioToMain()
+    override fun addView(photocardId: String) {
+        jobManager.addJobInBackground(AddViewJob(photocardId))
     }
 
     override fun updatePhotocards(offset: Int, limit: Int): Observable<Unit> {

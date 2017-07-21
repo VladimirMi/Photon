@@ -13,8 +13,8 @@ import io.github.vladimirmi.photon.di.DaggerService
  */
 
 class CreateAlbumJob(private val request: NewAlbumReq)
-    : Job(Params(JobPriority.MID)
-        .setGroupId("CreateAlbum")
+    : Job(Params(JobPriority.HIGH)
+        .setGroupId(TAG)
         .addTags(TAG + request.id)
         .requireNetwork()
         .persist()) {

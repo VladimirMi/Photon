@@ -132,10 +132,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     fun showPhotoCard(photocard: PhotocardDto) {
-        view.afterNetCheck<MainView> {
-            model.addView(photocard.id).subscribeWith(ErrorObserver())
-            Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
-        }
+        model.addView(photocard.id)
+        Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
     }
 
     fun loadMore(page: Int, limit: Int) {

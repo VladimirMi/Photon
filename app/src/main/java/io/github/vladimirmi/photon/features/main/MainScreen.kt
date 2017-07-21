@@ -2,6 +2,7 @@ package io.github.vladimirmi.photon.features.main
 
 import android.os.Parcelable
 import android.util.SparseArray
+import com.birbit.android.jobqueue.JobManager
 import dagger.Provides
 
 import dagger.Subcomponent
@@ -38,8 +39,8 @@ class MainScreen(var updated: Int = 0) : BaseScreen<RootActivityComponent>() {
 
         @Provides
         @DaggerScope(MainScreen::class)
-        fun provideMainModel(dataManager: DataManager, cache: Cache): IMainModel {
-            return MainModel(dataManager, cache)
+        fun provideMainModel(dataManager: DataManager, jobManager: JobManager, cache: Cache): IMainModel {
+            return MainModel(dataManager, jobManager, cache)
         }
 
         @Provides
