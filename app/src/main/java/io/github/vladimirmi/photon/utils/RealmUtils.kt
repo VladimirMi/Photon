@@ -54,10 +54,16 @@ fun <T : RealmObject> RealmQuery<T>.prepareQuery(query: List<Query>?)
     return this
 }
 
-inline fun <T : RealmObject> AtomicReference<Realm>.asFlowable(crossinline query: (Realm) -> RealmResults<T>)
+inline fun <T : RealmObject> AtomicReference<Realm>.asFlowable(mainThread: Boolean = false,
+                                                               crossinline query: (Realm) -> RealmResults<T>)
         : Flowable<List<T>> {
-    val handler = HandlerThread("RealmQueryThread", THREAD_PRIORITY_BACKGROUND).apply { start() }
-    val scheduler = AndroidSchedulers.from(handler.looper)
+    var handler: HandlerThread? = null
+    val scheduler = if (mainThread) {
+        AndroidSchedulers.mainThread()
+    } else {
+        handler = HandlerThread("RealmQueryThread", THREAD_PRIORITY_BACKGROUND).apply { start() }
+        AndroidSchedulers.from(handler.looper)
+    }
 
     return Flowable.create<List<T>>({ emitter ->
         val realm = Realm.getDefaultInstance()
@@ -76,7 +82,7 @@ inline fun <T : RealmObject> AtomicReference<Realm>.asFlowable(crossinline query
         emitter.setCancellable {
             result.removeChangeListener(listener)
             realm.close()
-            handler.quitSafely()
+            handler?.quitSafely()
         }
     }, BackpressureStrategy.LATEST)
             .subscribeOn(scheduler)

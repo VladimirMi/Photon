@@ -34,7 +34,6 @@ class CreateAlbumJob(private val request: NewAlbumReq)
 
         dataManager.createAlbum(request)
                 .doOnNext {
-                    //todo save and remove to DB through cache abstraction
                     dataManager.removeFromDb(Album::class.java, request.id)
                     cache.removeAlbum(request.id)
 

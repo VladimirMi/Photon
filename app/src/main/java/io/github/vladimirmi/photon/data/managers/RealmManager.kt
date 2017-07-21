@@ -1,7 +1,8 @@
 package io.github.vladimirmi.photon.data.managers
 
-import io.github.vladimirmi.photon.data.models.realm.Changeable
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
 import io.github.vladimirmi.photon.utils.asFlowable
@@ -20,21 +21,34 @@ import java.util.concurrent.atomic.AtomicReference
 class RealmManager {
 
     fun save(realmObject: RealmObject) {
+        val obj = setupObject(realmObject) ?: return
         Timber.e("save: ${realmObject::class.java.simpleName}")
-        if (realmObject is Changeable && !realmObject.active) {
-            remove(realmObject::class.java, realmObject.id)
-            return
-        }
-        if (realmObject is Photocard) {
-            realmObject.withId()
-            realmObject.search = realmObject.title.toLowerCase()
-        }
         val realm = Realm.getDefaultInstance()
-        realm.executeTransaction {
-            it.insertOrUpdate(realmObject)
-        }
+        realm.executeTransaction { it.insertOrUpdate(obj) }
         realm.close()
     }
+
+    private fun setupObject(realmObject: RealmObject): RealmObject? {
+        fun setupPhotocard(photocard: Photocard) = if (photocard.active)
+            photocard.apply { withId(); search = title.toLowerCase() }
+        else null
+
+        fun setupAlbum(album: Album) = if (album.active)
+            album.apply { photocards.map { setupPhotocard(it) } }
+        else null
+
+        fun setupUser(user: User) = if (user.active)
+            user.apply { albums.map { setupAlbum(it) } }
+        else null
+
+        return when (realmObject) {
+            is User -> realmObject.let { setupUser(it) }
+            is Album -> realmObject.let { setupAlbum(it) }
+            is Photocard -> realmObject.let { setupPhotocard(it) }
+            else -> realmObject
+        }
+    }
+
 
     fun <T : RealmObject> getObject(clazz: Class<T>, id: String): Observable<T> {
         val query = listOf(Query("id", RealmOperator.EQUALTO, id))
@@ -45,13 +59,14 @@ class RealmManager {
     fun <T : RealmObject> search(clazz: Class<T>,
                                  query: List<Query>? = null,
                                  sortBy: String? = null,
-                                 order: Sort = Sort.ASCENDING): Observable<List<T>> {
+                                 order: Sort = Sort.ASCENDING,
+                                 mainThread: Boolean = false): Observable<List<T>> {
 
-        return AtomicReference<Realm>().asFlowable {
+        return AtomicReference<Realm>().asFlowable(mainThread) {
             it.where(clazz).prepareQuery(query)
                     .let { if (sortBy != null) it.findAllSorted(sortBy, order) else it.findAll() }
         }
-                .doOnSubscribe { removeAllNotActive(clazz) }
+//                .doOnSubscribe { removeAllNotActive(clazz) }
                 .toObservable()
     }
 
@@ -65,15 +80,14 @@ class RealmManager {
         realm.close()
     }
 
-    fun <T : RealmObject> removeAllNotActive(clazz: Class<T>) {
-        if (!Changeable::class.java.isAssignableFrom(clazz)) return
-        Timber.e("remove not active ${clazz.simpleName}")
-        val realm = Realm.getDefaultInstance()
-        realm.executeTransaction {
-            it.where(clazz).equalTo("active", false).findAll()?.deleteAllFromRealm()
-        }
-        realm.close()
-    }
+//    fun <T : RealmObject> removeAllNotActive(clazz: Class<T>) {
+//        if (!Changeable::class.java.isAssignableFrom(clazz)) return
+//        val realm = Realm.getDefaultInstance()
+//        realm.executeTransaction {
+//            it.where(clazz).equalTo("active", false).findAll()?.deleteAllFromRealm()
+//        }
+//        realm.close()
+//    }
 
     fun <T : RealmObject> getDetachedObject(java: Class<T>, id: String): T? {
         val realm = Realm.getDefaultInstance()

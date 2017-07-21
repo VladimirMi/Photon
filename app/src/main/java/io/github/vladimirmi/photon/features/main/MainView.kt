@@ -87,7 +87,6 @@ class MainView(context: Context, attrs: AttributeSet) :
         saveHierarchyState(state)
         loginDialog.unsubscribe()
         registrationDialog.unsubscribe()
-//        photocardList.adapter = null //todo ломает анимацию
     }
 
     override fun onSaveInstanceState(): Parcelable {

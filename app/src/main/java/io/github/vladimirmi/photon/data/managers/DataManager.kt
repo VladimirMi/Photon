@@ -154,8 +154,9 @@ constructor(private val restService: RestService,
     fun <T : RealmObject> search(clazz: Class<T>,
                                  query: List<Query>?,
                                  sortBy: String? = null,
-                                 order: Sort = Sort.ASCENDING): Observable<List<T>> {
-        return realmManager.search(clazz, query, sortBy, order)
+                                 order: Sort = Sort.ASCENDING,
+                                 mainThread: Boolean = false): Observable<List<T>> {
+        return realmManager.search(clazz, query, sortBy, order, mainThread)
     }
 
     fun <T : RealmObject> removeFromDb(clazz: Class<T>, id: String) {

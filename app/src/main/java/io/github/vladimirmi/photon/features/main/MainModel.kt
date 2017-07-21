@@ -31,15 +31,12 @@ class MainModel(val dataManager: DataManager, val cache: Cache) : IMainModel {
     }
 
     override fun getPhotoCards(): Observable<List<PhotocardDto>> {
-        val photocards = dataManager.search(Photocard::class.java,
+        return dataManager.search(Photocard::class.java,
                 query = if (query.isNotEmpty()) query.toList() else null,
                 sortBy = "views",
                 order = Sort.DESCENDING)
                 .map { cache.cachePhotos(it) }
                 .ioToMain()
-        val cache = if (query.isEmpty()) Observable.just(cache.photocards) else Observable.empty()
-
-        return Observable.merge(cache, photocards)
     }
 
     override fun isFiltered() = query.isNotEmpty()
