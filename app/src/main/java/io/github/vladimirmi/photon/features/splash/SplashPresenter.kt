@@ -9,8 +9,8 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ErrorSingleObserver
-import io.github.vladimirmi.photon.utils.observeOnMainThread
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
 
@@ -36,15 +36,15 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     private fun updatePhotos(): Disposable {
         var loaded = false
 
-        val updateObs = model.updateLimitPhotoCards(AppConfig.PHOTOCARDS_PAGE_SIZE)
+        val updateObs = model.updateAll(AppConfig.PHOTOCARDS_PAGE_SIZE)
                 .doOnNext { loaded = true }
                 .doOnError { if (it is NoSuchElementException) loaded = true } //304 empty
                 .map { false } // ended
 
         return Observable.mergeDelayError(
-                Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS).map { true }, // ended
+                Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                        .map { true }, // ended
                 updateObs)
-                .observeOnMainThread()
                 .subscribeWith(object : ErrorObserver<Boolean>() {
                     override fun onNext(ended: Boolean) {
                         if (ended) {

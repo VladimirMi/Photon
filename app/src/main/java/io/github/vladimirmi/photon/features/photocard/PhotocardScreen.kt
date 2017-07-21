@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.features.photocard
 
+import com.birbit.android.jobqueue.JobManager
 import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
@@ -30,8 +31,8 @@ data class PhotocardScreen(val photocardId: String, val ownerId: String) : BaseS
     class Module {
         @Provides
         @DaggerScope(PhotocardScreen::class)
-        fun providePhotocardModel(dataManager: DataManager, cache: Cache): IPhotocardModel {
-            return PhotocardModel(dataManager, cache)
+        fun providePhotocardModel(dataManager: DataManager, jobManager: JobManager, cache: Cache): IPhotocardModel {
+            return PhotocardModel(dataManager, jobManager, cache)
         }
 
         @Provides

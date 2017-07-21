@@ -9,6 +9,6 @@ import io.reactivex.Single
  */
 
 interface ISplashModel : IModel {
-    fun updateLimitPhotoCards(limit: Int): Observable<Int>
+    fun updateAll(limit: Int): Observable<Unit>
     fun dbIsNotEmpty(): Single<Boolean>
 }
