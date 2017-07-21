@@ -40,14 +40,13 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
         val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
         val albums = dataManager.search(Album::class.java, query, sortBy = "id")
                 .map { cache.cacheAlbums(it) }
-                .ioToMain()
 
-        return Observable.merge(Observable.just(cache.albums), albums)
+        return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
     }
 
-    private fun updateUser(id: String, updated: String? = null) {
-        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id))
-                .flatMap { dataManager.getUserFromNet(id, getUpdated(it).toString()) }
+    private fun updateUser(id: String) {
+        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0))
+                .flatMap { dataManager.getUserFromNet(id, getUpdated(it)) }
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(ErrorObserver())

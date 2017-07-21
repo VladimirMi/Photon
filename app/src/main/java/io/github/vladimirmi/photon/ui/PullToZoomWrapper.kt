@@ -26,7 +26,7 @@ class PullToZoomWrapper(context: Context, attrs: AttributeSet)
     private val headerContainer by lazy { header_container }
     private val scrollView by lazy { scroll_view }
 
-    private val FRICTION = 3.0f
+    private val FRICTION = 2.0f
     private val PARALLAX = 0.3f
 
     private var isPulled = false
@@ -78,6 +78,8 @@ class PullToZoomWrapper(context: Context, attrs: AttributeSet)
                         val yDelta = event.y - initialY
                         if (yDelta > 0 && Math.abs(yDelta) > touchSlop && Math.abs(yDelta) > Math.abs(xDelta)) {
                             intercepted = true
+                            initialX = event.x
+                            initialY = event.y
                         }
                     }
                 }

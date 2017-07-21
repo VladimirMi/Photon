@@ -61,14 +61,14 @@ class ProfileView(context: Context, attrs: AttributeSet)
         loginView.text = user.login
         nameView.text = namePrefix + user.name
         if (user.avatar != curAvatarPath) {
-            avatarView.setRoundAvatarWithBorder(user.avatar, 0f)
+            avatarView.setRoundAvatarWithBorder(user.avatar)
             curAvatarPath = user.avatar
         }
     }
 
 
     fun setAlbums(albums: List<AlbumDto>) {
-        albumCountView.text = albums.count { !it.isFavorite }.toString()
+        albumCountView.text = albums.size.toString()
         cardCountView.text = albums.filter { !it.isFavorite }
                 .fold(0, { acc, album -> acc + album.photocards.size })
                 .toString()

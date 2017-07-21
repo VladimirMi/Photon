@@ -11,6 +11,7 @@ import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 /**
  * Created by Vladimir Mikhalev 14.06.2017.
@@ -27,8 +28,8 @@ class PhotocardModel(val dataManager: DataManager, val cache: Cache) : IPhotocar
     }
 
     private fun updateUser(id: String) {
-        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id))
-                .flatMap { dataManager.getUserFromNet(id, getUpdated(dataManager.getDetachedObjFromDb(User::class.java, id)).toString()) }
+        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0))
+                .flatMap { dataManager.getUserFromNet(id, getUpdated(it)) }
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(ErrorObserver())
@@ -43,8 +44,8 @@ class PhotocardModel(val dataManager: DataManager, val cache: Cache) : IPhotocar
     }
 
     private fun updatePhotocard(id: String, ownerId: String) {
-        Observable.just(dataManager.getDetachedObjFromDb(Photocard::class.java, id))
-                .flatMap { dataManager.getPhotocardFromNet(id, ownerId, getUpdated(it).toString()) }
+        Observable.just(dataManager.getDetachedObjFromDb(Photocard::class.java, id)?.updated ?: Date(0))
+                .flatMap { dataManager.getPhotocardFromNet(id, ownerId, getUpdated(it)) }
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(ErrorObserver())

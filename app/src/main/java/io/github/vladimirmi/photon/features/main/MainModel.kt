@@ -48,6 +48,7 @@ class MainModel(val dataManager: DataManager, val cache: Cache) : IMainModel {
         queryPage = SearchView.Page.TAGS
     }
 
+    //todo to job
     override fun addView(photocardId: String): Observable<Unit> {
         return dataManager.addView(photocardId)
                 .map { if (it.success) it else throw Throwable("Add view to photo fails") }

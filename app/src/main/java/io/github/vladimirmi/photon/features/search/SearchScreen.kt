@@ -23,9 +23,7 @@ import io.github.vladimirmi.photon.features.search.tags.SearchTagView
 class SearchScreen : BaseScreen<MainScreen.Component>(), TreeKey {
 
     override val layoutResId = R.layout.screen_search
-
     override fun getParentKey() = MainScreen()
-
 
     //region =============== DI ==============
 

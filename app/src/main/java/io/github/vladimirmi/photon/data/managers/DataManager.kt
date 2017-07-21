@@ -139,8 +139,9 @@ constructor(private val restService: RestService,
 
     fun <T : RealmObject> getListFromDb(clazz: Class<T>,
                                         sortBy: String? = null,
-                                        order: Sort = Sort.ASCENDING): Observable<List<T>> {
-        return search(clazz, null, sortBy, order)
+                                        order: Sort = Sort.ASCENDING,
+                                        mainThread: Boolean = false): Observable<List<T>> {
+        return search(clazz, null, sortBy, order, mainThread)
     }
 
     fun <T : RealmObject> getObjectFromDb(clazz: Class<T>, id: String): Observable<T> {

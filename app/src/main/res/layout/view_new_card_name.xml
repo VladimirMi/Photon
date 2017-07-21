@@ -41,7 +41,7 @@
             android:id="@+id/ic_clear_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
+            android:padding="16dp"
             app:srcCompat="@drawable/ic_action_close"
             tools:ignore="ContentDescription"
             />

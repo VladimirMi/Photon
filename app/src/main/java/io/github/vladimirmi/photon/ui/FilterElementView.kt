@@ -57,7 +57,7 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
     }
 
     private fun setupShapeDrawable(shapeDrawable: GradientDrawable) {
-        shapeDrawable.setStroke(5, color)
+        shapeDrawable.setStroke(6, color)
         setTextColor(color)
     }
 

@@ -3,15 +3,12 @@ package io.github.vladimirmi.photon.features.search.tags
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import com.google.android.flexbox.FlexboxLayout
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.ui.TagView
-import io.github.vladimirmi.photon.utils.Query
 import kotlinx.android.synthetic.main.view_search.view.*
 
 /**
@@ -21,39 +18,40 @@ import kotlinx.android.synthetic.main.view_search.view.*
 class SearchTagView(context: Context, attrs: AttributeSet)
     : BaseView<SearchTagPresenter, SearchTagView>(context, attrs) {
 
-    val searchObs by lazy { search_field.textChanges() }
+    private val flexbox by lazy { flex_box }
+    private val recentSearches by lazy { recent_search }
+    private val searchField by lazy { search_field }
+    private val actionIcon by lazy { ic_action }
+    private val clearIcon by lazy { ic_clear_tag }
+
+    val searchObs by lazy { searchField.textChanges() }
 
     private val searchAction: (String) -> Unit = { search_field.setText(it) }
     private val searchAdapter = StringAdapter(searchAction)
 
-    private val tagAction: (TagView) -> Unit = { select(it) }
-    private val flexbox by lazy {
-        LayoutInflater.from(context).inflate(R.layout.view_search_tags, tags_wrapper, false) as FlexboxLayout
-    }
+    private val tagAction: (TagView) -> Unit = { selectTag(it) }
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<SearchScreen.Component>(context).inject(this)
     }
 
-    private val recentSearches by lazy { recent_search }
-
     override fun initView() {
         recentSearches.layoutManager = LinearLayoutManager(context)
         recentSearches.adapter = searchAdapter
-        ic_action.setOnClickListener { presenter.submitSearch(search_field.text.toString()) }
-        ic_clear_tag.setOnClickListener { clearAll() }
+        actionIcon.setOnClickListener { presenter.submitSearch(search_field.text.toString()) }
+        clearIcon.setOnClickListener { clearAll() }
     }
 
     private fun clearAll() {
-        search_field.setText("")
-        (0..flexbox.childCount - 1)
+        searchField.setText("")
+        (0..flexbox.childCount - 1).asSequence()
                 .map { flexbox.getChildAt(it) as TagView }
                 .filter { it.picked }
                 .forEach { it.performClick() }
         presenter.submit()
     }
 
-    private fun select(tagView: TagView) {
+    private fun selectTag(tagView: TagView) {
         val query = Pair("tags.value", tagView.text.toString())
         if (tagView.picked) {
             presenter.addQuery(query)
@@ -67,24 +65,19 @@ class SearchTagView(context: Context, attrs: AttributeSet)
     }
 
     fun enableSubmit(enable: Boolean) {
-        ic_action.setImageResource(if (enable) R.drawable.ic_action_submit else R.drawable.ic_action_back_arrow)
+        actionIcon.setImageResource(if (enable) R.drawable.ic_action_submit else R.drawable.ic_action_back_arrow)
     }
 
-    fun restoreFromQuery(query: List<Query>) {
-        val value = query.find { it.fieldName == "searchTag" }?.value as? String
-        search_field.setText(value)
+    fun restoreSearchField(value: String) {
+        searchField.setText(value)
     }
 
-    //todo optimize , also on the PhotocardScreen
-    fun setTags(tags: List<String>, query: List<Query>) {
-        tags_wrapper.removeAllViews()
-        val queryTags = query.filter { it.fieldName == "tags.value" }
+    fun setTags(tags: List<String>, activeTags: List<String>) {
         tags.forEach { tag ->
-            val view = TagView(context, tag, tagAction)
-            if (queryTags.find { it.value == tag } != null) view.pick()
-            flexbox.addView(view)
+            val tagView = TagView(context, tag, tagAction)
+            if (activeTags.contains(tag)) tagView.pick()
+            flexbox.addView(tagView)
         }
-        tags_wrapper.addView(flexbox)
     }
 
     override fun onViewDestroyed(removedByFlow: Boolean) {

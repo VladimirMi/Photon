@@ -89,7 +89,6 @@
                         android:id="@+id/author_info"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="18dp"
                         android:layout_marginLeft="24dp"
                         android:layout_marginRight="24dp"
                         android:layout_marginTop="24dp"
@@ -100,7 +99,7 @@
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             android:layout_centerVertical="true"
-                            tools:src="@color/color_accent"
+                            app:srcCompat="@drawable/ic_placeholder_avatar"
                             />
 
                         <TextView
@@ -109,7 +108,7 @@
                             android:layout_marginBottom="8dp"
                             android:layout_marginLeft="14dp"
                             android:layout_toRightOf="@id/user_avatar"
-                            tools:text="Хелена Марчиано"
+                            android:text="@string/placeholder_not_available"
                             />
 
                         <TextView
@@ -117,7 +116,6 @@
                             style="@style/CustomText.Black"
                             android:layout_alignStart="@+id/user_name"
                             android:layout_below="@id/user_name"
-                            android:layout_marginBottom="4dp"
                             android:fontFamily="sans-serif-light"
                             android:text="@string/photocard_album"
                             />
@@ -139,7 +137,7 @@
                             android:layout_below="@id/album"
                             android:fontFamily="sans-serif-medium"
                             android:textSize="16sp"
-                            tools:text="9"
+                            android:text="@string/placeholder_not_available"
                             />
 
                         <TextView
@@ -149,17 +147,18 @@
                             android:layout_below="@id/album"
                             android:fontFamily="sans-serif-medium"
                             android:textSize="16sp"
-                            tools:text="22"
+                            android:text="@string/placeholder_not_available"
                             />
                     </RelativeLayout>
 
-                    <FrameLayout
-                        android:id="@+id/photocard_tags_wrapper"
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:id="@+id/flex_box"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="18dp"
-                        android:layout_marginLeft="18dp"
-                        android:layout_marginRight="18dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="18dp"
+                        app:alignContent="flex_start"
+                        app:flexDirection="row"
+                        app:flexWrap="wrap"
                         />
                 </LinearLayout>
 

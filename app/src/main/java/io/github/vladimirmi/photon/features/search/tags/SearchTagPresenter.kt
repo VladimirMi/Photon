@@ -18,12 +18,15 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
     override fun initView(view: SearchTagView) {
         compDisp.add(subscribeOnTags())
         compDisp.add(subscribeOnSearch())
-        view.restoreFromQuery(model.getQuery())
+        val searchField = model.getQuery().find { it.fieldName == "searchTag" }?.value as? String
+        searchField?.let { view.restoreSearchField(it) }
     }
 
     private fun subscribeOnTags(): Disposable {
+        val activeTags = model.getQuery().asSequence()
+                .filter { it.fieldName == "tags.value" }.map { it.value as String }.toList()
         return model.getTags()
-                .subscribe { view.setTags(it, model.getQuery()) }
+                .subscribe { view.setTags(it, activeTags) }
     }
 
     private fun subscribeOnSearch(): Disposable {

@@ -44,11 +44,11 @@
     <string name="dialog_delete_album">Вы действительно хотите удалить альбом и все его содержимое?</string>
     <string name="dialog_edit_profile">Редактировать профиль</string>
 
-    <string name="message_err_email">Неверный email</string>
-    <string name="message_err_password">Неверный пароль</string>
-    <string name="message_err_name">Неверное имя</string>
-    <string name="message_err_login">Неверный login</string>
-    <string name="message_err_description">Неверное описание</string>
+    <string name="message_err_email">Неверный формат email</string>
+    <string name="message_err_password">Разрешены латиница и цифры. Не менее 8 символов</string>
+    <string name="message_err_name">Не менее 3 символов</string>
+    <string name="message_err_login">Разрешены латиница, цифры и _</string>
+    <string name="message_err_description">Не менее 3 и не более 400 символов</string>
     <string name="message_err_net">Нет сети</string>
     <string name="message_err_connect">Невозможно подключиться к серверу</string>
     <string name="message_err_file_size">Размер файла не должен превышать %d мегабайта</string>
@@ -115,7 +115,7 @@
     <string name="photocard_menu_favorite_remove">Из избранного</string>
     <string name="photocard_menu_share">Поделиться</string>
     <string name="photocard_menu_download">Скачать</string>
-    <string name="photocard_message_download">Фото успешно загружен</string>
+    <string name="photocard_message_download">Фото успешно загружено</string>
     <string name="photocard_message_download_open">Открыть</string>
 
     <string name="profile_title">Профиль</string>
@@ -137,5 +137,7 @@
     <string name="newcard_create_success">Фотокарточка успешно добавлена</string>
 
     <string name="send_to">Отправить</string>
+    <string name="placeholder_not_available">-</string>
+    <string name="placeholder_name_not_available">/  -</string>
 
 </resources>

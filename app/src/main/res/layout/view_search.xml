@@ -33,18 +33,21 @@
                     android:layout_weight="1"
                     android:background="@color/transparent"
                     android:hint="@string/search_search"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
                     android:paddingLeft="16dp"
                     android:textColorHint="@android:color/black"
                     android:textSize="16sp"
-                    android:inputType="text"
-                    android:imeOptions="actionDone"
                     />
 
                 <ImageView
                     android:id="@+id/ic_action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
+                    android:paddingBottom="16dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="16dp"
                     app:srcCompat="@drawable/ic_action_back_arrow"
                     />
 
@@ -52,7 +55,10 @@
                     android:id="@+id/ic_clear_tag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="16dp"
+                    android:paddingBottom="16dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="16dp"
                     app:srcCompat="@drawable/ic_action_close"
                     />
             </LinearLayout>
@@ -85,32 +91,31 @@
                     />
             </FrameLayout>
 
+            <TextView
+                android:id="@+id/tags_title"
+                style="@style/CustomText.Black"
+                android:layout_below="@id/recent_search_wrapper"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/search_tags"
+                android:textSize="16sp"
+                />
 
-            <LinearLayout
-                android:id="@+id/tags_wrapper"
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/flex_box"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/recent_search_wrapper"
-                android:orientation="vertical"
-                android:paddingBottom="18dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="18dp"
-                >
-
-                <TextView
-                    style="@style/CustomText.Black"
-                    android:layout_marginBottom="12dp"
-                    android:layout_marginLeft="6dp"
-                    android:layout_marginRight="6dp"
-                    android:layout_marginTop="6dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/search_tags"
-                    android:textSize="16sp"
-                    />
-
-            </LinearLayout>
-
+                android:layout_below="@+id/tags_title"
+                android:layout_marginBottom="18dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                app:alignContent="flex_start"
+                app:flexDirection="row"
+                app:flexWrap="wrap"
+                />
         </RelativeLayout>
     </ScrollView>
 </io.github.vladimirmi.photon.features.search.tags.SearchTagView>

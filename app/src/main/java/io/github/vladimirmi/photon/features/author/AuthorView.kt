@@ -38,13 +38,13 @@ class AuthorView(context: Context, attrs: AttributeSet)
         user_login.text = user.login
         user_name.text = "/  ${user.name}"
         if (user.avatar != curAvatarPath) {
-            user_avatar.setRoundAvatarWithBorder(user.avatar, 0f)
+            user_avatar.setRoundAvatarWithBorder(user.avatar)
             curAvatarPath = user.avatar
         }
     }
 
     fun setAlbums(albums: List<AlbumDto>) {
-        album_count.text = albums.count { !it.isFavorite }.toString()
+        album_count.text = albums.size.toString()
         card_count.text = albums.filter { !it.isFavorite }
                 .fold(0, { acc, album -> acc + album.photocards.size })
                 .toString()

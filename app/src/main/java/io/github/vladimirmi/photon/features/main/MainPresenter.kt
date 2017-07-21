@@ -72,7 +72,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                 .subscribeWith(object : ErrorObserver<List<PhotocardDto>>() {
                     override fun onNext(it: List<PhotocardDto>) {
                         val update = if (updated == 0) it.size else updated
-                        view?.setData(it, update)
+                        view.setData(it, update)
                     }
                 })
     }

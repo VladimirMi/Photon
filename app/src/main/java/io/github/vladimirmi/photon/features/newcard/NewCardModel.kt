@@ -46,6 +46,7 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val
         }
     }
 
+    //todo get from net
     override fun searchTag(tag: String): Observable<List<String>> {
         val query = Query("value", RealmOperator.CONTAINS, tag)
         return dataManager.search(Tag::class.java, listOf(query), sortBy = "value")

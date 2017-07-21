@@ -14,7 +14,6 @@ import flow.Flow
 import flow.Traversal
 import flow.TraversalCallback
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.features.main.MainView
 import io.github.vladimirmi.photon.utils.AppConfig
 import mortar.MortarScope
 
@@ -82,9 +81,10 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
         set.addTransition(slideIn)
                 .addTransition(slideOut)
                 .setDuration(AppConfig.CHANGE_SCREEN_ANIMATION)
+                .setStartDelay(200L)
                 .interpolator = FastOutSlowInInterpolator()
 
-        if (newView is MainView) set.startDelay = AppConfig.CHANGE_SCREEN_ANIMATION
+//        if (newView is MainView) set.startDelay = AppConfig.CHANGE_SCREEN_ANIMATION
         TransitionManager.beginDelayedTransition(container, set)
     }
 }

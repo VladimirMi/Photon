@@ -35,8 +35,8 @@ class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val c
     }
 
     private fun updateAlbum(id: String) {
-        Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, id))
-                .flatMap { dataManager.getAlbumFromNet(it.id, getUpdated(it).toString()) }
+        Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, id)?.updated ?: Date(0))
+                .flatMap { dataManager.getAlbumFromNet(id, getUpdated(it)) }
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(ErrorObserver())

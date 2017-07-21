@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.design.widget.Snackbar
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
@@ -30,47 +28,54 @@ class PhotocardView(context: Context, attrs: AttributeSet)
         DaggerService.getComponent<PhotocardScreen.Component>(context).inject(this)
     }
 
+    private val userAvatarIm by lazy { user_avatar }
+    private val pullToZoomWrapper by lazy { pull_to_zoom }
+    private val flexbox by lazy { flex_box }
+    private val userNameTx by lazy { user_name }
+    private val albumCountTx by lazy { album_count }
+    private val cardCountTx by lazy { card_count }
+    private val cardNameTx by lazy { card_name }
+    private val favoriteIcon by lazy { ic_favorite }
+
     override fun initView() {
-        user_avatar.setOnClickListener { presenter.showAuthor() }
-        pull_to_zoom.subscribe()
+        userAvatarIm.setOnClickListener { presenter.showAuthor() }
+        pullToZoomWrapper.subscribe()
     }
 
     override fun onViewDestroyed(removedByFlow: Boolean) {
         super.onViewDestroyed(removedByFlow)
-        pull_to_zoom.unsubscribe()
+        pullToZoomWrapper.unsubscribe()
     }
 
     private var curAvatarPath = ""
+
     fun setUser(user: UserDto) {
         if (user.avatar != curAvatarPath) {
-            user_avatar.setRoundAvatarWithBorder(user.avatar, 0f)
+            userAvatarIm.setRoundAvatarWithBorder(user.avatar)
             curAvatarPath = user.avatar
         }
-        user_name.text = user.name
-        album_count.text = user.albums.count { !it.isFavorite }.toString()
-        card_count.text = user.albums.filter { !it.isFavorite }
+        userNameTx.text = user.name
+        albumCountTx.text = user.albums.size.toString()
+        cardCountTx.text = user.albums.filter { !it.isFavorite }
                 .fold(0, { acc, album -> acc + album.photocards.size })
                 .toString()
     }
 
     private var curImagePath = ""
+
     fun setPhotocard(photocard: PhotocardDto) {
         if (curImagePath != photocard.photo) {
             photo.setImage(photocard.photo)
             curImagePath = photocard.photo
         }
-        card_name.text = photocard.title
-        val flexbox = LayoutInflater.from(context).inflate(R.layout.view_search_tags, this, false)
-        flexbox as ViewGroup
-        photocard.tags.forEach {
-            val tag = TagView(context, it, null)
-            flexbox.addView(tag)
+        cardNameTx.text = photocard.title
+        if (flexbox.childCount == 0) {
+            photocard.tags.forEach { flexbox.addView(TagView(context, it, null)) }
         }
-        photocard_tags_wrapper.addView(flexbox)
     }
 
     fun setFavorite(favorite: Boolean) {
-        ic_favorite.visibility = if (favorite) View.VISIBLE else View.GONE
+        favoriteIcon.visibility = if (favorite) View.VISIBLE else View.GONE
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/profile_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:ignore="RtlHardcoded, ContentDescription, LabelFor"
+    tools:ignore="RtlHardcoded,ContentDescription"
     >
 
     <RelativeLayout
@@ -20,16 +21,16 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_centerVertical="true"
-            tools:src="@color/color_accent"
+            app:srcCompat="@drawable/ic_placeholder_avatar"
             />
 
         <TextView
             android:id="@+id/user_login"
             style="@style/CustomText.Black"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginLeft="12dp"
             android:layout_toRightOf="@id/user_avatar"
-            tools:text="rufus21"
+            android:text="@string/placeholder_not_available"
             />
 
         <TextView
@@ -38,7 +39,7 @@
             android:layout_marginLeft="8dp"
             android:layout_toRightOf="@id/user_login"
             android:fontFamily="sans-serif-light"
-            tools:text="/  Руфус Данн"
+            android:text="@string/placeholder_name_not_available"
             />
 
         <TextView
@@ -46,7 +47,6 @@
             style="@style/CustomText.Black"
             android:layout_alignStart="@+id/user_login"
             android:layout_below="@id/user_login"
-            android:layout_marginBottom="4dp"
             android:fontFamily="sans-serif-light"
             android:text="@string/photocard_album"
             />
@@ -68,7 +68,7 @@
             android:layout_below="@id/album"
             android:fontFamily="sans-serif-medium"
             android:textSize="16sp"
-            tools:text="9"
+            android:text="@string/placeholder_not_available"
             />
 
         <TextView
@@ -78,7 +78,7 @@
             android:layout_below="@id/album"
             android:fontFamily="sans-serif-medium"
             android:textSize="16sp"
-            tools:text="22"
+            android:text="@string/placeholder_not_available"
             />
     </RelativeLayout>
 

@@ -9,6 +9,7 @@ import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel {
 
@@ -22,8 +23,8 @@ class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel
     }
 
     private fun updateUser(id: String) {
-        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id))
-                .flatMap { dataManager.getUserFromNet(id, getUpdated(dataManager.getDetachedObjFromDb(User::class.java, id)).toString()) }
+        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0))
+                .flatMap { dataManager.getUserFromNet(id, getUpdated(it)) }
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(ErrorObserver())

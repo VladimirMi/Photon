@@ -8,7 +8,6 @@ import android.view.WindowManager
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.IView
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.ui.CircleTransformation
@@ -24,17 +23,17 @@ fun ImageView.setImage(path: String?) {
             .centerCrop()
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.RESULT)
-            .placeholder(R.drawable.ic_placeholder_image)
+            .crossFade()
             .into(this)
 }
 
-fun ImageView.setRoundAvatarWithBorder(path: String?, border: Float) {
+fun ImageView.setRoundAvatarWithBorder(path: String?, border: Float = 0f) {
     Glide.with(context)
             .load(path)
             .bitmapTransform(CircleTransformation(context, border))
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.RESULT)
-            .placeholder(R.drawable.ic_placeholder_avatar)
+            .crossFade()
             .into(this)
 }
 
