@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.ui
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.EditAlbumReq
+import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function3

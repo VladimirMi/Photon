@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.ui
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function5

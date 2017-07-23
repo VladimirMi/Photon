@@ -116,6 +116,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private fun share() {
         if (rootPresenter.isNetAvailable()) {
+            tempFile = createTempFile(suffix = ".jpg", directory = view.context.cacheDir)
             photocard.downloadTo(tempFile!!, view.context)
                     .subscribeWith(object : ErrorSingleObserver<Unit>() {
                         override fun onSuccess(t: Unit) {
@@ -128,7 +129,6 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     }
 
     private fun createShareImageIntent(): Intent {
-        tempFile = createTempFile(suffix = ".jpg", directory = view.context.cacheDir)
         val uri = FileProvider.getUriForFile(view.context,
                 AppConfig.FILE_PROVIDER_AUTHORITY, tempFile)
 

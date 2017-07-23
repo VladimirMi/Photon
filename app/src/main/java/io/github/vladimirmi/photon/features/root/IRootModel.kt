@@ -1,8 +1,8 @@
 package io.github.vladimirmi.photon.features.root
 
 import io.github.vladimirmi.photon.core.IModel
-import io.github.vladimirmi.photon.data.models.SignInReq
-import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.req.SignInReq
+import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.reactivex.Observable
 
 /**

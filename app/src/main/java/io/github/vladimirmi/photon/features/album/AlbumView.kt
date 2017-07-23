@@ -5,9 +5,9 @@ import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
+import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.CardAdapter
 import io.github.vladimirmi.photon.features.main.CardViewHolder

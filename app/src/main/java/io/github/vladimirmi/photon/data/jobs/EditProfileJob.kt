@@ -5,8 +5,8 @@ import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
-import io.github.vladimirmi.photon.data.models.EditProfileReq
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.req.EditProfileReq
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig

@@ -3,11 +3,13 @@ package io.github.vladimirmi.photon.data.managers
 import android.content.Context
 import android.net.ConnectivityManager
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.models.*
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.req.*
+import io.github.vladimirmi.photon.data.models.res.ImageUrlRes
+import io.github.vladimirmi.photon.data.models.res.SuccessRes
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.utils.*

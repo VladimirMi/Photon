@@ -5,9 +5,9 @@ import flow.Flow
 import flow.History
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
+import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder

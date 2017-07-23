@@ -1,10 +1,10 @@
 package io.github.vladimirmi.photon.features.profile
 
 import io.github.vladimirmi.photon.core.IModel
-import io.github.vladimirmi.photon.data.models.EditProfileReq
-import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
+import io.github.vladimirmi.photon.data.models.req.EditProfileReq
+import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
 import io.reactivex.Observable
 import io.reactivex.Single
 

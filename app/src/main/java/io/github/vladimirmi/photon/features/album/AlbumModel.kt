@@ -5,10 +5,10 @@ import com.birbit.android.jobqueue.TagConstraint
 import io.github.vladimirmi.photon.data.jobs.*
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.github.vladimirmi.photon.utils.justOrEmpty

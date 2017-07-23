@@ -7,9 +7,9 @@ import android.os.Build
 import android.os.Environment
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import io.github.vladimirmi.photon.data.models.SignInReq
-import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
+import io.github.vladimirmi.photon.data.models.req.SignInReq
+import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.reactivex.Observable

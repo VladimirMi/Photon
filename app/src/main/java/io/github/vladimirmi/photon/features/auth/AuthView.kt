@@ -3,8 +3,8 @@ package io.github.vladimirmi.photon.features.auth
 import android.content.Context
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.SignInReq
-import io.github.vladimirmi.photon.data.models.SignUpReq
+import io.github.vladimirmi.photon.data.models.req.SignInReq
+import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.ui.LoginDialog
 import io.github.vladimirmi.photon.ui.RegistrationDialog

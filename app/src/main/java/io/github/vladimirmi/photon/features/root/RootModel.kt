@@ -1,9 +1,9 @@
 package io.github.vladimirmi.photon.features.root
 
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.SignInReq
-import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.req.SignInReq
+import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import java.util.concurrent.TimeUnit

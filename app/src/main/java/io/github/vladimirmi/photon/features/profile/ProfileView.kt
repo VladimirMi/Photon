@@ -6,10 +6,10 @@ import android.content.Intent
 import android.support.v7.widget.GridLayoutManager
 import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.EditProfileReq
-import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
+import io.github.vladimirmi.photon.data.models.req.EditProfileReq
+import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.flow.FlowLifecycles

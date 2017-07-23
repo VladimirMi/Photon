@@ -3,9 +3,9 @@ package io.github.vladimirmi.photon.data.jobs
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
-import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
 import java.net.SocketTimeoutException

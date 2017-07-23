@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.data.models
+package io.github.vladimirmi.photon.data.models.req
 
 import java.io.Serializable
 

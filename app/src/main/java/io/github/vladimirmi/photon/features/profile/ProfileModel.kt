@@ -8,12 +8,12 @@ import io.github.vladimirmi.photon.data.jobs.singleCancelJobs
 import io.github.vladimirmi.photon.data.jobs.singleResultFor
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.EditProfileReq
-import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.req.EditProfileReq
+import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.reactivex.Single

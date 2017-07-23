@@ -1,10 +1,12 @@
 package io.github.vladimirmi.photon.data.network.api
 
-import io.github.vladimirmi.photon.data.models.*
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.models.req.*
+import io.github.vladimirmi.photon.data.models.res.ImageUrlRes
+import io.github.vladimirmi.photon.data.models.res.SuccessRes
 import io.github.vladimirmi.photon.utils.Constants.HEADER_AUTHORIZATION
 import io.github.vladimirmi.photon.utils.Constants.HEADER_IF_MODIFIED_SINCE
 import io.reactivex.Observable

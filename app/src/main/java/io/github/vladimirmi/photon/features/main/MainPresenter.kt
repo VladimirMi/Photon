@@ -4,9 +4,9 @@ import android.view.MenuItem
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.models.SignInReq
-import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
+import io.github.vladimirmi.photon.data.models.req.SignInReq
+import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
