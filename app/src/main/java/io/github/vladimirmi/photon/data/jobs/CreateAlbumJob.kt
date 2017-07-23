@@ -7,6 +7,8 @@ import io.github.vladimirmi.photon.data.models.NewAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.AppConfig
+import java.net.SocketTimeoutException
 
 /**
  * Created by Vladimir Mikhalev 17.07.2017.
@@ -25,7 +27,14 @@ class CreateAlbumJob(private val request: NewAlbumReq)
 
     val tag = TAG + request.id
 
-    override fun onAdded() {}
+    override fun onAdded() {
+        val dataManager = DaggerService.appComponent.dataManager()
+        val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
+        val album = Album(id = request.id, owner = request.owner,
+                title = request.title, description = request.description)
+        profile.albums.add(album)
+        dataManager.saveToDB(profile)
+    }
 
     override fun onRun() {
         val dataManager = DaggerService.appComponent.dataManager()
@@ -51,7 +60,11 @@ class CreateAlbumJob(private val request: NewAlbumReq)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return RetryConstraint.CANCEL
+        return if (throwable is SocketTimeoutException) {
+            RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
+        } else {
+            RetryConstraint.CANCEL
+        }
     }
 
 }

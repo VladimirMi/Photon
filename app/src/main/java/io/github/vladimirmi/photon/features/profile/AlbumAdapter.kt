@@ -69,23 +69,27 @@ class AlbumAdapter(val albumAction: (AlbumDto) -> Unit)
     }
 }
 
+@Suppress("HasPlatformType")
 class AlbumViewHolder(itemView: View, val albumAction: (AlbumDto) -> Unit)
     : RecyclerView.ViewHolder(itemView) {
 
-    //todo fid
+    val albumWrapper = itemView.album_wrapper
+    val previewIm = itemView.preview
+    val albumNameTxt = itemView.album_name
+    val cardCountTxt = itemView.card_count
+    val likesTxt = itemView.likes
+    val viewsTxt = itemView.views
 
     fun bind(album: AlbumDto) {
-        itemView.preview.setOnClickListener { albumAction(album) }
-        itemView.album_name.text = album.title
-
-        itemView.card_count.text = album.photocards.size.toString()
-        itemView.likes.text = album.photocards.fold(0, { acc, photocard -> acc + photocard.favorits }).toString()
-        itemView.views.text = album.photocards.fold(0, { acc, photocard -> acc + photocard.views }).toString()
-
-        itemView.preview.setImage(album.photocards.getOrNull(0)?.photo)
+        previewIm.setOnClickListener { albumAction(album) }
+        albumNameTxt.text = album.title
+        cardCountTxt.text = album.photocards.size.toString()
+        likesTxt.text = album.photocards.fold(0, { acc, photocard -> acc + photocard.favorits }).toString()
+        viewsTxt.text = album.photocards.fold(0, { acc, photocard -> acc + photocard.views }).toString()
+        previewIm.setImage(album.photocards.getOrNull(0)?.photo)
     }
 
     fun select(selected: Boolean) {
-        itemView.album_wrapper.setBackgroundResource(if (selected) R.drawable.album_selected else R.drawable.gradient_album)
+        albumWrapper.setBackgroundResource(if (selected) R.drawable.album_selected else R.drawable.gradient_album)
     }
 }

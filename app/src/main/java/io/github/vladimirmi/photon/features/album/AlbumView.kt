@@ -69,8 +69,8 @@ class AlbumView(context: Context, attrs: AttributeSet)
     fun setEditable(editMode: Boolean) {
         this.editMode = editMode
         (0..photocardList.adapter.itemCount - 1)
-                .map { photocardList.findViewHolderForAdapterPosition(it) as CardViewHolder }
-                .forEach { it.longTapAction(editMode) }
+                .map { photocardList.findViewHolderForAdapterPosition(it) as? CardViewHolder }
+                .forEach { it?.longTapAction(editMode) }
 
     }
 

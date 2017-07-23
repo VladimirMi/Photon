@@ -6,15 +6,18 @@ import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.schedulers.Schedulers
+import java.net.SocketTimeoutException
 import java.util.*
 
 /**
  * Created by Vladimir Mikhalev 18.07.2017.
  */
 
-class DeletePhotocardJob(private val photocardId: String)
+class DeletePhotocardJob(private val photocardId: String,
+                         private val skipNetworkPart: Boolean)
     : Job(Params(JobPriority.MID)
         .setSingleId(photocardId)
         .requireNetwork()
@@ -29,6 +32,7 @@ class DeletePhotocardJob(private val photocardId: String)
     }
 
     override fun onRun() {
+        if (skipNetworkPart) return
         var error: Throwable? = null
         val dataManager = DaggerService.appComponent.dataManager()
 
@@ -55,6 +59,10 @@ class DeletePhotocardJob(private val photocardId: String)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return RetryConstraint.CANCEL
+        return if (throwable is SocketTimeoutException) {
+            RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
+        } else {
+            RetryConstraint.CANCEL
+        }
     }
 }

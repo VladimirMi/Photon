@@ -58,18 +58,30 @@ class PhotocardModel(val dataManager: DataManager, val jobManager: JobManager, v
     }
 
     override fun addToFavorite(id: String): Single<Unit> {
-        val job = AddToFavoriteJob(id, favAlbumId!!)
         return jobManager.singleCancelJobs(TagConstraint.ANY, DeleteFromFavoriteJob.TAG + id)
-                .doOnSuccess { jobManager.addJobInBackground(job) }
-                .flatMap { jobManager.singleResultFor(job) }
+                .map { cancelResult ->
+                    if (cancelResult.cancelledJobs.isEmpty()) {
+                        AddToFavoriteJob(id, favAlbumId, skipNetworkPart = false)
+                    } else {
+                        AddToFavoriteJob(id, favAlbumId, skipNetworkPart = true)
+                    }
+                }
+                .doOnSuccess { jobManager.addJobInBackground(it) }
+                .flatMap { jobManager.singleResultFor(it) }
                 .ioToMain()
     }
 
     override fun removeFromFavorite(id: String): Single<Unit> {
-        val job = DeleteFromFavoriteJob(id, favAlbumId!!)
         return jobManager.singleCancelJobs(TagConstraint.ANY, AddToFavoriteJob.TAG + id)
-                .doOnSuccess { jobManager.addJobInBackground(job) }
-                .flatMap { jobManager.singleResultFor(job) }
+                .map { cancelResult ->
+                    if (cancelResult.cancelledJobs.isEmpty()) {
+                        DeleteFromFavoriteJob(id, favAlbumId, skipNetworkPart = false)
+                    } else {
+                        DeleteFromFavoriteJob(id, favAlbumId, skipNetworkPart = true)
+                    }
+                }
+                .doOnSuccess { jobManager.addJobInBackground(it) }
+                .flatMap { jobManager.singleResultFor(it) }
                 .ioToMain()
     }
 
@@ -78,10 +90,12 @@ class PhotocardModel(val dataManager: DataManager, val jobManager: JobManager, v
         val favorite = getFavAlbum()
                 .map { it.photocards.find { it.id == id } != null }
 
-        return Observable.merge(Observable.just(checkFavorite(id)), favorite).ioToMain()
+        return Observable.merge(Observable.just(checkIsFavorite(id)), favorite).ioToMain()
     }
 
-    private fun checkFavorite(id: String): Boolean {
+    private lateinit var favAlbumId: String
+
+    private fun checkIsFavorite(id: String): Boolean {
         if (!dataManager.isUserAuth()) return false
         val favPhoto = cache.albums.find { it.isFavorite }
                 ?.also { favAlbumId = it.id }
@@ -89,15 +103,13 @@ class PhotocardModel(val dataManager: DataManager, val jobManager: JobManager, v
         return favPhoto?.let { true } ?: false
     }
 
-    private var favAlbumId: String? = null
-
     private fun getFavAlbum(): Observable<Album> {
         val query = listOf(
                 Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()),
                 Query("isFavorite", RealmOperator.EQUALTO, true)
         )
         return dataManager.search(Album::class.java, query, "id")
-                .take(1)
+                .filter { it.isNotEmpty() }
                 .map { it[0] }
                 .doOnNext { favAlbumId = it.id }
     }

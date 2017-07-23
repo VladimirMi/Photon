@@ -4,6 +4,7 @@ import com.birbit.android.jobqueue.JobManager
 import com.birbit.android.jobqueue.TagConstraint
 import io.github.vladimirmi.photon.data.jobs.CreateAlbumJob
 import io.github.vladimirmi.photon.data.jobs.EditProfileJob
+import io.github.vladimirmi.photon.data.jobs.singleCancelJobs
 import io.github.vladimirmi.photon.data.jobs.singleResultFor
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
@@ -55,38 +56,19 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
     override fun createAlbum(newAlbumReq: NewAlbumReq): Single<Unit> {
         newAlbumReq.id = UUID.randomUUID().toString()
         newAlbumReq.owner = dataManager.getProfileId()
-        val job = CreateAlbumJob(newAlbumReq)
 
-        return Single.just(dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!)
-                .doOnSuccess { profile ->
-                    val album = Album(id = newAlbumReq.id, owner = newAlbumReq.owner,
-                            title = newAlbumReq.title, description = newAlbumReq.description)
-                    profile.albums.add(album)
-                    dataManager.saveToDB(profile)
-                    jobManager.addJobInBackground(job)
-                }
-                .flatMap { jobManager.singleResultFor(job) }
+        val job = CreateAlbumJob(newAlbumReq)
+        jobManager.addJobInBackground(job)
+        return jobManager.singleResultFor(job)
                 .ioToMain()
     }
 
 
     override fun editProfile(profileReq: EditProfileReq, loadAvatar: Boolean): Single<Unit> {
-        val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
-        profileReq.id = profile.id
-        if (profileReq.avatar.isEmpty()) profileReq.avatar = profile.avatar
-        val job = EditProfileJob(profileReq, avatarLoad = profile.avatar != profileReq.avatar)
+        val job = EditProfileJob(profileReq, loadAvatar = loadAvatar)
 
-        return Single.just(profile)
-                .doOnSuccess {
-                    profile.apply {
-                        login = profileReq.login
-                        name = profileReq.name
-                        avatar = profileReq.avatar
-                    }
-                    dataManager.saveToDB(profile)
-                    jobManager.cancelJobs(TagConstraint.ALL, job.tag)
-                    jobManager.addJobInBackground(job)
-                }
+        return jobManager.singleCancelJobs(TagConstraint.ANY, job.tag)
+                .doOnSuccess { jobManager.addJobInBackground(job) }
                 .flatMap { jobManager.singleResultFor(job) }
                 .ioToMain()
     }

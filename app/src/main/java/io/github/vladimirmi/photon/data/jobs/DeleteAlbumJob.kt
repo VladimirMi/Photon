@@ -6,8 +6,10 @@ import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.schedulers.Schedulers
+import java.net.SocketTimeoutException
 import java.util.*
 
 /**
@@ -15,13 +17,13 @@ import java.util.*
  */
 
 
-class DeleteAlbumJob(private val albumId: String)
+class DeleteAlbumJob(private val albumId: String,
+                     private val skipNetworkPart: Boolean)
     : Job(Params(JobPriority.MID)
         .setSingleId(albumId)
         .requireNetwork()
         .persist()) {
 
-    private val photosId = ArrayList<String>()
 
     override fun onAdded() {
         val dataManager = DaggerService.appComponent.dataManager()
@@ -32,6 +34,7 @@ class DeleteAlbumJob(private val albumId: String)
     }
 
     override fun onRun() {
+        if (skipNetworkPart) return
         var error: Throwable? = null
         val dataManager = DaggerService.appComponent.dataManager()
 
@@ -58,6 +61,10 @@ class DeleteAlbumJob(private val albumId: String)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return RetryConstraint.CANCEL
+        return if (throwable is SocketTimeoutException) {
+            RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
+        } else {
+            RetryConstraint.CANCEL
+        }
     }
 }

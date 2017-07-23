@@ -12,7 +12,6 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.github.vladimirmi.photon.utils.justOrEmpty
-import io.github.vladimirmi.photon.utils.unit
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -46,58 +45,73 @@ class AlbumModel(val dataManager: DataManager, val jobManager: JobManager, val c
 
     override fun editAlbum(albumReq: EditAlbumReq): Single<Unit> {
         val job = EditAlbumJob(albumReq)
-        return Single.just(dataManager.getDetachedObjFromDb(Album::class.java, albumReq.id))
-                .doOnSuccess { album ->
-                    album.apply { title = albumReq.title; description = albumReq.description }
-                    dataManager.saveToDB(album)
-                }
-                .flatMap { jobManager.singleCancelJobs(TagConstraint.ANY, job.tag) }
-                .doOnSuccess { jobManager.addJobInBackground(job) }
-                .flatMap { jobManager.singleResultFor(job) }
+        return jobManager.singleCancelJobs(TagConstraint.ANY, job.tag)
+                .map { jobManager.addJobInBackground(job) }
                 .ioToMain()
     }
 
     override fun deleteAlbum(albumId: String): Single<Unit> {
-        val album = dataManager.getDetachedObjFromDb(Album::class.java, albumId)!!
 
-        return cancelCreateOrRemovePhotos(album.photocards.map { it.id })
+        return Single.just(dataManager.getDetachedObjFromDb(Album::class.java, albumId))
+                .flatMap { removePhotosById(it.photocards.map { it.id }) }
                 .flatMap { jobManager.singleCancelJobs(TagConstraint.ANY, CreateAlbumJob.TAG + albumId) }
-                .map { cancelResult ->
-                    if (cancelResult.cancelledJobs.isNotEmpty()) {
-                        cache.removeAlbum(albumId)
-                        dataManager.removeFromDb(Album::class.java, albumId)
+                .map {
+                    if (it.cancelledJobs.isEmpty()) {
+                        DeleteAlbumJob(albumId, skipNetworkPart = false)
                     } else {
-                        jobManager.addJobInBackground(DeleteAlbumJob(albumId))
+                        DeleteAlbumJob(albumId, skipNetworkPart = true)
                     }
                 }
+                .map { jobManager.addJobInBackground(it) }
                 .ioToMain()
     }
 
     override fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Single<Unit> {
-        if (album.isFavorite) {
-            return removeFromFavorite(photosForDelete, album).lastOrError() //todo refactor to job
-        }
-        return cancelCreateOrRemovePhotos(photosForDelete.map { it.id })
+        return removePhotosById(photosForDelete.map { it.id }, album.id, album.isFavorite)
+                .ioToMain()
     }
 
-    private fun cancelCreateOrRemovePhotos(photocardsId: List<String>): Single<Unit> {
-        if (photocardsId.isEmpty()) return Single.just(Unit)
-        val createPhotoJobTags = photocardsId.mapTo(ArrayList()) { CreatePhotoJob.TAG + it }
+    private fun removePhotosById(photosForDelete: List<String>,
+                                 albumId: String = "",
+                                 isFavorite: Boolean = false): Single<Unit> {
+        if (photosForDelete.isEmpty()) return Single.just(Unit)
 
-        return jobManager.singleCancelJobs(TagConstraint.ANY, *createPhotoJobTags.toTypedArray())
-                .doOnSuccess { it.cancelledJobs.forEach { it.tags?.forEach { createPhotoJobTags.remove(it) } } }
-                .flatMapObservable { Observable.fromIterable(createPhotoJobTags) }
-                .map { jobManager.addJobInBackground(DeletePhotocardJob(it.removePrefix(CreatePhotoJob.TAG))) }
-                .last(Unit)
-    }
-
-    private fun removeFromFavorite(photosForDelete: List<PhotocardDto>, album: AlbumDto): Observable<Unit> {
-        val albumRealm = dataManager.getDetachedObjFromDb(Album::class.java, album.id)!!
         return Observable.fromIterable(photosForDelete)
-                .flatMap { photocard ->
-                    dataManager.removeFromFavorite(photocard.id)
-                            .doOnComplete { albumRealm.photocards.removeAll { it.id == photocard.id } }
-                }.unit()
-                .doOnComplete { dataManager.saveToDB(albumRealm) }
+                .flatMapSingle {
+                    if (isFavorite) {
+                        removeFromFavorite(it, albumId)
+                    } else {
+                        cancelCreateOrRemovePhoto(it)
+                    }
+                }
+                .lastOrError()
+    }
+
+    private fun cancelCreateOrRemovePhoto(photocardId: String): Single<Unit> {
+        val createPhotoJobTag = CreatePhotoJob.TAG + photocardId
+
+        return jobManager.singleCancelJobs(TagConstraint.ANY, createPhotoJobTag)
+                .map {
+                    if (it.cancelledJobs.isEmpty()) {
+                        DeletePhotocardJob(photocardId, skipNetworkPart = false)
+                    } else {
+                        DeletePhotocardJob(photocardId, skipNetworkPart = true)
+                    }
+                }
+                .map { jobManager.addJobInBackground(it) }
+    }
+
+    private fun removeFromFavorite(id: String, favAlbumId: String): Single<Unit> {
+        return jobManager.singleCancelJobs(TagConstraint.ANY, AddToFavoriteJob.TAG + id)
+                .map { cancelResult ->
+                    val job = if (cancelResult.cancelledJobs.isEmpty()) {
+                        DeleteFromFavoriteJob(id, favAlbumId, skipNetworkPart = false)
+                    } else {
+                        DeleteFromFavoriteJob(id, favAlbumId, skipNetworkPart = true)
+                    }
+                    jobManager.addJobInBackground(job)
+                    job
+                }
+                .flatMap { jobManager.singleResultFor(it) }
     }
 }

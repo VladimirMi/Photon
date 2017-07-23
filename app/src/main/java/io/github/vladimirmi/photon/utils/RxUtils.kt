@@ -6,7 +6,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.animation.GlideAnimation
 import com.bumptech.glide.request.target.SimpleTarget
 import com.crashlytics.android.Crashlytics
-import io.github.vladimirmi.photon.core.IView
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Changeable
 import io.github.vladimirmi.photon.data.network.ApiError
@@ -94,29 +93,25 @@ fun <T> Observable<T>.retryExp(): Observable<T> {
     }
 }
 
-open class ErrorObserver<T>(private val view: IView? = null) : DisposableObserver<T>() {
+open class ErrorObserver<T> : DisposableObserver<T>() {
     override fun onComplete() {}
 
     override fun onNext(it: T) {}
 
     override fun onError(e: Throwable) {
-        Timber.e(e, e.localizedMessage)
-        if (view != null && e is ConnectException) {
-            view.showNetError()
-        } else {
+        if (e !is ConnectException) {
+            Timber.e(e, e.localizedMessage)
             Crashlytics.logException(e)
         }
     }
 }
 
-open class ErrorSingleObserver<T>(private val view: IView? = null) : DisposableSingleObserver<T>() {
+open class ErrorSingleObserver<T> : DisposableSingleObserver<T>() {
     override fun onSuccess(t: T) {}
 
     override fun onError(e: Throwable) {
-        Timber.e(e, e.localizedMessage)
-        if (e is ConnectException) {
-            view?.showNetError()
-        } else {
+        if (e !is ConnectException) {
+            Timber.e(e, e.localizedMessage)
             Crashlytics.logException(e)
         }
     }

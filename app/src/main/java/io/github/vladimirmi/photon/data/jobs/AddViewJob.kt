@@ -5,6 +5,7 @@ import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.AppConfig
 
 /**
  * Created by Vladimir Mikhalev 21.07.2017.
@@ -31,7 +32,7 @@ class AddViewJob(private val photocardId: String) :
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return RetryConstraint.CANCEL
+        return RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
     }
 
     override fun onAdded() {

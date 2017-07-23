@@ -53,4 +53,12 @@ class AuthScreen : BaseScreen<RootActivityComponent>() {
     }
 
     //endregion
+
+    override fun equals(other: Any?): Boolean {
+        return this === other
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
 }

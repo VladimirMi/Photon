@@ -186,6 +186,7 @@ constructor(private val restService: RestService,
 
     //endregion
 
+    //todo refactor on broadcast
     fun isNetworkAvailable(): Observable<Boolean> {
         return Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
                 .flatMap<Boolean> { _ ->

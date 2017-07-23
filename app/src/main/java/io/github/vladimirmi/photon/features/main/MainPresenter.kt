@@ -72,7 +72,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                 .subscribeWith(object : ErrorObserver<List<PhotocardDto>>() {
                     override fun onNext(it: List<PhotocardDto>) {
                         val update = if (updated == 0) it.size else updated
-                        view.setData(it, update)
+                        view?.setData(it, update)
                     }
                 })
     }
@@ -139,7 +139,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun loadMore(page: Int, limit: Int) {
         Timber.e("loadMore: offset ${page * limit} limit $limit")
         model.updatePhotocards(page * limit, limit)
-                .subscribeWith(object : ErrorObserver<Unit>(view) {
+                .subscribeWith(object : ErrorObserver<Unit>() {
                     override fun onComplete() {
                         updated += limit
                         resubscribeCards()

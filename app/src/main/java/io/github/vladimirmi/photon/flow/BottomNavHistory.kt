@@ -40,6 +40,7 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
             LOAD to History.single(NewCardScreen()))
 
     fun dispatch(from: BottomItem, to: BottomItem, saveHistory: Boolean = true) {
+        currentItem = to
         val direction = getDirection(from, to)
         if (saveHistory) historyMap[from] = flow.history
 
@@ -54,7 +55,6 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
         }
 
         flow.setHistory(historyMap[to]!!, direction)
-        currentItem = to
     }
 
     private fun getDirection(from: BottomItem, to: BottomItem): Direction {

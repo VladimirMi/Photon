@@ -30,15 +30,21 @@ class RealmManager {
 
     private fun setupObject(realmObject: RealmObject): RealmObject? {
         fun setupPhotocard(photocard: Photocard) = if (photocard.active)
-            photocard.apply { withId(); search = title.toLowerCase() }
+            photocard.apply { withId(); searchTag = title.toLowerCase() }
         else null
 
         fun setupAlbum(album: Album) = if (album.active)
-            album.apply { photocards.map { setupPhotocard(it) } }
+            album.apply {
+                photocards.retainAll { it.active }
+                photocards.forEachIndexed { index, photo -> photocards[index] = setupPhotocard(photo) }
+            }
         else null
 
         fun setupUser(user: User) = if (user.active)
-            user.apply { albums.map { setupAlbum(it) } }
+            user.apply {
+                albums.retainAll { it.active }
+                albums.forEachIndexed { index, album -> albums[index] = setupAlbum(album) }
+            }
         else null
 
         return when (realmObject) {

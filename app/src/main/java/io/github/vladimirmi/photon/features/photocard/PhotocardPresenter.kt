@@ -10,6 +10,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
+import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.author.AuthorScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -25,7 +26,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         when (it.itemId) {
             R.id.menu_favorite -> view.afterAuthCheck<PhotocardView> { addToFavorite() }
             R.id.menu_favorite_remove -> view.afterAuthCheck<PhotocardView> { removeFromFavorite() }
-            R.id.menu_share -> view.afterNetCheck<PhotocardView> { share() }
+            R.id.menu_share -> share()
             R.id.menu_download -> view.afterNetCheck<PhotocardView> { download() }
         }
     }
@@ -88,22 +89,45 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     }
 
     fun showAuthor() {
-        Flow.get(view).set(AuthorScreen(photocard.owner))
+        view.afterNetCheck<PhotocardView> { Flow.get(view).set(AuthorScreen(photocard.owner)) }
     }
 
-
     private fun addToFavorite() {
-        compDisp.add(model.addToFavorite(photocard.id).subscribeWith(ErrorSingleObserver()))
+        compDisp.add(model.addToFavorite(photocard.id)
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        if (e is ApiError) view.showError(e.errorResId)
+                    }
+                }))
     }
 
     private fun removeFromFavorite() {
-        compDisp.add(model.removeFromFavorite(photocard.id).subscribeWith(ErrorSingleObserver()))
+        compDisp.add(model.removeFromFavorite(photocard.id)
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        if (e is ApiError) view.showError(e.errorResId)
+                    }
+                }))
     }
 
     private var tempFile: File? = null
 
-    //todo share url without net
     private fun share() {
+        if (rootPresenter.isNetAvailable()) {
+            photocard.downloadTo(tempFile!!, view.context)
+                    .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                        override fun onSuccess(t: Unit) {
+                            rootPresenter.startActivityForResult(createShareImageIntent(), Constants.REQUEST_SHARE)
+                        }
+                    })
+        } else {
+            rootPresenter.startActivityForResult(createShareLinkIntent(), Constants.REQUEST_SHARE)
+        }
+    }
+
+    private fun createShareImageIntent(): Intent {
         tempFile = createTempFile(suffix = ".jpg", directory = view.context.cacheDir)
         val uri = FileProvider.getUriForFile(view.context,
                 AppConfig.FILE_PROVIDER_AUTHORITY, tempFile)
@@ -114,13 +138,16 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
             type = "image/jpeg"
         }
 
-        photocard.downloadTo(tempFile!!, view.context)
-                .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                    override fun onSuccess(t: Unit) {
-                        val intent = Intent.createChooser(shareIntent, view.resources.getText(R.string.send_to))
-                        rootPresenter.startActivityForResult(intent, Constants.REQUEST_SHARE)
-                    }
-                })
+        return Intent.createChooser(shareIntent, view.resources.getText(R.string.send_to))
+    }
+
+    fun createShareLinkIntent(): Intent {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, photocard.photo)
+            type = "text/plain"
+        }
+        return Intent.createChooser(shareIntent, view.resources.getText(R.string.send_to))
     }
 
     private fun download() {

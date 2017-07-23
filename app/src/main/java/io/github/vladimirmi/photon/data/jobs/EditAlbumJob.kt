@@ -7,8 +7,10 @@ import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.EditAlbumReq
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.schedulers.Schedulers
+import java.net.SocketTimeoutException
 import java.util.*
 
 /**
@@ -27,7 +29,14 @@ class EditAlbumJob(private val albumReq: EditAlbumReq)
 
     val tag = EditAlbumJob.TAG + albumReq.id
 
-    override fun onAdded() {}
+    override fun onAdded() {
+        val dataManager = DaggerService.appComponent.dataManager()
+        val album = dataManager.getDetachedObjFromDb(Album::class.java, albumReq.id)!!.apply {
+            title = albumReq.title
+            description = albumReq.description
+        }
+        dataManager.saveToDB(album)
+    }
 
     override fun onRun() {
         val dataManager = DaggerService.appComponent.dataManager()
@@ -60,6 +69,10 @@ class EditAlbumJob(private val albumReq: EditAlbumReq)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return RetryConstraint.CANCEL
+        return if (throwable is SocketTimeoutException) {
+            RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
+        } else {
+            RetryConstraint.CANCEL
+        }
     }
 }

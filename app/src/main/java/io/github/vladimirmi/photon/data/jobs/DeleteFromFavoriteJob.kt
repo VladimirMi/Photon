@@ -5,17 +5,20 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.schedulers.Schedulers
+import java.net.SocketTimeoutException
 import java.util.*
 
 /**
  * Created by Vladimir Mikhalev 21.07.2017.
  */
 
-class DeleteFromFavoriteJob(private val photocardId: String, private val favAlbumId: String)
+class DeleteFromFavoriteJob(private val photocardId: String,
+                            private val favAlbumId: String,
+                            private val skipNetworkPart: Boolean)
     : Job(Params(JobPriority.HIGH)
         .setGroupId(TAG)
         .addTags(TAG + photocardId)
@@ -28,7 +31,14 @@ class DeleteFromFavoriteJob(private val photocardId: String, private val favAlbu
 
     val tag = TAG + photocardId
 
+    override fun onAdded() {
+        val dataManager = DaggerService.appComponent.dataManager()
+        val album = dataManager.getDetachedObjFromDb(Album::class.java, favAlbumId)!!
+        dataManager.saveToDB(album.apply { photocards.removeAll { it.id == photocardId } })
+    }
+
     override fun onRun() {
+        if (skipNetworkPart) return
         val dataManager = DaggerService.appComponent.dataManager()
         var error: Throwable? = null
 
@@ -39,14 +49,11 @@ class DeleteFromFavoriteJob(private val photocardId: String, private val favAlbu
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return RetryConstraint.CANCEL
-    }
-
-    override fun onAdded() {
-        val dataManager = DaggerService.appComponent.dataManager()
-        val album = dataManager.getDetachedObjFromDb(Album::class.java, favAlbumId)!!
-        val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, photocardId)!!
-        dataManager.saveToDB(album.apply { photocards.remove(photocard) })
+        return if (throwable is SocketTimeoutException) {
+            RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
+        } else {
+            RetryConstraint.CANCEL
+        }
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {

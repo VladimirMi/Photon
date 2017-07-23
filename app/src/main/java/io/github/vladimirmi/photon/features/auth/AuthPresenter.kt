@@ -13,7 +13,6 @@ import io.github.vladimirmi.photon.features.profile.ProfileScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.reactivex.disposables.Disposable
 
 /**
  * Created by Vladimir Mikhalev 25.06.2017.
@@ -27,13 +26,12 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
     }
 
     override fun initView(view: AuthView) {
-        compDisp.add(subscribeOnNet())
-    }
-
-    private fun subscribeOnNet(): Disposable {
-        return model.isNetAvail()
-                .doOnNext { view.enableButtons(it) }
-                .subscribeWith(ErrorObserver())
+        when (rootPresenter.bottomHistory.currentItem) {
+            BottomNavHistory.BottomItem.PROFILE -> view.setTitle(R.string.profile_not_auth)
+            BottomNavHistory.BottomItem.LOAD -> view.setTitle(R.string.newcard_not_auth)
+            else -> {
+            }
+        }
     }
 
     fun register(req: SignUpReq) {
@@ -80,7 +78,7 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
     }
 
     private fun nextScreen() {
-        val nextScreen = when (rootPresenter.bottomHistory!!.currentItem) {
+        val nextScreen = when (rootPresenter.bottomHistory.currentItem) {
             BottomNavHistory.BottomItem.PROFILE -> ProfileScreen()
             BottomNavHistory.BottomItem.LOAD -> NewCardScreen()
             BottomNavHistory.BottomItem.MAIN -> MainScreen()

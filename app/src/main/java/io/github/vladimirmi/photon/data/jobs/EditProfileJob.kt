@@ -6,6 +6,7 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.EditProfileReq
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
@@ -21,7 +22,7 @@ import java.util.*
  */
 
 class EditProfileJob(private val profileReq: EditProfileReq,
-                     private val avatarLoad: Boolean = false)
+                     private val loadAvatar: Boolean = false)
     : Job(Params(JobPriority.HIGH)
         .addTags(TAG + profileReq.id)
         .requireNetwork()
@@ -33,14 +34,27 @@ class EditProfileJob(private val profileReq: EditProfileReq,
 
     val tag = TAG + profileReq.id
 
-    override fun onAdded() {}
+    override fun onAdded() {
+        val dataManager = DaggerService.appComponent.dataManager()
+        val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
+
+        profileReq.id = profile.id
+        if (profileReq.avatar.isEmpty()) profileReq.avatar = profile.avatar
+
+        profile.apply {
+            login = profileReq.login
+            name = profileReq.name
+            avatar = profileReq.avatar
+        }
+        dataManager.saveToDB(profile)
+    }
 
     override fun onRun() {
         val dataManager = DaggerService.appComponent.dataManager()
 
         val editProfileObs = dataManager.editProfile(profileReq)
 
-        val observable = if (avatarLoad) {
+        val observable = if (loadAvatar) {
             val data = getByteArrayFromContent(profileReq.avatar)
             val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
             val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(profileReq.avatar).lastPathSegment, body)

@@ -8,6 +8,7 @@ import io.github.vladimirmi.photon.data.models.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.ui.LoginDialog
 import io.github.vladimirmi.photon.ui.RegistrationDialog
+import io.github.vladimirmi.photon.utils.afterNetCheck
 import kotlinx.android.synthetic.main.screen_auth.view.*
 
 /**
@@ -29,10 +30,11 @@ class AuthView(context: Context, attrs: AttributeSet)
 
     private val loginBtn by lazy { login_btn }
     private val registrationBtn by lazy { registration_btn }
+    private val titleTxt by lazy { title }
 
     override fun initView() {
-        loginBtn.setOnClickListener { openLoginDialog() }
-        registrationBtn.setOnClickListener { openRegistrationDialog() }
+        loginBtn.setOnClickListener { afterNetCheck<AuthView> { openLoginDialog() } }
+        registrationBtn.setOnClickListener { afterNetCheck<AuthView> { openRegistrationDialog() } }
     }
 
     fun openRegistrationDialog() = registrationDialog.show()
@@ -52,8 +54,5 @@ class AuthView(context: Context, attrs: AttributeSet)
         loginDialog.unsubscribe()
     }
 
-    fun enableButtons(enabled: Boolean) {
-        loginBtn.isEnabled = enabled
-        registrationBtn.isEnabled = enabled
-    }
+    fun setTitle(stringId: Int) = titleTxt.setText(stringId)
 }

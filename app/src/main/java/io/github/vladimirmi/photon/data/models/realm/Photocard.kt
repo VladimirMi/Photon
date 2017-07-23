@@ -14,7 +14,7 @@ open class Photocard(
         @PrimaryKey
         override var id: String = "",
         var owner: String = "",
-        var search: String = "",
+        var searchTag: String = "",
         var title: String = "",
         var photo: String = "",
         var views: Int = 0,
