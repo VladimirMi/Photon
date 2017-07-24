@@ -16,7 +16,8 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class CreatePhotoJob(private val photocardId: String)
+class CreatePhotoJob(private val photocardId: String,
+                     private val albumId: String)
     : Job(Params(JobPriority.HIGH)
         .groupBy("Images")
         .setSingleId(photocardId)
@@ -43,14 +44,14 @@ class CreatePhotoJob(private val photocardId: String)
         val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(photocard.photo).lastPathSegment, body)
 
         dataManager.uploadPhoto(bodyPart)
-                .flatMap {
-                    photocard.photo = it.image
+                .flatMap { imageUrlRes ->
+                    photocard.photo = imageUrlRes.image
+                    photocard.album = albumId
                     dataManager.createPhotocard(photocard)
                 }
                 .doOnNext {
                     photocard.id = it.id
-                    dataManager.removeFromDb(Photocard::class.java, photocardId)
-                    val album = dataManager.getDetachedObjFromDb(Album::class.java, photocard.album)!!
+                    val album = dataManager.getDetachedObjFromDb(Album::class.java, albumId)!!
                     album.photocards.add(photocard)
                     dataManager.saveToDB(album)
                 }
@@ -60,15 +61,21 @@ class CreatePhotoJob(private val photocardId: String)
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {
-        val inputStream = DaggerService.appComponent.context().contentResolver
-                .openInputStream(Uri.parse(contentUri))
-        val result = inputStream.readBytes()
-        inputStream.close()
-        return result
+        DaggerService.appComponent.context().contentResolver
+                .openInputStream(Uri.parse(contentUri)).use {
+            return it.readBytes()
+        }
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
+        if (throwable != null) {
+            removeTempPhotocard()
+        }
+    }
+
+    private fun removeTempPhotocard() {
+        DaggerService.appComponent.dataManager().removeFromDb(Photocard::class.java, photocardId)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {

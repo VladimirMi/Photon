@@ -41,9 +41,8 @@ data class Query(val fieldName: String, val operator: RealmOperator, val value: 
 fun <T : RealmObject> RealmQuery<T>.prepareQuery(query: List<Query>?)
         : RealmQuery<T> {
 
-    if (query != null) Timber.e("prepareQuery")
     query?.groupBy { it.fieldName }?.forEach { (_, list) ->
-        Timber.e("group $list")
+        Timber.e("query group $list")
         beginGroup()
         list.forEachIndexed { idx, qry ->
             qry.applyTo(this)

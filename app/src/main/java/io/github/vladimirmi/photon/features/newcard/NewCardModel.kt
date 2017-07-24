@@ -2,7 +2,8 @@ package io.github.vladimirmi.photon.features.newcard
 
 import com.birbit.android.jobqueue.JobManager
 import io.github.vladimirmi.photon.data.jobs.CreatePhotoJob
-import io.github.vladimirmi.photon.data.jobs.singleResultFor
+import io.github.vladimirmi.photon.data.jobs.JobStatus
+import io.github.vladimirmi.photon.data.jobs.observableFor
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
@@ -13,7 +14,6 @@ import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.realm.Sort
 import timber.log.Timber
 
@@ -28,7 +28,7 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val
         setFilterField(filter.first, filter.second, remove = true)
     }
 
-    fun setFilterField(name: String, value: String, remove: Boolean = false) {
+    private fun setFilterField(name: String, value: String, remove: Boolean = false) {
         Timber.e("setFilterField: with $name to $value, remove = $remove")
         when (name) {
             "filters.dish" -> photoCard.filters.dish = if (remove) "" else value
@@ -72,14 +72,17 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val
         photoCard.photo = uri
     }
 
-    override fun uploadPhotocard(): Single<Unit> {
-        return Single.just(photoCard)
-                .map { it.apply { withId(); owner = dataManager.getProfileId() } }
-                .doOnSuccess { dataManager.saveToDB(it) }
-                .flatMap {
-                    val uploadJob = CreatePhotoJob(it.id)
-                    jobManager.addJobInBackground(uploadJob)
-                    jobManager.singleResultFor(uploadJob)
+    override fun uploadPhotocard(): Observable<JobStatus> {
+        return Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, photoCard.album))
+                .map { album ->
+                    photoCard.owner = dataManager.getProfileId()
+                    album.photocards.add(photoCard.withId())
+                    dataManager.saveToDB(album)
+                    CreatePhotoJob(photoCard.id, photoCard.album)
+                }
+                .flatMap { job ->
+                    jobManager.addJobInBackground(job)
+                    jobManager.observableFor(job)
                 }
                 .ioToMain()
     }

@@ -9,12 +9,16 @@ import android.provider.OpenableColumns
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
+import io.github.vladimirmi.photon.data.jobs.JobStatus
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.PROFILE
-import io.github.vladimirmi.photon.utils.*
+import io.github.vladimirmi.photon.utils.AppConfig
+import io.github.vladimirmi.photon.utils.Constants
+import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import java.io.File
@@ -24,7 +28,7 @@ import java.util.concurrent.TimeUnit
 class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     : BasePresenter<NewCardView, INewCardModel>(model, rootPresenter) {
 
-    private var returnToAlbum: AlbumDto? = null
+    private var returnTo: AlbumDto? = null
     private var startAction: (() -> Unit)? = null
 
     override fun initToolbar() {
@@ -34,7 +38,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     override fun initView(view: NewCardView) {
         startAction?.invoke()
         Flow.getKey<NewCardScreen>(view)?.album?.let {
-            returnToAlbum = it
+            returnTo = it
             setAlbum(it)
         }
         compDisp.add(subscribeOnTitleField())
@@ -59,7 +63,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
             clearPhotocard()
             return true
         }
-        if (returnToAlbum != null) {
+        if (returnTo != null) {
             returnToAlbum()
             return true
         }
@@ -71,7 +75,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
         val history = rootPresenter.bottomHistory.historyMap[PROFILE]
         val newHistory = history!!.buildUpon().apply {
             pop()
-            returnToAlbum?.let { push(AlbumScreen(it)) }
+            returnTo?.let { push(AlbumScreen(it)) }
         }.build()
         rootPresenter.bottomHistory.historyMap[PROFILE] = newHistory
         rootPresenter.navigateTo(PROFILE)
@@ -111,18 +115,20 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     fun setAlbum(album: AlbumDto) {
         model.photoCard.album = album.id
         view.selectAlbum(album.id)
-        if (returnToAlbum != null) returnToAlbum = album
+        if (returnTo != null) returnTo = album
     }
 
     fun savePhotocard() {
+        if (!checkCanSave()) return
         compDisp.add(model.uploadPhotocard()
-                .ioToMain()
-                .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                    override fun onSuccess(t: Unit) {
-                        if (returnToAlbum != null) returnToAlbum() else {
-                            view.showError(R.string.newcard_create_success)
-                            view.postDelayed({ clearPhotocard() }, 2000)
-                        }
+                .subscribeWith(object : ErrorObserver<JobStatus>() {
+
+                    override fun onNext(it: JobStatus) {
+                        if (returnTo != null) returnToAlbum() else clearPhotocard()
+                    }
+
+                    override fun onComplete() {
+                        view.showError(R.string.newcard_create_success)
                     }
 
                     override fun onError(e: Throwable) {
@@ -130,6 +136,17 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
                         view.showError(R.string.message_api_err_unknown)
                     }
                 }))
+    }
+
+    private fun checkCanSave(): Boolean {
+        if (model.photoCard.title.isEmpty()) {
+            view.showError(R.string.newcard_err_title)
+            return false
+        } else if (model.photoCard.album.isEmpty()) {
+            view.showError(R.string.newcard_err_album)
+            return false
+        }
+        return true
     }
 
     fun clearPhotocard() {
@@ -175,7 +192,8 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
         val fileSize = when (uri.scheme) {
             "file" -> File(uri.path).length().toInt()
             else -> {
-                view.context.contentResolver.query(uri, null, null, null, null, null).use { cursor ->
+                DaggerService.appComponent.context()
+                        .contentResolver.query(uri, null, null, null, null, null).use { cursor ->
                     if (cursor != null && cursor.moveToFirst()) {
                         val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
                         if (!cursor.isNull(sizeIndex)) cursor.getInt(sizeIndex) else null

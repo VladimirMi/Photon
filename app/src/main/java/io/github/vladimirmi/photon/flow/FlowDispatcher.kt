@@ -1,20 +1,16 @@
 package io.github.vladimirmi.photon.flow
 
 import android.content.Context
-import android.support.v4.view.animation.FastOutSlowInInterpolator
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.transitionseverywhere.Slide
 import com.transitionseverywhere.TransitionManager
-import com.transitionseverywhere.TransitionSet
 import flow.Direction
 import flow.Flow
 import flow.Traversal
 import flow.TraversalCallback
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.utils.AppConfig
+import io.github.vladimirmi.photon.utils.prepareChangeScreenTransitionSet
 import mortar.MortarScope
 
 /**
@@ -61,30 +57,7 @@ class FlowDispatcher<S : BaseScreen<*>>(baseContext: Context) : BaseDispatcher(b
                                   direction: Direction) {
         if (direction == Direction.REPLACE) return
 
-        val slideIn = Slide()
-        val slideOut = Slide()
-
-        slideIn.addTarget(newView)
-        slideOut.addTarget(previousView)
-
-        if (direction == Direction.FORWARD) {
-            slideIn.slideEdge = Gravity.END
-            slideOut.slideEdge = Gravity.START
-
-        } else {
-            slideIn.slideEdge = Gravity.START
-            slideOut.slideEdge = Gravity.END
-        }
-
-        val set = TransitionSet()
-
-        set.addTransition(slideIn)
-                .addTransition(slideOut)
-                .setDuration(AppConfig.CHANGE_SCREEN_ANIMATION)
-                .setStartDelay(200L)
-                .interpolator = FastOutSlowInInterpolator()
-
-//        if (newView is MainView) set.startDelay = AppConfig.CHANGE_SCREEN_ANIMATION
+        val set = prepareChangeScreenTransitionSet(previousView, newView, direction).setStartDelay(200L)
         TransitionManager.beginDelayedTransition(container, set)
     }
 }

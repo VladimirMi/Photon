@@ -60,3 +60,6 @@
 
 -dontwarn com.google.android.gms.**
 -dontwarn io.github.vladimirmi.photon.**
+
+-keep class com.wang.avi.** { *; }
+-keep class com.wang.avi.indicators.** { *; }

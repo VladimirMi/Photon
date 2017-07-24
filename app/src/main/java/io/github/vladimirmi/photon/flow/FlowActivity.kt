@@ -60,9 +60,9 @@ abstract class FlowActivity : AppCompatActivity(), IView {
     }
 
     override fun onStop() {
+        super.onStop()
         dispatcher.onStop()
         dispatcher.onViewDestroyed(removedByFlow = false)
-        super.onStop()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

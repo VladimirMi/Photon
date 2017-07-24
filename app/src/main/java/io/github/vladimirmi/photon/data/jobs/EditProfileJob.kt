@@ -74,11 +74,10 @@ class EditProfileJob(private val profileReq: EditProfileReq,
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {
-        val inputStream = DaggerService.appComponent.context().contentResolver
-                .openInputStream(Uri.parse(contentUri))
-        val result = inputStream.readBytes()
-        inputStream.close()
-        return result
+        DaggerService.appComponent.context().contentResolver
+                .openInputStream(Uri.parse(contentUri)).use {
+            return it.readBytes()
+        }
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {

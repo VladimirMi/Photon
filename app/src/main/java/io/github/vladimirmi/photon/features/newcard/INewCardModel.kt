@@ -1,10 +1,10 @@
 package io.github.vladimirmi.photon.features.newcard
 
 import io.github.vladimirmi.photon.core.IModel
+import io.github.vladimirmi.photon.data.jobs.JobStatus
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.reactivex.Observable
-import io.reactivex.Single
 
 interface INewCardModel : IModel {
     var photoCard: Photocard
@@ -14,5 +14,5 @@ interface INewCardModel : IModel {
     fun addTag(tag: String)
     fun getAlbums(): Observable<List<AlbumDto>>
     fun savePhotoUri(uri: String)
-    fun uploadPhotocard(): Single<Unit>
+    fun uploadPhotocard(): Observable<JobStatus>
 }

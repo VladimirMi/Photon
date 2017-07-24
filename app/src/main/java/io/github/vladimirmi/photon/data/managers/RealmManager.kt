@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.data.managers
 
 import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Changeable
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.Query
@@ -11,7 +12,6 @@ import io.reactivex.Observable
 import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.Sort
-import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -22,7 +22,6 @@ class RealmManager {
 
     fun save(realmObject: RealmObject) {
         val obj = setupObject(realmObject) ?: return
-        Timber.e("save: ${realmObject::class.java.simpleName}")
         val realm = Realm.getDefaultInstance()
         realm.executeTransaction { it.insertOrUpdate(obj) }
         realm.close()
@@ -70,15 +69,18 @@ class RealmManager {
 
         return AtomicReference<Realm>().asFlowable(mainThread) {
             it.where(clazz).prepareQuery(query)
-                    .let { if (sortBy != null) it.findAllSorted(sortBy, order) else it.findAll() }
-        }
-//                .doOnSubscribe { removeAllNotActive(clazz) }
-                .toObservable()
+                    .let {
+                        if (sortBy != null) {
+                            it.findAllSorted(sortBy, order)
+                        } else {
+                            it.findAll()
+                        }
+                    }
+        }.toObservable()
     }
 
 
     fun <T : RealmObject> remove(clazz: Class<T>, id: String) {
-        Timber.e("remove: ${clazz.simpleName} with id=$id")
         val realm = Realm.getDefaultInstance()
         realm.executeTransaction {
             it.where(clazz).equalTo("id", id).findFirst()?.deleteFromRealm()
@@ -86,14 +88,14 @@ class RealmManager {
         realm.close()
     }
 
-//    fun <T : RealmObject> removeAllNotActive(clazz: Class<T>) {
-//        if (!Changeable::class.java.isAssignableFrom(clazz)) return
-//        val realm = Realm.getDefaultInstance()
-//        realm.executeTransaction {
-//            it.where(clazz).equalTo("active", false).findAll()?.deleteAllFromRealm()
-//        }
-//        realm.close()
-//    }
+    fun <T : RealmObject> removeAllNotActive(clazz: Class<T>) {
+        if (!Changeable::class.java.isAssignableFrom(clazz)) return
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransaction {
+            it.where(clazz).equalTo("active", false).findAll()?.deleteAllFromRealm()
+        }
+        realm.close()
+    }
 
     fun <T : RealmObject> getDetachedObject(java: Class<T>, id: String): T? {
         val realm = Realm.getDefaultInstance()

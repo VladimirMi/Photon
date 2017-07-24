@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.data.jobs
 import com.birbit.android.jobqueue.*
 import com.birbit.android.jobqueue.callback.JobManagerCallback
 import com.crashlytics.android.Crashlytics
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 import timber.log.Timber
@@ -54,11 +55,44 @@ fun <T : Job> JobManager.singleResultFor(localJob: T): Single<Unit> {
             override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
                 Timber.e("onJobCancelled byCancelRequest $byCancelRequest ")
                 Timber.e(throwable, throwable?.localizedMessage)
-                if (!e.isDisposed && throwable != null && localJob.id == job.id) e.onError(throwable)
+                if (!e.isDisposed && localJob.id == job.id) {
+                    if (throwable != null) e.onError(throwable) else e.onSuccess(Unit)
+                }
+            }
+        }
+
+        addCallback(callback)
+        e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
+    }
+}
+
+enum class JobStatus {ADDED, RUN, AFTER_RUN }
+
+fun <T : Job> JobManager.observableFor(localJob: T): Observable<JobStatus> {
+    return Observable.create { e ->
+        val callback = object : EmptyJobCallback() {
+            override fun onDone(job: Job) {
+                if (!e.isDisposed && localJob.id == job.id) e.onComplete()
+            }
+
+            override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
+                Timber.e("onJobCancelled byCancelRequest $byCancelRequest ")
+                Timber.e(throwable, throwable?.localizedMessage)
+                if (!e.isDisposed && localJob.id == job.id) {
+                    if (throwable != null) e.onError(throwable) else e.onComplete()
+                }
             }
 
             override fun onAfterJobRun(job: Job, resultCode: Int) {
-                Timber.e("onAfterJobRun: $resultCode")
+                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus.AFTER_RUN)
+            }
+
+            override fun onJobAdded(job: Job) {
+                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus.ADDED)
+            }
+
+            override fun onJobRun(job: Job, resultCode: Int) {
+                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus.RUN)
             }
         }
 

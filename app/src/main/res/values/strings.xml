@@ -137,6 +137,8 @@
     <string name="newcard_album_title">Выберите альбом</string>
     <string name="newcard_create_success">Фотокарточка успешно добавлена</string>
     <string name="newcard_not_auth">Авторизуйтесь,\n чтобы добавить\n новую фотокарточку</string>
+    <string name="newcard_err_title">Необходимо задать имя фотокарточки</string>
+    <string name="newcard_err_album">Необходимо задать альбом для фотокарточки</string>
 
     <string name="send_to">Отправить</string>
     <string name="placeholder_not_available">-</string>
