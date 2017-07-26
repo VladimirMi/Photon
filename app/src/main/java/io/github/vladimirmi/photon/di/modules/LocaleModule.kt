@@ -8,7 +8,11 @@ import com.uphyca.stetho_realm.RealmInspectorModulesProvider
 import dagger.Module
 import dagger.Provides
 import io.github.vladimirmi.photon.core.App
+import io.github.vladimirmi.photon.data.jobs.queue.AlbumJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.ProfileJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
+import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -31,7 +35,7 @@ class LocaleModule(val context: Context) {
 
     @Provides
     @DaggerScope(App::class)
-    fun provideCaacheManager() = Cache()
+    fun provideCacheManager() = Cache()
 
     @Provides
     @DaggerScope(App::class)
@@ -59,4 +63,22 @@ class LocaleModule(val context: Context) {
     @Provides
     @DaggerScope(App::class)
     fun provideRefWatcher(context: Context) = App.getRefWatcher(context)
+
+    @Provides
+    @DaggerScope(App::class)
+    fun providePhotocardJobQueue(jobManager: JobManager, dataManager: DataManager): PhotocardJobQueue {
+        return PhotocardJobQueue(jobManager, dataManager)
+    }
+
+    @Provides
+    @DaggerScope(App::class)
+    fun provideAlbumJobQueue(jobManager: JobManager, dataManager: DataManager, photocardJobQueue: PhotocardJobQueue): AlbumJobQueue {
+        return AlbumJobQueue(jobManager, dataManager, photocardJobQueue)
+    }
+
+    @Provides
+    @DaggerScope(App::class)
+    fun provideProfileJobQueue(jobManager: JobManager): ProfileJobQueue {
+        return ProfileJobQueue(jobManager)
+    }
 }

@@ -5,22 +5,30 @@ import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.JobGroup
+import io.github.vladimirmi.photon.utils.JobPriority
+import io.github.vladimirmi.photon.utils.cancelOrWait
+import io.github.vladimirmi.photon.utils.logCancel
 
 /**
  * Created by Vladimir Mikhalev 21.07.2017.
  */
 
-class AddViewJob(private val photocardId: String) :
+class PhotocardAddViewJob(val photocardId: String,
+                          val skipNetworkPart: Boolean = false,
+                          val onlyNetworkPart: Boolean = false) :
         Job(Params(JobPriority.HIGH)
-                .setGroupId(TAG)
+                .setGroupId(JobGroup.PHOTOCARD)
+                .addTags(JobGroup.PHOTOCARD + photocardId)
                 .requireNetwork()
                 .persist()) {
 
     companion object {
-        const val TAG = "AddViewJobTag"
+        const val TAG = "PhotocardAddViewJob"
     }
 
     override fun onRun() {
+        if (skipNetworkPart) return
         val dataManager = DaggerService.appComponent.dataManager()
         var error: Throwable? = null
 
@@ -31,10 +39,11 @@ class AddViewJob(private val photocardId: String) :
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return RetryConstraint.CANCEL
+        return cancelOrWait(throwable, runCount)
     }
 
     override fun onAdded() {
+        if (onlyNetworkPart) return
         val dataManager = DaggerService.appComponent.dataManager()
         val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, photocardId)!!
         dataManager.saveToDB(photocard.apply { views++ })

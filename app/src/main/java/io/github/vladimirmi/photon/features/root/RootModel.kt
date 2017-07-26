@@ -36,6 +36,8 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
         dataManager.saveToDB(user)
         dataManager.saveUserId(user.id)
         dataManager.saveUserToken(user.token)
+        //todo если fav album отсутствует, предложить создать(?)
+        dataManager.saveUserFavAlbumId(user.albums.find { it.isFavorite }!!.id)
     }
 
     override fun isNetAvail(): Boolean = dataManager.isNetworkAvailable().blockingFirst()

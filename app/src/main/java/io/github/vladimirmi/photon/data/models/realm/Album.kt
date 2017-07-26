@@ -23,4 +23,8 @@ open class Album(
         override var active: Boolean = true
 
 
-) : RealmObject(), Changeable
+) : RealmObject(), Changeable {
+    companion object {
+        const val TEMP = "TEMP"
+    }
+}

@@ -1,10 +1,11 @@
 package io.github.vladimirmi.photon.features.album
 
-import com.birbit.android.jobqueue.JobManager
 import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.jobs.queue.AlbumJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
@@ -33,8 +34,9 @@ data class AlbumScreen(val album: AlbumDto) : BaseScreen<RootActivityComponent>(
     class Module {
         @Provides
         @DaggerScope(AlbumScreen::class)
-        fun provideAlbumModel(dataManager: DataManager, jobManager: JobManager, cache: Cache): IAlbumModel {
-            return AlbumModel(dataManager, jobManager, cache)
+        fun provideAlbumModel(dataManager: DataManager, photocardJobQueue: PhotocardJobQueue,
+                              albumJobQueue: AlbumJobQueue, cache: Cache): IAlbumModel {
+            return AlbumModel(dataManager, photocardJobQueue, albumJobQueue, cache)
         }
 
         @Provides

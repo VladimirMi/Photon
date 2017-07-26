@@ -2,11 +2,11 @@ package io.github.vladimirmi.photon.features.newcard
 
 import android.os.Parcelable
 import android.util.SparseArray
-import com.birbit.android.jobqueue.JobManager
 import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
@@ -34,8 +34,9 @@ class NewCardScreen(var album: AlbumDto? = null) : BaseScreen<RootActivityCompon
     class Module {
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardModel(dataManager: DataManager, jobManager: JobManager, cache: Cache): INewCardModel {
-            return NewCardModel(dataManager, jobManager, cache)
+        fun provideNewCardModel(dataManager: DataManager, photocardJobQueue: PhotocardJobQueue,
+                                cache: Cache): INewCardModel {
+            return NewCardModel(dataManager, photocardJobQueue, cache)
         }
 
         @Provides

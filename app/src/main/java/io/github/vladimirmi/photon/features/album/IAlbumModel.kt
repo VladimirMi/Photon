@@ -4,13 +4,14 @@ import io.github.vladimirmi.photon.core.IModel
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
+import io.github.vladimirmi.photon.utils.JobStatus
 import io.reactivex.Observable
 import io.reactivex.Single
 
 interface IAlbumModel : IModel {
     fun getAlbum(id: String): Observable<AlbumDto>
     fun getProfileId(): String
-    fun editAlbum(albumReq: EditAlbumReq): Single<Unit>
-    fun deleteAlbum(albumId: String): Single<Unit>
+    fun editAlbum(albumReq: EditAlbumReq): Observable<JobStatus>
+    fun deleteAlbum(albumId: String): Observable<JobStatus>
     fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Single<Unit>
 }

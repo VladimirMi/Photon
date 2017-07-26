@@ -178,9 +178,13 @@ constructor(private val restService: RestService,
 
     fun saveUserToken(token: String) = preferencesManager.saveUserToken(token)
 
+    fun saveUserFavAlbumId(id: String) = preferencesManager.saveFavAlbumId(id)
+
     fun getProfileId() = preferencesManager.getUserId()
 
     fun getUserToken() = preferencesManager.getUserToken()
+
+    fun getUserFavAlbumId() = preferencesManager.getUserFavAlbumId()
 
     fun isUserAuth() = preferencesManager.isUserAuth()
 

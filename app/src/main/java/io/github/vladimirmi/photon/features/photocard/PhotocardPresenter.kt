@@ -94,7 +94,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private fun addToFavorite() {
         compDisp.add(model.addToFavorite(photocard.id)
-                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                .subscribeWith(object : ErrorObserver<JobStatus>() {
                     override fun onError(e: Throwable) {
                         super.onError(e)
                         if (e is ApiError) view.showError(e.errorResId)
@@ -104,7 +104,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private fun removeFromFavorite() {
         compDisp.add(model.removeFromFavorite(photocard.id)
-                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                .subscribeWith(object : ErrorObserver<JobStatus>() {
                     override fun onError(e: Throwable) {
                         super.onError(e)
                         if (e is ApiError) view.showError(e.errorResId)

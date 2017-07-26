@@ -6,8 +6,7 @@ import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.schedulers.Schedulers
 import java.net.SocketTimeoutException
 import java.util.*
@@ -16,12 +15,17 @@ import java.util.*
  * Created by Vladimir Mikhalev 18.07.2017.
  */
 
-class DeletePhotocardJob(private val photocardId: String,
-                         private val skipNetworkPart: Boolean)
+class PhotocardDeleteJob(private val photocardId: String,
+                         private val skipNetworkPart: Boolean = false)
     : Job(Params(JobPriority.MID)
         .setSingleId(photocardId)
+        .setGroupId(JobGroup.PHOTOCARD)
         .requireNetwork()
         .persist()) {
+
+    companion object {
+        const val TAG = "PhotocardDeleteJob"
+    }
 
     override fun onAdded() {
         val dataManager = DaggerService.appComponent.dataManager()

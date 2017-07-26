@@ -7,7 +7,7 @@ import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.AppConfig
+import io.github.vladimirmi.photon.utils.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -16,20 +16,20 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class CreatePhotoJob(private val photocardId: String,
-                     private val albumId: String)
+class PhotocardCreateJob(val photocardId: String,
+                         val albumId: String)
     : Job(Params(JobPriority.HIGH)
-        .groupBy("Images")
+        .groupBy(JobGroup.PHOTOCARD)
         .setSingleId(photocardId)
-        .addTags(TAG + photocardId)
+        .addTags(TAG + photocardId, JobGroup.PHOTOCARD + photocardId)
         .requireNetwork()
-        .persist()) {
+        .persist()), WithPayload {
 
     companion object {
-        val TAG = "CreatePhotoJobTag"
+        val TAG = "PhotocardCreateJob"
     }
 
-    val tag = TAG + photocardId
+    override val payload = Payload<String>()
 
     override fun onAdded() {}
 
@@ -50,10 +50,12 @@ class CreatePhotoJob(private val photocardId: String,
                     dataManager.createPhotocard(photocard)
                 }
                 .doOnNext {
+                    payload.value = it.id
                     photocard.id = it.id
                     val album = dataManager.getDetachedObjFromDb(Album::class.java, albumId)!!
                     album.photocards.add(photocard)
                     dataManager.saveToDB(album)
+                    removeTempPhotocard()
                 }
                 .blockingSubscribe({}, { error = it })
 

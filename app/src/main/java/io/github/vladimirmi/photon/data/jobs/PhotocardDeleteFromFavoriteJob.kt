@@ -6,8 +6,7 @@ import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.schedulers.Schedulers
 import java.net.SocketTimeoutException
 import java.util.*
@@ -16,22 +15,22 @@ import java.util.*
  * Created by Vladimir Mikhalev 21.07.2017.
  */
 
-class DeleteFromFavoriteJob(private val photocardId: String,
-                            private val favAlbumId: String,
-                            private val skipNetworkPart: Boolean)
+class PhotocardDeleteFromFavoriteJob(val photocardId: String,
+                                     val favAlbumId: String,
+                                     val skipNetworkPart: Boolean = false,
+                                     val onlyNetworkPart: Boolean = false)
     : Job(Params(JobPriority.HIGH)
-        .setGroupId(TAG)
-        .addTags(TAG + photocardId)
+        .setGroupId(JobGroup.PHOTOCARD)
+        .addTags(TAG + photocardId, JobGroup.PHOTOCARD + photocardId)
         .requireNetwork()
         .persist()) {
 
     companion object {
-        const val TAG = "DeleteFromFavoriteJob"
+        const val TAG = "PhotocardDeleteFromFavoriteJob"
     }
 
-    val tag = TAG + photocardId
-
     override fun onAdded() {
+        if (onlyNetworkPart) return
         val dataManager = DaggerService.appComponent.dataManager()
         val album = dataManager.getDetachedObjFromDb(Album::class.java, favAlbumId)!!
         dataManager.saveToDB(album.apply { photocards.removeAll { it.id == photocardId } })

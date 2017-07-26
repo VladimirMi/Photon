@@ -19,7 +19,8 @@ import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.Constants
-import io.github.vladimirmi.photon.utils.ErrorSingleObserver
+import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.JobStatus
 import io.reactivex.disposables.Disposable
 
 class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
@@ -83,8 +84,8 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     fun createNewAlbum(newAlbumReq: NewAlbumReq) {
         compDisp.add(model.createAlbum(newAlbumReq)
                 .doOnSubscribe { view.closeNewAlbumDialog() }
-                .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                    override fun onSuccess(t: Unit) {
+                .subscribeWith(object : ErrorObserver<JobStatus>() {
+                    override fun onComplete() {
                         view.showMessage(R.string.album_create_success)
                     }
 
@@ -95,13 +96,14 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                 }))
     }
 
-    fun editProfile(profileReq: EditProfileReq, avatarChanged: Boolean = false) {
+    fun editProfile(profileReq: EditProfileReq) {
         view.closeEditProfileDialog()
+        if (!profileReq.avatarChanged) profileReq.avatar = profile.avatar
         if (!profileChanged(profileReq)) return
 
-        compDisp.add(model.editProfile(profileReq, avatarChanged)
-                .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                    override fun onSuccess(t: Unit) {
+        compDisp.add(model.editProfile(profileReq)
+                .subscribeWith(object : ErrorObserver<JobStatus>() {
+                    override fun onComplete() {
                         view.showMessage(R.string.profile_edit_success)
                     }
 
@@ -115,7 +117,7 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     private fun profileChanged(profileReq: EditProfileReq): Boolean {
         return profile.name != profileReq.name ||
                 profile.login != profileReq.login ||
-                profile.avatar != profileReq.avatar
+                profileReq.avatarChanged
     }
 
     private fun takePhoto() {
@@ -144,10 +146,9 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     }
 
     private fun editAvatar(uri: String) {
-        val profileReq = EditProfileReq(name = profile.name,
-                login = profile.login,
-                avatar = uri)
-        editProfile(profileReq, true)
+        val profileReq = EditProfileReq(profile.name, profile.login, uri)
+        profileReq.avatarChanged = true
+        editProfile(profileReq)
     }
 }
 

@@ -8,24 +8,25 @@ import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.AppConfig
+import io.github.vladimirmi.photon.utils.JobGroup
+import io.github.vladimirmi.photon.utils.JobPriority
+import io.github.vladimirmi.photon.utils.logCancel
 import java.net.SocketTimeoutException
 
 /**
  * Created by Vladimir Mikhalev 17.07.2017.
  */
 
-class CreateAlbumJob(private val request: NewAlbumReq)
+class AlbumCreateJob(private val request: NewAlbumReq)
     : Job(Params(JobPriority.HIGH)
-        .setGroupId(TAG)
-        .addTags(TAG + request.id)
+        .setGroupId(JobGroup.ALBUM)
+        .addTags(TAG + request.id, JobGroup.ALBUM + request.id)
         .requireNetwork()
         .persist()) {
 
     companion object {
-        const val TAG = "CreateAlbumJobTag"
+        const val TAG = "AlbumCreateJob"
     }
-
-    val tag = TAG + request.id
 
     override fun onAdded() {
         val dataManager = DaggerService.appComponent.dataManager()

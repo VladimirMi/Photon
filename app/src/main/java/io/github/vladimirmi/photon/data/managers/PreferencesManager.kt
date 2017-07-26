@@ -4,9 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import io.github.vladimirmi.photon.utils.Constants.KEY_LAST_UPDATE_PREFIX
-import io.github.vladimirmi.photon.utils.Constants.KEY_USER_ID
-import io.github.vladimirmi.photon.utils.Constants.KEY_USER_TOKEN
 import java.util.*
 
 /**
@@ -14,6 +11,12 @@ import java.util.*
  */
 
 class PreferencesManager(context: Context) {
+    companion object {
+        const val KEY_LAST_UPDATE_PREFIX = "KEY_LAST_UPDATE_"
+        const val KEY_USER_ID = "KEY_USER_ID"
+        const val KEY_USER_TOKEN = "KEY_USER_TOKEN"
+        const val KEY_FAV_ALBUM = "KEY_FAV_ALBUM"
+    }
 
     private val editor: SharedPreferences.Editor
     private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -22,7 +25,6 @@ class PreferencesManager(context: Context) {
         @SuppressLint("CommitPrefEdits")
         editor = sharedPreferences.edit()
     }
-
 
     fun getLastUpdate(name: String): String {
         return sharedPreferences.getString(KEY_LAST_UPDATE_PREFIX + name, Date(0).toString())
@@ -43,6 +45,11 @@ class PreferencesManager(context: Context) {
         editor.commit()
     }
 
+    fun saveFavAlbumId(id: String) {
+        editor.putString(KEY_FAV_ALBUM, id)
+        editor.commit()
+    }
+
     fun getUserId(): String {
         return sharedPreferences.getString(KEY_USER_ID, "")
     }
@@ -51,11 +58,14 @@ class PreferencesManager(context: Context) {
         return sharedPreferences.getString(KEY_USER_TOKEN, "")
     }
 
+    fun getUserFavAlbumId(): String {
+        return sharedPreferences.getString(KEY_FAV_ALBUM, "")
+    }
+
     fun clearUser() {
         editor.remove(KEY_USER_ID)
         editor.remove(KEY_USER_TOKEN)
         editor.commit()
     }
-
     fun isUserAuth() = !getUserId().isEmpty() && !getUserToken().isEmpty()
 }

@@ -2,12 +2,11 @@ package io.github.vladimirmi.photon.features.main
 
 import android.os.Parcelable
 import android.util.SparseArray
-import com.birbit.android.jobqueue.JobManager
 import dagger.Provides
-
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -39,8 +38,9 @@ class MainScreen(var updated: Int = 0) : BaseScreen<RootActivityComponent>() {
 
         @Provides
         @DaggerScope(MainScreen::class)
-        fun provideMainModel(dataManager: DataManager, jobManager: JobManager, cache: Cache): IMainModel {
-            return MainModel(dataManager, jobManager, cache)
+        fun provideMainModel(dataManager: DataManager, photocardJobQueue: PhotocardJobQueue,
+                             cache: Cache): IMainModel {
+            return MainModel(dataManager, photocardJobQueue, cache)
         }
 
         @Provides

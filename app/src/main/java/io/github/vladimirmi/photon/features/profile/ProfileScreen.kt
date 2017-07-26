@@ -1,10 +1,11 @@
 package io.github.vladimirmi.photon.features.profile
 
-import com.birbit.android.jobqueue.JobManager
 import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.jobs.queue.AlbumJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.ProfileJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -32,8 +33,9 @@ class ProfileScreen : BaseScreen<RootActivityComponent>() {
 
         @Provides
         @DaggerScope(ProfileScreen::class)
-        fun provideProfileModel(dataManager: DataManager, jobManager: JobManager, cache: Cache): IProfileModel {
-            return ProfileModel(dataManager, jobManager, cache)
+        fun provideProfileModel(dataManager: DataManager, albumJobQueue: AlbumJobQueue,
+                                profileJobQueue: ProfileJobQueue, cache: Cache): IProfileModel {
+            return ProfileModel(dataManager, albumJobQueue, profileJobQueue, cache)
         }
 
         @Provides

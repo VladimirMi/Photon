@@ -13,7 +13,9 @@ import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.LOAD
+import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ErrorSingleObserver
+import io.github.vladimirmi.photon.utils.JobStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 
@@ -69,7 +71,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         view.closeEditDialog()
         if (albumChange(albumReq)) {
             albumReq.id = album.id
-            compDisp.add(model.editAlbum(albumReq).subscribeWith(ErrorSingleObserver()))
+            compDisp.add(model.editAlbum(albumReq).subscribeWith(ErrorObserver()))
         }
     }
 
@@ -100,8 +102,8 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     fun delete() {
         compDisp.add(model.deleteAlbum(album.id)
-                .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                    override fun onSuccess(t: Unit) {
+                .subscribeWith(object : ErrorObserver<JobStatus>() {
+                    override fun onComplete() {
                         view.closeDeleteDialog()
                         Flow.get(view).goBack()
                     }

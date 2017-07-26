@@ -5,45 +5,42 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.schedulers.Schedulers
-import java.net.SocketTimeoutException
 import java.util.*
 
 /**
- * Created by Vladimir Mikhalev 20.07.2017.
+ * Created by Vladimir Mikhalev 18.07.2017.
  */
 
-class EditAlbumJob(private val albumReq: EditAlbumReq)
+
+class AlbumDeleteJob(private val albumId: String,
+                     private val skipNetworkPart: Boolean)
     : Job(Params(JobPriority.HIGH)
-        .addTags(TAG + albumReq.id)
+        .setGroupId(JobGroup.ALBUM)
+        .setSingleId(albumId)
         .requireNetwork()
         .persist()) {
 
     companion object {
-        const val TAG = "EditAlbumJobTag"
+        const val TAG = "AlbumDeleteJob"
     }
-
-    val tag = EditAlbumJob.TAG + albumReq.id
 
     override fun onAdded() {
         val dataManager = DaggerService.appComponent.dataManager()
-        val album = dataManager.getDetachedObjFromDb(Album::class.java, albumReq.id)!!.apply {
-            title = albumReq.title
-            description = albumReq.description
-        }
-        dataManager.saveToDB(album)
+        val cache = DaggerService.appComponent.cache()
+
+        cache.removeAlbum(albumId)
+        dataManager.removeFromDb(Album::class.java, albumId)
     }
 
     override fun onRun() {
+        if (skipNetworkPart) return
+        var error: Throwable? = null
         val dataManager = DaggerService.appComponent.dataManager()
 
-        var error: Throwable? = null
-        dataManager.editAlbum(albumReq)
-                .doOnNext { dataManager.saveToDB(it) }
+        dataManager.deleteAlbum(albumId)
                 .blockingSubscribe({}, { error = it })
 
         error?.let { throw it }
@@ -59,20 +56,13 @@ class EditAlbumJob(private val albumReq: EditAlbumReq)
     private fun updateAlbum() {
         val dataManager = DaggerService.appComponent.dataManager()
 
-        dataManager.getAlbumFromNet(albumReq.id, Date(0).toString())
+        dataManager.getAlbumFromNet(albumId, Date(0).toString())
+                .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
-                .subscribeWith(object : ErrorObserver<Album>() {
-                    override fun onNext(it: Album) {
-                        dataManager.saveToDB(it)
-                    }
-                })
+                .subscribeWith(ErrorObserver())
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return if (throwable is SocketTimeoutException) {
-            RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
-        } else {
-            RetryConstraint.CANCEL
-        }
+        return cancelOrWait(throwable, runCount)
     }
 }

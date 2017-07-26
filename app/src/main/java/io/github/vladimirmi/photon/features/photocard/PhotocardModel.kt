@@ -1,11 +1,6 @@
 package io.github.vladimirmi.photon.features.photocard
 
-import com.birbit.android.jobqueue.JobManager
-import com.birbit.android.jobqueue.TagConstraint
-import io.github.vladimirmi.photon.data.jobs.AddToFavoriteJob
-import io.github.vladimirmi.photon.data.jobs.DeleteFromFavoriteJob
-import io.github.vladimirmi.photon.data.jobs.singleCancelJobs
-import io.github.vladimirmi.photon.data.jobs.singleResultFor
+import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
@@ -15,7 +10,6 @@ import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
@@ -23,7 +17,9 @@ import java.util.*
  * Created by Vladimir Mikhalev 14.06.2017.
  */
 
-class PhotocardModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache) : IPhotocardModel {
+class PhotocardModel(val dataManager: DataManager,
+                     val photocardJobQueue: PhotocardJobQueue,
+                     val cache: Cache) : IPhotocardModel {
 
     override fun getUser(id: String): Observable<UserDto> {
         updateUser(id)
@@ -57,60 +53,29 @@ class PhotocardModel(val dataManager: DataManager, val jobManager: JobManager, v
                 .subscribeWith(ErrorObserver())
     }
 
-    override fun addToFavorite(id: String): Single<Unit> {
-        return jobManager.singleCancelJobs(TagConstraint.ANY, DeleteFromFavoriteJob.TAG + id)
-                .map { cancelResult ->
-                    if (cancelResult.cancelledJobs.isEmpty()) {
-                        AddToFavoriteJob(id, favAlbumId, skipNetworkPart = false)
-                    } else {
-                        AddToFavoriteJob(id, favAlbumId, skipNetworkPart = true)
-                    }
-                }
-                .doOnSuccess { jobManager.addJobInBackground(it) }
-                .flatMap { jobManager.singleResultFor(it) }
+    override fun addToFavorite(id: String): Observable<JobStatus> {
+        return photocardJobQueue.queueAddToFavoriteJob(id)
                 .ioToMain()
     }
 
-    override fun removeFromFavorite(id: String): Single<Unit> {
-        return jobManager.singleCancelJobs(TagConstraint.ANY, AddToFavoriteJob.TAG + id)
-                .map { cancelResult ->
-                    if (cancelResult.cancelledJobs.isEmpty()) {
-                        DeleteFromFavoriteJob(id, favAlbumId, skipNetworkPart = false)
-                    } else {
-                        DeleteFromFavoriteJob(id, favAlbumId, skipNetworkPart = true)
-                    }
-                }
-                .doOnSuccess { jobManager.addJobInBackground(it) }
-                .flatMap { jobManager.singleResultFor(it) }
+    override fun removeFromFavorite(id: String): Observable<JobStatus> {
+        return photocardJobQueue.queueDeleteFromFavoriteJob(id)
                 .ioToMain()
     }
 
 
     override fun isFavorite(id: String): Observable<Boolean> {
-        val favorite = getFavAlbum()
+        val favorite = dataManager.getObjectFromDb(Album::class.java, dataManager.getUserFavAlbumId())
                 .map { it.photocards.find { it.id == id } != null }
 
         return Observable.merge(Observable.just(checkIsFavorite(id)), favorite).ioToMain()
     }
 
-    private lateinit var favAlbumId: String
 
     private fun checkIsFavorite(id: String): Boolean {
         if (!dataManager.isUserAuth()) return false
         val favPhoto = cache.albums.find { it.isFavorite }
-                ?.also { favAlbumId = it.id }
                 ?.photocards?.find { it.id == id }
         return favPhoto?.let { true } ?: false
-    }
-
-    private fun getFavAlbum(): Observable<Album> {
-        val query = listOf(
-                Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()),
-                Query("isFavorite", RealmOperator.EQUALTO, true)
-        )
-        return dataManager.search(Album::class.java, query, "id")
-                .filter { it.isNotEmpty() }
-                .map { it[0] }
-                .doOnNext { favAlbumId = it.id }
     }
 }

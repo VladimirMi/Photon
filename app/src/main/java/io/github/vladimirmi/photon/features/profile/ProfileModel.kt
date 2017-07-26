@@ -1,11 +1,7 @@
 package io.github.vladimirmi.photon.features.profile
 
-import com.birbit.android.jobqueue.JobManager
-import com.birbit.android.jobqueue.TagConstraint
-import io.github.vladimirmi.photon.data.jobs.CreateAlbumJob
-import io.github.vladimirmi.photon.data.jobs.EditProfileJob
-import io.github.vladimirmi.photon.data.jobs.singleCancelJobs
-import io.github.vladimirmi.photon.data.jobs.singleResultFor
+import io.github.vladimirmi.photon.data.jobs.queue.AlbumJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.ProfileJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
@@ -16,11 +12,13 @@ import io.github.vladimirmi.photon.data.models.req.EditProfileReq
 import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
-class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache)
+class ProfileModel(val dataManager: DataManager,
+                   val albumJobQueue: AlbumJobQueue,
+                   val profileJobQueue: ProfileJobQueue,
+                   val cache: Cache)
     : IProfileModel {
 
     override fun isUserAuth(): Boolean {
@@ -53,23 +51,13 @@ class ProfileModel(val dataManager: DataManager, val jobManager: JobManager, val
                 .subscribeWith(ErrorObserver())
     }
 
-    override fun createAlbum(newAlbumReq: NewAlbumReq): Single<Unit> {
-        newAlbumReq.id = UUID.randomUUID().toString()
-        newAlbumReq.owner = dataManager.getProfileId()
-
-        val job = CreateAlbumJob(newAlbumReq)
-        jobManager.addJobInBackground(job)
-        return jobManager.singleResultFor(job)
+    override fun createAlbum(newAlbumReq: NewAlbumReq): Observable<JobStatus> {
+        return albumJobQueue.queueCreateJob(newAlbumReq)
                 .ioToMain()
     }
 
-
-    override fun editProfile(profileReq: EditProfileReq, loadAvatar: Boolean): Single<Unit> {
-        val job = EditProfileJob(profileReq, loadAvatar = loadAvatar)
-
-        return jobManager.singleCancelJobs(TagConstraint.ANY, job.tag)
-                .doOnSuccess { jobManager.addJobInBackground(job) }
-                .flatMap { jobManager.singleResultFor(job) }
+    override fun editProfile(profileReq: EditProfileReq): Observable<JobStatus> {
+        return profileJobQueue.queueEditJob(profileReq)
                 .ioToMain()
     }
 }

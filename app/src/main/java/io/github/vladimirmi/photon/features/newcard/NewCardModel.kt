@@ -1,15 +1,13 @@
 package io.github.vladimirmi.photon.features.newcard
 
-import com.birbit.android.jobqueue.JobManager
-import io.github.vladimirmi.photon.data.jobs.CreatePhotoJob
-import io.github.vladimirmi.photon.data.jobs.JobStatus
-import io.github.vladimirmi.photon.data.jobs.observableFor
+import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
+import io.github.vladimirmi.photon.utils.JobStatus
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
 import io.github.vladimirmi.photon.utils.ioToMain
@@ -17,7 +15,9 @@ import io.reactivex.Observable
 import io.realm.Sort
 import timber.log.Timber
 
-class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache) : INewCardModel {
+class NewCardModel(val dataManager: DataManager,
+                   val photocardJobQueue: PhotocardJobQueue,
+                   val cache: Cache) : INewCardModel {
     override var photoCard = Photocard()
 
     override fun addFilter(filter: Pair<String, String>) {
@@ -78,12 +78,8 @@ class NewCardModel(val dataManager: DataManager, val jobManager: JobManager, val
                     photoCard.owner = dataManager.getProfileId()
                     album.photocards.add(photoCard.withId())
                     dataManager.saveToDB(album)
-                    CreatePhotoJob(photoCard.id, photoCard.album)
                 }
-                .flatMap { job ->
-                    jobManager.addJobInBackground(job)
-                    jobManager.observableFor(job)
-                }
+                .flatMap { photocardJobQueue.queueCreateJob(photoCard.id, photoCard.album) }
                 .ioToMain()
     }
 }

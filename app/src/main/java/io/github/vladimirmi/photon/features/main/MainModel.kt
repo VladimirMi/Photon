@@ -1,12 +1,12 @@
 package io.github.vladimirmi.photon.features.main
 
-import com.birbit.android.jobqueue.JobManager
-import io.github.vladimirmi.photon.data.jobs.AddViewJob
+import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
+import io.github.vladimirmi.photon.utils.JobStatus
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
@@ -16,7 +16,9 @@ import io.realm.Sort
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class MainModel(val dataManager: DataManager, val jobManager: JobManager, val cache: Cache) : IMainModel {
+class MainModel(val dataManager: DataManager,
+                val photocardJobQueue: PhotocardJobQueue,
+                val cache: Cache) : IMainModel {
 
     var query = ArrayList<Query>()
     override var queryPage: SearchView.Page = SearchView.Page.TAGS
@@ -50,8 +52,9 @@ class MainModel(val dataManager: DataManager, val jobManager: JobManager, val ca
         queryPage = SearchView.Page.TAGS
     }
 
-    override fun addView(photocardId: String) {
-        jobManager.addJobInBackground(AddViewJob(photocardId))
+    override fun addView(photocardId: String): Observable<JobStatus> {
+        return photocardJobQueue.queueAddViewJob(photocardId)
+                .ioToMain()
     }
 
     override fun updatePhotocards(offset: Int, limit: Int): Observable<Unit> {

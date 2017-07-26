@@ -26,8 +26,12 @@ open class Photocard(
         @Ignore var album: String = ""
 ) : RealmObject(), Changeable {
 
+    companion object {
+        const val TEMP = "TEMP"
+    }
+
     fun withId(): Photocard {
-        if (id.isEmpty()) id = UUID.randomUUID().toString()
+        if (id.isEmpty()) id = TEMP + UUID.randomUUID().toString()
         filters.generateId()
         return this
     }
