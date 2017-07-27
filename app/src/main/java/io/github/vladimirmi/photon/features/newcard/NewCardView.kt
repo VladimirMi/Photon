@@ -74,7 +74,7 @@ class NewCardView(context: Context, attrs: AttributeSet)
 
     private fun initFiltersSection() {
         filterElements.forEach { view ->
-            if (view.filter.first != "filters.nuances" || view.filter.first != "filters.dish") {
+            if (view.filter.first != "filters.nuances" && view.filter.first != "filters.dish") {
                 view.radioMode = true
             }
             view.setAction(filterAction)

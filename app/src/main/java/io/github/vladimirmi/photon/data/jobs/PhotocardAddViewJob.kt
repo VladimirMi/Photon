@@ -17,9 +17,10 @@ import io.github.vladimirmi.photon.utils.logCancel
 class PhotocardAddViewJob(val photocardId: String,
                           val skipNetworkPart: Boolean = false,
                           val onlyNetworkPart: Boolean = false) :
-        Job(Params(JobPriority.HIGH)
+        Job(Params(JobPriority.LOW)
+                .setDelayMs(1000)
                 .setGroupId(JobGroup.PHOTOCARD)
-                .addTags(JobGroup.PHOTOCARD + photocardId)
+                .addTags(TAG + photocardId, JobGroup.PHOTOCARD + photocardId)
                 .requireNetwork()
                 .persist()) {
 

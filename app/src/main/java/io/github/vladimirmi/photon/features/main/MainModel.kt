@@ -58,7 +58,9 @@ class MainModel(val dataManager: DataManager,
     }
 
     override fun updatePhotocards(offset: Int, limit: Int): Observable<Unit> {
-        return dataManager.getPhotocardsFromNet(offset, limit)
+        return dataManager.isNetworkAvailable()
+                .filter { it }
+                .flatMap { dataManager.getPhotocardsFromNet(offset, limit) }
                 .map { it.forEach { dataManager.saveToDB(it) } }
                 .ioToMain()
     }

@@ -16,7 +16,7 @@ import java.util.*
 
 
 class AlbumDeleteJob(private val albumId: String,
-                     private val skipNetworkPart: Boolean)
+                     private val skipNetworkPart: Boolean = false)
     : Job(Params(JobPriority.HIGH)
         .setGroupId(JobGroup.ALBUM)
         .setSingleId(albumId)

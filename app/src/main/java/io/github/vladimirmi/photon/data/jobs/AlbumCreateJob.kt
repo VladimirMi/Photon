@@ -7,26 +7,24 @@ import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.JobGroup
-import io.github.vladimirmi.photon.utils.JobPriority
-import io.github.vladimirmi.photon.utils.logCancel
-import java.net.SocketTimeoutException
+import io.github.vladimirmi.photon.utils.*
 
 /**
  * Created by Vladimir Mikhalev 17.07.2017.
  */
 
-class AlbumCreateJob(private val request: NewAlbumReq)
+class AlbumCreateJob(val request: NewAlbumReq)
     : Job(Params(JobPriority.HIGH)
         .setGroupId(JobGroup.ALBUM)
         .addTags(TAG + request.id, JobGroup.ALBUM + request.id)
         .requireNetwork()
-        .persist()) {
+        .persist()), WithPayload {
 
     companion object {
         const val TAG = "AlbumCreateJob"
     }
+
+    override val payload = Payload<String>()
 
     override fun onAdded() {
         val dataManager = DaggerService.appComponent.dataManager()
@@ -39,14 +37,11 @@ class AlbumCreateJob(private val request: NewAlbumReq)
 
     override fun onRun() {
         val dataManager = DaggerService.appComponent.dataManager()
-        val cache = DaggerService.appComponent.cache()
         var error: Throwable? = null
 
         dataManager.createAlbum(request)
                 .doOnNext {
-                    dataManager.removeFromDb(Album::class.java, request.id)
-                    cache.removeAlbum(request.id)
-
+                    payload.value = it.id
                     val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
                     profile.albums.add(it)
                     dataManager.saveToDB(profile)
@@ -58,14 +53,18 @@ class AlbumCreateJob(private val request: NewAlbumReq)
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
+        if (throwable != null) {
+            removeTempAlbum()
+        }
+    }
+
+    fun removeTempAlbum() {
+        DaggerService.appComponent.dataManager().removeFromDb(Album::class.java, request.id)
+        DaggerService.appComponent.cache().removeAlbum(request.id)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return if (throwable is SocketTimeoutException) {
-            RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
-        } else {
-            RetryConstraint.CANCEL
-        }
+        return RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
     }
 
 }

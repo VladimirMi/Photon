@@ -16,8 +16,9 @@ import java.util.*
  */
 
 class AlbumEditJob(val request: EditAlbumReq,
-                   val skipNetworkPart: Boolean)
-    : Job(Params(JobPriority.MID)
+                   val skipNetworkPart: Boolean = false)
+    : Job(Params(JobPriority.LOW)
+        .setDelayMs(1000)
         .setGroupId(JobGroup.ALBUM)
         .addTags(TAG + request.id, JobGroup.ALBUM + request.id)
         .requireNetwork()

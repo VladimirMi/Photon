@@ -78,6 +78,7 @@ class PhotocardCreateJob(val photocardId: String,
 
     private fun removeTempPhotocard() {
         DaggerService.appComponent.dataManager().removeFromDb(Photocard::class.java, photocardId)
+        DaggerService.appComponent.cache().removePhoto(photocardId)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {

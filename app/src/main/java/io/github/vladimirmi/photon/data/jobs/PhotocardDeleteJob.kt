@@ -17,7 +17,7 @@ import java.util.*
 
 class PhotocardDeleteJob(private val photocardId: String,
                          private val skipNetworkPart: Boolean = false)
-    : Job(Params(JobPriority.MID)
+    : Job(Params(JobPriority.HIGH)
         .setSingleId(photocardId)
         .setGroupId(JobGroup.PHOTOCARD)
         .requireNetwork()

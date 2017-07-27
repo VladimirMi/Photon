@@ -23,7 +23,9 @@ class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel
     }
 
     private fun updateUser(id: String) {
-        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0))
+        dataManager.isNetworkAvailable()
+                .filter { it }
+                .flatMap { Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0)) }
                 .flatMap { dataManager.getUserFromNet(id, getUpdated(it)) }
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
@@ -32,7 +34,7 @@ class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel
 
     override fun getAlbums(ownerId: String): Observable<List<AlbumDto>> {
         val query = listOf(Query("owner", RealmOperator.EQUALTO, ownerId))
-        return dataManager.search(Album::class.java, query, sortBy = "id")
+        return dataManager.search(Album::class.java, query)
                 .map { cache.cacheAlbums(it) }
                 .ioToMain()
     }

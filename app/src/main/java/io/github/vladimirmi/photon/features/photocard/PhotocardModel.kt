@@ -30,7 +30,9 @@ class PhotocardModel(val dataManager: DataManager,
     }
 
     private fun updateUser(id: String) {
-        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0))
+        dataManager.isNetworkAvailable()
+                .filter { it }
+                .flatMap { Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0)) }
                 .flatMap { dataManager.getUserFromNet(id, getUpdated(it)) }
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
@@ -46,7 +48,9 @@ class PhotocardModel(val dataManager: DataManager,
     }
 
     private fun updatePhotocard(id: String, ownerId: String) {
-        Observable.just(dataManager.getDetachedObjFromDb(Photocard::class.java, id)?.updated ?: Date(0))
+        dataManager.isNetworkAvailable()
+                .filter { it }
+                .flatMap { Observable.just(dataManager.getDetachedObjFromDb(Photocard::class.java, id)?.updated ?: Date(0)) }
                 .flatMap { dataManager.getPhotocardFromNet(id, ownerId, getUpdated(it)) }
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())

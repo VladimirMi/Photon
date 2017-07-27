@@ -57,7 +57,7 @@ fun Context.getDisplayMetrics(): DisplayMetrics {
 
 @Suppress("UNCHECKED_CAST")
 inline fun <V : IView> IView.afterNetCheck(block: V.() -> Unit) {
-    val netAvail = DaggerService.appComponent.dataManager().isNetworkAvailable().blockingFirst()
+    val netAvail = DaggerService.appComponent.dataManager().checkNetAvail()
     if (netAvail) block(this as V) else showNetError()
 }
 

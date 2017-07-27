@@ -1,7 +1,10 @@
 package io.github.vladimirmi.photon.data.managers
 
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.support.v4.content.LocalBroadcastManager
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
@@ -14,10 +17,10 @@ import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
+import io.reactivex.disposables.Disposables
 import io.realm.RealmObject
 import io.realm.Sort
 import okhttp3.MultipartBody
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -192,14 +195,32 @@ constructor(private val restService: RestService,
 
     //endregion
 
-    //todo refactor on broadcast
-    fun isNetworkAvailable(): Observable<Boolean> {
-        return Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
-                .flatMap<Boolean> { _ ->
-                    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                    Observable.just(cm.activeNetworkInfo != null && cm.activeNetworkInfo.isConnectedOrConnecting)
+    fun checkNetAvail(): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return cm.activeNetworkInfo != null && cm.activeNetworkInfo.isConnected
+    }
+
+    val netAvailObs: Observable<Boolean> by lazy {
+        Observable.create<Boolean> { e ->
+            if (!e.isDisposed) e.onNext(checkNetAvail())
+
+            val receiver = object : NetworkChangeReceiver() {
+                override fun onReceive(context: Context?, intent: Intent?) {
+                    if (!e.isDisposed) e.onNext(checkNetAvail())
                 }
+            }
+            LocalBroadcastManager.getInstance(context).registerReceiver(receiver,
+                    IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
+
+            e.setDisposable(Disposables.fromRunnable {
+                LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver)
+            })
+        }
                 .distinctUntilChanged()
+    }
+
+    fun isNetworkAvailable(): Observable<Boolean> {
+        return netAvailObs
     }
 }
 

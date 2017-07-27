@@ -128,7 +128,8 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun clearToolbar() {
         toolBarMenuItems.clear()
-        supportActionBar?.invalidateOptionsMenu()
+        popups.clear()
+        toolbar.menu.clear()
     }
 
     override fun setBottomMenuVisible(visible: Boolean) {
@@ -153,7 +154,6 @@ class RootActivity : FlowActivity(), IRootView {
 
     override fun enableBackNavigation(backNavEnabled: Boolean) {
         supportActionBar?.setDisplayHomeAsUpEnabled(backNavEnabled)
-        supportActionBar
     }
 
     override fun enableTabs(enabled: Boolean) {
@@ -177,14 +177,13 @@ class RootActivity : FlowActivity(), IRootView {
     }
 
     override fun setMenuItems(menuItems: List<MenuItemHolder>) {
+        toolBarMenuItems.clear()
         toolBarMenuItems.addAll(menuItems)
         invalidateOptionsMenu()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.clear()
-        popups.clear()
-        if (!toolBarMenuItems.isEmpty()) {
+        if (toolBarMenuItems.isNotEmpty()) {
             for (menuItemHolder in toolBarMenuItems) {
                 val item = menu.add(menuItemHolder.itemTitle)
                 if (menuItemHolder.hasPopupMenu()) {

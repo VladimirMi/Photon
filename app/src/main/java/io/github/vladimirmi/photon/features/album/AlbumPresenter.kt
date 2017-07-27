@@ -8,6 +8,7 @@ import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
+import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
@@ -33,7 +34,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
             R.id.add_photocard -> addPhotocard()
         }
     }
-    private val submitAction: (MenuItem) -> Unit = { submit() }
+    private val submitAction: (MenuItem) -> Unit = { submitDeletePhotos() }
 
     override fun initToolbar() {
         val builder = rootPresenter.getNewToolbarBuilder()
@@ -75,10 +76,15 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         }
     }
 
-    fun submit() {
+    fun submitDeletePhotos() {
         if (photosForDelete.size > 0) {
             compDisp.add(model.removePhotos(photosForDelete, album)
-                    .subscribeWith(ErrorSingleObserver()))
+                    .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                        override fun onError(e: Throwable) {
+                            if (e is ApiError) view.showError(e.errorResId)
+                            super.onError(e)
+                        }
+                    }))
             photosForDelete.clear()
         }
         setEditable(false)
@@ -103,9 +109,14 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     fun delete() {
         compDisp.add(model.deleteAlbum(album.id)
                 .subscribeWith(object : ErrorObserver<JobStatus>() {
-                    override fun onComplete() {
+                    override fun onNext(it: JobStatus) {
                         view.closeDeleteDialog()
                         Flow.get(view).goBack()
+                    }
+
+                    override fun onError(e: Throwable) {
+                        if (e is ApiError) view.showError(e.errorResId)
+                        super.onError(e)
                     }
                 }))
     }

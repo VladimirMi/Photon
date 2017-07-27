@@ -40,5 +40,5 @@ class RootModel(private val dataManager: DataManager) : IRootModel {
         dataManager.saveUserFavAlbumId(user.albums.find { it.isFavorite }!!.id)
     }
 
-    override fun isNetAvail(): Boolean = dataManager.isNetworkAvailable().blockingFirst()
+    override fun isNetAvail(): Boolean = dataManager.checkNetAvail()
 }

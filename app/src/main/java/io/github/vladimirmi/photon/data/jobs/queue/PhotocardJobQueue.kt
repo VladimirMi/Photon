@@ -77,7 +77,6 @@ class PhotocardJobQueue(private val jobManager: JobManager, private val dataMana
 
         return jobManager.singleCancelJobs(TagConstraint.ANY, PhotocardAddToFavoriteJob.TAG + id)
                 .map {
-
                     if (photocardIsTemp(id) || it.cancelledJobs.isNotEmpty()) {
                         Timber.e("queueDeleteFromFavoriteJob: ")
                         PhotocardDeleteFromFavoriteJob(id, favAlbumId, skipNetworkPart = true)
@@ -105,7 +104,8 @@ class PhotocardJobQueue(private val jobManager: JobManager, private val dataMana
         return jobManager.singleCancelJobs(TagConstraint.ANY, JobGroup.PHOTOCARD + tempId)
                 .flatMapObservable {
                     Timber.e("substituteTempJobs: ${it.cancelledJobs}")
-                    Observable.fromIterable(it.cancelledJobs)
+                    Timber.e("substituteTempJobs: ${it.failedToCancel}")
+                    Observable.fromIterable(it.cancelledJobs + it.failedToCancel)
                 }
                 .map { it.tags?.let { handleCancelledTags(it, tempId, newId) } ?: Unit }
     }
@@ -115,10 +115,13 @@ class PhotocardJobQueue(private val jobManager: JobManager, private val dataMana
         Timber.e("handleCancelledTags: $tags, $tempId, $newId")
         when {
             tags.contains(PhotocardAddViewJob.TAG + tempId) -> queueAddViewJob(newId)
+                    .subscribeWith(ErrorObserver<JobStatus>())
 
             tags.contains(PhotocardAddToFavoriteJob.TAG + tempId) -> queueAddToFavoriteJob(newId)
+                    .subscribeWith(ErrorObserver<JobStatus>())
 
             tags.contains(PhotocardDeleteFromFavoriteJob.TAG + tempId) -> queueDeleteFromFavoriteJob(newId)
+                    .subscribeWith(ErrorObserver<JobStatus>())
         }
     }
 

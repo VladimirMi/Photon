@@ -37,14 +37,16 @@ class ProfileModel(val dataManager: DataManager,
 
     override fun getAlbums(): Observable<List<AlbumDto>> {
         val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
-        val albums = dataManager.search(Album::class.java, query, sortBy = "id")
+        val albums = dataManager.search(Album::class.java, query)
                 .map { cache.cacheAlbums(it) }
 
         return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
     }
 
     private fun updateUser(id: String) {
-        Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0))
+        dataManager.isNetworkAvailable()
+                .filter { it }
+                .flatMap { Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0)) }
                 .flatMap { dataManager.getUserFromNet(id, getUpdated(it)) }
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())

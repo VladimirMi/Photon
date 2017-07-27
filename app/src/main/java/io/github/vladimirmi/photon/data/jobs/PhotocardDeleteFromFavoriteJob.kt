@@ -19,7 +19,8 @@ class PhotocardDeleteFromFavoriteJob(val photocardId: String,
                                      val favAlbumId: String,
                                      val skipNetworkPart: Boolean = false,
                                      val onlyNetworkPart: Boolean = false)
-    : Job(Params(JobPriority.HIGH)
+    : Job(Params(JobPriority.MID)
+        .setDelayMs(1000)
         .setGroupId(JobGroup.PHOTOCARD)
         .addTags(TAG + photocardId, JobGroup.PHOTOCARD + photocardId)
         .requireNetwork()

@@ -50,7 +50,6 @@ class ToolbarBuilder(private val rootView: IRootView) {
     }
 
     fun build() {
-        rootView.clearToolbar()
         rootView.setToolbarVisible(isToolbarVisible)
         rootView.setToolbarTitle(toolbarTitleId)
         rootView.enableBackNavigation(backNavEnabled)

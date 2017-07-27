@@ -138,13 +138,14 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     fun loadMore(page: Int, limit: Int) {
         Timber.e("loadMore: offset ${page * limit} limit $limit")
-        model.updatePhotocards(page * limit, limit)
+        compDisp.add(model.updatePhotocards(page * limit, limit)
                 .subscribeWith(object : ErrorObserver<Unit>() {
                     override fun onComplete() {
                         updated += limit
                         resubscribeCards()
                     }
                 })
+        )
     }
 
     private fun resubscribeCards() {

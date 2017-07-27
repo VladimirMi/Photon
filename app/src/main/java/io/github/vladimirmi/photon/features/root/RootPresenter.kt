@@ -13,6 +13,7 @@ import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.reactivex.Observable
+import mortar.MortarScope
 import mortar.Presenter
 import mortar.bundler.BundleService
 import java.io.File
@@ -29,6 +30,10 @@ class RootPresenter(val model: IRootModel) :
 
     override fun extractBundleService(view: IRootView?): BundleService {
         return BundleService.getBundleService(view as Context)
+    }
+
+    override fun onEnterScope(scope: MortarScope?) {
+        super.onEnterScope(scope)
     }
 
     fun hasActiveView() = hasView()
