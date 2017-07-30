@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            style="@style/CustomText.Black.Title"
+            android:layout_marginTop="0dp"
+            android:text="@string/newcard_album_title"
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/album_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </LinearLayout>
+</io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumView>

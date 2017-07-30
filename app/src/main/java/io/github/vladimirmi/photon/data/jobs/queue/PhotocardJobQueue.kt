@@ -19,7 +19,7 @@ class PhotocardJobQueue(private val jobManager: JobManager, private val dataMana
     fun queueCreateJob(id: String, albumId: String): Observable<JobStatus> {
         Timber.e("queueCreateJob: ")
         val job = PhotocardCreateJob(id, albumId)
-        jobManager.addJobInBackground(job)
+//        jobManager.addJobInBackground(job)
         syncPhotocardJobsAfter(job)
         return jobManager.observableFor(job)
     }

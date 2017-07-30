@@ -33,7 +33,7 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
 
     lateinit var flow: Flow
     private val dm = DaggerService.appComponent.dataManager()
-    var currentItem = MAIN
+    var currentItem = LOAD
 
     val historyMap = hashMapOf(MAIN to History.single(SplashScreen()),
             PROFILE to History.single(ProfileScreen()),

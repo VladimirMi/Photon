@@ -46,11 +46,11 @@ class CardAdapter(private val cardAction: (PhotocardDto) -> Unit, private val hi
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_photocard, parent, false)
         if (hideInfo) view.info.visibility = GONE
-        val lp = view.layoutParams
-        val spanCount = (((parent as RecyclerView).layoutManager) as GridLayoutManager).spanCount
-        lp.width = parent.context.getDisplayMetrics().widthPixels / spanCount
-        lp.height = lp.width
-        view.layoutParams = lp
+        view.layoutParams = view.layoutParams.apply {
+            val spanCount = (((parent as RecyclerView).layoutManager) as GridLayoutManager).spanCount
+            width = parent.context.getDisplayMetrics().widthPixels / spanCount
+            height = width
+        }
         return CardViewHolder(view, cardAction)
     }
 

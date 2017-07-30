@@ -11,6 +11,12 @@ import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.di.DaggerScope
+import io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumPresenter
+import io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumView
+import io.github.vladimirmi.photon.features.newcard.info.NewCardInfoPresenter
+import io.github.vladimirmi.photon.features.newcard.info.NewCardInfoView
+import io.github.vladimirmi.photon.features.newcard.param.NewCardParamPresenter
+import io.github.vladimirmi.photon.features.newcard.param.NewCardParamView
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
 
@@ -41,8 +47,30 @@ class NewCardScreen(var album: AlbumDto? = null) : BaseScreen<RootActivityCompon
 
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter): NewCardPresenter {
+        fun provideNewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
+                : NewCardPresenter {
             return NewCardPresenter(model, rootPresenter)
+        }
+
+        @Provides
+        @DaggerScope(NewCardScreen::class)
+        fun provideNewCardInfoPresenter(model: INewCardModel, rootPresenter: RootPresenter)
+                : NewCardInfoPresenter {
+            return NewCardInfoPresenter(model, rootPresenter)
+        }
+
+        @Provides
+        @DaggerScope(NewCardScreen::class)
+        fun provideNewCardParamPresenter(model: INewCardModel, rootPresenter: RootPresenter)
+                : NewCardParamPresenter {
+            return NewCardParamPresenter(model, rootPresenter)
+        }
+
+        @Provides
+        @DaggerScope(NewCardScreen::class)
+        fun provideNewCardAlbumPresenter(model: INewCardModel, rootPresenter: RootPresenter)
+                : NewCardAlbumPresenter {
+            return NewCardAlbumPresenter(model, rootPresenter)
         }
     }
 
@@ -56,6 +84,9 @@ class NewCardScreen(var album: AlbumDto? = null) : BaseScreen<RootActivityCompon
         }
 
         fun inject(newCardView: NewCardView)
+        fun inject(newCardInfoView: NewCardInfoView)
+        fun inject(newCardParamView: NewCardParamView)
+        fun inject(newCardAlbumView: NewCardAlbumView)
     }
     //endregion
 }

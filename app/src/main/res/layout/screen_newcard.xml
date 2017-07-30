@@ -5,20 +5,9 @@
     android:layout_height="match_parent"
     >
 
-    <include
-        layout="@layout/view_choose"
-        />
+    <include layout="@layout/view_choose"/>
 
-    <ScrollView
-        android:id="@+id/new_card_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:isScrollContainer="false"
-        >
-
-        <include layout="@layout/view_new_card"/>
-    </ScrollView>
+    <include layout="@layout/view_newcard"/>
 
 
 </io.github.vladimirmi.photon.features.newcard.NewCardView>

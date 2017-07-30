@@ -129,6 +129,7 @@
     <string name="album_delete_success">Альбом успешно удален</string>
 
     <string name="newcard_choose">Выберите фотокарточку\nиз галлереи и добавьте\nк вашим альбомам</string>
+    <string name="newcard_pager_header" formatted="false">Шаг %d из %d</string>
     <string name="newcard_name_hint">Название фотографии</string>
     <string name="newcard_name_title">Укажите название фотографии</string>
     <string name="newcard_tag_title">Укажите теги</string>

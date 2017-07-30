@@ -10,7 +10,6 @@ import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
-import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -19,10 +18,8 @@ import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.JobStatus
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
+import timber.log.Timber
 import java.io.File
-import java.util.concurrent.TimeUnit
 
 
 class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
@@ -32,26 +29,21 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     private var startAction: (() -> Unit)? = null
 
     override fun initToolbar() {
-        rootPresenter.getNewToolbarBuilder().build()
+        rootPresenter.getNewToolbarBuilder()
+                .build()
     }
 
     override fun initView(view: NewCardView) {
         startAction?.invoke()
-        Flow.getKey<NewCardScreen>(view)?.album?.let {
-            returnTo = it
-            setAlbum(it)
-        }
-        compDisp.add(subscribeOnTitleField())
-        compDisp.add(subscribeOnTagField())
-        compDisp.add(subscribeOnAlbums())
 
-        view.setTags(model.photoCard.tags.map { it.value })
-
-        chooseWhatShow()
+//        chooseWhatShow()
+        view.showPhotoParams()
+        Timber.e("initView: ${model.screenInfo.currentPage}")
+        view.changePage(model.screenInfo.currentPage)
     }
 
     private fun chooseWhatShow() {
-        if (model.photoCard.photo.isNotEmpty()) {
+        if (model.screenInfo.photo.isNotEmpty()) {
             view.showPhotoParams()
         } else {
             view.showPhotoChoose()
@@ -59,7 +51,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     fun onBackPressed(): Boolean {
-        if (model.photoCard.photo.isNotEmpty()) {
+        if (model.screenInfo.photo.isNotEmpty()) {
             clearPhotocard()
             return true
         }
@@ -79,43 +71,6 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
         }.build()
         rootPresenter.bottomHistory.historyMap[PROFILE] = newHistory
         rootPresenter.navigateTo(PROFILE)
-    }
-
-    private fun subscribeOnTitleField(): Disposable {
-        return view.nameObs
-                .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
-                .subscribe { model.photoCard.title = it.toString() }
-    }
-
-    private fun subscribeOnTagField(): Disposable {
-        return view.tagObs.doOnNext { view.setTagActionIcon(it.isNotEmpty()) }
-                .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
-                .flatMap { model.searchTag(it.toString()) }
-                .subscribe { view.setTagSuggestions(it) }
-    }
-
-    private fun subscribeOnAlbums(): Disposable {
-        return model.getAlbums()
-                .subscribeWith(object : ErrorObserver<List<AlbumDto>>() {
-                    override fun onNext(it: List<AlbumDto>) {
-                        view.setAlbums(it)
-                    }
-                })
-    }
-
-    fun addFilter(filter: Pair<String, String>) = model.addFilter(filter)
-
-    fun removeFilter(filter: Pair<String, String>) = model.removeFilter(filter)
-
-    fun saveTag(tag: String) {
-        model.addTag(tag)
-        view.setTags(model.photoCard.tags.map { it.value })
-    }
-
-    fun setAlbum(album: AlbumDto) {
-        model.photoCard.album = album.id
-        view.selectAlbum(album.id)
-        if (returnTo != null) returnTo = album
     }
 
     fun savePhotocard() {
@@ -139,18 +94,20 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     private fun checkCanSave(): Boolean {
-        if (model.photoCard.title.isEmpty()) {
-            view.showError(R.string.newcard_err_title)
-            return false
-        } else if (model.photoCard.album.isEmpty()) {
-            view.showError(R.string.newcard_err_album)
-            return false
+        fun pageIsValid(page: Page): Boolean {
+            return model.getPageError(page)?.let { errorId ->
+                view.changePage(page)
+                view.showError(errorId)
+                false
+            } ?: true
         }
-        return true
+
+        if (!pageIsValid(model.screenInfo.currentPage)) return false
+        return Page.values().any { pageIsValid(it) }
     }
 
     fun clearPhotocard() {
-        model.photoCard = Photocard()
+        model.screenInfo = NewCardScreenInfo()
         view.clearView()
         chooseWhatShow()
     }
@@ -203,11 +160,16 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
         }
 
         if (fileSize != null && fileSize < limit) {
-            model.photoCard.photo = uri.toString()
+            model.screenInfo.photo = uri.toString()
             startAction = null
         } else {
             startAction = { view.showError(R.string.message_err_file_size, AppConfig.IMAGE_SIZE_LIMIT) }
         }
+    }
+
+    fun saveCurrentPage(page: Page) {
+        Timber.e("saveCurrentPage: $page")
+        model.screenInfo.currentPage = page
     }
 }
 

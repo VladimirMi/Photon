@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.features.newcard
 
+import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
@@ -18,7 +19,8 @@ import timber.log.Timber
 class NewCardModel(val dataManager: DataManager,
                    val photocardJobQueue: PhotocardJobQueue,
                    val cache: Cache) : INewCardModel {
-    override var photoCard = Photocard()
+
+    override var screenInfo = NewCardScreenInfo()
 
     override fun addFilter(filter: Pair<String, String>) {
         setFilterField(filter.first, filter.second)
@@ -31,17 +33,17 @@ class NewCardModel(val dataManager: DataManager,
     private fun setFilterField(name: String, value: String, remove: Boolean = false) {
         Timber.e("setFilterField: with $name to $value, remove = $remove")
         when (name) {
-            "filters.dish" -> photoCard.filters.dish = if (remove) "" else value
-            "filters.decor" -> photoCard.filters.decor = if (remove) "" else value
-            "filters.light" -> photoCard.filters.light = if (remove) "" else value
-            "filters.lightDirection" -> photoCard.filters.lightDirection = if (remove) "" else value
-            "filters.lightSource" -> photoCard.filters.lightSource = if (remove) "" else value
-            "filters.temperature" -> photoCard.filters.temperature = if (remove) "" else value
+            "filters.dish" -> screenInfo.filter.dish = if (remove) "" else value
+            "filters.decor" -> screenInfo.filter.decor = if (remove) "" else value
+            "filters.light" -> screenInfo.filter.light = if (remove) "" else value
+            "filters.lightDirection" -> screenInfo.filter.lightDirection = if (remove) "" else value
+            "filters.lightSource" -> screenInfo.filter.lightSource = if (remove) "" else value
+            "filters.temperature" -> screenInfo.filter.temperature = if (remove) "" else value
             "filters.nuances" -> {
-                val values = photoCard.filters.nuances.split(", ").toMutableList()
+                val values = screenInfo.filter.nuances.split(", ").toMutableList()
                 values.removeAll { it.isEmpty() }
                 if (remove) values.remove(value) else values.add(value)
-                photoCard.filters.nuances = values.joinToString()
+                screenInfo.filter.nuances = values.joinToString()
             }
         }
     }
@@ -55,8 +57,8 @@ class NewCardModel(val dataManager: DataManager,
     }
 
     override fun addTag(tag: String) {
-        if (photoCard.tags.count { it.value == tag } == 0) {
-            photoCard.tags.add(Tag(tag))
+        if (!screenInfo.tags.contains(tag)) {
+            screenInfo.tags.add(tag)
         }
     }
 
@@ -68,18 +70,27 @@ class NewCardModel(val dataManager: DataManager,
         return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
     }
 
-    override fun savePhotoUri(uri: String) {
-        photoCard.photo = uri
+    override fun getPageError(page: Page): Int? {
+        return when (page) {
+            Page.INFO -> if (screenInfo.title.isBlank()) R.string.newcard_err_title else null
+            Page.PARAMS -> null
+            Page.ALBUMS -> if (screenInfo.album.isBlank()) R.string.newcard_err_album else null
+        }
     }
 
     override fun uploadPhotocard(): Observable<JobStatus> {
-        return Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, photoCard.album))
+        val photoCard = Photocard().withId().apply {
+            title = screenInfo.title
+            tags.addAll(screenInfo.tags.map { Tag(it) })
+            filters = screenInfo.filter
+            owner = dataManager.getProfileId()
+        }
+        return Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, screenInfo.album))
                 .map { album ->
-                    photoCard.owner = dataManager.getProfileId()
-                    album.photocards.add(photoCard.withId())
+                    album.photocards.add(photoCard)
                     dataManager.saveToDB(album)
                 }
-                .flatMap { photocardJobQueue.queueCreateJob(photoCard.id, photoCard.album) }
+                .flatMap { photocardJobQueue.queueCreateJob(photoCard.id, screenInfo.album) }
                 .ioToMain()
     }
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
+import java.lang.IllegalStateException
 
 /**
  * Developer Vladimir Mikhalev, 06.06.2017.
@@ -13,23 +14,22 @@ import io.github.vladimirmi.photon.core.BaseView
 
 class SearchPagerAdapter(private val tabTitles: Array<String>) : PagerAdapter() {
 
-    override fun isViewFromObject(view: View?, `object`: Any?): Boolean = view?.equals(`object`) ?: false
+    override fun isViewFromObject(view: View?, `object`: Any?) = view?.equals(`object`) ?: false
 
-    override fun getCount(): Int = 2
+    override fun getCount() = 2
 
     override fun getPageTitle(position: Int): CharSequence = tabTitles[position]
 
     override fun destroyItem(container: ViewGroup?, position: Int, `object`: Any?) {
-        container?.removeAllViews()
-        if (`object` is BaseView<*, *>) `object`.onViewDestroyed(false)
+        container?.removeView(`object` as? View)
+        (`object` as? BaseView<*, *>)?.onViewDestroyed(false)
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val view: View
-        if (position == 0) {
-            view = LayoutInflater.from(container.context).inflate(R.layout.view_search, container, false)
-        } else {
-            view = LayoutInflater.from(container.context).inflate(R.layout.view_filters, container, false)
+        val view = when (position) {
+            0 -> LayoutInflater.from(container.context).inflate(R.layout.view_search, container, false)
+            1 -> LayoutInflater.from(container.context).inflate(R.layout.view_filters, container, false)
+            else -> throw IllegalStateException("No view for given position found")
         }
         container.addView(view)
         (view as BaseView<*, *>).onViewRestored()

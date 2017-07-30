@@ -108,9 +108,9 @@ class PullToZoomWrapper(context: Context, attrs: AttributeSet)
     private fun pullTo(y: Float) {
         val delta = Math.round(Math.max(y - initialY, 0f) / FRICTION)
 
-        val lp = headerContainer.layoutParams
-        lp.height = headerHeight + delta
-        headerContainer.layoutParams = lp
+        headerContainer.layoutParams = headerContainer.layoutParams.apply {
+            height = headerHeight + delta
+        }
     }
 
     private fun restoreInitialSize() {
@@ -120,9 +120,9 @@ class PullToZoomWrapper(context: Context, attrs: AttributeSet)
                 .interpolator = FastOutSlowInInterpolator()
         TransitionManager.beginDelayedTransition(this, set)
 
-        val lp = headerContainer.layoutParams
-        lp.height = headerHeight
-        headerContainer.layoutParams = lp
+        headerContainer.layoutParams = headerContainer.layoutParams.apply {
+            height = headerHeight
+        }
     }
 }
 

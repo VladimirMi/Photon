@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.features.main
 
 import android.support.v7.util.DiffUtil
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -47,10 +48,11 @@ class AlbumAdapter(val albumAction: (AlbumDto) -> Unit)
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_album, parent, false)
         if (authorMode) view.likesNViews.visibility = GONE else view.menu_share.visibility = GONE
-        val lp = view.layoutParams
-        lp.width = parent.context.getDisplayMetrics().widthPixels / 2
-        lp.height = lp.width
-        view.layoutParams = lp
+        view.layoutParams = view.layoutParams.apply {
+            val spanCount = (((parent as RecyclerView).layoutManager) as GridLayoutManager).spanCount
+            width = parent.context.getDisplayMetrics().widthPixels / spanCount
+            height = width
+        }
         return AlbumViewHolder(view, albumAction)
     }
 

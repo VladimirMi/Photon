@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.github.vladimirmi.photon.features.newcard.param.NewCardParamView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                style="@style/CustomText.Black.Title"
+                android:layout_marginTop="0dp"
+                android:text="@string/newcard_param_title"
+                />
+
+            <include layout="@layout/view_filters_dishes"/>
+
+            <include layout="@layout/view_filters_nuances"/>
+
+            <include layout="@layout/view_filters_decor"/>
+
+            <include layout="@layout/view_filters_temp"/>
+
+            <include layout="@layout/view_filters_light"/>
+
+            <include layout="@layout/view_filters_light_dir"/>
+
+            <include layout="@layout/view_filters_light_src"/>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</io.github.vladimirmi.photon.features.newcard.param.NewCardParamView>
