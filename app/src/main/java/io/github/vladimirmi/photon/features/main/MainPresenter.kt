@@ -108,7 +108,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                     override fun onError(e: Throwable) {
                         if (e is ApiError) {
                             when (e.statusCode) {
-                                404 -> view.showError(R.string.message_api_err_auth)
+                                404 -> view.showError(R.string.message_api_err_auth_login)
+                                403 -> view.showError(R.string.message_api_err_auth_password)
                                 else -> view.showError(e.errorResId)
                             }
                         } else {

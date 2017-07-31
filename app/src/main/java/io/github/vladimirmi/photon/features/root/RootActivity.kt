@@ -1,6 +1,5 @@
 package io.github.vladimirmi.photon.features.root
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -8,10 +7,10 @@ import android.provider.Settings
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
-import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.view.menu.MenuBuilder
 import android.support.v7.view.menu.MenuPopupHelper
+import android.support.v7.widget.AppCompatDrawableManager
 import android.support.v7.widget.PopupMenu
 import android.view.LayoutInflater
 import android.view.Menu
@@ -87,24 +86,9 @@ class RootActivity : FlowActivity(), IRootView {
 
     //region =============== IRootView ==============
 
-    private var progressDialog: ProgressDialog? = null
+    override fun showLoading() = loading.show()
 
-    override fun showLoading() {
-        hideLoading()
-        progressDialog = ProgressDialog(this).apply {
-            setMessage(this@RootActivity.getString(R.string.message_wait))
-            isIndeterminate = true
-            setCancelable(false)
-            show()
-        }
-    }
-
-    override fun hideLoading() {
-        if (progressDialog != null) {
-            progressDialog?.apply { hide(); dismiss() }
-            progressDialog = null
-        }
-    }
+    override fun hideLoading() = loading.hide()
 
     override fun showPermissionSnackBar() {
         Snackbar.make(root_container, R.string.message_permission_need, Snackbar.LENGTH_LONG)
@@ -203,7 +187,7 @@ class RootActivity : FlowActivity(), IRootView {
 
     private fun configurePopupFor(item: MenuItem, menuItemHolder: MenuItemHolder) {
         val actionView = LayoutInflater.from(this).inflate(R.layout.view_menu_item, toolbar, false)
-        actionView.icon.setImageDrawable(ContextCompat.getDrawable(this, menuItemHolder.iconResId))
+        actionView.icon.setImageDrawable(AppCompatDrawableManager.get().getDrawable(this, menuItemHolder.iconResId))
         item.actionView = actionView
 
         val popup = PopupMenu(this, actionView)

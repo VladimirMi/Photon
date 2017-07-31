@@ -33,7 +33,7 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
 
     lateinit var flow: Flow
     private val dm = DaggerService.appComponent.dataManager()
-    var currentItem = LOAD
+    var currentItem = MAIN
 
     val historyMap = hashMapOf(MAIN to History.single(SplashScreen()),
             PROFILE to History.single(ProfileScreen()),
@@ -43,7 +43,12 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
         currentItem = to
         val direction = getDirection(from, to)
         if (saveHistory) historyMap[from] = flow.history
+        handleIsAuth(to)
 
+        flow.setHistory(historyMap[to]!!, direction)
+    }
+
+    private fun handleIsAuth(to: BottomItem) {
         if (dm.isUserAuth()) {
             val top = historyMap[to]!!.top<BaseScreen<*>>()
             if (top is AuthScreen) {
@@ -53,8 +58,6 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
         } else {
             if (to == PROFILE || to == LOAD) historyMap[to] = History.single(AuthScreen())
         }
-
-        flow.setHistory(historyMap[to]!!, direction)
     }
 
     private fun getDirection(from: BottomItem, to: BottomItem): Direction {

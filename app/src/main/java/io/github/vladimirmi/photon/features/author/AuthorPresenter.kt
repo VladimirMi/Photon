@@ -47,7 +47,7 @@ class AuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter)
     }
 
     fun showAlbum(album: AlbumDto) {
-        Flow.get(view).set(AlbumScreen(album))
+        Flow.get(view).set(AlbumScreen(album.id))
     }
 }
 

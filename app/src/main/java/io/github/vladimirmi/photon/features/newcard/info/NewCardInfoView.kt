@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.features.newcard.info
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.util.AttributeSet
+import com.jakewharton.rxbinding2.view.focusChanges
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
@@ -10,8 +11,11 @@ import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreenInfo
 import io.github.vladimirmi.photon.features.search.tags.StringAdapter
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.view_newcard_name.view.*
+import kotlinx.android.synthetic.main.view_newcard_step1.view.*
 import kotlinx.android.synthetic.main.view_newcard_tags.view.*
+import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 28.07.2017.
@@ -38,6 +42,8 @@ class NewCardInfoView(context: Context, attrs: AttributeSet)
     val nameObs by lazy { nameTx.textChanges() }
     val tagObs by lazy { tagTx.textChanges() }
 
+    private lateinit var disposable: Disposable
+
     override fun initDagger(context: Context) {
         DaggerService.getComponent<NewCardScreen.Component>(context).inject(this)
     }
@@ -46,6 +52,9 @@ class NewCardInfoView(context: Context, attrs: AttributeSet)
         clearNameIcon.setOnClickListener { nameTx.setText("") }
         clearTagIcon.setOnClickListener { tagTx.setText("") }
         initTagSection()
+        disposable = tagTx.focusChanges()
+                .filter { it }
+                .subscribe { scroll_view.smoothScrollTo(0, tags_title.y.toInt()) }
     }
 
     private fun initTagSection() {
@@ -64,18 +73,23 @@ class NewCardInfoView(context: Context, attrs: AttributeSet)
         suggestionTagList.adapter = suggestTagAdapter
     }
 
+    override fun onViewDestroyed(removedByFlow: Boolean) {
+        super.onViewDestroyed(removedByFlow)
+        disposable.dispose()
+    }
+
     fun setTagActionIcon(submit: Boolean) {
         tagActionIcon.setImageResource(if (submit) R.drawable.ic_action_submit else R.drawable.ic_action_back_arrow)
     }
 
     fun setTagSuggestions(tags: List<String>) {
         suggestTagAdapter.updateData(tags)
-//        scroll_view.fullScroll(ScrollView.FOCUS_DOWN)
     }
 
     fun restoreFromModel(newCardScreenInfo: NewCardScreenInfo) {
         nameTx.setText(newCardScreenInfo.title)
         tagTx.setText(newCardScreenInfo.tag)
+        Timber.e("restoreFromModel: ${newCardScreenInfo.tags}")
         tagsAdapter.updateData(newCardScreenInfo.tags)
     }
 }

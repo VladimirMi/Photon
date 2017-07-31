@@ -45,7 +45,7 @@ fun ImageView.setRoundAvatarWithBorder(path: String?, border: Float = 0f) {
             .into(this)
 }
 
-val Context.dp get() = getDisplayMetrics().density
+val Context.dp get() = getDisplayMetrics().density //todo to int?
 
 val Context.sp get() = getDisplayMetrics().scaledDensity
 

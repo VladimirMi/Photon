@@ -1,7 +1,6 @@
 package io.github.vladimirmi.photon.core
 
 import android.os.Bundle
-import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.reactivex.disposables.CompositeDisposable
 import mortar.MortarScope
@@ -45,7 +44,7 @@ abstract class BasePresenter<V : BaseView<*, V>, out M : IModel>
         super.onExitScope()
         Timber.tag(javaClass.simpleName)
         Timber.d("onExitScope")
-        DaggerService.appComponent.watcher().watch(this)
+//        DaggerService.appComponent.watcher().watch(this)
     }
 
     protected abstract fun initToolbar()

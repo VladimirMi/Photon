@@ -58,6 +58,7 @@ class NewCardModel(val dataManager: DataManager,
 
     override fun addTag(tag: String) {
         if (!screenInfo.tags.contains(tag)) {
+            Timber.e("addTag: $tag")
             screenInfo.tags.add(tag)
         }
     }

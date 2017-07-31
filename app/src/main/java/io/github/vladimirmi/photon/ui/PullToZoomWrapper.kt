@@ -6,13 +6,9 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
-import com.jakewharton.rxbinding2.view.ViewScrollChangeEvent
-import com.jakewharton.rxbinding2.view.scrollChangeEvents
-import com.jakewharton.rxbinding2.view.touches
 import com.transitionseverywhere.ChangeBounds
 import com.transitionseverywhere.TransitionManager
 import com.transitionseverywhere.TransitionSet
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.screen_photocard.view.*
 
 
@@ -35,22 +31,24 @@ class PullToZoomWrapper(context: Context, attrs: AttributeSet)
     private var initialY = 0f
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
 
-    private val compDisposable = CompositeDisposable()
+    private val scrollListener = { onScrollChange(scrollView.scrollY) }
 
     fun subscribe() {
-        compDisposable.addAll(
-                scrollView.touches().subscribe {
-                    scrollView.onTouchEvent(it)
-                    if (onInterceptTouchEvent(it)) onTouchEvent(it)
-                },
-                scrollView.scrollChangeEvents().subscribe { onScrollChange(it) }
-        )
+        scrollView.setOnTouchListener { v, event ->
+            v.onTouchEvent(event)
+            if (onInterceptTouchEvent(event)) onTouchEvent(event)
+            true
+        }
+        scrollView.viewTreeObserver.addOnScrollChangedListener(scrollListener)
     }
 
-    fun unsubscribe() = compDisposable.clear()
+    fun unsubscribe() {
+        scrollView.setOnTouchListener(null)
+        scrollView.viewTreeObserver.removeOnScrollChangedListener(scrollListener)
+    }
 
-    private fun onScrollChange(event: ViewScrollChangeEvent) {
-        val scroll = (PARALLAX * event.scrollY()).toInt()
+    private fun onScrollChange(scrollY: Int) {
+        val scroll = (PARALLAX * scrollY).toInt()
         headerContainer.scrollTo(0, -scroll)
     }
 

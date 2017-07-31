@@ -27,13 +27,8 @@ class NewCardView(context: Context, attrs: AttributeSet)
 
     private lateinit var disposable: Disposable
     private val state = Flow.getKey<NewCardScreen>(context)!!.state
-    private val pagerAdapter by lazy {
-        if (Flow.getKey<NewCardScreen>(context)?.album == null) {
-            NewCardPagerAdapter(3)
-        } else {
-            NewCardPagerAdapter(2)
-        }
-    }
+    private val stepCount = if (Flow.getKey<NewCardScreen>(context)!!.info.returnToAlbum) 2 else 3
+    private val pagerAdapter by lazy { NewCardPagerAdapter(stepCount) }
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<NewCardScreen.Component>(context).inject(this)
@@ -60,10 +55,10 @@ class NewCardView(context: Context, attrs: AttributeSet)
         super.onViewDestroyed(removedByFlow)
         disposable.dispose()
         view_pager.adapter = null
-        if (removedByFlow) state.clear()
     }
 
     fun clearView() {
+        state.clear()
         changePage(Page.INFO, smoothScroll = false)
         pagerAdapter.notifyDataSetChanged()
     }
@@ -88,13 +83,20 @@ class NewCardView(context: Context, attrs: AttributeSet)
         if (page.index != view_pager.currentItem) {
             view_pager.setCurrentItem(page.index, smoothScroll)
         }
+
         when (page) {
-            Page.INFO -> ic_action_back.isEnabled = false
-            Page.PARAMS -> {
-                ic_action_back.isEnabled = true
-                ic_action_forward.isEnabled = true
+            Page.INFO -> {
+                ic_action_back.visibility = View.INVISIBLE
+                ic_action_forward.visibility = View.VISIBLE
             }
-            Page.ALBUMS -> ic_action_forward.isEnabled = false
+            Page.PARAMS -> {
+                ic_action_back.visibility = View.VISIBLE
+                ic_action_forward.visibility = if (stepCount == 3) View.VISIBLE else View.INVISIBLE
+            }
+            Page.ALBUMS -> {
+                ic_action_back.visibility = View.VISIBLE
+                ic_action_forward.visibility = View.INVISIBLE
+            }
         }
     }
 

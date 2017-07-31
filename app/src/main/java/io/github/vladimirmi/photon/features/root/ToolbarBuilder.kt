@@ -64,5 +64,6 @@ class MenuItemHolder(val itemTitle: String,
                      val iconResId: Int,
                      val actions: (MenuItem) -> Unit,
                      val popupMenu: Int? = null) {
+    //todo action to weakref
     fun hasPopupMenu() = popupMenu != null
 }

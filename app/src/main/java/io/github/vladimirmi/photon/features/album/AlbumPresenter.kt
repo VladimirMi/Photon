@@ -10,6 +10,7 @@ import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
+import io.github.vladimirmi.photon.features.newcard.NewCardScreenInfo
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -17,15 +18,17 @@ import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.LOAD
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.ErrorSingleObserver
 import io.github.vladimirmi.photon.utils.JobStatus
-import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 
 class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     : BasePresenter<AlbumView, IAlbumModel>(model, rootPresenter) {
 
-    private var editMode: Boolean = false
-    private val album by lazy { Flow.getKey<AlbumScreen>(view)?.album!! }
+    private var editMode = false
+    private val albumId by lazy { Flow.getKey<AlbumScreen>(view)?.albumId!! }
     private val photosForDelete = ArrayList<PhotocardDto>()
+    private var albumSettled = false
+    private lateinit var album: AlbumDto
+
 
     private val moreActions: (MenuItem) -> Unit = {
         when (it.itemId) {
@@ -44,7 +47,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         if (editMode) builder.addAction(MenuItemHolder("Submit",
                 R.drawable.ic_action_submit, submitAction))
 
-        if (album.owner == model.getProfileId() && !album.isFavorite) {
+        if (albumSettled && album.owner == model.getProfileId() && !album.isFavorite) {
             builder.addAction(MenuItemHolder("Actions",
                     iconResId = R.drawable.ic_action_more,
                     actions = moreActions,
@@ -55,13 +58,19 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     override fun initView(view: AlbumView) {
-        compDisp.add(subscribeOnAlbum(album))
+        compDisp.add(subscribeOnAlbum(albumId))
     }
 
-    private fun subscribeOnAlbum(album: AlbumDto): Disposable {
-        return Observable.just(album)
-                .mergeWith(model.getAlbum(album.id))
-                .subscribe { view.setAlbum(it) }
+    private fun subscribeOnAlbum(albumId: String): Disposable {
+        return model.getAlbum(albumId)
+                .subscribeWith(object : ErrorObserver<AlbumDto>() {
+                    override fun onNext(it: AlbumDto) {
+                        view.setAlbum(it)
+                        album = it
+                        albumSettled = true
+                        initToolbar()
+                    }
+                })
     }
 
     fun showPhotoCard(photocard: PhotocardDto) {
@@ -127,7 +136,11 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     private fun addPhotocard() {
-        rootPresenter.bottomHistory.historyMap.set(LOAD, History.single(NewCardScreen(album)))
+        rootPresenter.bottomHistory.historyMap[LOAD] =
+                History.single(NewCardScreen(NewCardScreenInfo().apply {
+                    returnToAlbum = true
+                    album = albumId
+                }))
         rootPresenter.navigateTo(LOAD)
     }
 

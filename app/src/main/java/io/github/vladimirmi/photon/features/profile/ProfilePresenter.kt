@@ -66,7 +66,7 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     }
 
     fun showAlbum(album: AlbumDto) {
-        Flow.get(view).set(AlbumScreen(album))
+        Flow.get(view).set(AlbumScreen(album.id))
     }
 
     private fun logout() {

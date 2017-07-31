@@ -30,6 +30,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     }
 
     override fun initView(view: SplashView) {
+        rootPresenter.showLoading()
         compDisp.add(updatePhotos())
     }
 
@@ -88,6 +89,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     }
 
     private fun openMainScreen(updated: Int = 0) {
+        rootPresenter.hideLoading()
         Flow.get(view).replaceTop(MainScreen(updated), Direction.FORWARD)
     }
 }

@@ -12,6 +12,7 @@ import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.TextView
 import io.github.vladimirmi.photon.R
+import io.github.vladimirmi.photon.utils.dp
 
 
 /**
@@ -23,7 +24,8 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
     var picked = false
         private set
     var radioMode: Boolean
-    private val drawable: Drawable = DrawableCompat.wrap(compoundDrawables[1])
+    var isShape = false
+    private var drawable: Drawable = DrawableCompat.wrap(compoundDrawables[1])
     private val colorAccent = ContextCompat.getColor(context, R.color.color_accent)
     private val colorGrey = ContextCompat.getColor(context, R.color.grey)
     private var color = colorGrey
@@ -35,16 +37,18 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
         radioMode = a.getBoolean(R.styleable.FilterElementView_radioMode, false)
         a.recycle()
 
-        if (drawable is GradientDrawable) {
-            drawable.setColor(shapeColor)
+        if (shapeColor != 0) {
+            isShape = true
+            drawable = DrawableCompat.unwrap<GradientDrawable>(drawable)
+            (drawable as GradientDrawable).setColor(shapeColor)
         }
         setupDrawable()
     }
 
     private fun setupDrawable() {
         color = if (picked) colorAccent else colorGrey
-        if (drawable is GradientDrawable) {
-            setupShapeDrawable(drawable)
+        if (isShape) {
+            setupShapeDrawable(drawable as GradientDrawable)
         } else {
             setupVectorDrawable(drawable)
         }
@@ -57,7 +61,7 @@ class FilterElementView(context: Context, attrs: AttributeSet?) : TextView(conte
     }
 
     private fun setupShapeDrawable(shapeDrawable: GradientDrawable) {
-        shapeDrawable.setStroke(6, color)
+        shapeDrawable.setStroke(2 * context.dp.toInt(), color)
         setTextColor(color)
     }
 

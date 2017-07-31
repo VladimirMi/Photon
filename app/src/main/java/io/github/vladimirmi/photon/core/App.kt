@@ -30,7 +30,7 @@ class App : Application() {
         super.onCreate()
         if (LeakCanary.isInAnalyzerProcess(this)) return
 
-        refWatcher = LeakCanary.install(this)
+//        refWatcher = LeakCanary.install(this)
 
         Realm.init(this)
 

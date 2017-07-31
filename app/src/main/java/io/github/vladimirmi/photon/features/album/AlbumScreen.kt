@@ -8,7 +8,6 @@ import io.github.vladimirmi.photon.data.jobs.queue.AlbumJobQueue
 import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -17,10 +16,10 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
  * Created by Vladimir Mikhalev 19.06.2017.
  */
 
-data class AlbumScreen(val album: AlbumDto) : BaseScreen<RootActivityComponent>() {
+data class AlbumScreen(val albumId: String) : BaseScreen<RootActivityComponent>() {
 
     override val layoutResId = R.layout.screen_album
-    override val scopeName = super.scopeName + album.id
+    override val scopeName = super.scopeName + albumId
 
     //region =============== DI ==============
 

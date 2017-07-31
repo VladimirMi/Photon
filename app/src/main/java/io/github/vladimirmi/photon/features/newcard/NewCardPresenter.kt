@@ -9,7 +9,6 @@ import android.provider.OpenableColumns
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -25,7 +24,6 @@ import java.io.File
 class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     : BasePresenter<NewCardView, INewCardModel>(model, rootPresenter) {
 
-    private var returnTo: AlbumDto? = null
     private var startAction: (() -> Unit)? = null
 
     override fun initToolbar() {
@@ -34,12 +32,15 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     override fun initView(view: NewCardView) {
+        model.screenInfo = Flow.getKey<NewCardScreen>(view.context)!!.info
         startAction?.invoke()
-
-//        chooseWhatShow()
-        view.showPhotoParams()
-        Timber.e("initView: ${model.screenInfo.currentPage}")
+        chooseWhatShow()
         view.changePage(model.screenInfo.currentPage)
+    }
+
+    override fun dropView(view: NewCardView) {
+        Flow.getKey<NewCardScreen>(view)?.info = model.screenInfo
+        super.dropView(view)
     }
 
     private fun chooseWhatShow() {
@@ -55,7 +56,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
             clearPhotocard()
             return true
         }
-        if (returnTo != null) {
+        if (model.screenInfo.returnToAlbum) {
             returnToAlbum()
             return true
         }
@@ -63,11 +64,10 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
     }
 
     fun returnToAlbum() {
-        Flow.getKey<NewCardScreen>(view)?.album = null
         val history = rootPresenter.bottomHistory.historyMap[PROFILE]
         val newHistory = history!!.buildUpon().apply {
             pop()
-            returnTo?.let { push(AlbumScreen(it)) }
+            push(AlbumScreen(model.screenInfo.album))
         }.build()
         rootPresenter.bottomHistory.historyMap[PROFILE] = newHistory
         rootPresenter.navigateTo(PROFILE)
@@ -79,7 +79,7 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
                 .subscribeWith(object : ErrorObserver<JobStatus>() {
 
                     override fun onNext(it: JobStatus) {
-                        if (returnTo != null) returnToAlbum() else clearPhotocard()
+                        if (model.screenInfo.returnToAlbum) returnToAlbum() else clearPhotocard()
                     }
 
                     override fun onComplete() {
@@ -98,18 +98,16 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
             return model.getPageError(page)?.let { errorId ->
                 view.changePage(page)
                 view.showError(errorId)
-                false
+                return false
             } ?: true
         }
-
-        if (!pageIsValid(model.screenInfo.currentPage)) return false
-        return Page.values().any { pageIsValid(it) }
+        return pageIsValid(model.screenInfo.currentPage) && Page.values().all { pageIsValid(it) }
     }
 
     fun clearPhotocard() {
-        model.screenInfo = NewCardScreenInfo()
-        view.clearView()
-        chooseWhatShow()
+        Flow.getKey<NewCardScreen>(view)?.info = NewCardScreenInfo()
+        initView(view)
+//        view.clearView()
     }
 
     fun choosePhoto() {

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:app="http://schemas.android.com/apk/res-auto"
        xmlns:tools="http://schemas.android.com/tools"
        tools:showIn="@layout/view_newcard_step1"
     >
 
     <TextView
+        android:id="@+id/tags_title"
         style="@style/CustomText.Black.Title"
         android:text="@string/newcard_tag_title"
         />
@@ -54,7 +54,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="8dp"
             android:paddingTop="16dp"
-            app:srcCompat="@drawable/ic_action_back_arrow"
+            android:src="@drawable/ic_action_back_arrow"
             />
 
         <ImageView
@@ -65,7 +65,7 @@
             android:paddingLeft="8dp"
             android:paddingRight="16dp"
             android:paddingTop="16dp"
-            app:srcCompat="@drawable/ic_action_close"
+            android:src="@drawable/ic_action_close"
 
             />
     </LinearLayout>

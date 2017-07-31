@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.item_simple_string.view.*
 
 class StringAdapter(private val action: ((String) -> Unit)? = null) : RecyclerView.Adapter<ItemViewHolder>() {
 
-    private var strings: List<String> = ArrayList()
+    private var strings = ArrayList<String>()
 
     fun updateData(list: List<String>) {
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
@@ -29,7 +29,8 @@ class StringAdapter(private val action: ((String) -> Unit)? = null) : RecyclerVi
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = true
         })
-        strings = list
+        strings.clear()
+        strings.addAll(list)
         diffResult.dispatchUpdatesTo(this)
     }
 

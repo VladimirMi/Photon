@@ -9,7 +9,6 @@ import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumPresenter
 import io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumView
@@ -24,7 +23,8 @@ import io.github.vladimirmi.photon.features.root.RootPresenter
  * Created by Vladimir Mikhalev 19.06.2017.
  */
 
-class NewCardScreen(var album: AlbumDto? = null) : BaseScreen<RootActivityComponent>() {
+class NewCardScreen(var info: NewCardScreenInfo = NewCardScreenInfo())
+    : BaseScreen<RootActivityComponent>() {
     val state = SparseArray<Parcelable>()
     override val layoutResId = R.layout.screen_newcard
 
