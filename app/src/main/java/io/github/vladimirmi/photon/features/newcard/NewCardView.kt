@@ -40,7 +40,6 @@ class NewCardView(context: Context, attrs: AttributeSet)
         choose_btn.setOnClickListener { presenter.choosePhoto() }
         save.setOnClickListener { presenter.savePhotocard() }
         cancel.setOnClickListener { presenter.clearPhotocard() }
-        view_pager.adapter = pagerAdapter
         ic_action_back.setOnClickListener {
             changePage(Page.fromIndex(view_pager.currentItem - 1))
         }
@@ -49,6 +48,8 @@ class NewCardView(context: Context, attrs: AttributeSet)
         }
         disposable = view_pager.pageSelections().skipInitialValue()
                 .subscribe { changePage(Page.fromIndex(it)) }
+        view_pager.adapter = pagerAdapter
+        view_pager_indicator.setupWithViewPager(view_pager)
     }
 
     override fun onViewDestroyed(removedByFlow: Boolean) {

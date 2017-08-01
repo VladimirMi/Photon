@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <layer-list>
+            <item>
+                <shape
+                    android:innerRadius="0dp"
+                    android:shape="ring"
+                    android:thickness="6dp"
+                    android:tint="@color/grey_dark"
+                    android:useLevel="false">
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <item>
+        <layer-list>
+            <item>
+                <shape
+                    android:innerRadius="5dp"
+                    android:shape="ring"
+                    android:thickness="1dp"
+                    android:tint="@color/black"
+                    android:useLevel="false">
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>
