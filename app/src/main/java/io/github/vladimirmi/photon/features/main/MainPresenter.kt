@@ -35,6 +35,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     private lateinit var cardsDisposable: Disposable
     private var updated = 0
+    private lateinit var mainScreen: MainScreen
 
     override fun initToolbar() {
         val popupMenu = if (rootPresenter.isUserAuth()) R.menu.submenu_main_screen_auth
@@ -45,7 +46,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
         rootPresenter.getNewToolbarBuilder()
                 .addAction(MenuItemHolder("Search", searchIcon,
-                        actions = { Flow.get(view).set(SearchScreen()) }))
+                        actions = { openSearchScreen() }))
                 .addAction(MenuItemHolder("Login",
                         iconResId = R.drawable.ic_action_settings,
                         popupMenu = popupMenu,
@@ -55,16 +56,30 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     override fun initView(view: MainView) {
-        updated = Flow.getKey<MainScreen>(view)!!.updated
-        if (updated == 0) {
-            loadMore(0, AppConfig.PHOTOCARDS_PAGE_SIZE)
-        } else {
-            Flow.getKey<MainScreen>(view)!!.updated = 0
-        }
-
+        mainScreen = Flow.getKey<MainScreen>(view)!!
+        loadCardsIfNeeded()
+        updateModel()
         cardsDisposable = subscribeOnPhotocards()
         compDisp.add(cardsDisposable)
         if (model.isFiltered()) view.showFilterWarning()
+    }
+
+    private fun loadCardsIfNeeded() {
+        updated = mainScreen.updated
+        if (updated == 0) {
+            loadMore(0, AppConfig.PHOTOCARDS_PAGE_SIZE)
+        } else {
+            mainScreen.updated = 0
+        }
+    }
+
+    private fun updateModel() {
+        if (model.isFiltered()) return
+        model.tagsQuery = mainScreen.tagsQuery
+        model.filtersQuery = mainScreen.filtersQuery
+        model.queryPage = mainScreen.queryPage
+        model.makeQuery()
+        initToolbar()
     }
 
     private fun subscribeOnPhotocards(): Disposable {
@@ -75,6 +90,13 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                         view?.setData(it, update)
                     }
                 })
+    }
+
+    override fun onExitScope() {
+        mainScreen.tagsQuery = model.tagsQuery
+        mainScreen.filtersQuery = model.filtersQuery
+        mainScreen.queryPage = model.queryPage
+        super.onExitScope()
     }
 
     fun register(req: SignUpReq) {
@@ -132,9 +154,13 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
         resubscribeCards()
     }
 
-    fun showPhotoCard(photocard: PhotocardDto) {
+    fun openPhotocardScreen(photocard: PhotocardDto) {
         model.addView(photocard.id)
         Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
+    }
+
+    private fun openSearchScreen() {
+        Flow.get(view).set(SearchScreen())
     }
 
     fun loadMore(page: Int, limit: Int) {

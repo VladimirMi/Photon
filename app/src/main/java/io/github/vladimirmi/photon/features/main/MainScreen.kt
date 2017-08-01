@@ -13,6 +13,9 @@ import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
+import io.github.vladimirmi.photon.features.search.SearchView
+import io.github.vladimirmi.photon.utils.Query
+import java.util.*
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -21,9 +24,17 @@ import io.github.vladimirmi.photon.features.search.SearchScreen
 class MainScreen(var updated: Int = 0) : BaseScreen<RootActivityComponent>() {
 
     val state = SparseArray<Parcelable>()
+    var tagsQuery = ArrayList<Query>()
+    var filtersQuery = ArrayList<Query>()
+    var queryPage = SearchView.Page.TAGS
 
-    override val layoutResId: Int
-        get() = R.layout.screen_main
+    fun clearData() {
+        tagsQuery.clear()
+        filtersQuery.clear()
+        queryPage = SearchView.Page.TAGS
+    }
+
+    override val layoutResId = R.layout.screen_main
 
     //region =============== DI ==============
 

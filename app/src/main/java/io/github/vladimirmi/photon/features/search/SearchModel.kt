@@ -11,15 +11,31 @@ import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Sort
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 /**
  * Developer Vladimir Mikhalev, 06.06.2017.
  */
 
-class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val cache: Cache) : ISearchModel {
+class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val cache: Cache)
+    : ISearchModel {
 
-    override var queryPage = mainModel.queryPage
+    override var queryPage
+        get() = mainModel.queryPage
+        set(value) {
+            mainModel.queryPage = value
+        }
+    override var tagsQuery
+        get() = mainModel.tagsQuery
+        set(value) {
+            mainModel.tagsQuery = value
+        }
+    override var filtersQuery
+        get() = mainModel.filtersQuery
+        set(value) {
+            mainModel.filtersQuery = value
+        }
 
     override fun getTags(): Observable<List<String>> {
         val pageSize = 20
@@ -41,15 +57,22 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
                 .map { it.map { it.value } }
     }
 
-    override fun getQuery(): MutableList<Query> {
+    override fun isFiltered() = mainModel.isFiltered()
+
+    override fun getQuery(): ArrayList<Query> {
         return when (queryPage) {
-            SearchView.Page.TAGS -> mainModel.tagsQuery
-            SearchView.Page.FILTERS -> mainModel.filtersQuery
+            SearchView.Page.TAGS -> tagsQuery
+            SearchView.Page.FILTERS -> filtersQuery
         }
     }
 
     override fun addQuery(pair: Pair<String, String>) {
+        Timber.e("addQuery: $pair")
         getQuery().add(parseToQuery(pair))
+    }
+
+    override fun addQuery(query: Query) {
+        getQuery().add(query)
     }
 
     override fun removeQuery(pair: Pair<String, String>) {
@@ -71,7 +94,8 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
     }
 
     override fun makeQuery() {
-        mainModel.makeQuery(queryPage)
+        Timber.e("makeQuery: ")
+        mainModel.makeQuery()
     }
 
     override fun searchRecents(string: String): Observable<List<String>> {

@@ -20,6 +20,7 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
         compDisp.add(subscribeOnSearch())
         val searchField = model.getQuery().find { it.fieldName == "searchTag" }?.value as? String
         searchField?.let { view.restoreSearchField(it) }
+        checkEnableSubmit()
     }
 
     private fun subscribeOnTags(): Disposable {

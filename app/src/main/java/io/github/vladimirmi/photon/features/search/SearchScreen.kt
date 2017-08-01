@@ -15,12 +15,18 @@ import io.github.vladimirmi.photon.features.search.filters.SearchFilterPresenter
 import io.github.vladimirmi.photon.features.search.filters.SearchFilterView
 import io.github.vladimirmi.photon.features.search.tags.SearchTagPresenter
 import io.github.vladimirmi.photon.features.search.tags.SearchTagView
+import io.github.vladimirmi.photon.utils.Query
+import java.util.*
 
 /**
  * Developer Vladimir Mikhalev, 06.06.2017.
  */
 
 class SearchScreen : BaseScreen<MainScreen.Component>(), TreeKey {
+
+    var tagsQuery = ArrayList<Query>()
+    var filtersQuery = ArrayList<Query>()
+    var queryPage = SearchView.Page.TAGS
 
     override val layoutResId = R.layout.screen_search
     override fun getParentKey() = MainScreen()

@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.screen_main.view.*
 class MainView(context: Context, attrs: AttributeSet) :
         BaseView<MainPresenter, MainView>(context, attrs) {
 
-    private val cardAction: (PhotocardDto) -> Unit = { presenter.showPhotoCard(it) }
+    private val cardAction: (PhotocardDto) -> Unit = { presenter.openPhotocardScreen(it) }
     private val adapter = CardAdapter(cardAction)
 
     private val registrationAction: (SignUpReq) -> Unit = { register(it) }

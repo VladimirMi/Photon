@@ -8,7 +8,6 @@ import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.di.DaggerService
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.screen_search.view.*
-import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 06.06.2017.
@@ -17,7 +16,7 @@ import timber.log.Timber
 class SearchView(context: Context, attrs: AttributeSet)
     : BaseView<SearchPresenter, SearchView>(context, attrs) {
 
-    enum class Page(val position: Int) { TAGS(0), FILTERS(1) }
+    enum class Page { TAGS, FILTERS }
 
     private lateinit var disposable: Disposable
 
@@ -41,7 +40,6 @@ class SearchView(context: Context, attrs: AttributeSet)
     }
 
     fun setPage(page: Page) {
-        Timber.e("setQueryPage: ${page.position}")
-        search_pager.currentItem = page.position
+        search_pager.currentItem = page.ordinal
     }
 }

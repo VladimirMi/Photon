@@ -21,17 +21,16 @@ class MainModel(val dataManager: DataManager,
                 val cache: Cache) : IMainModel {
 
     var query = ArrayList<Query>()
-    override var queryPage: SearchView.Page = SearchView.Page.TAGS
-    override val tagsQuery = ArrayList<Query>()
-    override val filtersQuery = ArrayList<Query>()
+    override var queryPage = SearchView.Page.TAGS
+    override var tagsQuery = ArrayList<Query>()
+    override var filtersQuery = ArrayList<Query>()
 
 
-    override fun makeQuery(currentPage: SearchView.Page) {
-        when (currentPage) {
+    override fun makeQuery() {
+        when (queryPage) {
             SearchView.Page.TAGS -> query = tagsQuery
             SearchView.Page.FILTERS -> query = filtersQuery
         }
-        queryPage = currentPage
     }
 
     override fun getPhotoCards(): Observable<List<PhotocardDto>> {
