@@ -12,6 +12,7 @@ import io.github.vladimirmi.photon.utils.ErrorSingleObserver
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 /**
@@ -39,8 +40,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
         var loaded = false
 
         val updateObs = model.updateAll(AppConfig.PHOTOCARDS_PAGE_SIZE)
-                .doOnNext { loaded = true }
-                .doOnError { if (it is NoSuchElementException) loaded = true } //304 empty
+                .doOnComplete { loaded = true }
                 .map { false } // ended
 
         val timer = Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
@@ -49,6 +49,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
         return Observable.mergeDelayError(timer, updateObs)
                 .subscribeWith(object : ErrorObserver<Boolean>() {
                     override fun onNext(ended: Boolean) {
+                        Timber.e("onNext: ended=$ended loaded=$loaded")
                         if (ended) {
                             if (loaded) {
                                 openMainScreen()
@@ -59,15 +60,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
                         }
                     }
 
-                    override fun onComplete() {
-                        openMainScreen(AppConfig.PHOTOCARDS_PAGE_SIZE)
-                    }
-
                     override fun onError(e: Throwable) {
-                        if (loaded) {
-                            openMainScreen(AppConfig.PHOTOCARDS_PAGE_SIZE)
-                            return
-                        }
                         super.onError(e)
                         handleError(e)
                     }
@@ -81,11 +74,12 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     }
 
     private fun chooseCanOpen() {
-        compDisp.add(model.dbIsNotEmpty().subscribeWith(object : ErrorSingleObserver<Boolean>() {
-            override fun onSuccess(notEmpty: Boolean) {
-                if (notEmpty) openMainScreen()
-            }
-        }))
+        compDisp.add(model.dbIsNotEmpty()
+                .subscribeWith(object : ErrorSingleObserver<Boolean>() {
+                    override fun onSuccess(notEmpty: Boolean) {
+                        if (notEmpty) openMainScreen()
+                    }
+                }))
     }
 
     private fun openMainScreen(updated: Int = 0) {

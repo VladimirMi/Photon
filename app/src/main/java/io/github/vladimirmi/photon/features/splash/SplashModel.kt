@@ -20,8 +20,7 @@ class SplashModel(val dataManager: DataManager, val cache: Cache) : ISplashModel
         return dataManager.isNetworkAvailable()
                 .filter { it != false }
                 .firstOrError().toObservable()
-                .flatMap { Observable.merge(updatePhotocards(limit), updateProfile()) }
-                .unit()
+                .flatMap { Observable.mergeDelayError(updatePhotocards(limit), updateProfile()) }
                 .ioToMain()
     }
 
