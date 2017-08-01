@@ -22,6 +22,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    splits {
+        abi {
+            enable false
+            reset()
+            include 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips', 'x86', 'x86_64'
+        }
+    }
 }
 ext {
     SUPPORT_LIBRARY_VERSION = '25.3.1'
@@ -81,7 +88,6 @@ dependencies {
     }
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-
 }
 
 

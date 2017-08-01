@@ -46,6 +46,7 @@
         />
 
     <View
+        android:id="@+id/bottom_menu_shadow"
         android:layout_width="match_parent"
         android:layout_height="4dp"
         android:layout_above="@+id/bottom_menu"

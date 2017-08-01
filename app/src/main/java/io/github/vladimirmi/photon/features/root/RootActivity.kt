@@ -86,9 +86,14 @@ class RootActivity : FlowActivity(), IRootView {
 
     //region =============== IRootView ==============
 
-    override fun showLoading() = loading.show()
+    override fun showLoading() {
+        loading.smoothToShow()
+        loading.show()
+    }
 
-    override fun hideLoading() = loading.hide()
+    override fun hideLoading() {
+        loading.hide()
+    }
 
     override fun showPermissionSnackBar() {
         Snackbar.make(root_container, R.string.message_permission_need, Snackbar.LENGTH_LONG)
@@ -119,8 +124,10 @@ class RootActivity : FlowActivity(), IRootView {
     override fun setBottomMenuVisible(visible: Boolean) {
         if (visible) {
             bottom_menu.visibility = View.VISIBLE
+            bottom_menu_shadow.visibility = View.VISIBLE
         } else {
             bottom_menu.visibility = View.GONE
+            bottom_menu_shadow.visibility = View.GONE
         }
     }
 

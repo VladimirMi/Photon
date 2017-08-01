@@ -32,6 +32,7 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     override fun initView(view: SplashView) {
         rootPresenter.showLoading()
         compDisp.add(updatePhotos())
+        if (!rootPresenter.isNetAvailable()) view.showError(R.string.message_err_net)
     }
 
     private fun updatePhotos(): Disposable {
@@ -42,17 +43,17 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
                 .doOnError { if (it is NoSuchElementException) loaded = true } //304 empty
                 .map { false } // ended
 
-        return Observable.mergeDelayError(
-                Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
-                        .map { true }, // ended
-                updateObs)
+        val timer = Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                .map { true } // ended
+
+        return Observable.mergeDelayError(timer, updateObs)
                 .subscribeWith(object : ErrorObserver<Boolean>() {
                     override fun onNext(ended: Boolean) {
                         if (ended) {
                             if (loaded) {
                                 openMainScreen()
                             } else {
-                                view.showMessage(R.string.message_err_connect)
+                                view.showError(R.string.message_err_connect)
                                 chooseCanOpen()
                             }
                         }
@@ -74,9 +75,8 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
 
     }
 
-
     private fun handleError(error: Throwable) {
-        rootPresenter.showMessage(R.string.message_api_err_unknown)
+        view.showError(R.string.message_api_err_unknown)
         chooseCanOpen()
     }
 

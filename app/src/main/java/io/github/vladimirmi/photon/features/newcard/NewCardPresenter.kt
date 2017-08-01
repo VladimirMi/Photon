@@ -101,7 +101,17 @@ class NewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
                 return false
             } ?: true
         }
-        return pageIsValid(model.screenInfo.currentPage) && Page.values().all { pageIsValid(it) }
+
+        fun pageIsLast(page: Page, returnToAlbum: Boolean): Boolean {
+            val isLast = if (returnToAlbum && page == Page.PARAMS) true
+            else !returnToAlbum && page == Page.ALBUMS
+
+            if (!isLast) view.changePage(Page.fromIndex(page.index + 1))
+            return isLast
+        }
+        return pageIsValid(model.screenInfo.currentPage) &&
+                Page.values().all { pageIsValid(it) } &&
+                pageIsLast(model.screenInfo.currentPage, model.screenInfo.returnToAlbum)
     }
 
     fun clearPhotocard() {

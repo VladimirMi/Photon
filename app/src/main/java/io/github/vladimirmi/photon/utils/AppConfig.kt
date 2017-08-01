@@ -11,7 +11,7 @@ object AppConfig {
     const val CONNECT_TIMEOUT = 5000 //ms
     const val READ_TIMEOUT = 5000 //ms
     const val WRITE_TIMEOUT = 5000 //ms
-    const val UPDATE_TIMEOUT = 600_000 //ms
+    const val UPDATE_TIMEOUT = 900_000 //ms
 
     const val PHOTOCARDS_PAGE_SIZE = 60
 

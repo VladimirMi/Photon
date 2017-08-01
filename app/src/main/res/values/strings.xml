@@ -51,7 +51,7 @@
     <string name="message_err_description">Не менее 3 и не более 400 символов</string>
     <string name="message_err_net">Нет сети</string>
     <string name="message_err_auth">Необходимо фойти в аккаунт</string>
-    <string name="message_err_connect">Невозможно подключиться к серверу</string>
+    <string name="message_err_connect">Плохое соединение</string>
     <string name="message_err_file_size">Размер файла не должен превышать %d мегабайта</string>
     <string name="message_err_create_file">Неудалось создать файл</string>
     <string name="message_api_err_login">Пользователь с таким логином уже существует</string>

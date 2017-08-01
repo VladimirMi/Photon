@@ -84,6 +84,7 @@ class NewCardModel(val dataManager: DataManager,
             title = screenInfo.title
             tags.addAll(screenInfo.tags.map { Tag(it) })
             filters = screenInfo.filter
+            photo = screenInfo.photo
             owner = dataManager.getProfileId()
         }
         return Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, screenInfo.album))

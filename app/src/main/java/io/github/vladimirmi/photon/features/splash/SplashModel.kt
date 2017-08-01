@@ -3,11 +3,11 @@ package io.github.vladimirmi.photon.features.splash
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.github.vladimirmi.photon.utils.unit
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.*
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -41,7 +41,8 @@ class SplashModel(val dataManager: DataManager, val cache: Cache) : ISplashModel
 
     fun updateProfile(): Observable<Unit> {
         return if (dataManager.getProfileId().isNotEmpty()) {
-            dataManager.getUserFromNet(dataManager.getProfileId(), Date(0).toString())
+            Observable.just(dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId()))
+                    .flatMap { dataManager.getUserFromNet(it.id, getUpdated(it.updated)) }
                     .doOnNext { dataManager.saveToDB(it) }
                     .doOnNext { cache.cacheUser(it) }
                     .unit()

@@ -15,7 +15,6 @@ import timber.log.Timber
 
 class PhotocardJobQueue(private val jobManager: JobManager, private val dataManager: DataManager) {
 
-
     fun queueCreateJob(id: String, albumId: String): Observable<JobStatus> {
         Timber.e("queueCreateJob: ")
         val job = PhotocardCreateJob(id, albumId)

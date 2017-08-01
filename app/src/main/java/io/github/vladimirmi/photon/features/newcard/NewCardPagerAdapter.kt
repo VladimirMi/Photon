@@ -36,6 +36,7 @@ class NewCardPagerAdapter(private val count: Int) : PagerAdapter() {
     }
 }
 
+//todo remove index, use ordinal
 enum class Page(val index: Int) {
     INFO(0), PARAMS(1), ALBUMS(2);
 
@@ -44,4 +45,6 @@ enum class Page(val index: Int) {
         fun fromIndex(index: Int) = map[index] ?:
                 throw IllegalArgumentException("No page found for given index")
     }
+
+
 }
