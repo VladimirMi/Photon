@@ -26,6 +26,13 @@ object JobGroup {
     const val PROFILE = "PROFILE"
 }
 
+enum class JobType() {
+    ROOT,
+    CREATE,
+    DELETE,
+    UNIQUE
+}
+
 open class EmptyJobCallback : JobManagerCallback {
     override fun onJobRun(job: Job, resultCode: Int) {}
 
