@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.ui
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
+import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.dialog_new_album.view.*
  * Created by Vladimir Mikhalev 23.06.2017.
  */
 
-class EditAlbumDialog(viewGroup: ViewGroup, editAlbumAction: (EditAlbumReq) -> Unit)
+class EditAlbumDialog(viewGroup: ViewGroup, editAlbumAction: (AlbumEditReq) -> Unit)
     : ValidationDialog(R.layout.dialog_edit_album, viewGroup) {
 
     private val nameField = view.name
@@ -23,7 +23,7 @@ class EditAlbumDialog(viewGroup: ViewGroup, editAlbumAction: (EditAlbumReq) -> U
     init {
         cancel.setOnClickListener { hide() }
         ok.setOnClickListener {
-            val request = EditAlbumReq(title = nameField.text.toString(),
+            val request = AlbumEditReq(title = nameField.text.toString(),
                     description = descriptionField.text.toString()
             )
             editAlbumAction(request)

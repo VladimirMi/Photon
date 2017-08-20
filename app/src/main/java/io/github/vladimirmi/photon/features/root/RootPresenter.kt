@@ -12,7 +12,9 @@ import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavHistory
+import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import mortar.MortarScope
 import mortar.Presenter
 import mortar.bundler.BundleService
@@ -27,13 +29,20 @@ class RootPresenter(val model: IRootModel) :
         Presenter<IRootView>() {
 
     val bottomHistory = BottomNavHistory()
+    private val comDisp = CompositeDisposable()
 
-    override fun extractBundleService(view: IRootView?): BundleService {
-        return BundleService.getBundleService(view as Context)
-    }
+    override fun extractBundleService(view: IRootView?): BundleService =
+            BundleService.getBundleService(view as Context)
 
     override fun onEnterScope(scope: MortarScope?) {
         super.onEnterScope(scope)
+        comDisp.add(model.execJobQueue()
+                .subscribeWith(ErrorObserver()))
+    }
+
+    override fun onExitScope() {
+        super.onExitScope()
+        comDisp.dispose()
     }
 
     fun hasActiveView() = hasView()
@@ -77,7 +86,7 @@ class RootPresenter(val model: IRootModel) :
     }
 
     fun createFileForPhotocard(photocard: PhotocardDto): File? {
-        val folder = Environment.getExternalStorageDirectory()
+        val folder = Environment.getDataDirectory()
         val file = File(folder, "/Photon/${photocard.title}.jpg")
         val dir = file.parentFile
         if (!dir.mkdirs() && (!dir.exists() || !dir.isDirectory)) {

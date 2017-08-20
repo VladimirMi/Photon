@@ -52,7 +52,6 @@ class ProfileScreen : BaseScreen<RootActivityComponent>() {
         interface Builder {
             fun module(module: Module): Component.Builder
             fun build(): Component
-
         }
 
         fun inject(profileView: ProfileView)

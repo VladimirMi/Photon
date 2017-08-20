@@ -15,4 +15,5 @@ interface IRootModel : IModel {
     fun login(req: SignInReq): Observable<Unit>
     fun register(req: SignUpReq): Observable<Unit>
     fun isNetAvail(): Boolean
+    fun execJobQueue(): Observable<Unit>
 }

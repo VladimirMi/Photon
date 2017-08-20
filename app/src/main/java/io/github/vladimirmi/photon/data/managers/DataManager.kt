@@ -94,7 +94,7 @@ constructor(private val restService: RestService,
                 .body()
     }
 
-    fun editAlbum(req: EditAlbumReq): Observable<Album> {
+    fun editAlbum(req: AlbumEditReq): Observable<Album> {
         return restService.editAlbum(getProfileId(), req.id, req, getUserToken())
                 .parseStatusCode()
                 .body()

@@ -32,9 +32,7 @@ data class Query(val fieldName: String, val operator: RealmOperator, val value: 
         return realmQuery
     }
 
-    override fun toString(): String {
-        return "($fieldName $operator $value)"
-    }
+    override fun toString() = "($fieldName $operator $value)"
 }
 
 

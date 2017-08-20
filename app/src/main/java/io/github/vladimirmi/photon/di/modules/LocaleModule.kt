@@ -9,6 +9,7 @@ import dagger.Module
 import dagger.Provides
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.jobs.queue.AlbumJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.JobQueue
 import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
 import io.github.vladimirmi.photon.data.jobs.queue.ProfileJobQueue
 import io.github.vladimirmi.photon.data.managers.Cache
@@ -62,23 +63,25 @@ class LocaleModule(val context: Context) {
 
     @Provides
     @DaggerScope(App::class)
+    fun provideJobQueue(dataManager: DataManager, jobManager: JobManager) =
+            JobQueue(dataManager, jobManager)
+
+    @Provides
+    @DaggerScope(App::class)
     fun provideRefWatcher(context: Context) = App.getRefWatcher(context)
 
     @Provides
     @DaggerScope(App::class)
-    fun providePhotocardJobQueue(jobManager: JobManager, dataManager: DataManager): PhotocardJobQueue {
-        return PhotocardJobQueue(jobManager, dataManager)
-    }
+    fun providePhotocardJobQueue(jobQueue: JobQueue, dataManager: DataManager) =
+            PhotocardJobQueue(jobQueue, dataManager)
 
     @Provides
     @DaggerScope(App::class)
-    fun provideAlbumJobQueue(jobManager: JobManager, dataManager: DataManager, photocardJobQueue: PhotocardJobQueue): AlbumJobQueue {
-        return AlbumJobQueue(jobManager, dataManager, photocardJobQueue)
-    }
+    fun provideAlbumJobQueue(jobQueue: JobQueue, dataManager: DataManager) =
+            AlbumJobQueue(jobQueue, dataManager)
 
     @Provides
     @DaggerScope(App::class)
-    fun provideProfileJobQueue(jobManager: JobManager): ProfileJobQueue {
-        return ProfileJobQueue(jobManager)
-    }
+    fun provideProfileJobQueue(jobQueue: JobQueue, dataManager: DataManager) =
+            ProfileJobQueue(jobQueue, dataManager)
 }

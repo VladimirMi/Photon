@@ -4,8 +4,7 @@ import android.net.Uri
 import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
-import com.birbit.android.jobqueue.RetryConstraint
-import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.jobs.queue.JobTask
 import io.github.vladimirmi.photon.data.models.req.EditProfileReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.*
@@ -22,28 +21,23 @@ import java.util.*
 class ProfileEditJob(private val request: EditProfileReq)
     : Job(Params(JobPriority.HIGH)
         .setGroupId(JobGroup.PROFILE)
-        .addTags(TAG)
         .requireNetwork()
-        .persist()) {
+        .persist()), JobTask {
 
     companion object {
         const val TAG = "ProfileEditJob"
     }
 
-    override fun onAdded() {
-        val dataManager = DaggerService.appComponent.dataManager()
-        val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
+    override var entityId = request.id
+    override var parentEntityId = request.id
+    override val tag = TAG
+    override val type = JobTask.Type.UNIQUE
 
-        profile.apply {
-            login = request.login
-            name = request.name
-            avatar = request.avatar
-        }
-        dataManager.saveToDB(profile)
-    }
+    override fun onAdded() {}
 
     override fun onRun() {
         val dataManager = DaggerService.appComponent.dataManager()
+        request.id = entityId
 
         val editProfileObs = dataManager.editProfile(request)
 
@@ -89,8 +83,7 @@ class ProfileEditJob(private val request: EditProfileReq)
                 .subscribeWith(ErrorObserver())
     }
 
-    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int): RetryConstraint {
-        return cancelOrWait(throwable, runCount)
-    }
+    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
+            cancelOrWait(throwable, runCount)
 
 }

@@ -71,12 +71,10 @@ class NewCardModel(val dataManager: DataManager,
         return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
     }
 
-    override fun getPageError(page: Page): Int? {
-        return when (page) {
-            Page.INFO -> if (screenInfo.title.isBlank()) R.string.newcard_err_title else null
-            Page.PARAMS -> null
-            Page.ALBUMS -> if (screenInfo.album.isBlank()) R.string.newcard_err_album else null
-        }
+    override fun getPageError(page: Page) = when (page) {
+        Page.INFO -> if (screenInfo.title.isBlank()) R.string.newcard_err_title else null
+        Page.PARAMS -> null
+        Page.ALBUMS -> if (screenInfo.album.isBlank()) R.string.newcard_err_album else null
     }
 
     override fun uploadPhotocard(): Observable<JobStatus> {
@@ -87,13 +85,7 @@ class NewCardModel(val dataManager: DataManager,
             photo = screenInfo.photo
             owner = dataManager.getProfileId()
         }
-        return Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, screenInfo.album))
-                .map { album ->
-                    album.photocards.add(photoCard)
-                    dataManager.saveToDB(album)
-                }
-                .flatMap { photocardJobQueue.queueCreateJob(photoCard.id, screenInfo.album) }
-                .ioToMain()
+        return photocardJobQueue.queueCreateJob(photoCard, screenInfo.album)
     }
 }
 

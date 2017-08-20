@@ -10,7 +10,7 @@ import java.io.Serializable
 class EditProfileReq(val name: String,
                      val login: String,
                      var avatar: String = "") : Serializable {
-    val id = DaggerService.appComponent.dataManager().getProfileId()
+    var id = DaggerService.appComponent.dataManager().getProfileId()
 
     var avatarChanged = false
 }

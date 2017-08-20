@@ -7,7 +7,7 @@ import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
+import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -44,7 +44,7 @@ class AlbumModel(val dataManager: DataManager,
 
     override fun getProfileId() = dataManager.getProfileId()
 
-    override fun editAlbum(albumReq: EditAlbumReq): Observable<JobStatus> {
+    override fun editAlbum(albumReq: AlbumEditReq): Observable<JobStatus> {
         return albumJobQueue.queueEditJob(albumReq)
                 .ioToMain()
     }

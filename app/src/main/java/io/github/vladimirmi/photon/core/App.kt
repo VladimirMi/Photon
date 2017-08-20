@@ -3,7 +3,6 @@ package io.github.vladimirmi.photon.core
 import android.app.Application
 import android.content.Context
 import com.crashlytics.android.Crashlytics
-import com.squareup.leakcanary.LeakCanary
 import com.squareup.leakcanary.RefWatcher
 import io.fabric.sdk.android.Fabric
 import io.github.vladimirmi.photon.BuildConfig
@@ -28,8 +27,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        if (LeakCanary.isInAnalyzerProcess(this)) return
-
+//        if (LeakCanary.isInAnalyzerProcess(this)) return
 //        refWatcher = LeakCanary.install(this)
 
         Realm.init(this)

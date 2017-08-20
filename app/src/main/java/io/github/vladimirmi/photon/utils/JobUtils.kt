@@ -3,11 +3,11 @@ package io.github.vladimirmi.photon.utils
 import com.birbit.android.jobqueue.*
 import com.birbit.android.jobqueue.callback.JobManagerCallback
 import com.crashlytics.android.Crashlytics
+import io.github.vladimirmi.photon.utils.JobStatus.Status.*
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 import timber.log.Timber
-import java.io.Serializable
 import java.net.SocketTimeoutException
 
 /**
@@ -24,13 +24,6 @@ object JobGroup {
     const val PHOTOCARD = "PHOTOCARD"
     const val ALBUM = "ALBUM"
     const val PROFILE = "PROFILE"
-}
-
-enum class JobType() {
-    ROOT,
-    CREATE,
-    DELETE,
-    UNIQUE
 }
 
 open class EmptyJobCallback : JobManagerCallback {
@@ -89,18 +82,21 @@ fun <T : Job> JobManager.singleResultFor(localJob: T): Single<Unit> {
     }
 }
 
-enum class JobStatus {ADDED, RUN, AFTER_RUN }
+class JobStatus(val job: Job, val status: Status) {
+    enum class Status {ADDED, RUN, AFTER_RUN, DONE }
+}
 
 fun <T : Job> JobManager.observableFor(localJob: T): Observable<JobStatus> {
     return Observable.create { e ->
         val callback = object : EmptyJobCallback() {
             override fun onDone(job: Job) {
-                if (!e.isDisposed && localJob.id == job.id) e.onComplete()
+                if (!e.isDisposed && localJob.id == job.id) {
+                    e.onNext(JobStatus(job, DONE))
+                    e.onComplete()
+                }
             }
 
             override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
-                Timber.e("onJobCancelled job ${job.tags} ")
-                Timber.e("onJobCancelled byCancelRequest $byCancelRequest ")
                 Timber.e(throwable, throwable?.localizedMessage)
                 if (!e.isDisposed && localJob.id == job.id) {
                     if (throwable != null) e.onError(throwable)
@@ -108,48 +104,15 @@ fun <T : Job> JobManager.observableFor(localJob: T): Observable<JobStatus> {
             }
 
             override fun onAfterJobRun(job: Job, resultCode: Int) {
-                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus.AFTER_RUN)
+                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus(job, AFTER_RUN))
             }
 
             override fun onJobAdded(job: Job) {
-                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus.ADDED)
+                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus(job, ADDED))
             }
 
             override fun onJobRun(job: Job, resultCode: Int) {
-                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus.RUN)
-            }
-        }
-
-        addCallback(callback)
-        e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
-    }
-}
-
-class Payload<T : Serializable> : Serializable {
-    var value: T? = null
-}
-
-interface WithPayload {
-    val payload: Payload<*>
-}
-
-fun <T : Job> JobManager.observablePayloadFor(localJob: T): Observable<Payload<*>> {
-    return Observable.create { e ->
-        val callback = object : EmptyJobCallback() {
-            override fun onDone(job: Job) {
-                if (!e.isDisposed && localJob.id == job.id) {
-                    if (job is WithPayload) e.onNext(job.payload)
-                    e.onComplete()
-                }
-            }
-
-            override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
-                Timber.e("onJobCancelled job ${job.tags} ")
-                Timber.e("onJobCancelled byCancelRequest $byCancelRequest ")
-                Timber.e(throwable, throwable?.localizedMessage)
-                if (!e.isDisposed && localJob.id == job.id) {
-                    if (throwable != null) e.onError(throwable) else e.onComplete()
-                }
+                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus(job, RUN))
             }
         }
 

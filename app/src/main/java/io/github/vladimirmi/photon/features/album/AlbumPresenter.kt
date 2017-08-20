@@ -7,7 +7,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
-import io.github.vladimirmi.photon.data.models.req.EditAlbumReq
+import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreenInfo
@@ -77,7 +77,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
     }
 
-    fun editAlbum(albumReq: EditAlbumReq) {
+    fun editAlbum(albumReq: AlbumEditReq) {
         view.closeEditDialog()
         if (albumChange(albumReq)) {
             albumReq.id = album.id
@@ -99,7 +99,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         setEditable(false)
     }
 
-    private fun albumChange(albumReq: EditAlbumReq): Boolean {
+    private fun albumChange(albumReq: AlbumEditReq): Boolean {
         val name = view.name.text.toString()
         val description = view.description.text.toString()
         var albumChanged = false

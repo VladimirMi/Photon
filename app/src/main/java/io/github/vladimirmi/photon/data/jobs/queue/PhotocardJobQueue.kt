@@ -1,128 +1,69 @@
 package io.github.vladimirmi.photon.data.jobs.queue
 
-import com.birbit.android.jobqueue.JobManager
-import com.birbit.android.jobqueue.TagConstraint
 import io.github.vladimirmi.photon.data.jobs.*
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.utils.*
+import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.utils.JobStatus
+import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
-import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 25.07.2017.
  */
 
-class PhotocardJobQueue(private val jobManager: JobManager, private val dataManager: DataManager) {
+class PhotocardJobQueue(private val jobQueue: JobQueue,
+                        private val dataManager: DataManager) {
 
-    fun queueCreateJob(id: String, albumId: String): Observable<JobStatus> {
-        Timber.e("queueCreateJob: ")
-        val job = PhotocardCreateJob(id, albumId)
-        jobManager.addJobInBackground(job)
-        syncPhotocardJobsAfter(job)
-        return jobManager.observableFor(job)
+    fun queueCreateJob(photocard: Photocard, albumId: String): Observable<JobStatus> {
+        return Observable.just {
+            val album = dataManager.getDetachedObjFromDb(Album::class.java, albumId)!!
+            album.photocards.add(photocard)
+            dataManager.saveToDB(album)
+        }
+                .flatMap { jobQueue.add(PhotocardCreateJob(photocard.id, albumId)) }
+                .ioToMain()
     }
 
     fun queueDeleteJob(id: String): Observable<JobStatus> {
-        return jobManager.singleCancelJobs(TagConstraint.ANY, JobGroup.PHOTOCARD + id)
-                .map {
-                    if (photocardIsTemp(id)) {
-                        Timber.e("queueDeleteJob: ")
-                        PhotocardDeleteJob(id, skipNetworkPart = true)
-                    } else {
-                        Timber.e("queueDeleteJob: net")
-                        PhotocardDeleteJob(id)
-                    }
-                }
-                .flatMapObservable {
-                    jobManager.addJobInBackground(it)
-                    jobManager.observableFor(it)
-                }
+        return Observable.just {
+            val cache = DaggerService.appComponent.cache()
+            cache.removePhoto(id)
+            dataManager.removeFromDb(Photocard::class.java, id)
+        }
+                .flatMap { jobQueue.add(PhotocardDeleteJob(id)) }
+                .ioToMain()
     }
 
 
     fun queueAddViewJob(id: String): Observable<JobStatus> {
-        val job = if (photocardIsTemp(id)) {
-            Timber.e("queueAddViewJob: ")
-            PhotocardAddViewJob(id, skipNetworkPart = true)
-        } else {
-            Timber.e("queueAddViewJob: net")
-            PhotocardAddViewJob(id)
+        return Observable.just {
+            val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, id)!!
+            dataManager.saveToDB(photocard.apply { views++ })
         }
-        jobManager.addJobInBackground(job)
-        return jobManager.observableFor(job)
+                .flatMap { jobQueue.add(PhotocardAddViewJob(id)) }
+                .ioToMain()
     }
 
     fun queueAddToFavoriteJob(id: String): Observable<JobStatus> {
-        val favAlbumId = dataManager.getUserFavAlbumId()
-        return jobManager.singleCancelJobs(TagConstraint.ANY, PhotocardDeleteFromFavoriteJob.TAG + id)
-                .map {
-                    if (photocardIsTemp(id) || it.cancelledJobs.isNotEmpty()) {
-                        Timber.e("queueAddToFavoriteJob: ")
-                        PhotocardAddToFavoriteJob(id, favAlbumId, skipNetworkPart = true)
-                    } else {
-                        Timber.e("queueAddToFavoriteJob: net")
-                        PhotocardAddToFavoriteJob(id, favAlbumId)
-                    }
-                }
-                .flatMapObservable {
-                    jobManager.addJobInBackground(it)
-                    jobManager.observableFor(it)
-                }
+        return Observable.just {
+            val favAlbumId = dataManager.getUserFavAlbumId()
+            val album = dataManager.getDetachedObjFromDb(Album::class.java, favAlbumId)!!
+            val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, id)!!
+            dataManager.saveToDB(album.apply { photocards.add(photocard) })
+        }
+                .flatMap { jobQueue.add(PhotocardAddToFavoriteJob(id)) }
+                .ioToMain()
     }
 
     fun queueDeleteFromFavoriteJob(id: String): Observable<JobStatus> {
-        val favAlbumId = dataManager.getUserFavAlbumId()
-
-        return jobManager.singleCancelJobs(TagConstraint.ANY, PhotocardAddToFavoriteJob.TAG + id)
-                .map {
-                    if (photocardIsTemp(id) || it.cancelledJobs.isNotEmpty()) {
-                        Timber.e("queueDeleteFromFavoriteJob: ")
-                        PhotocardDeleteFromFavoriteJob(id, favAlbumId, skipNetworkPart = true)
-                    } else {
-                        Timber.e("queueDeleteFromFavoriteJob: net")
-                        PhotocardDeleteFromFavoriteJob(id, favAlbumId)
-                    }
-                }
-                .flatMapObservable {
-                    jobManager.addJobInBackground(it)
-                    jobManager.observableFor(it)
-                }
-    }
-
-    private fun syncPhotocardJobsAfter(job: PhotocardCreateJob) {
-        jobManager.observablePayloadFor(job)
-                .flatMap { payload ->
-                    Timber.e("syncPhotocardJobsAfter: ${payload.value as String}")
-                    substituteTempJobs(job.photocardId, payload.value as String)
-                }
-                .subscribeWith(ErrorObserver())
-    }
-
-    private fun substituteTempJobs(tempId: String, newId: String): Observable<Unit> {
-        return jobManager.singleCancelJobs(TagConstraint.ANY, JobGroup.PHOTOCARD + tempId)
-                .flatMapObservable {
-                    Timber.e("substituteTempJobs: ${it.cancelledJobs}")
-                    Timber.e("substituteTempJobs: ${it.failedToCancel}")
-                    Observable.fromIterable(it.cancelledJobs + it.failedToCancel)
-                }
-                .map { it.tags?.let { handleCancelledTags(it, tempId, newId) } ?: Unit }
-    }
-
-
-    private fun handleCancelledTags(tags: Set<String>, tempId: String, newId: String) {
-        Timber.e("handleCancelledTags: $tags, $tempId, $newId")
-        when {
-            tags.contains(PhotocardAddViewJob.TAG + tempId) -> queueAddViewJob(newId)
-                    .subscribeWith(ErrorObserver<JobStatus>())
-
-            tags.contains(PhotocardAddToFavoriteJob.TAG + tempId) -> queueAddToFavoriteJob(newId)
-                    .subscribeWith(ErrorObserver<JobStatus>())
-
-            tags.contains(PhotocardDeleteFromFavoriteJob.TAG + tempId) -> queueDeleteFromFavoriteJob(newId)
-                    .subscribeWith(ErrorObserver<JobStatus>())
+        return Observable.just {
+            val favAlbumId = dataManager.getUserFavAlbumId()
+            val album = dataManager.getDetachedObjFromDb(Album::class.java, favAlbumId)!!
+            dataManager.saveToDB(album.apply { photocards.removeAll { it.id == id } })
         }
+                .flatMap { jobQueue.add(PhotocardDeleteFromFavoriteJob(id)) }
+                .ioToMain()
     }
-
-    private fun photocardIsTemp(id: String) = id.startsWith(Photocard.TEMP)
 }

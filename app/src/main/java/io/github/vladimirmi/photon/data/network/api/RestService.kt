@@ -75,7 +75,7 @@ interface RestService {
     @PUT("user/{userId}/album/{id}")
     fun editAlbum(@Path("userId") userId: String,
                   @Path("id") id: String,
-                  @Body req: EditAlbumReq,
+                  @Body req: AlbumEditReq,
                   @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<Album>>
 
