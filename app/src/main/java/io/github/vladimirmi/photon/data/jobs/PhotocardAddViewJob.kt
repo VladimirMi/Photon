@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.data.jobs
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import io.github.vladimirmi.photon.data.jobs.queue.JobTask
+import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.JobGroup
 import io.github.vladimirmi.photon.utils.JobPriority
@@ -24,9 +25,21 @@ class PhotocardAddViewJob(photocardId: String) :
     }
 
     override var entityId = photocardId
-    override var parentEntityId = photocardId
+    override var parentEntityId
+        get() = entityId
+        set(value) {
+            entityId = value
+        }
     override val tag = TAG
     override val type = JobTask.Type.NORMAL
+
+    override fun onQueued() {
+        val dataManager = DaggerService.appComponent.dataManager()
+        val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, id)!!
+        dataManager.saveToDB(photocard.apply { views++ })
+    }
+
+    override fun onAdded() {}
 
     override fun onRun() {
         val dataManager = DaggerService.appComponent.dataManager()
@@ -38,12 +51,10 @@ class PhotocardAddViewJob(photocardId: String) :
         error?.let { throw it }
     }
 
-    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
-            cancelOrWait(throwable, runCount)
-
-    override fun onAdded() {}
-
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
     }
+
+    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
+            cancelOrWait(throwable, runCount)
 }

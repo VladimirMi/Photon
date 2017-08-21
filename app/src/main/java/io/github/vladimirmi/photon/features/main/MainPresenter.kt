@@ -155,8 +155,9 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     fun openPhotocardScreen(photocard: PhotocardDto) {
-        model.addView(photocard.id)
-        Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
+        compDisp.add(model.addView(photocard.id)
+                .doOnNext { Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner)) }
+                .subscribeWith(ErrorObserver()))
     }
 
     private fun openSearchScreen() {

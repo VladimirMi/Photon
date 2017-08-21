@@ -15,15 +15,13 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
-class ProfileModel(val dataManager: DataManager,
-                   val albumJobQueue: AlbumJobQueue,
-                   val profileJobQueue: ProfileJobQueue,
-                   val cache: Cache)
+class ProfileModel(private val dataManager: DataManager,
+                   private val albumJobQueue: AlbumJobQueue,
+                   private val profileJobQueue: ProfileJobQueue,
+                   private val cache: Cache)
     : IProfileModel {
 
-    override fun isUserAuth(): Boolean {
-        return dataManager.isUserAuth()
-    }
+    override fun isUserAuth() = dataManager.isUserAuth()
 
     override fun getProfile(): Observable<UserDto> {
         val id = dataManager.getProfileId()
@@ -53,13 +51,10 @@ class ProfileModel(val dataManager: DataManager,
                 .subscribeWith(ErrorObserver())
     }
 
-    override fun createAlbum(newAlbumReq: NewAlbumReq): Observable<JobStatus> {
-        return albumJobQueue.queueCreateJob(newAlbumReq)
-                .ioToMain()
-    }
+    override fun createAlbum(newAlbumReq: NewAlbumReq): Observable<JobStatus> =
+            albumJobQueue.queueCreateJob(newAlbumReq).ioToMain()
 
-    override fun editProfile(profileReq: EditProfileReq): Observable<JobStatus> {
-        return profileJobQueue.queueEditJob(profileReq)
-                .ioToMain()
-    }
+    override fun editProfile(profileReq: EditProfileReq): Observable<JobStatus> =
+            profileJobQueue.queueEditJob(profileReq).ioToMain()
+
 }

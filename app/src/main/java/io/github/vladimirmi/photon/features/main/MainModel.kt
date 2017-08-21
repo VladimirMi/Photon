@@ -16,9 +16,9 @@ import io.realm.Sort
  * Developer Vladimir Mikhalev, 03.06.2017.
  */
 
-class MainModel(val dataManager: DataManager,
-                val photocardJobQueue: PhotocardJobQueue,
-                val cache: Cache) : IMainModel {
+class MainModel(private val dataManager: DataManager,
+                private val photocardJobQueue: PhotocardJobQueue,
+                private val cache: Cache) : IMainModel {
 
     var query = ArrayList<Query>()
     override var queryPage = SearchView.Page.TAGS
@@ -51,10 +51,8 @@ class MainModel(val dataManager: DataManager,
         queryPage = SearchView.Page.TAGS
     }
 
-    override fun addView(photocardId: String): Observable<JobStatus> {
-        return photocardJobQueue.queueAddViewJob(photocardId)
-                .ioToMain()
-    }
+    override fun addView(photocardId: String): Observable<JobStatus> =
+            photocardJobQueue.queueAddViewJob(photocardId).ioToMain()
 
     override fun updatePhotocards(offset: Int, limit: Int): Observable<Unit> {
         return dataManager.isNetworkAvailable()

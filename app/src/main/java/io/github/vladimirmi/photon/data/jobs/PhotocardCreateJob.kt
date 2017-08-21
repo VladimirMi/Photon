@@ -36,6 +36,8 @@ class PhotocardCreateJob(photocardId: String,
     override val tag = TAG
     override val type = JobTask.Type.CREATE
 
+    override fun onQueued() {}
+
     override fun onAdded() {}
 
     @Throws(Throwable::class)

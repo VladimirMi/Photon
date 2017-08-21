@@ -7,6 +7,7 @@ import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 /**
@@ -34,9 +35,10 @@ class RootModel(private val dataManager: DataManager,
 
     override fun logout() = dataManager.logout()
 
-    override fun isNetAvail(): Boolean = dataManager.checkNetAvail()
+    override fun isNetAvail() = dataManager.checkNetAvail()
 
-    override fun execJobQueue() = jobQueue.execQueue()
+    override fun execJobQueue(): Observable<Unit>
+            = jobQueue.execQueue().subscribeOn(Schedulers.newThread())
 
     private fun saveUser(user: User) {
         dataManager.saveToDB(user)

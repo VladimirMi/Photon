@@ -5,6 +5,7 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
 import io.github.vladimirmi.photon.data.jobs.queue.JobTask
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.schedulers.Schedulers
@@ -26,9 +27,20 @@ class PhotocardDeleteFromFavoriteJob(photocardId: String)
     }
 
     override var entityId = photocardId
-    override var parentEntityId = photocardId
+    override var parentEntityId
+        get() = entityId
+        set(value) {
+            entityId = value
+        }
     override val tag = TAG
     override val type = JobTask.Type.OTHER
+
+    override fun onQueued() {
+        val dataManager = DaggerService.appComponent.dataManager()
+        val favAlbumId = dataManager.getUserFavAlbumId()
+        val album = dataManager.getDetachedObjFromDb(Album::class.java, favAlbumId)!!
+        dataManager.saveToDB(album.apply { photocards.removeAll { it.id == id } })
+    }
 
     override fun onAdded() {}
 

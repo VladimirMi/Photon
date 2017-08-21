@@ -18,10 +18,10 @@ import java.util.*
  * Created by Vladimir Mikhalev 19.06.2017.
  */
 
-class AlbumModel(val dataManager: DataManager,
-                 val photocardJobQueue: PhotocardJobQueue,
-                 val albumJobQueue: AlbumJobQueue,
-                 val cache: Cache) : IAlbumModel {
+class AlbumModel(private val dataManager: DataManager,
+                 private val photocardJobQueue: PhotocardJobQueue,
+                 private val albumJobQueue: AlbumJobQueue,
+                 private val cache: Cache) : IAlbumModel {
 
     override fun getAlbum(id: String): Observable<AlbumDto> {
         updateAlbum(id)
@@ -44,20 +44,15 @@ class AlbumModel(val dataManager: DataManager,
 
     override fun getProfileId() = dataManager.getProfileId()
 
-    override fun editAlbum(albumReq: AlbumEditReq): Observable<JobStatus> {
-        return albumJobQueue.queueEditJob(albumReq)
-                .ioToMain()
-    }
+    override fun editAlbum(albumReq: AlbumEditReq): Observable<JobStatus> =
+            albumJobQueue.queueEditJob(albumReq).ioToMain()
 
-    override fun deleteAlbum(albumId: String): Observable<JobStatus> {
-        return albumJobQueue.queueDeleteJob(albumId)
-                .ioToMain()
-    }
+    override fun deleteAlbum(albumId: String): Observable<JobStatus> =
+            albumJobQueue.queueDeleteJob(albumId).ioToMain()
 
-    override fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Single<Unit> {
-        return removePhotosById(photosForDelete.map { it.id }, album.isFavorite)
-                .ioToMain()
-    }
+    override fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Single<Unit> =
+            removePhotosById(photosForDelete.map { it.id }, album.isFavorite).ioToMain()
+
 
     private fun removePhotosById(photosForDelete: List<String>,
                                  isFavorite: Boolean = false): Single<Unit> {

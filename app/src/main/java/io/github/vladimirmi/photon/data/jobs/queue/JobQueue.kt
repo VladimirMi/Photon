@@ -2,16 +2,14 @@ package io.github.vladimirmi.photon.data.jobs.queue
 
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.JobManager
-import com.birbit.android.jobqueue.persistentQueue.sqlite.SqliteJobQueue
-import io.github.vladimirmi.photon.data.jobs.PhotocardAddToFavoriteJob
-import io.github.vladimirmi.photon.data.jobs.PhotocardDeleteFromFavoriteJob
+import io.github.vladimirmi.photon.data.jobs.*
 import io.github.vladimirmi.photon.data.jobs.queue.JobTask.Type.*
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.Task
 import io.github.vladimirmi.photon.data.models.realm.deleteAll
-import io.github.vladimirmi.photon.data.models.realm.find
+import io.github.vladimirmi.photon.data.models.realm.findParent
 import io.github.vladimirmi.photon.utils.JobStatus
-import io.github.vladimirmi.photon.utils.ioToMain
+import io.github.vladimirmi.photon.utils.Serializer
 import io.github.vladimirmi.photon.utils.observableFor
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -23,7 +21,7 @@ import io.reactivex.Single
 class JobQueue(private val dataManager: DataManager,
                private val jobManager: JobManager) {
 
-    private val javaSerializer = SqliteJobQueue.JavaSerializer()
+    private val serializer = Serializer()
 
     private val root = dataManager.getDetachedObjFromDb(Task::class.java, "ROOT") ?:
             Task(id = "ROOT", entityId = "ROOT", type = CREATE.name)
@@ -31,6 +29,7 @@ class JobQueue(private val dataManager: DataManager,
 
 
     fun add(job: JobTask): Observable<JobStatus> {
+        job.onQueued()
         with(job) {
             when (type) {
                 CREATE -> getParentForCreateJob(job)
@@ -44,38 +43,26 @@ class JobQueue(private val dataManager: DataManager,
         return jobManager.observableFor(job as Job)
     }
 
-    private fun createTask(job: JobTask) = with(job) {
-        Task(id = (job as Job).id,
-                entityId = entityId,
-                tag = tag,
-                type = type.name,
-                task = javaSerializer.serialize(job))
-    }
-
-
     fun execQueue(): Observable<Unit> {
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getObjectFromDb(Task::class.java, "ROOT") }
                 .filter { it.queue.isNotEmpty() }
                 .flatMapSingle { execTask() }
-                .ioToMain()
     }
 
     private fun execTask(): Single<Unit> {
         val task = root.queue[0]
-        val job = javaSerializer.deserialize<Job>(task.task)
-        (job as? JobTask)?.apply { parentEntityId = task.parentEntityId }
-                ?: throw IllegalStateException("Job${job.tags} not implements JobTask interface")
+        val job = createJob(task)
+//        (job as? JobTask)?.apply { parentEntityId = task.parentEntityId }
+//                ?: throw IllegalStateException("Job${job.tags} not implements JobTask interface")
 
         return Single.just(jobManager.addJobInBackground(job))
                 .flatMap {
-                    job as JobTask
-                    if (job.type == CREATE) {
+                    if ((job as JobTask).type == CREATE) {
                         jobManager.observableFor(job)
                                 .filter { it.status == JobStatus.Status.DONE }
-                                .cast(JobTask::class.java)
-                                .map { it.entityId }
+                                .map { (it.job as JobTask).entityId }
                                 .first("")
                     } else Single.just("")
                 }
@@ -83,20 +70,43 @@ class JobQueue(private val dataManager: DataManager,
                     if (newId.isNotEmpty()) {
                         task.queue.forEach { it.parentEntityId = newId }
                     }
-                    root.queue.addAll(task.queue)
                     root.queue.remove(task)
+                    dataManager.removeFromDb(Task::class.java, task.id)
+                    root.queue.addAll(task.queue)
                     dataManager.saveToDB(root)
                 }
     }
 
-    private fun getParentForCreateJob(job: JobTask) =
-            root.find { it.entityId == job.parentEntityId && it.type == CREATE.name }
 
+    private fun createTask(job: JobTask) = with(job) {
+        Task(id = (job as Job).id,
+                entityId = entityId,
+                tag = tag,
+                type = type.name,
+                request = serializer.serialize(request))
+    }
+
+    private fun createJob(task: Task): Job = with(task) {
+        when (tag) {
+            AlbumCreateJob.TAG -> AlbumCreateJob(serializer.deserialize(request!!))
+            AlbumDeleteJob.TAG -> AlbumDeleteJob(entityId)
+            AlbumEditJob.TAG -> AlbumEditJob(serializer.deserialize(request!!))
+            PhotocardCreateJob.TAG -> PhotocardCreateJob(entityId, parentEntityId)
+            PhotocardDeleteJob.TAG -> PhotocardDeleteJob(entityId)
+            PhotocardAddViewJob.TAG -> PhotocardAddViewJob(entityId)
+            PhotocardAddToFavoriteJob.TAG -> PhotocardAddToFavoriteJob(entityId)
+            PhotocardDeleteFromFavoriteJob.TAG -> PhotocardDeleteFromFavoriteJob(entityId)
+            ProfileEditJob.TAG -> ProfileEditJob(serializer.deserialize(request!!))
+            else -> throw IllegalArgumentException("Unknown task")
+        }
+    }
+
+    private fun getParentForCreateJob(job: JobTask) = root.findParent(job.parentEntityId)
 
     private fun getParentForUniqueJob(job: JobTask): Task {
-        root.deleteAll { it.entityId == job.entityId && it.tag == job.tag }
-
-        return root.find { it.entityId == job.entityId && it.type == CREATE.name }
+        val deleted = root.deleteAll { it.entityId == job.entityId && it.tag == job.tag }
+        deleted.forEach { dataManager.removeFromDb(Task::class.java, it.id) }
+        return root.findParent(job.parentEntityId)
     }
 
     private fun getParentForOtherJob(job: JobTask): Task? {
@@ -105,19 +115,19 @@ class JobQueue(private val dataManager: DataManager,
                 val deleted = root.deleteAll {
                     it.entityId == job.entityId && it.tag == PhotocardAddToFavoriteJob.TAG
                 }
+                deleted.forEach { dataManager.removeFromDb(Task::class.java, it.id) }
                 return if (deleted.isNotEmpty()) null
-                else root.find { it.entityId == job.entityId && it.type == CREATE.name }
+                else root.findParent(job.parentEntityId)
             }
             else -> root
         }
     }
 
-    private fun getParentForNormalJob(job: JobTask) =
-            root.find { it.entityId == job.entityId && it.type == CREATE.name }
+    private fun getParentForNormalJob(job: JobTask) = root.findParent(job.parentEntityId)
 
     private fun getParentForDeleteJob(job: JobTask): Task? {
         val deleted = root.deleteAll { it.entityId == job.entityId }
-        return if (deleted.find { it.type == CREATE.name } != null) root else null
+        deleted.forEach { dataManager.removeFromDb(Task::class.java, it.id) }
+        return if (deleted.find { it.type == CREATE.name } == null) root else null
     }
-
 }

@@ -15,7 +15,7 @@ import java.util.*
  * Created by Vladimir Mikhalev 20.07.2017.
  */
 
-class AlbumEditJob(private val request: AlbumEditReq)
+class AlbumEditJob(override val request: AlbumEditReq)
     : Job(Params(JobPriority.LOW)
         .setGroupId(JobGroup.ALBUM)
         .requireNetwork()
@@ -26,15 +26,28 @@ class AlbumEditJob(private val request: AlbumEditReq)
     }
 
     override var entityId = request.id
-    override var parentEntityId = request.id
+    override var parentEntityId
+        get() = entityId
+        set(value) {
+            entityId = value
+        }
     override val tag = TAG
     override val type = JobTask.Type.UNIQUE
+
+    override fun onQueued() {
+        val dataManager = DaggerService.appComponent.dataManager()
+        val album = dataManager.getDetachedObjFromDb(Album::class.java, request.id)!!.apply {
+            title = request.title
+            description = request.description
+        }
+        dataManager.saveToDB(album)
+    }
 
     override fun onAdded() {}
 
     override fun onRun() {
         val dataManager = DaggerService.appComponent.dataManager()
-        request.id = parentEntityId
+        request.id = entityId
 
         var error: Throwable? = null
         dataManager.editAlbum(request)
@@ -50,6 +63,9 @@ class AlbumEditJob(private val request: AlbumEditReq)
         }
     }
 
+    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
+            cancelOrWait(throwable, runCount)
+
     private fun updateAlbum() {
         val dataManager = DaggerService.appComponent.dataManager()
 
@@ -61,7 +77,4 @@ class AlbumEditJob(private val request: AlbumEditReq)
                     }
                 })
     }
-
-    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
-            cancelOrWait(throwable, runCount)
 }

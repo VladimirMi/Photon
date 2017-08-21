@@ -17,9 +17,9 @@ import java.util.*
  * Created by Vladimir Mikhalev 14.06.2017.
  */
 
-class PhotocardModel(val dataManager: DataManager,
-                     val photocardJobQueue: PhotocardJobQueue,
-                     val cache: Cache) : IPhotocardModel {
+class PhotocardModel(private val dataManager: DataManager,
+                     private val photocardJobQueue: PhotocardJobQueue,
+                     private val cache: Cache) : IPhotocardModel {
 
     override fun getUser(id: String): Observable<UserDto> {
         updateUser(id)
@@ -57,15 +57,11 @@ class PhotocardModel(val dataManager: DataManager,
                 .subscribeWith(ErrorObserver())
     }
 
-    override fun addToFavorite(id: String): Observable<JobStatus> {
-        return photocardJobQueue.queueAddToFavoriteJob(id)
-                .ioToMain()
-    }
+    override fun addToFavorite(id: String): Observable<JobStatus> =
+            photocardJobQueue.queueAddToFavoriteJob(id).ioToMain()
 
-    override fun removeFromFavorite(id: String): Observable<JobStatus> {
-        return photocardJobQueue.queueDeleteFromFavoriteJob(id)
-                .ioToMain()
-    }
+    override fun removeFromFavorite(id: String): Observable<JobStatus> =
+            photocardJobQueue.queueDeleteFromFavoriteJob(id).ioToMain()
 
 
     override fun isFavorite(id: String): Observable<Boolean> {

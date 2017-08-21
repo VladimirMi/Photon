@@ -4,6 +4,7 @@ import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import io.github.vladimirmi.photon.data.jobs.queue.JobTask
+import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.schedulers.Schedulers
@@ -25,9 +26,18 @@ class PhotocardDeleteJob(photocardId: String)
     }
 
     override var entityId = photocardId
-    override var parentEntityId = photocardId
+    override var parentEntityId
+        get() = entityId
+        set(value) {
+            entityId = value
+        }
     override val tag = TAG
     override val type = JobTask.Type.DELETE
+
+    override fun onQueued() {
+        DaggerService.appComponent.cache().removePhoto(id)
+        DaggerService.appComponent.dataManager().removeFromDb(Photocard::class.java, id)
+    }
 
     override fun onAdded() {}
 

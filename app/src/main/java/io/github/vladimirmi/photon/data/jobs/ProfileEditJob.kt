@@ -5,6 +5,7 @@ import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import io.github.vladimirmi.photon.data.jobs.queue.JobTask
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.EditProfileReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.*
@@ -18,7 +19,7 @@ import java.util.*
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class ProfileEditJob(private val request: EditProfileReq)
+class ProfileEditJob(override val request: EditProfileReq)
     : Job(Params(JobPriority.HIGH)
         .setGroupId(JobGroup.PROFILE)
         .requireNetwork()
@@ -29,9 +30,25 @@ class ProfileEditJob(private val request: EditProfileReq)
     }
 
     override var entityId = request.id
-    override var parentEntityId = request.id
+    override var parentEntityId
+        get() = entityId
+        set(value) {
+            entityId = value
+        }
     override val tag = TAG
     override val type = JobTask.Type.UNIQUE
+
+    override fun onQueued() {
+        val dataManager = DaggerService.appComponent.dataManager()
+        val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
+
+        profile.apply {
+            login = request.login
+            name = request.name
+            avatar = request.avatar
+        }
+        dataManager.saveToDB(profile)
+    }
 
     override fun onAdded() {}
 
@@ -74,6 +91,9 @@ class ProfileEditJob(private val request: EditProfileReq)
         }
     }
 
+    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
+            cancelOrWait(throwable, runCount)
+
     private fun updateProfile() {
         val dataManager = DaggerService.appComponent.dataManager()
 
@@ -82,8 +102,5 @@ class ProfileEditJob(private val request: EditProfileReq)
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(ErrorObserver())
     }
-
-    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
-            cancelOrWait(throwable, runCount)
 
 }

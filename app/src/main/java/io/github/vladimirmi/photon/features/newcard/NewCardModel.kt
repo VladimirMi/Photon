@@ -86,6 +86,7 @@ class NewCardModel(val dataManager: DataManager,
             owner = dataManager.getProfileId()
         }
         return photocardJobQueue.queueCreateJob(photoCard, screenInfo.album)
+                .ioToMain()
     }
 }
 

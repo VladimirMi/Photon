@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.data.models.realm
 
+import io.github.vladimirmi.photon.data.jobs.queue.JobTask
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
@@ -16,12 +17,12 @@ open class Task(@PrimaryKey var id: String = "",
                 var tag: String = "",
                 var type: String = "",
                 var queue: RealmList<Task> = RealmList(),
-                var task: ByteArray = ByteArray(0)
+                var request: ByteArray? = null
 
 
 ) : RealmObject()
 
-fun Task.find(predicate: (Task) -> Boolean): Task {
+fun Task.find(predicate: (Task) -> Boolean): Task? {
     checkIfRoot()
     val queue = LinkedList<Task>()
     queue.add(this)
@@ -31,7 +32,12 @@ fun Task.find(predicate: (Task) -> Boolean): Task {
         if (predicate(task)) return task
         if (task.queue.isNotEmpty()) queue.addAll(task.queue)
     }
-    return this
+    return null
+}
+
+fun Task.findParent(parentEntityId: String): Task {
+    checkIfRoot()
+    return find { it.entityId == parentEntityId && it.type == JobTask.Type.CREATE.name } ?: this
 }
 
 fun Task.deleteAll(predicate: (Task) -> Boolean): ArrayList<Task> {
@@ -54,5 +60,5 @@ fun Task.deleteAll(predicate: (Task) -> Boolean): ArrayList<Task> {
 }
 
 private fun Task.checkIfRoot() {
-    if (this.id != "ROOT") throw IllegalStateException("Function is applicable only for root task")
+    if (this.id != "ROOT") throw IllegalStateException("Function is applicable only for the root task")
 }

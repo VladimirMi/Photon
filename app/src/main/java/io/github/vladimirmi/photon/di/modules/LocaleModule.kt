@@ -72,16 +72,13 @@ class LocaleModule(val context: Context) {
 
     @Provides
     @DaggerScope(App::class)
-    fun providePhotocardJobQueue(jobQueue: JobQueue, dataManager: DataManager) =
-            PhotocardJobQueue(jobQueue, dataManager)
+    fun providePhotocardJobQueue(jobQueue: JobQueue) = PhotocardJobQueue(jobQueue)
 
     @Provides
     @DaggerScope(App::class)
-    fun provideAlbumJobQueue(jobQueue: JobQueue, dataManager: DataManager) =
-            AlbumJobQueue(jobQueue, dataManager)
+    fun provideAlbumJobQueue(jobQueue: JobQueue) = AlbumJobQueue(jobQueue)
 
     @Provides
     @DaggerScope(App::class)
-    fun provideProfileJobQueue(jobQueue: JobQueue, dataManager: DataManager) =
-            ProfileJobQueue(jobQueue, dataManager)
+    fun provideProfileJobQueue(jobQueue: JobQueue) = ProfileJobQueue(jobQueue)
 }

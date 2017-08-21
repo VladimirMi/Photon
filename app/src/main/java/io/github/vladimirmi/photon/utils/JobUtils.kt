@@ -83,7 +83,7 @@ fun <T : Job> JobManager.singleResultFor(localJob: T): Single<Unit> {
 }
 
 class JobStatus(val job: Job, val status: Status) {
-    enum class Status {ADDED, RUN, AFTER_RUN, DONE }
+    enum class Status {ADDED, RUN, AFTER_RUN, DONE, QUEUED }
 }
 
 fun <T : Job> JobManager.observableFor(localJob: T): Observable<JobStatus> {
@@ -117,6 +117,7 @@ fun <T : Job> JobManager.observableFor(localJob: T): Observable<JobStatus> {
         }
 
         addCallback(callback)
+        e.onNext(JobStatus(localJob, QUEUED))
         e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
     }
 }
