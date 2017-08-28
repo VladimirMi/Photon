@@ -1,21 +1,21 @@
 package io.github.vladimirmi.photon.data.managers
 
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
+import io.github.vladimirmi.photon.data.models.dto.Cached
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
-import io.github.vladimirmi.photon.data.models.realm.*
-import java.util.TreeSet
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
-import kotlin.collections.List
-import kotlin.collections.forEach
-import kotlin.collections.toList
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.User
+import io.realm.RealmObject
+import java.lang.UnsupportedOperationException
 
 /**
  * Created by Vladimir Mikhalev 17.07.2017.
  */
 
 class Cache {
+    //todo разделить по сущностям, переименовать в мапперы
     private val photocardMap = LinkedHashMap<String, PhotocardDto>()
     val photocards: List<PhotocardDto> get() = photocardMap.values.toList()
     fun photocard(id: String) = photocardMap[id]
@@ -84,39 +84,11 @@ class Cache {
         userMap.remove(id)
     }
 
-
-    private val tagsSet = TreeSet<String>()
-    val tags: List<String> get() = tagsSet.toList()
-
-    fun cacheTags(list: List<Tag>): List<String> {
-        return ArrayList<String>().apply {
-            list.forEach { add(cacheTag(it)) }
+    fun cache(obj: RealmObject): Cached? =
+            when (obj) {
+                is Album -> cacheAlbum(obj)
+                is Photocard -> cachePhotocard(obj)
+                is User -> cacheUser(obj)
+                else -> throw UnsupportedOperationException()
         }
-    }
-
-    fun cacheTag(tag: Tag): String {
-        return tag.value.also { tagsSet.add(it) }
-    }
-
-    fun removeTag(id: String) {
-        tagsSet.remove(id)
-    }
-
-
-    private val searchSet = TreeSet<String>()
-    val searches: List<String> get() = searchSet.toList()
-
-    fun cacheSearches(list: List<Search>): List<String> {
-        return ArrayList<String>().apply {
-            list.forEach { add(cacheSearch(it)) }
-        }
-    }
-
-    fun cacheSearch(search: Search): String {
-        return search.value.also { searchSet.add(it) }
-    }
-
-    fun removeSearch(id: String) {
-        searchSet.remove(id)
-    }
 }

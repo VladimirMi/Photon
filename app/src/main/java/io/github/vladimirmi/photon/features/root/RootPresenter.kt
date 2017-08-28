@@ -12,7 +12,7 @@ import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavHistory
-import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import mortar.MortarScope
@@ -34,14 +34,13 @@ class RootPresenter(val model: IRootModel) :
     override fun extractBundleService(view: IRootView?): BundleService =
             BundleService.getBundleService(view as Context)
 
+    //todo сервис синхронизирующий бд
+
     override fun onEnterScope(scope: MortarScope?) {
-        super.onEnterScope(scope)
-        comDisp.add(model.execJobQueue()
-                .subscribeWith(ErrorObserver()))
+        comDisp.add(model.syncDB().subscribeWith(ErrorCompletableObserver()))
     }
 
     override fun onExitScope() {
-        super.onExitScope()
         comDisp.dispose()
     }
 

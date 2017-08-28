@@ -1,60 +1,51 @@
 package io.github.vladimirmi.photon.features.profile
 
-import io.github.vladimirmi.photon.data.jobs.queue.AlbumJobQueue
-import io.github.vladimirmi.photon.data.jobs.queue.ProfileJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.data.models.req.EditProfileReq
-import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
-import io.github.vladimirmi.photon.utils.*
+import io.github.vladimirmi.photon.utils.JobStatus
+import io.github.vladimirmi.photon.utils.Query
+import io.github.vladimirmi.photon.utils.RealmOperator
+import io.github.vladimirmi.photon.utils.ioToMain
+import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
-import java.util.*
 
 class ProfileModel(private val dataManager: DataManager,
-                   private val albumJobQueue: AlbumJobQueue,
-                   private val profileJobQueue: ProfileJobQueue,
+                   private val jobs: Jobs,
                    private val cache: Cache)
     : IProfileModel {
 
     override fun isUserAuth() = dataManager.isUserAuth()
 
     override fun getProfile(): Observable<UserDto> {
-        val id = dataManager.getProfileId()
-        updateUser(id)
-        val profile = dataManager.getObjectFromDb(User::class.java, id)
-                .flatMap { justOrEmpty(cache.cacheUser(it)) }
+        return dataManager.getCached<User, UserDto>(dataManager.getProfileId())
                 .ioToMain()
-
-        return Observable.merge(justOrEmpty(cache.user(id)), profile)
     }
 
     override fun getAlbums(): Observable<List<AlbumDto>> {
         val query = listOf(Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId()))
-        val albums = dataManager.search(Album::class.java, query)
+        return dataManager.search(Album::class.java, query)
                 .map { cache.cacheAlbums(it) }
-
-        return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
+                .ioToMain()
     }
 
-    private fun updateUser(id: String) {
-        dataManager.isNetworkAvailable()
+    override fun updateProfile(): Completable {
+        return dataManager.isNetworkAvailable()
                 .filter { it }
-                .flatMap { Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0)) }
-                .flatMap { dataManager.getUserFromNet(id, getUpdated(it)) }
+                .flatMap { dataManager.getUserFromNet(dataManager.getProfileId()) }
                 .doOnNext { dataManager.saveToDB(it) }
-                .subscribeOn(Schedulers.io())
-                .subscribeWith(ErrorObserver())
+                .ignoreElements()
+                .ioToMain()
     }
 
-    override fun createAlbum(newAlbumReq: NewAlbumReq): Observable<JobStatus> =
-            albumJobQueue.queueCreateJob(newAlbumReq).ioToMain()
+    override fun createAlbum(albumDto: AlbumDto): Observable<JobStatus> =
+            jobs.albumCreate(albumDto).ioToMain()
 
-    override fun editProfile(profileReq: EditProfileReq): Observable<JobStatus> =
-            profileJobQueue.queueEditJob(profileReq).ioToMain()
+    override fun editProfile(userDto: UserDto): Observable<JobStatus> =
+            jobs.profileEdit(userDto).ioToMain()
 
 }

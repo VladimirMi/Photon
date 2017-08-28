@@ -11,7 +11,7 @@ import java.util.*
 
 open class Album(
         @PrimaryKey
-        override var id: String = "",
+        override var id: String = Synchronizable.tempId(),
         var owner: String = "",
         var title: String = "",
         var description: String = "",
@@ -20,11 +20,7 @@ open class Album(
         var isFavorite: Boolean = false,
         var photocards: RealmList<Photocard> = RealmList(),
         override var updated: Date = Date(),
-        override var active: Boolean = true
+        override var active: Boolean = true,
+        override var sync: Boolean = true
 
-
-) : RealmObject(), Changeable {
-    companion object {
-        const val TEMP = "TEMP"
-    }
-}
+) : RealmObject(), Synchronizable

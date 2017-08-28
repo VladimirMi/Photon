@@ -9,8 +9,6 @@ import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
-import io.github.vladimirmi.photon.data.models.dto.UserDto
-import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.author.AuthorScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -54,8 +52,10 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     override fun initView(view: PhotocardView) {
         val id = Flow.getKey<PhotocardScreen>(view)?.photocardId!!
         val ownerId = Flow.getKey<PhotocardScreen>(view)?.ownerId!!
-        compDisp.add(subscribeOnUser(ownerId))
-        compDisp.add(subscribeOnPhotocard(id, ownerId))
+        compDisp.add(subscribeOnUser(id))
+        compDisp.add(subscribeOnUpdateUser(id))
+        compDisp.add(subscribeOnPhotocard(id))
+        compDisp.add(subscribeOnUpdatePhotocard(id, ownerId))
         compDisp.add(subscribeOnIsFavorite(id))
     }
 
@@ -71,21 +71,27 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private fun subscribeOnUser(ownerId: String): Disposable {
         return model.getUser(ownerId)
-                .subscribeWith(object : ErrorObserver<UserDto>() {
-                    override fun onNext(it: UserDto) {
-                        view.setUser(it)
-                    }
-                })
+                .doOnNext { view.setUser(it) }
+                .subscribeWith(ErrorObserver())
     }
 
-    private fun subscribeOnPhotocard(id: String, ownerId: String): Disposable {
-        return model.getPhotocard(id, ownerId)
-                .subscribeWith(object : ErrorObserver<PhotocardDto>() {
-                    override fun onNext(it: PhotocardDto) {
-                        photocard = it
-                        view.setPhotocard(it)
-                    }
-                })
+    private fun subscribeOnPhotocard(id: String): Disposable {
+        return model.getPhotocard(id)
+                .doOnNext {
+                    photocard = it
+                    view.setPhotocard(it)
+                }
+                .subscribeWith(ErrorObserver())
+    }
+
+    private fun subscribeOnUpdateUser(id: String): Disposable {
+        return model.updateUser(id)
+                .subscribeWith(ErrorCompletableObserver())
+    }
+
+    private fun subscribeOnUpdatePhotocard(id: String, ownerId: String): Disposable {
+        return model.updatePhotocard(id, ownerId)
+                .subscribeWith(ErrorCompletableObserver())
     }
 
     fun showAuthor() {
@@ -94,22 +100,12 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private fun addToFavorite() {
         compDisp.add(model.addToFavorite(photocard.id)
-                .subscribeWith(object : ErrorObserver<JobStatus>() {
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        if (e is ApiError) view.showError(e.errorResId)
-                    }
-                }))
+                .subscribeWith(ErrorObserver(view)))
     }
 
     private fun removeFromFavorite() {
         compDisp.add(model.removeFromFavorite(photocard.id)
-                .subscribeWith(object : ErrorObserver<JobStatus>() {
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        if (e is ApiError) view.showError(e.errorResId)
-                    }
-                }))
+                .subscribeWith(ErrorObserver(view)))
     }
 
     private var tempFile: File? = null

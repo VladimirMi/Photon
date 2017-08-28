@@ -29,15 +29,12 @@ class AuthScreen : BaseScreen<RootActivityComponent>() {
     class Module {
         @Provides
         @DaggerScope(AuthScreen::class)
-        fun provideAuthModel(dataManager: DataManager): IAuthModel {
-            return AuthModel(dataManager)
-        }
+        fun provideAuthModel(dataManager: DataManager): IAuthModel = AuthModel(dataManager)
 
         @Provides
         @DaggerScope(AuthScreen::class)
-        fun provideAuthPresenter(model: IAuthModel, rootPresenter: RootPresenter): AuthPresenter {
-            return AuthPresenter(model, rootPresenter)
-        }
+        fun provideAuthPresenter(model: IAuthModel, rootPresenter: RootPresenter): AuthPresenter =
+                AuthPresenter(model, rootPresenter)
     }
 
     @DaggerScope(AuthScreen::class)

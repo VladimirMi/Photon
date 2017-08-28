@@ -66,6 +66,7 @@ inline fun <T : RealmObject> AtomicReference<Realm>.asFlowable(mainThread: Boole
         val realm = Realm.getDefaultInstance()
         set(realm)
         val listener = { result: RealmResults<T> ->
+            Timber.e("asFlowable: listener oyee")
             if (!emitter.isCancelled && result.isLoaded && result.isValid) {
                 emitter.onNext(result)
             }

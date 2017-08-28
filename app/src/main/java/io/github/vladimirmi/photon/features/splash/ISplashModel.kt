@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.features.splash
 
 import io.github.vladimirmi.photon.core.IModel
-import io.reactivex.Observable
+import io.reactivex.Completable
 import io.reactivex.Single
 
 /**
@@ -9,6 +9,6 @@ import io.reactivex.Single
  */
 
 interface ISplashModel : IModel {
-    fun updateAll(limit: Int): Observable<Unit>
+    fun updateAll(limit: Int): Completable
     fun dbIsNotEmpty(): Single<Boolean>
 }

@@ -4,42 +4,24 @@ import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import com.birbit.android.jobqueue.RetryConstraint
-import io.github.vladimirmi.photon.data.jobs.queue.JobTask
-import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.*
 import io.reactivex.schedulers.Schedulers
 import java.net.SocketTimeoutException
-import java.util.*
 
 /**
  * Created by Vladimir Mikhalev 21.07.2017.
  */
 
-class PhotocardDeleteFromFavoriteJob(photocardId: String)
+class AlbumDeleteFavoritePhotoJob(private val photocardId: String)
     : Job(Params(JobPriority.MID)
         .setGroupId(JobGroup.PHOTOCARD)
+        .addTags(TAG)
         .requireNetwork()
-        .persist()), JobTask {
+        .persist()) {
 
     companion object {
-        const val TAG = "PhotocardDeleteFromFavoriteJob"
-    }
-
-    override var entityId = photocardId
-    override var parentEntityId
-        get() = entityId
-        set(value) {
-            entityId = value
-        }
-    override val tag = TAG
-    override val type = JobTask.Type.OTHER
-
-    override fun onQueued() {
-        val dataManager = DaggerService.appComponent.dataManager()
-        val favAlbumId = dataManager.getUserFavAlbumId()
-        val album = dataManager.getDetachedObjFromDb(Album::class.java, favAlbumId)!!
-        dataManager.saveToDB(album.apply { photocards.removeAll { it.id == id } })
+        const val TAG = "AlbumDeleteFavoritePhotoJob"
     }
 
     override fun onAdded() {}
@@ -48,7 +30,7 @@ class PhotocardDeleteFromFavoriteJob(photocardId: String)
         val dataManager = DaggerService.appComponent.dataManager()
         var error: Throwable? = null
 
-        dataManager.removeFromFavorite(parentEntityId)
+        dataManager.removeFromFavorite(photocardId)
                 .blockingSubscribe({}, { error = it })
 
         error?.let { throw it }
@@ -65,7 +47,7 @@ class PhotocardDeleteFromFavoriteJob(photocardId: String)
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
         if (cancelReason == CancelReason.CANCELLED_VIA_SHOULD_RE_RUN) {
-            updateAlbum()
+//            updateAlbum()
         }
     }
 
@@ -73,7 +55,7 @@ class PhotocardDeleteFromFavoriteJob(photocardId: String)
         val dataManager = DaggerService.appComponent.dataManager()
         val favAlbumId = dataManager.getUserFavAlbumId()
 
-        dataManager.getAlbumFromNet(favAlbumId, Date(0).toString())
+        dataManager.getAlbumFromNet(favAlbumId)
                 .doOnNext { dataManager.saveToDB(it) }
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(ErrorObserver())

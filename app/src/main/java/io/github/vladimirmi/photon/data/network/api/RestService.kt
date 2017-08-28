@@ -55,7 +55,7 @@ interface RestService {
 
     @POST("user/{userId}/album")
     fun createAlbum(@Path("userId") userId: String,
-                    @Body req: NewAlbumReq,
+                    @Body req: AlbumNewReq,
                     @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<Album>>
 
@@ -87,7 +87,7 @@ interface RestService {
 
     @PUT("user/{userId}")
     fun editProfile(@Path("userId") userId: String,
-                    @Body req: EditProfileReq,
+                    @Body req: ProfileEditReq,
                     @Header(HEADER_AUTHORIZATION) token: String)
             : Observable<Response<User>>
 

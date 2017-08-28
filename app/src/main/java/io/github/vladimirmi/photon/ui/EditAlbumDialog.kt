@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.ui
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
+import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
@@ -12,7 +12,10 @@ import kotlinx.android.synthetic.main.dialog_new_album.view.*
  * Created by Vladimir Mikhalev 23.06.2017.
  */
 
-class EditAlbumDialog(viewGroup: ViewGroup, editAlbumAction: (AlbumEditReq) -> Unit)
+class EditAlbumDialog(
+        viewGroup: ViewGroup,
+        editAlbumAction: (AlbumDto) -> Unit,
+        albumDto: AlbumDto)
     : ValidationDialog(R.layout.dialog_edit_album, viewGroup) {
 
     private val nameField = view.name
@@ -21,9 +24,15 @@ class EditAlbumDialog(viewGroup: ViewGroup, editAlbumAction: (AlbumEditReq) -> U
     private val cancel = view.cancel
 
     init {
+        nameField.setText(albumDto.title)
+        nameField.setSelection(albumDto.title.length)
+        descriptionField.setText(albumDto.description)
+        descriptionField.setSelection(albumDto.description.length)
         cancel.setOnClickListener { hide() }
         ok.setOnClickListener {
-            val request = AlbumEditReq(title = nameField.text.toString(),
+            val request = AlbumDto(
+                    id = albumDto.id,
+                    title = nameField.text.toString(),
                     description = descriptionField.text.toString()
             )
             editAlbumAction(request)
@@ -41,12 +50,5 @@ class EditAlbumDialog(viewGroup: ViewGroup, editAlbumAction: (AlbumEditReq) -> U
         return Observable.combineLatest(nameObs, descriptionObs,
                 BiFunction { t1: Boolean, t2: Boolean -> t1 && t2 })
                 .subscribe { ok.isEnabled = it }
-    }
-
-    fun initFields(name: CharSequence, description: CharSequence) {
-        nameField.setText(name)
-        nameField.setSelection(name.length)
-        descriptionField.setText(description)
-        descriptionField.setSelection(description.length)
     }
 }

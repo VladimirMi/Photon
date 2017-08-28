@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -49,16 +49,13 @@ class MainScreen(var updated: Int = 0) : BaseScreen<RootActivityComponent>() {
 
         @Provides
         @DaggerScope(MainScreen::class)
-        fun provideMainModel(dataManager: DataManager, photocardJobQueue: PhotocardJobQueue,
-                             cache: Cache): IMainModel {
-            return MainModel(dataManager, photocardJobQueue, cache)
-        }
+        fun provideMainModel(dataManager: DataManager, jobs: Jobs, cache: Cache): IMainModel =
+                MainModel(dataManager, jobs, cache)
 
         @Provides
         @DaggerScope(MainScreen::class)
-        fun provideMainPresenter(model: IMainModel, rootPresenter: RootPresenter): MainPresenter {
-            return MainPresenter(model, rootPresenter)
-        }
+        fun provideMainPresenter(model: IMainModel, rootPresenter: RootPresenter): MainPresenter =
+                MainPresenter(model, rootPresenter)
 
     }
 

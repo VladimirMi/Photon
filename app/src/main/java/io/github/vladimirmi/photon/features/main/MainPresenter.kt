@@ -13,6 +13,7 @@ import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.utils.AppConfig
+import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.afterNetCheck
 import io.reactivex.disposables.Disposable
@@ -167,12 +168,11 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun loadMore(page: Int, limit: Int) {
         Timber.e("loadMore: offset ${page * limit} limit $limit")
         compDisp.add(model.updatePhotocards(page * limit, limit)
-                .subscribeWith(object : ErrorObserver<Unit>() {
-                    override fun onComplete() {
-                        updated += limit
-                        resubscribeCards()
-                    }
-                })
+                .doOnComplete {
+                    updated += limit
+                    resubscribeCards()
+                }
+                .subscribeWith(ErrorCompletableObserver())
         )
     }
 

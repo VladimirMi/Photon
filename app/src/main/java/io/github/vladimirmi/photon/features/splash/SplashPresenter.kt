@@ -37,27 +37,28 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     }
 
     private fun updatePhotos(): Disposable {
-        var loaded = false
+        if (!rootPresenter.isNetAvailable()) {
+            view.showNetError()
+            chooseCanOpen()
+        }
 
         val updateObs = model.updateAll(AppConfig.PHOTOCARDS_PAGE_SIZE)
-                .doOnComplete { loaded = true }
-                .map { false } // ended
+                .toObservable<Long>()
 
-        val timer = Observable.timer(AppConfig.SPLASH_TIMEOUT, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
-                .map { true } // ended
+        val timer = Observable.timer(AppConfig.SPLASH_TIMEOUT,
+                TimeUnit.MILLISECONDS,
+                AndroidSchedulers.mainThread())
 
         return Observable.mergeDelayError(timer, updateObs)
-                .subscribeWith(object : ErrorObserver<Boolean>() {
-                    override fun onNext(ended: Boolean) {
-                        Timber.e("onNext: ended=$ended loaded=$loaded")
-                        if (ended) {
-                            if (loaded) {
-                                openMainScreen()
-                            } else {
-                                view.showError(R.string.message_err_connect)
-                                chooseCanOpen()
-                            }
-                        }
+                .subscribeWith(object : ErrorObserver<Long>() {
+                    override fun onNext(it: Long) {
+                        Timber.e("onNext: timer ended")
+                        view.showError(R.string.message_err_connect)
+                        chooseCanOpen()
+                    }
+
+                    override fun onComplete() {
+                        openMainScreen(AppConfig.PHOTOCARDS_PAGE_SIZE)
                     }
 
                     override fun onError(e: Throwable) {

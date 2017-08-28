@@ -6,30 +6,26 @@ import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.utils.*
+import io.github.vladimirmi.photon.utils.Query
+import io.github.vladimirmi.photon.utils.RealmOperator
+import io.github.vladimirmi.photon.utils.ioToMain
+import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
-import java.util.*
 
 class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel {
 
-    override fun getUser(userId: String): Observable<UserDto> {
-        updateUser(userId)
-        val user = dataManager.getObjectFromDb(User::class.java, userId)
-                .flatMap { justOrEmpty(cache.cacheUser(it)) }
+    override fun getUser(id: String): Observable<UserDto> {
+        return dataManager.getCached<User, UserDto>(id)
                 .ioToMain()
-
-        return Observable.merge(justOrEmpty(cache.user(userId)), user)
     }
 
-    private fun updateUser(id: String) {
-        dataManager.isNetworkAvailable()
+    override fun updateUser(id: String): Completable {
+        return dataManager.isNetworkAvailable()
                 .filter { it }
-                .flatMap { Observable.just(dataManager.getDetachedObjFromDb(User::class.java, id)?.updated ?: Date(0)) }
-                .flatMap { dataManager.getUserFromNet(id, getUpdated(it)) }
+                .flatMap { dataManager.getUserFromNet(id) }
                 .doOnNext { dataManager.saveToDB(it) }
-                .subscribeOn(Schedulers.io())
-                .subscribeWith(ErrorObserver())
+                .ignoreElements()
+                .ioToMain()
     }
 
     override fun getAlbums(ownerId: String): Observable<List<AlbumDto>> {

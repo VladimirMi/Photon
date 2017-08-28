@@ -8,8 +8,6 @@ import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
-import io.github.vladimirmi.photon.data.models.req.EditProfileReq
-import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.flow.FlowLifecycles
@@ -25,11 +23,12 @@ import kotlinx.android.synthetic.main.view_profile.view.*
 class ProfileView(context: Context, attrs: AttributeSet)
     : BaseView<ProfilePresenter, ProfileView>(context, attrs),
         FlowLifecycles.ActivityResultListener, FlowLifecycles.PermissionRequestListener {
+    private lateinit var profile: UserDto
 
     private val albumAction: (AlbumDto) -> Unit = { showAlbum(it) }
     private val adapter = AlbumAdapter(albumAction)
 
-    private val newAlbumAction: (NewAlbumReq) -> Unit = { presenter.createNewAlbum(it) }
+    private val newAlbumAction: (AlbumDto) -> Unit = { presenter.createNewAlbum(it) }
     private val newAlbumDialog = NewAlbumDialog(this, newAlbumAction)
 
     private val loginView by lazy { user_login }
@@ -39,8 +38,8 @@ class ProfileView(context: Context, attrs: AttributeSet)
     private val cardCountView by lazy { card_count }
     private val avatarView by lazy { user_avatar }
 
-    private val editProfileAction: (EditProfileReq) -> Unit = { presenter.editProfile(it) }
-    private val editProfileDialog = EditProfileDialog(this, editProfileAction)
+    private val editProfileAction: (UserDto) -> Unit = { presenter.editProfile(it) }
+    private val editProfileDialog by lazy { EditProfileDialog(this, editProfileAction, profile) }
 
     override fun initDagger(context: Context) {
         DaggerService.getComponent<ProfileScreen.Component>(context).inject(this)
@@ -53,11 +52,11 @@ class ProfileView(context: Context, attrs: AttributeSet)
     }
 
     private var curAvatarPath = ""
-    val namePrefix = "/  "
+    private val namePrefix = "/  "
 
     @SuppressLint("SetTextI18n")
     fun setProfile(user: UserDto) {
-        editProfileDialog.initFields(user.login, user.name)
+        profile = user
         loginView.text = user.login
         nameView.text = namePrefix + user.name
         if (user.avatar != curAvatarPath) {

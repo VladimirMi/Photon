@@ -7,14 +7,18 @@ import io.github.vladimirmi.photon.data.models.realm.User
  */
 
 
-class UserDto(user: User) {
-    val id = user.id
-    val name = user.name
-    val login = user.login
-    val avatar = user.avatar
-    val albums = ArrayList<AlbumDto>()
+data class UserDto(val id: String = "",
+                   val name: String = "",
+                   val login: String = "",
+                   val avatar: String = "",
+                   val albums: List<AlbumDto> = ArrayList())
+    : Cached {
 
-    init {
-        user.albums.forEach { if (it.active) albums.add(AlbumDto(it)) }
-    }
+    constructor(user: User) : this(
+            id = user.id,
+            name = user.name,
+            login = user.login,
+            avatar = user.avatar,
+            albums = user.albums.map { AlbumDto(it) }
+    )
 }

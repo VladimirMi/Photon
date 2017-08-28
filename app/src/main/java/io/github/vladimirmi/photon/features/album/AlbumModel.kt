@@ -1,71 +1,61 @@
 package io.github.vladimirmi.photon.features.album
 
-import io.github.vladimirmi.photon.data.jobs.queue.AlbumJobQueue
-import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
-import io.github.vladimirmi.photon.data.managers.Cache
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
-import io.github.vladimirmi.photon.utils.*
+import io.github.vladimirmi.photon.utils.JobStatus
+import io.github.vladimirmi.photon.utils.ioToMain
+import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
-import java.util.*
 
 /**
  * Created by Vladimir Mikhalev 19.06.2017.
  */
 
 class AlbumModel(private val dataManager: DataManager,
-                 private val photocardJobQueue: PhotocardJobQueue,
-                 private val albumJobQueue: AlbumJobQueue,
-                 private val cache: Cache) : IAlbumModel {
+                 private val jobs: Jobs) : IAlbumModel {
 
     override fun getAlbum(id: String): Observable<AlbumDto> {
-        updateAlbum(id)
-        val album = dataManager.getObjectFromDb(Album::class.java, id)
-                .flatMap { justOrEmpty(cache.cacheAlbum(it)) }
+        return dataManager.getCached<Album, AlbumDto>(id)
                 .ioToMain()
-
-        return Observable.merge(justOrEmpty(cache.album(id)), album)
     }
 
-    private fun updateAlbum(id: String) {
-        dataManager.isNetworkAvailable()
+    override fun updateAlbum(id: String): Completable {
+        return dataManager.isNetworkAvailable()
                 .filter { it }
-                .flatMap { Observable.just(dataManager.getDetachedObjFromDb(Album::class.java, id)?.updated ?: Date(0)) }
-                .flatMap { dataManager.getAlbumFromNet(id, getUpdated(it)) }
+                .flatMap { dataManager.getAlbumFromNet(id) }
                 .doOnNext { dataManager.saveToDB(it) }
-                .subscribeOn(Schedulers.io())
-                .subscribeWith(ErrorObserver())
+                .ignoreElements()
+                .ioToMain()
     }
 
     override fun getProfileId() = dataManager.getProfileId()
 
-    override fun editAlbum(albumReq: AlbumEditReq): Observable<JobStatus> =
-            albumJobQueue.queueEditJob(albumReq).ioToMain()
+    override fun editAlbum(request: AlbumDto): Observable<JobStatus> =
+            jobs.albumEdit(request).ioToMain()
 
-    override fun deleteAlbum(albumId: String): Observable<JobStatus> =
-            albumJobQueue.queueDeleteJob(albumId).ioToMain()
+    override fun deleteAlbum(id: String): Observable<JobStatus> =
+            jobs.albumDelete(id).ioToMain()
 
-    override fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Single<Unit> =
+    override fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Observable<JobStatus> =
             removePhotosById(photosForDelete.map { it.id }, album.isFavorite).ioToMain()
 
 
     private fun removePhotosById(photosForDelete: List<String>,
-                                 isFavorite: Boolean = false): Single<Unit> {
-        if (photosForDelete.isEmpty()) return Single.just(Unit)
-
-        return Observable.fromIterable(photosForDelete)
-                .flatMap {
-                    if (isFavorite) {
-                        photocardJobQueue.queueDeleteFromFavoriteJob(it)
-                    } else {
-                        photocardJobQueue.queueDeleteJob(it)
+                                 isFavorite: Boolean): Observable<JobStatus> {
+        return if (photosForDelete.isEmpty()) {
+            Observable.empty()
+        } else {
+            Observable.fromIterable(photosForDelete)
+                    .flatMap {
+                        if (isFavorite) {
+                            jobs.albumDeleteFavorite(it)
+                        } else {
+                            jobs.albumDelete(it)
+                        }
                     }
-                }.unit()
-                .lastOrError()
+        }
     }
 }

@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -40,38 +40,32 @@ class NewCardScreen(var info: NewCardScreenInfo = NewCardScreenInfo())
     class Module {
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardModel(dataManager: DataManager, photocardJobQueue: PhotocardJobQueue,
-                                cache: Cache): INewCardModel {
-            return NewCardModel(dataManager, photocardJobQueue, cache)
-        }
+        fun provideNewCardModel(dataManager: DataManager, jobs: Jobs, cache: Cache): INewCardModel =
+                NewCardModel(dataManager, cache, jobs)
 
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardPresenter(model: INewCardModel, rootPresenter: RootPresenter)
-                : NewCardPresenter {
-            return NewCardPresenter(model, rootPresenter)
-        }
+        fun provideNewCardPresenter(model: INewCardModel,
+                                    rootPresenter: RootPresenter): NewCardPresenter =
+                NewCardPresenter(model, rootPresenter)
 
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardInfoPresenter(model: INewCardModel, rootPresenter: RootPresenter)
-                : NewCardInfoPresenter {
-            return NewCardInfoPresenter(model, rootPresenter)
-        }
+        fun provideNewCardInfoPresenter(model: INewCardModel,
+                                        rootPresenter: RootPresenter): NewCardInfoPresenter =
+                NewCardInfoPresenter(model, rootPresenter)
 
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardParamPresenter(model: INewCardModel, rootPresenter: RootPresenter)
-                : NewCardParamPresenter {
-            return NewCardParamPresenter(model, rootPresenter)
-        }
+        fun provideNewCardParamPresenter(model: INewCardModel,
+                                         rootPresenter: RootPresenter): NewCardParamPresenter =
+                NewCardParamPresenter(model, rootPresenter)
 
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardAlbumPresenter(model: INewCardModel, rootPresenter: RootPresenter)
-                : NewCardAlbumPresenter {
-            return NewCardAlbumPresenter(model, rootPresenter)
-        }
+        fun provideNewCardAlbumPresenter(model: INewCardModel,
+                                         rootPresenter: RootPresenter): NewCardAlbumPresenter =
+                NewCardAlbumPresenter(model, rootPresenter)
     }
 
     @DaggerScope(NewCardScreen::class)

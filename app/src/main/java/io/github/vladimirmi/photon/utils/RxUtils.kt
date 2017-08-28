@@ -6,12 +6,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.animation.GlideAnimation
 import com.bumptech.glide.request.target.SimpleTarget
 import com.crashlytics.android.Crashlytics
+import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
-import io.github.vladimirmi.photon.data.models.realm.Changeable
+import io.github.vladimirmi.photon.data.models.realm.Synchronizable
 import io.github.vladimirmi.photon.data.network.ApiError
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableCompletableObserver
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
@@ -30,6 +33,9 @@ fun <T> Observable<T>.observeOnMainThread(): Observable<T> = observeOn(AndroidSc
 fun <T> Observable<T>.ioToMain(): Observable<T> = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
 
+fun Completable.ioToMain(): Completable = subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+
 fun <T> Observable<T>.mainToIo(): Observable<T> = subscribeOn(AndroidSchedulers.mainThread())
         .observeOn(Schedulers.io())
 
@@ -38,9 +44,8 @@ fun <T> Single<T>.ioToMain(): Single<T> = subscribeOn(Schedulers.io())
 
 fun <T> Observable<T>.unit(): Observable<Unit> = map {}
 
-fun <T> justOrEmpty(it: T): Observable<T> {
-    return if (it == null) Observable.empty() else Observable.just(it)
-}
+fun <T> justOrEmpty(it: T?): Observable<T> =
+        if (it == null) Observable.empty() else Observable.just(it)
 
 fun <T> Observable<T?>.notNull(): Observable<T> = filter { it != null }
         .map { it!! }
@@ -68,7 +73,7 @@ fun <T> Observable<Response<T>>.parseResponse(saveUpdated: ((String) -> Unit)? =
                     saveUpdated(Date().toString())
                 }
                 val body = it.body()!!
-                if (body is Changeable) {
+                if (body is Synchronizable) {
                     body.updated = Date()
                 }
                 return@map body
@@ -79,10 +84,10 @@ class ErrorOnAttempt(val throwable: Throwable, val attempt: Int)
 
 fun <T> Observable<T>.retryExp(): Observable<T> {
     return retryWhen {
-        it.zipWith(1..AppConfig.RETRY_REQUEST_COUNT,
+        it.zipWith(1..AppConfig.RETRY_REQUEST_COUNT + 1,
                 { throwable, attempt -> ErrorOnAttempt(throwable, attempt) })
                 .flatMap<Long> {
-                    if (it.attempt == AppConfig.RETRY_REQUEST_COUNT) {
+                    if (it.attempt == AppConfig.RETRY_REQUEST_COUNT + 1) {
                         return@flatMap Observable.error(it.throwable)
                     } else {
                         val delay = AppConfig.RETRY_REQUEST_BASE_DELAY * Math.pow(Math.E, it.attempt.toDouble()).toLong()
@@ -93,12 +98,13 @@ fun <T> Observable<T>.retryExp(): Observable<T> {
     }
 }
 
-open class ErrorObserver<T> : DisposableObserver<T>() {
+open class ErrorObserver<T>(private val view: BaseView<*, *>? = null) : DisposableObserver<T>() {
     override fun onComplete() {}
 
     override fun onNext(it: T) {}
 
     override fun onError(e: Throwable) {
+        if (view != null && e is ApiError) view.showError(e.errorResId)
         if (e !is ConnectException) {
             Timber.e(e, e.localizedMessage)
             Crashlytics.logException(e)
@@ -106,10 +112,23 @@ open class ErrorObserver<T> : DisposableObserver<T>() {
     }
 }
 
-open class ErrorSingleObserver<T> : DisposableSingleObserver<T>() {
+open class ErrorSingleObserver<T>(private val view: BaseView<*, *>? = null) : DisposableSingleObserver<T>() {
     override fun onSuccess(t: T) {}
 
     override fun onError(e: Throwable) {
+        if (view != null && e is ApiError) view.showError(e.errorResId)
+        if (e !is ConnectException) {
+            Timber.e(e, e.localizedMessage)
+            Crashlytics.logException(e)
+        }
+    }
+}
+
+open class ErrorCompletableObserver(private val view: BaseView<*, *>? = null) : DisposableCompletableObserver() {
+    override fun onComplete() {}
+
+    override fun onError(e: Throwable) {
+        if (view != null && e is ApiError) view.showError(e.errorResId)
         if (e !is ConnectException) {
             Timber.e(e, e.localizedMessage)
             Crashlytics.logException(e)

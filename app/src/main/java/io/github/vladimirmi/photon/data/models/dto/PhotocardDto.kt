@@ -6,18 +6,15 @@ import io.github.vladimirmi.photon.data.models.realm.Photocard
  * Created by Vladimir Mikhalev 15.07.2017.
  */
 
-class PhotocardDto(photocard: Photocard) {
+class PhotocardDto(photocard: Photocard) : Cached {
     val id = photocard.id
     val title = photocard.title
     val photo = photocard.photo
     val owner = photocard.owner
     val views = photocard.views
     val favorits = photocard.favorits
-    val tags = ArrayList<String>()
+    val tags = photocard.tags.map { it.value }
 
-    init {
-        photocard.tags.forEach { tags.add(it.value) }
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

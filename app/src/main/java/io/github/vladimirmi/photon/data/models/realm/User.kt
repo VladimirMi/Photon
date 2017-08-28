@@ -12,7 +12,7 @@ import java.util.*
 
 open class User(
         @PrimaryKey
-        override var id: String = "",
+        override var id: String = Synchronizable.tempId(),
         var name: String = "",
         var login: String = "",
         var avatar: String = "",
@@ -21,5 +21,6 @@ open class User(
         var albums: RealmList<Album> = RealmList(),
         override var updated: Date = Date(),
         override var active: Boolean = true,
+        override var sync: Boolean = true,
         @Ignore var token: String = ""
-) : RealmObject(), Changeable
+) : RealmObject(), Synchronizable

@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.ui
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.req.EditProfileReq
+import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
@@ -12,7 +12,9 @@ import kotlinx.android.synthetic.main.dialog_edit_profile.view.*
  * Created by Vladimir Mikhalev 17.06.2017.
  */
 
-class EditProfileDialog(viewGroup: ViewGroup, val editProfileAction: (EditProfileReq) -> Unit)
+class EditProfileDialog(viewGroup: ViewGroup,
+                        private val editProfileAction: (UserDto) -> Unit,
+                        private val userDto: UserDto)
     : ValidationDialog(R.layout.dialog_edit_profile, viewGroup) {
 
     private val loginField = view.login
@@ -21,11 +23,17 @@ class EditProfileDialog(viewGroup: ViewGroup, val editProfileAction: (EditProfil
     private val cancel = view.cancel
 
     init {
+        loginField.setText(userDto.login)
+        nameField.setText(userDto.name)
+        loginField.setSelection(userDto.login.length)
+        nameField.setSelection(userDto.name.length)
         cancel.setOnClickListener { hide() }
         ok.setOnClickListener {
             kotlin.run {
-                val request = EditProfileReq(login = loginField.text.toString(),
-                        name = nameField.text.toString()
+                val request = UserDto(
+                        login = loginField.text.toString(),
+                        name = nameField.text.toString(),
+                        avatar = userDto.avatar
                 )
                 editProfileAction(request)
             }
@@ -43,13 +51,6 @@ class EditProfileDialog(viewGroup: ViewGroup, val editProfileAction: (EditProfil
         return Observable.combineLatest(loginObs, nameObs,
                 BiFunction { t1: Boolean, t2: Boolean -> t1 && t2 })
                 .subscribe { ok.isEnabled = it }
-    }
-
-    fun initFields(login: CharSequence, name: CharSequence) {
-        loginField.setText(login)
-        loginField.setSelection(login.length)
-        nameField.setText(name)
-        nameField.setSelection(name.length)
     }
 }
 

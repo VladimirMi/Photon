@@ -4,8 +4,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
-import io.github.vladimirmi.photon.data.managers.Cache
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
@@ -31,16 +30,14 @@ data class PhotocardScreen(val photocardId: String, val ownerId: String) : BaseS
     class Module {
         @Provides
         @DaggerScope(PhotocardScreen::class)
-        fun providePhotocardModel(dataManager: DataManager, photocardJobQueue: PhotocardJobQueue,
-                                  cache: Cache): IPhotocardModel {
-            return PhotocardModel(dataManager, photocardJobQueue, cache)
-        }
+        fun providePhotocardModel(dataManager: DataManager, jobs: Jobs): IPhotocardModel =
+                PhotocardModel(dataManager, jobs)
 
         @Provides
         @DaggerScope(PhotocardScreen::class)
-        fun providePhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter): PhotocardPresenter {
-            return PhotocardPresenter(model, rootPresenter)
-        }
+        fun providePhotocardPresenter(model: IPhotocardModel,
+                                      rootPresenter: RootPresenter): PhotocardPresenter =
+                PhotocardPresenter(model, rootPresenter)
     }
 
     @DaggerScope(PhotocardScreen::class)

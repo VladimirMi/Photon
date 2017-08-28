@@ -6,17 +6,22 @@ import io.github.vladimirmi.photon.data.models.realm.Album
  * Created by Vladimir Mikhalev 15.07.2017.
  */
 
-class AlbumDto(album: Album) {
-    val id = album.id
-    val owner = album.owner
-    val title = album.title
-    val description = album.description
-    val isFavorite = album.isFavorite
-    val photocards = ArrayList<PhotocardDto>()
+class AlbumDto(val id: String = "",
+               val owner: String = "",
+               val title: String = "",
+               val description: String = "",
+               val isFavorite: Boolean = false,
+               val photocards: List<PhotocardDto> = ArrayList())
+    : Cached {
 
-    init {
-        album.photocards.forEach { if (it.active) photocards.add(PhotocardDto(it)) }
-    }
+    constructor(album: Album) : this(
+            album.id,
+            album.owner,
+            album.title,
+            album.description,
+            album.isFavorite,
+            album.photocards.map { PhotocardDto(it) }
+    )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

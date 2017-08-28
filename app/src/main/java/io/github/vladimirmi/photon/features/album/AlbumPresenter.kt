@@ -7,17 +7,14 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
-import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
-import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreenInfo
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.LOAD
+import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.github.vladimirmi.photon.utils.ErrorSingleObserver
-import io.github.vladimirmi.photon.utils.JobStatus
 import io.reactivex.disposables.Disposable
 
 class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
@@ -59,6 +56,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     override fun initView(view: AlbumView) {
         compDisp.add(subscribeOnAlbum(albumId))
+        compDisp.add(subscribeOnUpdateAlbum(albumId))
     }
 
     private fun subscribeOnAlbum(albumId: String): Disposable {
@@ -73,41 +71,36 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
                 })
     }
 
+    private fun subscribeOnUpdateAlbum(albumId: String): Disposable {
+        return model.updateAlbum(albumId)
+                .subscribeWith(ErrorCompletableObserver())
+    }
+
     fun showPhotoCard(photocard: PhotocardDto) {
         Flow.get(view).set(PhotocardScreen(photocard.id, photocard.owner))
     }
 
-    fun editAlbum(albumReq: AlbumEditReq) {
+    fun editAlbum(albumDto: AlbumDto) {
         view.closeEditDialog()
-        if (albumChange(albumReq)) {
-            albumReq.id = album.id
-            compDisp.add(model.editAlbum(albumReq).subscribeWith(ErrorObserver()))
+        if (albumChange(albumDto)) {
+            compDisp.add(model.editAlbum(albumDto)
+                    .subscribeWith(ErrorObserver(view)))
         }
     }
 
-    fun submitDeletePhotos() {
+    private fun submitDeletePhotos() {
         if (photosForDelete.size > 0) {
             compDisp.add(model.removePhotos(photosForDelete, album)
-                    .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                        override fun onError(e: Throwable) {
-                            if (e is ApiError) view.showError(e.errorResId)
-                            super.onError(e)
-                        }
-                    }))
-            photosForDelete.clear()
+                    .doOnComplete {
+                        photosForDelete.clear()
+                        setEditable(false)
+                    }
+                    .subscribeWith(ErrorObserver(view)))
         }
-        setEditable(false)
     }
 
-    private fun albumChange(albumReq: AlbumEditReq): Boolean {
-        val name = view.name.text.toString()
-        val description = view.description.text.toString()
-        var albumChanged = false
-        if (albumReq.title != name || albumReq.description != description) {
-            albumChanged = true
-        }
-        return albumChanged
-    }
+    private fun albumChange(albumDto: AlbumDto) =
+            albumDto.title != album.title || albumDto.description != album.description
 
     fun setEditable(boolean: Boolean) {
         editMode = boolean
@@ -116,18 +109,10 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     fun delete() {
+        view.closeDeleteDialog()
         compDisp.add(model.deleteAlbum(album.id)
-                .subscribeWith(object : ErrorObserver<JobStatus>() {
-                    override fun onNext(it: JobStatus) {
-                        view.closeDeleteDialog()
-                        Flow.get(view).goBack()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        if (e is ApiError) view.showError(e.errorResId)
-                        super.onError(e)
-                    }
-                }))
+                .doOnComplete { Flow.get(view).goBack() }
+                .subscribeWith(ErrorObserver(view)))
     }
 
     fun deletePhotocard(photocard: PhotocardDto) {
@@ -145,12 +130,12 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     }
 
     fun onBackPressed(): Boolean {
-        if (editMode) {
+        return if (editMode) {
             setEditable(false)
             photosForDelete.clear()
             view.setAlbum(album)
-            return true
-        } else return false
+            true
+        } else false
     }
 
 }

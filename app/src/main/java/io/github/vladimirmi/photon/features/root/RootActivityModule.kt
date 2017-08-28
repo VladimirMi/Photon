@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.features.root
 
 import dagger.Module
 import dagger.Provides
-import io.github.vladimirmi.photon.data.jobs.queue.JobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
 
@@ -15,8 +15,8 @@ class RootActivityModule {
 
     @Provides
     @DaggerScope(RootActivity::class)
-    fun provideIRootModel(dataManager: DataManager, jobQueue: JobQueue): IRootModel =
-            RootModel(dataManager, jobQueue)
+    fun provideIRootModel(dataManager: DataManager, jobs: Jobs): IRootModel =
+            RootModel(dataManager, jobs)
 
     @Provides
     @DaggerScope(RootActivity::class)

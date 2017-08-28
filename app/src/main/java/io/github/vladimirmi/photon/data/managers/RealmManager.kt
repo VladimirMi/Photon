@@ -1,45 +1,44 @@
 package io.github.vladimirmi.photon.data.managers
 
+import io.github.vladimirmi.photon.data.models.dto.Cached
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.Changeable
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.RealmOperator
-import io.github.vladimirmi.photon.utils.asFlowable
-import io.github.vladimirmi.photon.utils.prepareQuery
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.Observable
 import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.Sort
+import java.lang.UnsupportedOperationException
 import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
  */
 
-class RealmManager {
+class RealmManager(private val cache: Cache) {
 
     fun save(realmObject: RealmObject) {
         val obj = setupObject(realmObject) ?: return
         val realm = Realm.getDefaultInstance()
         realm.executeTransaction { it.insertOrUpdate(obj) }
         realm.close()
+        cache.cache(obj)
     }
 
     private fun setupObject(realmObject: RealmObject): RealmObject? {
-        fun setupPhotocard(photocard: Photocard) = if (photocard.active)
-            photocard.apply { withId(); searchTag = title.toLowerCase() }
+        fun setupPhotocard(photocard: Photocard) = if (photocard.active && photocard.sync)
+            photocard.apply { searchTag = title.toLowerCase() }
         else null
 
-        fun setupAlbum(album: Album) = if (album.active)
+        fun setupAlbum(album: Album) = if (album.active && album.sync)
             album.apply {
                 photocards.retainAll { it.active }
                 photocards.forEachIndexed { index, photo -> photocards[index] = setupPhotocard(photo) }
             }
         else null
 
-        fun setupUser(user: User) = if (user.active)
+        fun setupUser(user: User) = if (user.active && user.sync)
             user.apply {
                 albums.retainAll { it.active }
                 albums.forEachIndexed { index, album -> albums[index] = setupAlbum(album) }
@@ -61,6 +60,19 @@ class RealmManager {
                 .flatMap { if (it.isEmpty()) Observable.empty() else Observable.just(it.first()) }
     }
 
+    @Suppress("UNCHECKED_CAST")
+    fun <T : RealmObject, R : Cached> getCached(clazz: Class<T>, id: String): Observable<R> {
+        fun cached() = when (clazz) {
+            Album::class.java -> cache.album(id)
+            Photocard::class.java -> cache.photocard(id)
+            User::class.java -> cache.user(id)
+            else -> throw UnsupportedOperationException()
+        } as R?
+        return Observable.merge(justOrEmpty(cached()),
+                getObject(clazz, id).flatMap { justOrEmpty(cache.cache(it) as R?) })
+    }
+
+    //todo detach instead mainthread
     fun <T : RealmObject> search(clazz: Class<T>,
                                  query: List<Query>? = null,
                                  sortBy: String? = null,
@@ -84,15 +96,6 @@ class RealmManager {
         val realm = Realm.getDefaultInstance()
         realm.executeTransaction {
             it.where(clazz).equalTo("id", id).findFirst()?.deleteFromRealm()
-        }
-        realm.close()
-    }
-
-    fun <T : RealmObject> removeAllNotActive(clazz: Class<T>) {
-        if (!Changeable::class.java.isAssignableFrom(clazz)) return
-        val realm = Realm.getDefaultInstance()
-        realm.executeTransaction {
-            it.where(clazz).equalTo("active", false).findAll()?.deleteAllFromRealm()
         }
         realm.close()
     }

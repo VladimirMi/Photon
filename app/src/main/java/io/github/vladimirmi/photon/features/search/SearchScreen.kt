@@ -49,23 +49,21 @@ class SearchScreen : BaseScreen<MainScreen.Component>(), TreeKey {
 
         @Provides
         @DaggerScope(SearchScreen::class)
-        fun provideSearchPresenter(model: ISearchModel, rootPresenter: RootPresenter): SearchPresenter {
-            return SearchPresenter(model, rootPresenter)
-        }
+        fun provideSearchPresenter(model: ISearchModel,
+                                   rootPresenter: RootPresenter): SearchPresenter =
+                SearchPresenter(model, rootPresenter)
 
         @Provides
         @DaggerScope(SearchScreen::class)
         fun provideSearchTagPresenter(model: ISearchModel,
-                                      rootPresenter: RootPresenter): SearchTagPresenter {
-            return SearchTagPresenter(model, rootPresenter)
-        }
+                                      rootPresenter: RootPresenter): SearchTagPresenter =
+                SearchTagPresenter(model, rootPresenter)
 
         @Provides
         @DaggerScope(SearchScreen::class)
         fun provideSearchFilterPresenter(model: ISearchModel,
-                                         rootPresenter: RootPresenter): SearchFilterPresenter {
-            return SearchFilterPresenter(model, rootPresenter)
-        }
+                                         rootPresenter: RootPresenter): SearchFilterPresenter =
+                SearchFilterPresenter(model, rootPresenter)
     }
 
     @DaggerScope(SearchScreen::class)

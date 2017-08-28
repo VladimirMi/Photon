@@ -31,15 +31,14 @@ class AuthorScreen(val userId: String) : BaseScreen<RootActivityComponent>() {
 
         @Provides
         @DaggerScope(AuthorScreen::class)
-        fun provideAuthorModel(dataManager: DataManager, cache: Cache): IAuthorModel {
-            return AuthorModel(dataManager, cache)
-        }
+        fun provideAuthorModel(dataManager: DataManager, cache: Cache): IAuthorModel =
+                AuthorModel(dataManager, cache)
 
         @Provides
         @DaggerScope(AuthorScreen::class)
-        fun provideAuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter): AuthorPresenter {
-            return AuthorPresenter(model, rootPresenter)
-        }
+        fun provideAuthorPresenter(model: IAuthorModel,
+                                   rootPresenter: RootPresenter): AuthorPresenter =
+                AuthorPresenter(model, rootPresenter)
     }
 
     @DaggerScope(AuthorScreen::class)

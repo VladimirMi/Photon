@@ -11,16 +11,13 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
-import io.github.vladimirmi.photon.data.models.req.EditProfileReq
-import io.github.vladimirmi.photon.data.models.req.NewAlbumReq
-import io.github.vladimirmi.photon.data.network.ApiError
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.Constants
+import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.github.vladimirmi.photon.utils.JobStatus
 import io.reactivex.disposables.Disposable
 
 class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
@@ -49,6 +46,7 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
 
     override fun initView(view: ProfileView) {
         compDisp.add(subscribeOnProfile())
+        compDisp.add(subscribeOnUpdateProfile())
         compDisp.add(subscribeOnAlbums())
     }
 
@@ -58,6 +56,11 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                     profile = it
                     view.setProfile(it)
                 }
+    }
+
+    private fun subscribeOnUpdateProfile(): Disposable {
+        return model.updateProfile()
+                .subscribeWith(ErrorCompletableObserver())
     }
 
     private fun subscribeOnAlbums(): Disposable {
@@ -81,43 +84,24 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
         }
     }
 
-    fun createNewAlbum(newAlbumReq: NewAlbumReq) {
-        compDisp.add(model.createAlbum(newAlbumReq)
-                .doOnSubscribe { view.closeNewAlbumDialog() }
-                .subscribeWith(object : ErrorObserver<JobStatus>() {
-                    override fun onComplete() {
-                        view.showMessage(R.string.album_create_success)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        if (e is ApiError) view.showError(e.errorResId)
-                    }
-                }))
+    fun createNewAlbum(albumDto: AlbumDto) {
+        view.closeNewAlbumDialog()
+        compDisp.add(model.createAlbum(albumDto)
+                .subscribeWith(ErrorObserver(view)))
     }
 
-    fun editProfile(profileReq: EditProfileReq) {
+    fun editProfile(request: UserDto) {
         view.closeEditProfileDialog()
-        if (!profileReq.avatarChanged) profileReq.avatar = profile.avatar
-        if (!profileChanged(profileReq)) return
+        if (!profileChanged(request)) return
 
-        compDisp.add(model.editProfile(profileReq)
-                .subscribeWith(object : ErrorObserver<JobStatus>() {
-                    override fun onComplete() {
-                        view.showMessage(R.string.profile_edit_success)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        if (e is ApiError) view.showError(e.errorResId)
-                    }
-                }))
+        compDisp.add(model.editProfile(request)
+                .subscribeWith(ErrorObserver(view)))
     }
 
-    private fun profileChanged(profileReq: EditProfileReq): Boolean {
-        return profile.name != profileReq.name ||
-                profile.login != profileReq.login ||
-                profileReq.avatarChanged
+    private fun profileChanged(request: UserDto): Boolean {
+        return request.name != profile.name ||
+                request.login != profile.login ||
+                !request.avatar.startsWith("http")
     }
 
     private fun takePhoto() {
@@ -146,9 +130,11 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     }
 
     private fun editAvatar(uri: String) {
-        val profileReq = EditProfileReq(profile.name, profile.login, uri)
-        profileReq.avatarChanged = true
-        editProfile(profileReq)
+        val request = UserDto(
+                name = profile.name,
+                login = profile.login,
+                avatar = uri)
+        editProfile(request)
     }
 }
 

@@ -5,6 +5,7 @@ import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.features.search.SearchView
 import io.github.vladimirmi.photon.utils.JobStatus
 import io.github.vladimirmi.photon.utils.Query
+import io.reactivex.Completable
 import io.reactivex.Observable
 
 /**
@@ -21,5 +22,5 @@ interface IMainModel : IModel {
     fun isFiltered(): Boolean
     fun resetFilter()
     fun addView(photocardId: String): Observable<JobStatus>
-    fun updatePhotocards(offset: Int, limit: Int): Observable<Unit>
+    fun updatePhotocards(offset: Int, limit: Int): Completable
 }

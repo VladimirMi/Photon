@@ -3,9 +3,9 @@ package io.github.vladimirmi.photon.data.jobs
 import android.net.Uri
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
-import io.github.vladimirmi.photon.data.jobs.queue.JobTask
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.req.PhotocardNewReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.JobGroup
 import io.github.vladimirmi.photon.utils.JobPriority
@@ -19,24 +19,16 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class PhotocardCreateJob(photocardId: String,
-                         albumId: String)
+class PhotocardCreateJob(private val request: PhotocardNewReq)
     : Job(Params(JobPriority.HIGH)
         .groupBy(JobGroup.PHOTOCARD)
-        .setSingleId(photocardId)
+        .addTags(TAG)
         .requireNetwork()
-        .persist()), JobTask {
+        .persist()) {
 
     companion object {
         val TAG = "PhotocardCreateJob"
     }
-
-    override var entityId = photocardId
-    override var parentEntityId = albumId
-    override val tag = TAG
-    override val type = JobTask.Type.CREATE
-
-    override fun onQueued() {}
 
     override fun onAdded() {}
 
@@ -44,7 +36,7 @@ class PhotocardCreateJob(photocardId: String,
     override fun onRun() {
         var error: Throwable? = null
         val dataManager = DaggerService.appComponent.dataManager()
-        val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, entityId)!!
+        val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, request.id)!!
 
         val data = getByteArrayFromContent(photocard.photo)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
@@ -53,13 +45,11 @@ class PhotocardCreateJob(photocardId: String,
         dataManager.uploadPhoto(bodyPart)
                 .flatMap { imageUrlRes ->
                     photocard.photo = imageUrlRes.image
-                    photocard.album = parentEntityId
                     dataManager.createPhotocard(photocard)
                 }
                 .doOnNext {
-                    entityId = it.id
                     photocard.id = it.id
-                    val album = dataManager.getDetachedObjFromDb(Album::class.java, parentEntityId)!!
+                    val album = dataManager.getDetachedObjFromDb(Album::class.java, request.album)!!
                     album.photocards.add(photocard)
                     dataManager.saveToDB(album)
                     removeTempPhotocard()
@@ -84,8 +74,8 @@ class PhotocardCreateJob(photocardId: String,
     }
 
     private fun removeTempPhotocard() {
-        DaggerService.appComponent.dataManager().removeFromDb(Photocard::class.java, entityId)
-        DaggerService.appComponent.cache().removePhoto(entityId)
+        DaggerService.appComponent.dataManager().removeFromDb(Photocard::class.java, request.id)
+        DaggerService.appComponent.cache().removePhoto(request.id)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =

@@ -8,10 +8,7 @@ import com.uphyca.stetho_realm.RealmInspectorModulesProvider
 import dagger.Module
 import dagger.Provides
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.jobs.queue.AlbumJobQueue
-import io.github.vladimirmi.photon.data.jobs.queue.JobQueue
-import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
-import io.github.vladimirmi.photon.data.jobs.queue.ProfileJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
@@ -40,12 +37,12 @@ class LocaleModule(val context: Context) {
 
     @Provides
     @DaggerScope(App::class)
-    fun provideRealmManager(context: Context): RealmManager {
+    fun provideRealmManager(context: Context, cache: Cache): RealmManager {
         Stetho.initialize(Stetho.newInitializerBuilder(context)
                 .enableDumpapp(Stetho.defaultDumperPluginsProvider(context))
                 .enableWebKitInspector(RealmInspectorModulesProvider.builder(context).build())
                 .build())
-        return RealmManager()
+        return RealmManager(cache)
     }
 
     @Provides
@@ -63,22 +60,10 @@ class LocaleModule(val context: Context) {
 
     @Provides
     @DaggerScope(App::class)
-    fun provideJobQueue(dataManager: DataManager, jobManager: JobManager) =
-            JobQueue(dataManager, jobManager)
+    fun provideJobs(dataManager: DataManager, jobManager: JobManager) =
+            Jobs(dataManager, jobManager)
 
     @Provides
     @DaggerScope(App::class)
     fun provideRefWatcher(context: Context) = App.getRefWatcher(context)
-
-    @Provides
-    @DaggerScope(App::class)
-    fun providePhotocardJobQueue(jobQueue: JobQueue) = PhotocardJobQueue(jobQueue)
-
-    @Provides
-    @DaggerScope(App::class)
-    fun provideAlbumJobQueue(jobQueue: JobQueue) = AlbumJobQueue(jobQueue)
-
-    @Provides
-    @DaggerScope(App::class)
-    fun provideProfileJobQueue(jobQueue: JobQueue) = ProfileJobQueue(jobQueue)
 }

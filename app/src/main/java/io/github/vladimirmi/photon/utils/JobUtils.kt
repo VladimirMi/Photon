@@ -84,9 +84,11 @@ fun <T : Job> JobManager.singleResultFor(localJob: T): Single<Unit> {
 
 class JobStatus(val job: Job, val status: Status) {
     enum class Status {ADDED, RUN, AFTER_RUN, DONE, QUEUED }
+
+    fun isDone() = status == DONE
 }
 
-fun <T : Job> JobManager.observableFor(localJob: T): Observable<JobStatus> {
+fun <T : Job> JobManager.addAndObserve(localJob: T): Observable<JobStatus> {
     return Observable.create { e ->
         val callback = object : EmptyJobCallback() {
             override fun onDone(job: Job) {
@@ -117,10 +119,47 @@ fun <T : Job> JobManager.observableFor(localJob: T): Observable<JobStatus> {
         }
 
         addCallback(callback)
+        addJobInBackground(localJob)
         e.onNext(JobStatus(localJob, QUEUED))
         e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
     }
 }
+
+fun JobManager.observe(tag: String): Observable<JobStatus> {
+    return Observable.create { e ->
+        val callback = object : EmptyJobCallback() {
+            override fun onDone(job: Job) {
+                if (!e.isDisposed && job.tags?.contains(tag) == true) {
+                    e.onNext(JobStatus(job, DONE))
+                    e.onComplete()
+                }
+            }
+
+            override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
+                Timber.e(throwable, throwable?.localizedMessage)
+                if (!e.isDisposed && job.tags?.contains(tag) == true) {
+                    if (throwable != null) e.onError(throwable)
+                }
+            }
+
+            override fun onAfterJobRun(job: Job, resultCode: Int) {
+                if (!e.isDisposed && job.tags?.contains(tag) == true) e.onNext(JobStatus(job, AFTER_RUN))
+            }
+
+            override fun onJobAdded(job: Job) {
+                if (!e.isDisposed && job.tags?.contains(tag) == true) e.onNext(JobStatus(job, ADDED))
+            }
+
+            override fun onJobRun(job: Job, resultCode: Int) {
+                if (!e.isDisposed && job.tags?.contains(tag) == true) e.onNext(JobStatus(job, RUN))
+            }
+        }
+
+        addCallback(callback)
+        e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
+    }
+}
+
 
 fun JobManager.singleCancelJobs(constraint: TagConstraint, vararg tags: String)
         : Single<CancelResult> {

@@ -1,13 +1,12 @@
 package io.github.vladimirmi.photon.features.root
 
-import io.github.vladimirmi.photon.data.jobs.queue.JobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 /**
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit
  */
 
 class RootModel(private val dataManager: DataManager,
-                private val jobQueue: JobQueue) : IRootModel {
+                private val jobs: Jobs) : IRootModel {
 
     override fun isUserAuth() = dataManager.isUserAuth()
 
@@ -37,9 +36,6 @@ class RootModel(private val dataManager: DataManager,
 
     override fun isNetAvail() = dataManager.checkNetAvail()
 
-    override fun execJobQueue(): Observable<Unit>
-            = jobQueue.execQueue().subscribeOn(Schedulers.newThread())
-
     private fun saveUser(user: User) {
         dataManager.saveToDB(user)
         dataManager.saveUserId(user.id)
@@ -47,4 +43,6 @@ class RootModel(private val dataManager: DataManager,
         //todo если fav album отсутствует, предложить создать(?)
         dataManager.saveUserFavAlbumId(user.albums.find { it.isFavorite }!!.id)
     }
+
+    override fun syncDB() = dataManager.syncDB()
 }

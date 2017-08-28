@@ -1,6 +1,6 @@
 package io.github.vladimirmi.photon.features.main
 
-import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
@@ -9,6 +9,7 @@ import io.github.vladimirmi.photon.features.search.SearchView
 import io.github.vladimirmi.photon.utils.JobStatus
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.ioToMain
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.realm.Sort
 
@@ -17,7 +18,7 @@ import io.realm.Sort
  */
 
 class MainModel(private val dataManager: DataManager,
-                private val photocardJobQueue: PhotocardJobQueue,
+                private val jobs: Jobs,
                 private val cache: Cache) : IMainModel {
 
     var query = ArrayList<Query>()
@@ -52,13 +53,14 @@ class MainModel(private val dataManager: DataManager,
     }
 
     override fun addView(photocardId: String): Observable<JobStatus> =
-            photocardJobQueue.queueAddViewJob(photocardId).ioToMain()
+            jobs.photocardAddView(photocardId).ioToMain()
 
-    override fun updatePhotocards(offset: Int, limit: Int): Observable<Unit> {
+    override fun updatePhotocards(offset: Int, limit: Int): Completable {
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getPhotocardsFromNet(offset, limit) }
                 .map { it.forEach { dataManager.saveToDB(it) } }
+                .ignoreElements()
                 .ioToMain()
     }
 }

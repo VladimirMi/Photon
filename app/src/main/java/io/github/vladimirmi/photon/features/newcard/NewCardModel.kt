@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.features.newcard
 
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.jobs.queue.PhotocardJobQueue
+import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
@@ -13,12 +13,13 @@ import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
+import io.realm.RealmList
 import io.realm.Sort
 import timber.log.Timber
 
-class NewCardModel(val dataManager: DataManager,
-                   val photocardJobQueue: PhotocardJobQueue,
-                   val cache: Cache) : INewCardModel {
+class NewCardModel(private val dataManager: DataManager,
+                   private val cache: Cache,
+                   private val jobs: Jobs) : INewCardModel {
 
     override var screenInfo = NewCardScreenInfo()
 
@@ -51,8 +52,7 @@ class NewCardModel(val dataManager: DataManager,
     override fun searchTag(tag: String): Observable<List<String>> {
         val query = Query("value", RealmOperator.CONTAINS, tag)
         return dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
-                .map { cache.cacheTags(it) }
-                .map { if (it.size > 3) it.subList(0, 3) else it }
+                .map { (if (it.size > 3) it.subList(0, 3) else it).map { it.value } }
                 .ioToMain()
     }
 
@@ -65,10 +65,9 @@ class NewCardModel(val dataManager: DataManager,
 
     override fun getAlbums(): Observable<List<AlbumDto>> {
         val query = Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId())
-        val albums = dataManager.search(Album::class.java, listOf(query), sortBy = "views", order = Sort.DESCENDING)
+        return dataManager.search(Album::class.java, listOf(query), sortBy = "views", order = Sort.DESCENDING)
                 .map { cache.cacheAlbums(it) }
-
-        return Observable.merge(Observable.just(cache.albums), albums).ioToMain()
+                .ioToMain()
     }
 
     override fun getPageError(page: Page) = when (page) {
@@ -78,14 +77,17 @@ class NewCardModel(val dataManager: DataManager,
     }
 
     override fun uploadPhotocard(): Observable<JobStatus> {
-        val photoCard = Photocard().withId().apply {
-            title = screenInfo.title
-            tags.addAll(screenInfo.tags.map { Tag(it) })
-            filters = screenInfo.filter
-            photo = screenInfo.photo
-            owner = dataManager.getProfileId()
+        val photocard = with(screenInfo) {
+            Photocard(
+                    title = title,
+                    filters = filter,
+                    photo = photo,
+                    album = album,
+                    owner = dataManager.getProfileId(),
+                    tags = RealmList<Tag>().apply { addAll(screenInfo.tags.map { Tag(it) }) }
+            )
         }
-        return photocardJobQueue.queueCreateJob(photoCard, screenInfo.album)
+        return jobs.photocardCreate(photocard)
                 .ioToMain()
     }
 }

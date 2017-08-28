@@ -2,8 +2,8 @@ package io.github.vladimirmi.photon.data.models.realm
 
 import io.realm.RealmList
 import io.realm.RealmObject
-import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
+import timber.log.Timber
 import java.util.*
 
 /**
@@ -12,7 +12,7 @@ import java.util.*
 
 open class Photocard(
         @PrimaryKey
-        override var id: String = "",
+        override var id: String = Synchronizable.tempId(),
         var owner: String = "",
         var searchTag: String = "",
         var title: String = "",
@@ -23,18 +23,11 @@ open class Photocard(
         var tags: RealmList<Tag> = RealmList(),
         override var updated: Date = Date(),
         override var active: Boolean = true,
-        @Ignore var album: String = ""
-) : RealmObject(), Changeable {
+        override var sync: Boolean = true,
+        var album: String = Synchronizable.tempId()
+) : RealmObject(), Synchronizable {
 
-    companion object {
-        const val TEMP = "TEMP"
-    }
-
-    fun withId(): Photocard {
-        if (id.isEmpty()) id = TEMP + UUID.randomUUID().toString()
-        filters.generateId()
-        return this
-    }
+    fun canCreate() = !album.startsWith(Synchronizable.TEMP)
 }
 
 open class Filter(
@@ -48,8 +41,9 @@ open class Filter(
         var lightSource: String = ""
 ) : RealmObject() {
 
-    fun generateId() {
+    init {
         id = hashCode().toString()
+        Timber.e("filter id:  $id")
     }
 
     //region =============== hash and equals ==============
@@ -69,7 +63,7 @@ open class Filter(
         return true
     }
 
-    override fun hashCode(): Int {
+    final override fun hashCode(): Int {
         var result = dish.hashCode()
         result = 31 * result + nuances.hashCode()
         result = 31 * result + decor.hashCode()

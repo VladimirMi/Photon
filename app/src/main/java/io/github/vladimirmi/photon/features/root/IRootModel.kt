@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.features.root
 import io.github.vladimirmi.photon.core.IModel
 import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
+import io.reactivex.Completable
 import io.reactivex.Observable
 
 /**
@@ -15,5 +16,5 @@ interface IRootModel : IModel {
     fun login(req: SignInReq): Observable<Unit>
     fun register(req: SignUpReq): Observable<Unit>
     fun isNetAvail(): Boolean
-    fun execJobQueue(): Observable<Unit>
+    fun syncDB(): Completable
 }
