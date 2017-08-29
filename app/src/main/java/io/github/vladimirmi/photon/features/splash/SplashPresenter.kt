@@ -53,7 +53,6 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
                 .subscribeWith(object : ErrorObserver<Long>() {
                     override fun onNext(it: Long) {
                         Timber.e("onNext: timer ended")
-                        view.showError(R.string.message_err_connect)
                         chooseCanOpen()
                     }
 

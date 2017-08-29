@@ -1,6 +1,6 @@
 package io.github.vladimirmi.photon.features.main
 
-import io.github.vladimirmi.photon.data.jobs.queue.Jobs
+import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
@@ -39,7 +39,7 @@ class MainModel(private val dataManager: DataManager,
                 query = if (query.isNotEmpty()) query.toList() else null,
                 sortBy = "views",
                 order = Sort.DESCENDING)
-                .map { cache.cachePhotos(it) }
+                .map { cache.cachePhotocards(it) }
                 .ioToMain()
     }
 
@@ -59,7 +59,7 @@ class MainModel(private val dataManager: DataManager,
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getPhotocardsFromNet(offset, limit) }
-                .map { it.forEach { dataManager.saveToDB(it) } }
+                .doOnNext { dataManager.saveFromNet(it) }
                 .ignoreElements()
                 .ioToMain()
     }

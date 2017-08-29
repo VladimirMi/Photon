@@ -20,7 +20,7 @@ class Cache {
     val photocards: List<PhotocardDto> get() = photocardMap.values.toList()
     fun photocard(id: String) = photocardMap[id]
 
-    fun cachePhotos(list: List<Photocard>): List<PhotocardDto> {
+    fun cachePhotocards(list: List<Photocard>): List<PhotocardDto> {
         return ArrayList<PhotocardDto>().apply {
             list.forEach { cachePhotocard(it)?.let { add(it) } }
         }
@@ -90,5 +90,14 @@ class Cache {
                 is Photocard -> cachePhotocard(obj)
                 is User -> cacheUser(obj)
                 else -> throw UnsupportedOperationException()
-        }
+            }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : RealmObject> cache(list: List<T>): List<Cached?> =
+            when (list[0]) {
+                is Album -> cacheAlbums(list as List<Album>)
+                is Photocard -> cachePhotocards(list as List<Photocard>)
+                is User -> cacheUsers(list as List<User>)
+                else -> throw UnsupportedOperationException()
+            }
 }

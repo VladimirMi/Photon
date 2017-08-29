@@ -10,7 +10,6 @@ import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.Sort
 import java.lang.UnsupportedOperationException
-import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
@@ -18,17 +17,35 @@ import java.util.concurrent.atomic.AtomicReference
 
 class RealmManager(private val cache: Cache) {
 
+    //todo SRP violation
     fun save(realmObject: RealmObject) {
-        val obj = setupObject(realmObject) ?: return
         val realm = Realm.getDefaultInstance()
-        realm.executeTransaction { it.insertOrUpdate(obj) }
+        realm.executeTransaction { it.insertOrUpdate(realmObject) }
         realm.close()
-        cache.cache(obj)
+        cache.cache(realmObject)
+    }
+
+    fun <T : RealmObject> save(list: List<T>) {
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransaction { it.insertOrUpdate(list) }
+        realm.close()
+        cache.cache(list)
+    }
+
+    fun saveFromNet(realmObject: RealmObject) {
+        setupObject(realmObject)?.let { save(it) }
+    }
+
+    fun <T : RealmObject> saveFromNet(list: List<T>) {
+        save(list.mapNotNull { setupObject(it) })
     }
 
     private fun setupObject(realmObject: RealmObject): RealmObject? {
         fun setupPhotocard(photocard: Photocard) = if (photocard.active && photocard.sync)
-            photocard.apply { searchTag = title.toLowerCase() }
+            photocard.apply {
+                searchTag = title.toLowerCase()
+                if (filters.id.isEmpty()) generateId()
+            }
         else null
 
         fun setupAlbum(album: Album) = if (album.active && album.sync)
@@ -72,14 +89,12 @@ class RealmManager(private val cache: Cache) {
                 getObject(clazz, id).flatMap { justOrEmpty(cache.cache(it) as R?) })
     }
 
-    //todo detach instead mainthread
     fun <T : RealmObject> search(clazz: Class<T>,
                                  query: List<Query>? = null,
                                  sortBy: String? = null,
                                  order: Sort = Sort.ASCENDING,
-                                 mainThread: Boolean = false): Observable<List<T>> {
-
-        return AtomicReference<Realm>().asFlowable(mainThread) {
+                                 detach: Boolean = false): Observable<List<T>> {
+        return asFlowable(detach) {
             it.where(clazz).prepareQuery(query)
                     .let {
                         if (sortBy != null) {

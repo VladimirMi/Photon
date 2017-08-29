@@ -23,7 +23,7 @@ class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getUserFromNet(id) }
-                .doOnNext { dataManager.saveToDB(it) }
+                .doOnNext { dataManager.saveFromNet(it) }
                 .ignoreElements()
                 .ioToMain()
     }

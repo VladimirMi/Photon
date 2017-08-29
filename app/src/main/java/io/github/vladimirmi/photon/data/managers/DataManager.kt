@@ -17,7 +17,6 @@ import io.reactivex.Observable
 import io.realm.RealmObject
 import io.realm.Sort
 import okhttp3.MultipartBody
-import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -147,13 +146,22 @@ constructor(private val restService: RestService,
 
     //region =============== DataBase ==============
 
-    fun <T : RealmObject> saveToDB(realmObject: T) = realmManager.save(realmObject)
+    fun <T : RealmObject> saveFromNet(realmObject: T) {
+        realmManager.saveFromNet(realmObject)
+    }
+
+    fun <T : RealmObject> saveFromNet(list: List<T>) {
+        realmManager.saveFromNet(list)
+    }
+
+    fun <T : RealmObject> save(realmObject: T) {
+        realmManager.save(realmObject)
+    }
 
     fun <T : RealmObject> getListFromDb(clazz: Class<T>,
                                         sortBy: String? = null,
-                                        order: Sort = Sort.ASCENDING,
-                                        mainThread: Boolean = false): Observable<List<T>> =
-            search(clazz, null, sortBy, order, mainThread)
+                                        order: Sort = Sort.ASCENDING): Observable<List<T>> =
+            search(clazz, null, sortBy, order)
 
     fun <T : RealmObject> getObjectFromDb(clazz: Class<T>, id: String): Observable<T> =
             realmManager.getObject(clazz, id)
@@ -165,14 +173,14 @@ constructor(private val restService: RestService,
                                  query: List<Query>?,
                                  sortBy: String? = null,
                                  order: Sort = Sort.ASCENDING,
-                                 mainThread: Boolean = false): Observable<List<T>> =
-            realmManager.search(clazz, query, sortBy, order, mainThread)
+                                 detach: Boolean = false): Observable<List<T>> =
+            realmManager.search(clazz, query, sortBy, order, detach)
 
     fun <T : RealmObject> removeFromDb(clazz: Class<T>, id: String) {
         realmManager.remove(clazz, id)
     }
 
-    fun syncDB() = RealmSynchronizer(this, jobManager).syncAll()
+    fun syncDB() = RealmSynchronizer(jobManager, this).syncAll()
 
     inline fun <reified T : RealmObject, R : Cached> getCached(id: String): Observable<R> =
             DaggerService.appComponent.realmManager().getCached(T::class.java, id)
@@ -215,7 +223,6 @@ constructor(private val restService: RestService,
             Observable.interval(0, 2, TimeUnit.SECONDS)
                     .map { checkNetAvail() }
                     .distinctUntilChanged()
-                    .doOnNext { Timber.e("isNetworkAvailable $it") }
 
     private val cm by lazy { context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
 }

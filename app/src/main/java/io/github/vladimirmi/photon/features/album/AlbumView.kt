@@ -2,9 +2,7 @@ package io.github.vladimirmi.photon.features.album
 
 import android.content.Context
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
-import android.widget.TextView
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
@@ -23,11 +21,6 @@ import kotlinx.android.synthetic.main.screen_album.view.*
 
 class AlbumView(context: Context, attrs: AttributeSet)
     : BaseView<AlbumPresenter, AlbumView>(context, attrs) {
-
-    val name: TextView by lazy { album_name }
-    val description: TextView by lazy { album_description }
-    private val cardCount: TextView by lazy { card_count }
-    private val photocardList: RecyclerView by lazy { photocard_list }
 
     private var editMode: Boolean = false
     private lateinit var album: AlbumDto
@@ -50,44 +43,47 @@ class AlbumView(context: Context, attrs: AttributeSet)
     override fun onBackPressed() = presenter.onBackPressed()
 
     override fun initView() {
-        photocardList.layoutManager = GridLayoutManager(context, 3)
-        photocardList.adapter = adapter
-        photocardList.setOnLongClickListener { presenter.setEditable(true); true }
+        photocard_list.layoutManager = GridLayoutManager(context, 3)
+        photocard_list.adapter = adapter
+        photocard_list.setOnLongClickListener { presenter.setEditable(true); true }
     }
 
     fun setAlbum(album: AlbumDto) {
         this.album = album
-        name.text = album.title
-        description.text = album.description
-        cardCount.text = album.photocards.size.toString()
+        album_name.text = album.title
+        album_description.text = album.description
+        card_count.text = album.photocards.size.toString()
         adapter.updateData(album.photocards)
     }
 
     fun setEditable(editMode: Boolean) {
         this.editMode = editMode
-        (0 until photocardList.adapter.itemCount)
-                .map { photocardList.findViewHolderForAdapterPosition(it) as? CardViewHolder }
+        (0 until photocard_list.adapter.itemCount)
+                .map { photocard_list.findViewHolderForAdapterPosition(it) as? CardViewHolder }
                 .forEach { it?.longTapAction(editMode) }
 
     }
 
-    fun showDeleteDialog() = deleteDialog.show()
-    fun closeDeleteDialog() = deleteDialog.hide()
-    fun showEditDialog() = editDialog.show()
-    fun closeEditDialog() = editDialog.hide()
-
-    fun deletePhotocard(photocard: PhotocardDto) {
-        adapter.deletePhotocard(photocard)
+    fun showDeleteDialog() {
+        deleteDialog.show()
     }
 
-    override fun onViewRestored() {
-        super.onViewRestored()
+    fun closeDeleteDialog() {
+        deleteDialog.hide()
+    }
+
+    fun showEditDialog() {
+        editDialog.show()
         editDialog.subscribe()
     }
 
-    override fun onViewDestroyed(removedByFlow: Boolean) {
-        super.onViewDestroyed(removedByFlow)
+    fun closeEditDialog() {
+        editDialog.hide()
         editDialog.unsubscribe()
+    }
+
+    fun deletePhotocard(photocard: PhotocardDto) {
+        adapter.deletePhotocard(photocard)
     }
 }
 

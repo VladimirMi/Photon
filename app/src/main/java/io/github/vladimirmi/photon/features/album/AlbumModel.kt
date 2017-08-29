@@ -1,6 +1,6 @@
 package io.github.vladimirmi.photon.features.album
 
-import io.github.vladimirmi.photon.data.jobs.queue.Jobs
+import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
@@ -26,7 +26,7 @@ class AlbumModel(private val dataManager: DataManager,
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getAlbumFromNet(id) }
-                .doOnNext { dataManager.saveToDB(it) }
+                .doOnNext { dataManager.saveFromNet(it) }
                 .ignoreElements()
                 .ioToMain()
     }
@@ -53,7 +53,7 @@ class AlbumModel(private val dataManager: DataManager,
                         if (isFavorite) {
                             jobs.albumDeleteFavorite(it)
                         } else {
-                            jobs.albumDelete(it)
+                            jobs.photocardDelete(it)
                         }
                     }
         }

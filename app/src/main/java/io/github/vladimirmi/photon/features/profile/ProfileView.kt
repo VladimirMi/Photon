@@ -31,13 +31,6 @@ class ProfileView(context: Context, attrs: AttributeSet)
     private val newAlbumAction: (AlbumDto) -> Unit = { presenter.createNewAlbum(it) }
     private val newAlbumDialog = NewAlbumDialog(this, newAlbumAction)
 
-    private val loginView by lazy { user_login }
-    private val nameView by lazy { user_name }
-    private val albumsView by lazy { album_list }
-    private val albumCountView by lazy { album_count }
-    private val cardCountView by lazy { card_count }
-    private val avatarView by lazy { user_avatar }
-
     private val editProfileAction: (UserDto) -> Unit = { presenter.editProfile(it) }
     private val editProfileDialog by lazy { EditProfileDialog(this, editProfileAction, profile) }
 
@@ -46,9 +39,8 @@ class ProfileView(context: Context, attrs: AttributeSet)
     }
 
     override fun initView() {
-        @Suppress("UsePropertyAccessSyntax")
-        albumsView.setLayoutManager(GridLayoutManager(context, 2))
-        albumsView.adapter = adapter
+        album_list.layoutManager = GridLayoutManager(context, 2)
+        album_list.adapter = adapter
     }
 
     private var curAvatarPath = ""
@@ -57,18 +49,18 @@ class ProfileView(context: Context, attrs: AttributeSet)
     @SuppressLint("SetTextI18n")
     fun setProfile(user: UserDto) {
         profile = user
-        loginView.text = user.login
-        nameView.text = namePrefix + user.name
+        user_login.text = user.login
+        user_name.text = namePrefix + user.name
         if (user.avatar != curAvatarPath) {
-            avatarView.setRoundAvatarWithBorder(user.avatar)
+            user_avatar.setRoundAvatarWithBorder(user.avatar)
             curAvatarPath = user.avatar
         }
     }
 
 
     fun setAlbums(albums: List<AlbumDto>) {
-        albumCountView.text = albums.size.toString()
-        cardCountView.text = albums.filter { !it.isFavorite }
+        album_count.text = albums.size.toString()
+        card_count.text = albums.filter { !it.isFavorite }
                 .fold(0, { acc, album -> acc + album.photocards.size })
                 .toString()
         adapter.updateData(albums)
@@ -76,10 +68,25 @@ class ProfileView(context: Context, attrs: AttributeSet)
 
     private fun showAlbum(album: AlbumDto) = presenter.showAlbum(album)
 
-    fun openNewAlbumDialog() = newAlbumDialog.show()
-    fun closeNewAlbumDialog() = newAlbumDialog.hide()
-    fun openEditProfileDialog() = editProfileDialog.show()
-    fun closeEditProfileDialog() = editProfileDialog.hide()
+    fun openNewAlbumDialog() {
+        newAlbumDialog.show()
+        newAlbumDialog.subscribe()
+    }
+
+    fun closeNewAlbumDialog() {
+        newAlbumDialog.hide()
+        newAlbumDialog.unsubscribe()
+    }
+
+    fun openEditProfileDialog() {
+        editProfileDialog.show()
+        editProfileDialog.subscribe()
+    }
+
+    fun closeEditProfileDialog() {
+        editProfileDialog.hide()
+        editProfileDialog.unsubscribe()
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         presenter.onActivityResult(requestCode, resultCode, data)
@@ -87,18 +94,6 @@ class ProfileView(context: Context, attrs: AttributeSet)
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         presenter.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    override fun onViewRestored() {
-        super.onViewRestored()
-        newAlbumDialog.subscribe()
-        editProfileDialog.subscribe()
-    }
-
-    override fun onViewDestroyed(removedByFlow: Boolean) {
-        super.onViewDestroyed(removedByFlow)
-        newAlbumDialog.unsubscribe()
-        editProfileDialog.unsubscribe()
     }
 }
 

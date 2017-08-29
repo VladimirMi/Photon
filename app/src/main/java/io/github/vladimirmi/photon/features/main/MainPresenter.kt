@@ -17,7 +17,6 @@ import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.github.vladimirmi.photon.utils.afterNetCheck
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev, 03.06.2017.
@@ -166,7 +165,6 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     }
 
     fun loadMore(page: Int, limit: Int) {
-        Timber.e("loadMore: offset ${page * limit} limit $limit")
         compDisp.add(model.updatePhotocards(page * limit, limit)
                 .doOnComplete {
                     updated += limit

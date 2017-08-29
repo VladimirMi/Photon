@@ -8,7 +8,7 @@ import com.uphyca.stetho_realm.RealmInspectorModulesProvider
 import dagger.Module
 import dagger.Provides
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.jobs.queue.Jobs
+import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.PreferencesManager

@@ -9,7 +9,6 @@ import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Sort
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -39,9 +38,10 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
 
     override fun getTags(): Observable<List<String>> {
         val pageSize = 20
-        return dataManager.getListFromDb(Tag::class.java, sortBy = "value", mainThread = true)
+        return dataManager.getListFromDb(Tag::class.java, sortBy = "value")
+                .map { it.map { it.value } }
                 .flatMap { list ->
-                    Observable.interval(0, 500, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                    Observable.interval(0, 500, TimeUnit.MILLISECONDS)
                             .flatMap { long ->
                                 val from = (pageSize * long).toInt()
                                 val to = (pageSize * (long + 1)).toInt()
@@ -54,7 +54,6 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
                                 }
                             }
                 }
-                .map { it.map { it.value } }
     }
 
     override fun isFiltered() = mainModel.isFiltered()
@@ -108,6 +107,6 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
     }
 
     override fun saveSearchField(search: String) {
-        dataManager.saveToDB(Search(search))
+        dataManager.save(Search(search))
     }
 }

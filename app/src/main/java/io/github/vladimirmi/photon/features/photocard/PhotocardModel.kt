@@ -1,6 +1,6 @@
 package io.github.vladimirmi.photon.features.photocard
 
-import io.github.vladimirmi.photon.data.jobs.queue.Jobs
+import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
@@ -28,7 +28,7 @@ class PhotocardModel(private val dataManager: DataManager,
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getUserFromNet(id) }
-                .doOnNext { dataManager.saveToDB(it) }
+                .doOnNext { dataManager.saveFromNet(it) }
                 .ignoreElements()
                 .ioToMain()
     }
@@ -42,7 +42,7 @@ class PhotocardModel(private val dataManager: DataManager,
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getPhotocardFromNet(id, ownerId) }
-                .doOnNext { dataManager.saveToDB(it) }
+                .doOnNext { dataManager.saveFromNet(it) }
                 .ignoreElements()
                 .ioToMain()
     }

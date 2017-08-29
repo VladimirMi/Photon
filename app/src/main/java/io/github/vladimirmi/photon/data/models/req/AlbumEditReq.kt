@@ -7,9 +7,13 @@ import java.io.Serializable
  * Created by Vladimir Mikhalev 27.06.2017.
  */
 
-class AlbumEditReq(album: Album) : Serializable {
+data class AlbumEditReq(val id: String,
+                        val title: String,
+                        val description: String) : Serializable {
 
-    var id = album.id
-    val title = album.title
-    val description = album.description
+    companion object {
+        fun fromAlbum(album: Album) = with(album) {
+            AlbumEditReq(id, title, description)
+        }
+    }
 }

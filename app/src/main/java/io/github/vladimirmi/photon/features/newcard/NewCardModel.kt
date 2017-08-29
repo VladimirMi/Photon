@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.features.newcard
 
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.jobs.queue.Jobs
+import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto

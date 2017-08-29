@@ -91,7 +91,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     private fun submitDeletePhotos() {
         if (photosForDelete.size > 0) {
             compDisp.add(model.removePhotos(photosForDelete, album)
-                    .doOnComplete {
+                    .doOnNext {
                         photosForDelete.clear()
                         setEditable(false)
                     }
@@ -111,7 +111,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
     fun delete() {
         view.closeDeleteDialog()
         compDisp.add(model.deleteAlbum(album.id)
-                .doOnComplete { Flow.get(view).goBack() }
+                .doOnNext { Flow.get(view).goBack() }
                 .subscribeWith(ErrorObserver(view)))
     }
 

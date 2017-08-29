@@ -1,9 +1,10 @@
-package io.github.vladimirmi.photon.data.jobs
+package io.github.vladimirmi.photon.data.jobs.profile
 
 import android.net.Uri
 import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.*
@@ -16,7 +17,7 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class ProfileEditJob(private val request: ProfileEditReq)
+class ProfileEditJob
     : Job(Params(JobPriority.HIGH)
         .setGroupId(JobGroup.PROFILE)
         .addTags(TAG)
@@ -31,6 +32,9 @@ class ProfileEditJob(private val request: ProfileEditReq)
 
     override fun onRun() {
         val dataManager = DaggerService.appComponent.dataManager()
+
+        val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
+        val request = ProfileEditReq.fromProfile(profile)
 
         val editProfileObs = dataManager.editProfile(request)
 
@@ -47,7 +51,7 @@ class ProfileEditJob(private val request: ProfileEditReq)
         }
 
         var error: Throwable? = null
-        observable.doOnNext { dataManager.saveToDB(it) }
+        observable.doOnNext { dataManager.saveFromNet(it) }
                 .blockingSubscribe({}, { error = it })
 
         error?.let { throw it }
@@ -63,18 +67,18 @@ class ProfileEditJob(private val request: ProfileEditReq)
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
         if (cancelReason == CancelReason.CANCELLED_VIA_SHOULD_RE_RUN) {
-//            updateProfile()
+            updateProfile()
         }
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
-            cancelOrWait(throwable, runCount)
+            cancelOrWaitConnection(throwable, runCount)
 
     private fun updateProfile() {
         val dataManager = DaggerService.appComponent.dataManager()
 
-        dataManager.getUserFromNet(dataManager.getProfileId())
-                .doOnNext { dataManager.saveToDB(it) }
+        dataManager.getUserFromNet(dataManager.getProfileId(), "0")
+                .doOnNext { dataManager.saveFromNet(it) }
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(ErrorObserver())
     }

@@ -8,7 +8,6 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.crashlytics.android.Crashlytics
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
-import io.github.vladimirmi.photon.data.models.realm.Synchronizable
 import io.github.vladimirmi.photon.data.network.ApiError
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -72,11 +71,7 @@ fun <T> Observable<Response<T>>.parseResponse(saveUpdated: ((String) -> Unit)? =
                 if (saveUpdated != null) {
                     saveUpdated(Date().toString())
                 }
-                val body = it.body()!!
-                if (body is Synchronizable) {
-                    body.updated = Date()
-                }
-                return@map body
+                it.body()!!
             }
 }
 
@@ -84,14 +79,13 @@ class ErrorOnAttempt(val throwable: Throwable, val attempt: Int)
 
 fun <T> Observable<T>.retryExp(): Observable<T> {
     return retryWhen {
-        it.zipWith(1..AppConfig.RETRY_REQUEST_COUNT + 1,
-                { throwable, attempt -> ErrorOnAttempt(throwable, attempt) })
+        it.zipWith(1..5, { _, attempt -> attempt as Any })
+                .concatWith(it)
                 .flatMap<Long> {
-                    if (it.attempt == AppConfig.RETRY_REQUEST_COUNT + 1) {
-                        return@flatMap Observable.error(it.throwable)
+                    if (it is Throwable) {
+                        Observable.error(it)
                     } else {
-                        val delay = AppConfig.RETRY_REQUEST_BASE_DELAY * Math.pow(Math.E, it.attempt.toDouble()).toLong()
-                        return@flatMap Observable.just(delay)
+                        Observable.just(1000 * Math.pow(Math.E, (it as Int).toDouble()).toLong())
                     }
                 }
                 .flatMap { Observable.timer(it, TimeUnit.MILLISECONDS) }

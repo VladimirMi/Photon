@@ -1,11 +1,11 @@
-package io.github.vladimirmi.photon.data.jobs
+package io.github.vladimirmi.photon.data.jobs.photocard
 
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.JobGroup
 import io.github.vladimirmi.photon.utils.JobPriority
-import io.github.vladimirmi.photon.utils.cancelOrWait
+import io.github.vladimirmi.photon.utils.cancelOrWaitConnection
 import io.github.vladimirmi.photon.utils.logCancel
 
 /**
@@ -40,5 +40,5 @@ class PhotocardAddViewJob(private val photocardId: String) :
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
-            cancelOrWait(throwable, runCount)
+            cancelOrWaitConnection(throwable, runCount)
 }

@@ -3,7 +3,6 @@ package io.github.vladimirmi.photon.data.models.realm
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
-import timber.log.Timber
 import java.util.*
 
 /**
@@ -28,6 +27,10 @@ open class Photocard(
 ) : RealmObject(), Synchronizable {
 
     fun canCreate() = !album.startsWith(Synchronizable.TEMP)
+
+    fun generateId() {
+        filters.generateId()
+    }
 }
 
 open class Filter(
@@ -41,10 +44,10 @@ open class Filter(
         var lightSource: String = ""
 ) : RealmObject() {
 
-    init {
+    fun generateId() {
         id = hashCode().toString()
-        Timber.e("filter id:  $id")
     }
+
 
     //region =============== hash and equals ==============
 

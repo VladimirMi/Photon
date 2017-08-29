@@ -52,8 +52,8 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
     override fun initView(view: PhotocardView) {
         val id = Flow.getKey<PhotocardScreen>(view)?.photocardId!!
         val ownerId = Flow.getKey<PhotocardScreen>(view)?.ownerId!!
-        compDisp.add(subscribeOnUser(id))
-        compDisp.add(subscribeOnUpdateUser(id))
+        compDisp.add(subscribeOnUser(ownerId))
+        compDisp.add(subscribeOnUpdateUser(ownerId))
         compDisp.add(subscribeOnPhotocard(id))
         compDisp.add(subscribeOnUpdatePhotocard(id, ownerId))
         compDisp.add(subscribeOnIsFavorite(id))

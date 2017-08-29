@@ -6,8 +6,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.*
-import timber.log.Timber
-import java.util.concurrent.atomic.AtomicReference
 
 
 /**
@@ -40,7 +38,6 @@ fun <T : RealmObject> RealmQuery<T>.prepareQuery(query: List<Query>?)
         : RealmQuery<T> {
 
     query?.groupBy { it.fieldName }?.forEach { (_, list) ->
-        Timber.e("query group $list")
         beginGroup()
         list.forEachIndexed { idx, qry ->
             qry.applyTo(this)
@@ -51,36 +48,28 @@ fun <T : RealmObject> RealmQuery<T>.prepareQuery(query: List<Query>?)
     return this
 }
 
-inline fun <T : RealmObject> AtomicReference<Realm>.asFlowable(mainThread: Boolean = false,
-                                                               crossinline query: (Realm) -> RealmResults<T>)
+inline fun <T : RealmObject> asFlowable(detach: Boolean, crossinline query: (Realm) -> RealmResults<T>)
         : Flowable<List<T>> {
-    var handler: HandlerThread? = null
-    val scheduler = if (mainThread) {
-        AndroidSchedulers.mainThread()
-    } else {
-        handler = HandlerThread("RealmQueryThread", THREAD_PRIORITY_BACKGROUND).apply { start() }
-        AndroidSchedulers.from(handler.looper)
-    }
+    val handler = HandlerThread("RealmQueryThread", THREAD_PRIORITY_BACKGROUND).apply { start() }
+    val scheduler = AndroidSchedulers.from(handler.looper)
 
     return Flowable.create<List<T>>({ emitter ->
         val realm = Realm.getDefaultInstance()
-        set(realm)
         val listener = { result: RealmResults<T> ->
-            Timber.e("asFlowable: listener oyee")
             if (!emitter.isCancelled && result.isLoaded && result.isValid) {
-                emitter.onNext(result)
+                emitter.onNext(if (detach) realm.copyFromRealm(result) else result)
             }
         }
         val result = query(realm)
         if (!emitter.isCancelled && result.isLoaded && result.isValid) {
-            emitter.onNext(result)
+            emitter.onNext(if (detach) realm.copyFromRealm(result) else result)
         }
 
         result.addChangeListener(listener)
         emitter.setCancellable {
             result.removeChangeListener(listener)
             realm.close()
-            handler?.quitSafely()
+            handler.quitSafely()
         }
     }, BackpressureStrategy.LATEST)
             .subscribeOn(scheduler)

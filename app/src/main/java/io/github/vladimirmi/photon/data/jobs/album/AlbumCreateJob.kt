@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.data.jobs
+package io.github.vladimirmi.photon.data.jobs.album
 
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
@@ -8,14 +8,14 @@ import io.github.vladimirmi.photon.data.models.req.AlbumNewReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.JobGroup
 import io.github.vladimirmi.photon.utils.JobPriority
-import io.github.vladimirmi.photon.utils.cancelOrWait
+import io.github.vladimirmi.photon.utils.cancelOrWaitConnection
 import io.github.vladimirmi.photon.utils.logCancel
 
 /**
  * Created by Vladimir Mikhalev 17.07.2017.
  */
 
-class AlbumCreateJob(private val request: AlbumNewReq)
+class AlbumCreateJob(private val albumId: String)
     : Job(Params(JobPriority.HIGH)
         .setGroupId(JobGroup.ALBUM)
         .addTags(TAG)
@@ -32,12 +32,22 @@ class AlbumCreateJob(private val request: AlbumNewReq)
         val dataManager = DaggerService.appComponent.dataManager()
         var error: Throwable? = null
 
+        val album = dataManager.getDetachedObjFromDb(Album::class.java, albumId)!!
+        val request = AlbumNewReq.fromAlbum(album)
+
         dataManager.createAlbum(request)
                 .doOnNext {
                     val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
                     profile.albums.add(it)
-                    dataManager.saveToDB(profile)
-                    deleteLocalAlbum()
+                    dataManager.save(profile)
+                    album.photocards.forEach { photocard ->
+                        dataManager.save(photocard.apply {
+                            this.album = it.id
+                            sync = false
+                        })
+                    }
+
+                    deleteTempAlbum()
                 }
                 .blockingSubscribe({}, { error = it })
 
@@ -46,17 +56,13 @@ class AlbumCreateJob(private val request: AlbumNewReq)
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
-        if (throwable != null) {
-            deleteLocalAlbum()
-        }
     }
 
-
-    private fun deleteLocalAlbum() {
-        DaggerService.appComponent.dataManager().removeFromDb(Album::class.java, request.id)
-        DaggerService.appComponent.cache().removeAlbum(request.id)
+    private fun deleteTempAlbum() {
+        DaggerService.appComponent.dataManager().removeFromDb(Album::class.java, albumId)
+        DaggerService.appComponent.cache().removeAlbum(albumId)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
-            cancelOrWait(throwable, runCount)
+            cancelOrWaitConnection(throwable, runCount)
 }

@@ -53,7 +53,7 @@ fun logCancel(cancelReason: Int, throwable: Throwable?) {
     Crashlytics.logException(throwable)
 }
 
-fun cancelOrWait(throwable: Throwable, runCount: Int): RetryConstraint {
+fun cancelOrWaitConnection(throwable: Throwable, runCount: Int): RetryConstraint {
     return if (throwable is SocketTimeoutException) {
         RetryConstraint.createExponentialBackoff(runCount, AppConfig.INITIAL_BACK_OFF_IN_MS)
     } else {
@@ -82,7 +82,7 @@ fun <T : Job> JobManager.singleResultFor(localJob: T): Single<Unit> {
     }
 }
 
-class JobStatus(val job: Job, val status: Status) {
+class JobStatus(val job: Job?, val status: Status) {
     enum class Status {ADDED, RUN, AFTER_RUN, DONE, QUEUED }
 
     fun isDone() = status == DONE
@@ -157,6 +157,7 @@ fun JobManager.observe(tag: String): Observable<JobStatus> {
 
         addCallback(callback)
         e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
+        e.onNext(JobStatus(null, QUEUED))
     }
 }
 

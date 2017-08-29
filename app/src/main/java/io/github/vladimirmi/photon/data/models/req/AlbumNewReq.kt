@@ -8,10 +8,16 @@ import java.io.Serializable
  * Created by Vladimir Mikhalev 23.06.2017.
  */
 
-class AlbumNewReq(album: Album) : Serializable {
+class AlbumNewReq(
+        val id: String,
+        val title: String,
+        val description: String,
+        val owner: String = DaggerService.appComponent.dataManager().getProfileId()
+) : Serializable {
 
-    val id = album.id
-    val owner = DaggerService.appComponent.dataManager().getProfileId()
-    val title = album.title
-    val description = album.description
+    companion object {
+        fun fromAlbum(album: Album) = with(album) {
+            AlbumNewReq(id, title, description)
+        }
+    }
 }

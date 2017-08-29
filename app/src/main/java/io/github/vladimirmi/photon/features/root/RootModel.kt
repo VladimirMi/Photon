@@ -1,6 +1,5 @@
 package io.github.vladimirmi.photon.features.root
 
-import io.github.vladimirmi.photon.data.jobs.queue.Jobs
 import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.SignInReq
@@ -13,8 +12,7 @@ import java.util.concurrent.TimeUnit
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-class RootModel(private val dataManager: DataManager,
-                private val jobs: Jobs) : IRootModel {
+class RootModel(private val dataManager: DataManager) : IRootModel {
 
     override fun isUserAuth() = dataManager.isUserAuth()
 
@@ -37,7 +35,7 @@ class RootModel(private val dataManager: DataManager,
     override fun isNetAvail() = dataManager.checkNetAvail()
 
     private fun saveUser(user: User) {
-        dataManager.saveToDB(user)
+        dataManager.saveFromNet(user)
         dataManager.saveUserId(user.id)
         dataManager.saveUserToken(user.token)
         //todo если fav album отсутствует, предложить создать(?)
