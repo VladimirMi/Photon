@@ -1,19 +1,17 @@
 package io.github.vladimirmi.photon.data.models.req
 
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.di.DaggerService
-import java.io.Serializable
+import io.github.vladimirmi.photon.data.models.realm.Synchronizable
 
 /**
  * Created by Vladimir Mikhalev 23.06.2017.
  */
 
 class AlbumNewReq(
-        val id: String,
+        val id: String = Synchronizable.tempId(),
         val title: String,
-        val description: String,
-        val owner: String = DaggerService.appComponent.dataManager().getProfileId()
-) : Serializable {
+        val description: String
+) {
 
     companion object {
         fun fromAlbum(album: Album) = with(album) {

@@ -11,6 +11,8 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
@@ -84,21 +86,21 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
         }
     }
 
-    fun createNewAlbum(albumDto: AlbumDto) {
+    fun createNewAlbum(album: Album) {
         view.closeNewAlbumDialog()
-        compDisp.add(model.createAlbum(albumDto)
+        compDisp.add(model.createAlbum(album)
                 .subscribeWith(ErrorObserver(view)))
     }
 
-    fun editProfile(request: UserDto) {
-        view.closeEditProfileDialog()
+    fun editProfile(request: ProfileEditReq) {
+        view?.closeEditProfileDialog()
         if (!profileChanged(request)) return
 
         compDisp.add(model.editProfile(request)
                 .subscribeWith(ErrorObserver(view)))
     }
 
-    private fun profileChanged(request: UserDto): Boolean {
+    private fun profileChanged(request: ProfileEditReq): Boolean {
         return request.name != profile.name ||
                 request.login != profile.login ||
                 !request.avatar.startsWith("http")
@@ -130,7 +132,7 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
     }
 
     private fun editAvatar(uri: String) {
-        val request = UserDto(
+        val request = ProfileEditReq(
                 name = profile.name,
                 login = profile.login,
                 avatar = uri)

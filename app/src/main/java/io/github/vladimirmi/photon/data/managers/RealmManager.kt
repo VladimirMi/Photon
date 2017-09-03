@@ -10,7 +10,6 @@ import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.Sort
 import java.lang.UnsupportedOperationException
-
 /**
  * Created by Vladimir Mikhalev 04.06.2017.
  */
@@ -32,48 +31,19 @@ class RealmManager(private val cache: Cache) {
         cache.cache(list)
     }
 
-    fun saveFromNet(realmObject: RealmObject) {
+    fun saveFromServer(realmObject: RealmObject) {
         setupObject(realmObject)?.let { save(it) }
     }
 
-    fun <T : RealmObject> saveFromNet(list: List<T>) {
+    fun <T : RealmObject> saveFromServer(list: List<T>) {
         save(list.mapNotNull { setupObject(it) })
     }
 
-    private fun setupObject(realmObject: RealmObject): RealmObject? {
-        fun setupPhotocard(photocard: Photocard) = if (photocard.active && photocard.sync)
-            photocard.apply {
-                searchTag = title.toLowerCase()
-                if (filters.id.isEmpty()) generateId()
-            }
-        else null
-
-        fun setupAlbum(album: Album) = if (album.active && album.sync)
-            album.apply {
-                photocards.retainAll { it.active }
-                photocards.forEachIndexed { index, photo -> photocards[index] = setupPhotocard(photo) }
-            }
-        else null
-
-        fun setupUser(user: User) = if (user.active && user.sync)
-            user.apply {
-                albums.retainAll { it.active }
-                albums.forEachIndexed { index, album -> albums[index] = setupAlbum(album) }
-            }
-        else null
-
-        return when (realmObject) {
-            is User -> realmObject.let { setupUser(it) }
-            is Album -> realmObject.let { setupAlbum(it) }
-            is Photocard -> realmObject.let { setupPhotocard(it) }
-            else -> realmObject
-        }
-    }
-
-
-    fun <T : RealmObject> getObject(clazz: Class<T>, id: String): Observable<T> {
+    fun <T : RealmObject> getObject(clazz: Class<T>,
+                                    id: String,
+                                    detach: Boolean = false): Observable<T> {
         val query = listOf(Query("id", RealmOperator.EQUALTO, id))
-        return search(clazz, query)
+        return search(clazz, query, detach = detach)
                 .flatMap { if (it.isEmpty()) Observable.empty() else Observable.just(it.first()) }
     }
 
@@ -88,6 +58,7 @@ class RealmManager(private val cache: Cache) {
         return Observable.merge(justOrEmpty(cached()),
                 getObject(clazz, id).flatMap { justOrEmpty(cache.cache(it) as R?) })
     }
+
 
     fun <T : RealmObject> search(clazz: Class<T>,
                                  query: List<Query>? = null,
@@ -105,7 +76,6 @@ class RealmManager(private val cache: Cache) {
                     }
         }.toObservable()
     }
-
 
     fun <T : RealmObject> remove(clazz: Class<T>, id: String) {
         val realm = Realm.getDefaultInstance()

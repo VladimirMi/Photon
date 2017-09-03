@@ -2,6 +2,9 @@ package io.github.vladimirmi.photon.utils
 
 import android.os.HandlerThread
 import android.os.Process.THREAD_PRIORITY_BACKGROUND
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.models.realm.User
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -74,4 +77,34 @@ inline fun <T : RealmObject> asFlowable(detach: Boolean, crossinline query: (Rea
     }, BackpressureStrategy.LATEST)
             .subscribeOn(scheduler)
             .unsubscribeOn(scheduler)
+}
+
+fun setupObject(realmObject: RealmObject): RealmObject? {
+    fun setupPhotocard(photocard: Photocard) = if (photocard.active && photocard.sync)
+        photocard.apply {
+            searchTag = title.toLowerCase()
+            if (filters.id.isEmpty()) generateId()
+        }
+    else null
+
+    fun setupAlbum(album: Album) = if (album.active && album.sync)
+        album.apply {
+            photocards.retainAll { it.active }
+            photocards.forEachIndexed { index, photo -> photocards[index] = setupPhotocard(photo) }
+        }
+    else null
+
+    fun setupUser(user: User) = if (user.active && user.sync)
+        user.apply {
+            albums.retainAll { it.active }
+            albums.forEachIndexed { index, album -> albums[index] = setupAlbum(album) }
+        }
+    else null
+
+    return when (realmObject) {
+        is User -> realmObject.let { setupUser(it) }
+        is Album -> realmObject.let { setupAlbum(it) }
+        is Photocard -> realmObject.let { setupPhotocard(it) }
+        else -> realmObject
+    }
 }

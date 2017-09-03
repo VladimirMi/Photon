@@ -7,6 +7,7 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
+import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.CardAdapter
 import io.github.vladimirmi.photon.features.main.CardViewHolder
@@ -33,7 +34,7 @@ class AlbumView(context: Context, attrs: AttributeSet)
     private val deleteAction: () -> Unit = { presenter.delete() }
     private val deleteDialog = SimpleDialog(this, R.string.dialog_delete_album, deleteAction)
 
-    private val editAction: (AlbumDto) -> Unit = { presenter.editAlbum(it) }
+    private val editAction: (AlbumEditReq) -> Unit = { presenter.editAlbum(it) }
     private val editDialog by lazy { EditAlbumDialog(this, editAction, album) }
 
     override fun initDagger(context: Context) {

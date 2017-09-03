@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import com.birbit.android.jobqueue.JobManager
 import io.github.vladimirmi.photon.core.App
+import io.github.vladimirmi.photon.data.jobs.JobsManager
 import io.github.vladimirmi.photon.data.models.dto.Cached
 import io.github.vladimirmi.photon.data.models.realm.*
 import io.github.vladimirmi.photon.data.models.req.*
@@ -13,7 +14,9 @@ import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.*
+import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.realm.RealmObject
 import io.realm.Sort
 import okhttp3.MultipartBody
@@ -36,124 +39,125 @@ constructor(private val restService: RestService,
 
     //region =============== Network ==============
 
+    //todo remake
     fun getPhotocardsFromNet(offset: Int, limit: Int): Observable<List<Photocard>> {
+        if (!jobsManager.syncComplete) return Observable.empty()
         val tag = Photocard::class.java.simpleName
         return restService.getPhotocards(limit, offset, getLastUpdate(tag))
-                .parseResponse { saveLastUpdate(tag, it) }
+                .parseGetResponse { saveLastUpdate(tag, it) }
     }
 
-    fun getPhotocardFromNet(id: String,
-                            ownerId: String,
-                            lastModified: String = getLastUpdate(Photocard::class.java, id))
-            : Observable<Photocard> {
-        return restService.getPhotocard(id, ownerId, lastModified)
-                .parseResponse()
+    fun getPhotocardFromNet(id: String, force: Boolean = false): Observable<Photocard> {
+        if (!jobsManager.syncComplete && !force) return Observable.empty()
+        return restService.getPhotocard(id, "any", getLastModified(User::class.java, id, force)) // "any" because of bug in api
+                .parseGetResponse()
     }
 
     fun getTagsFromNet(): Observable<List<Tag>> {
+        if (!jobsManager.syncComplete) return Observable.empty()
         val tag = Tag::class.java.simpleName
         return restService.getTags(getLastUpdate(tag))
-                .parseResponse { saveLastUpdate(tag, it) }
+                .parseGetResponse { saveLastUpdate(tag, it) }
     }
 
-    fun getUserFromNet(id: String,
-                       lastModified: String = getLastUpdate(User::class.java, id))
-            : Observable<User> {
-        return restService.getUser(id, lastModified)
-                .parseResponse()
+    fun getUserFromNet(id: String, force: Boolean = false): Observable<User> {
+        if (!jobsManager.syncComplete && !force) return Observable.empty()
+        return restService.getUser(id, getLastModified(User::class.java, id, force))
+                .parseGetResponse()
     }
 
-    fun getAlbumFromNet(id: String,
-                        lastModified: String = getLastUpdate(Album::class.java, id))
-            : Observable<Album> {
-        return restService.getAlbum(id, getProfileId(), lastModified)
-                .parseResponse()
+    fun getAlbumFromNet(id: String, force: Boolean = false): Observable<Album> {
+        if (!jobsManager.syncComplete) return Observable.empty()
+        return restService.getAlbum(id, getProfileId(), getLastModified(User::class.java, id, force))
+                .parseGetResponse()
     }
 
-    fun signIn(req: SignInReq): Observable<User> {
+    fun signIn(req: SignInReq): Single<User> {
         return restService.signIn(req)
                 .parseStatusCode()
                 .body()
     }
 
-    fun signUp(req: SignUpReq): Observable<User> {
+    fun signUp(req: SignUpReq): Single<User> {
         return restService.signUp(req)
                 .parseStatusCode()
                 .body()
     }
 
-    fun createAlbum(albumNewReq: AlbumNewReq): Observable<Album> {
-        return restService.createAlbum(getProfileId(), albumNewReq, getUserToken())
+    fun createAlbum(request: AlbumNewReq): Single<Album> {
+        return restService.createAlbum(getProfileId(), request, getUserToken())
                 .parseStatusCode()
                 .body()
     }
 
-    fun uploadPhoto(bodyPart: MultipartBody.Part): Observable<ImageUrlRes> {
+    fun uploadPhoto(bodyPart: MultipartBody.Part): Single<ImageUrlRes> {
         return restService.uploadPhoto(getProfileId(), bodyPart, getUserToken())
                 .parseStatusCode()
                 .body()
     }
 
-    fun createPhotocard(photocard: Photocard): Observable<Photocard> {
+    fun createPhotocard(photocard: Photocard): Single<Photocard> {
         return restService.createPhotocard(getProfileId(), photocard, getUserToken())
                 .parseStatusCode()
                 .body()
     }
 
-    fun editAlbum(req: AlbumEditReq): Observable<Album> {
+    fun editAlbum(req: AlbumEditReq): Single<Album> {
         return restService.editAlbum(getProfileId(), req.id, req, getUserToken())
                 .parseStatusCode()
                 .body()
     }
 
-    fun deleteAlbum(id: String): Observable<Int> {
+    fun deleteAlbum(id: String): Single<Int> {
         return restService.deleteAlbum(getProfileId(), id, getUserToken())
                 .parseStatusCode()
                 .statusCode()
     }
 
-    fun editProfile(req: ProfileEditReq): Observable<User> {
+    fun editProfile(req: ProfileEditReq): Single<User> {
         return restService.editProfile(getProfileId(), req, getUserToken())
                 .parseStatusCode()
                 .body()
     }
 
-    fun addView(id: String): Observable<SuccessRes> {
+    fun addView(id: String): Single<SuccessRes> {
         return restService.addView(id)
                 .parseStatusCode()
                 .body()
     }
 
-    fun addToFavorite(id: String): Observable<SuccessRes> {
+    fun addToFavorite(id: String): Single<SuccessRes> {
         return restService.addToFavorite(getProfileId(), id, getUserToken())
                 .parseStatusCode()
                 .body()
     }
 
-    fun removeFromFavorite(id: String): Observable<Int> {
+    fun removeFromFavorite(id: String): Single<Int> {
         return restService.removeFromFavorite(getProfileId(), id, getUserToken())
                 .parseStatusCode()
                 .statusCode()
     }
 
-    fun deletePhotocard(id: String): Observable<Int> {
+    fun deletePhotocard(id: String): Single<Int> {
         return restService.deletePhotocard(getProfileId(), id, getUserToken())
                 .parseStatusCode()
                 .statusCode()
     }
 
+    private fun <T : RealmObject> getLastModified(clazz: Class<T>, id: String, force: Boolean) =
+            if (force) "0" else getLastUpdate(clazz, id)
+
     //endregion
 
     //region =============== DataBase ==============
 
-    fun <T : RealmObject> saveFromNet(realmObject: T) {
-        realmManager.saveFromNet(realmObject)
+    fun <T : RealmObject> saveFromServer(realmObject: T) {
+        realmManager.saveFromServer(realmObject)
     }
 
-    fun <T : RealmObject> saveFromNet(list: List<T>) {
-        realmManager.saveFromNet(list)
+    fun <T : RealmObject> saveFromServer(list: List<T>) {
+        realmManager.saveFromServer(list)
     }
-
     fun <T : RealmObject> save(realmObject: T) {
         realmManager.save(realmObject)
     }
@@ -163,8 +167,10 @@ constructor(private val restService: RestService,
                                         order: Sort = Sort.ASCENDING): Observable<List<T>> =
             search(clazz, null, sortBy, order)
 
-    fun <T : RealmObject> getObjectFromDb(clazz: Class<T>, id: String): Observable<T> =
-            realmManager.getObject(clazz, id)
+    fun <T : RealmObject> getObjectFromDb(clazz: Class<T>,
+                                          id: String,
+                                          detach: Boolean = false): Observable<T> =
+            realmManager.getObject(clazz, id, detach)
 
     fun <T : RealmObject> getDetachedObjFromDb(clazz: Class<T>, id: String): T? =
             realmManager.getDetachedObject(clazz, id)
@@ -180,7 +186,9 @@ constructor(private val restService: RestService,
         realmManager.remove(clazz, id)
     }
 
-    fun syncDB() = RealmSynchronizer(jobManager, this).syncAll()
+    private val jobsManager = JobsManager(this, jobManager)
+
+    fun syncProfile(): Completable = jobsManager.subscribe()
 
     inline fun <reified T : RealmObject, R : Cached> getCached(id: String): Observable<R> =
             DaggerService.appComponent.realmManager().getCached(T::class.java, id)
@@ -217,6 +225,7 @@ constructor(private val restService: RestService,
 
     //endregion
 
+    //todo remake on receiver
     fun checkNetAvail() = cm.activeNetworkInfo != null && cm.activeNetworkInfo.isConnected
 
     fun isNetworkAvailable(): Observable<Boolean> =

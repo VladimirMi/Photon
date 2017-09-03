@@ -8,6 +8,8 @@ import android.util.AttributeSet
 import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
+import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.main.AlbumAdapter
 import io.github.vladimirmi.photon.flow.FlowLifecycles
@@ -28,10 +30,10 @@ class ProfileView(context: Context, attrs: AttributeSet)
     private val albumAction: (AlbumDto) -> Unit = { showAlbum(it) }
     private val adapter = AlbumAdapter(albumAction)
 
-    private val newAlbumAction: (AlbumDto) -> Unit = { presenter.createNewAlbum(it) }
+    private val newAlbumAction: (Album) -> Unit = { presenter.createNewAlbum(it) }
     private val newAlbumDialog = NewAlbumDialog(this, newAlbumAction)
 
-    private val editProfileAction: (UserDto) -> Unit = { presenter.editProfile(it) }
+    private val editProfileAction: (ProfileEditReq) -> Unit = { presenter.editProfile(it) }
     private val editProfileDialog by lazy { EditProfileDialog(this, editProfileAction, profile) }
 
     override fun initDagger(context: Context) {

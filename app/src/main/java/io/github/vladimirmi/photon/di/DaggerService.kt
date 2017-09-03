@@ -38,11 +38,9 @@ object DaggerService {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> getComponent(context: Context): T {
-        return context.getSystemService(SERVICE_NAME) as T
-    }
+    fun <T> getComponent(context: Context) = context.getSystemService(SERVICE_NAME) as T
 
-    val rootScope: MortarScope by lazy {
+    private val rootScope: MortarScope by lazy {
         createRootScope()
     }
 

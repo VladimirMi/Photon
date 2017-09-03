@@ -1,9 +1,9 @@
 package io.github.vladimirmi.photon.features.main
 
 import io.github.vladimirmi.photon.core.IModel
+import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.features.search.SearchView
-import io.github.vladimirmi.photon.utils.JobStatus
 import io.github.vladimirmi.photon.utils.Query
 import io.reactivex.Completable
 import io.reactivex.Observable

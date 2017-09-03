@@ -2,12 +2,12 @@ package io.github.vladimirmi.photon.features.photocard
 
 import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.utils.JobStatus
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -28,7 +28,7 @@ class PhotocardModel(private val dataManager: DataManager,
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getUserFromNet(id) }
-                .doOnNext { dataManager.saveFromNet(it) }
+                .doOnNext { dataManager.saveFromServer(it) }
                 .ignoreElements()
                 .ioToMain()
     }
@@ -41,8 +41,8 @@ class PhotocardModel(private val dataManager: DataManager,
     override fun updatePhotocard(id: String, ownerId: String): Completable {
         return dataManager.isNetworkAvailable()
                 .filter { it }
-                .flatMap { dataManager.getPhotocardFromNet(id, ownerId) }
-                .doOnNext { dataManager.saveFromNet(it) }
+                .flatMap { dataManager.getPhotocardFromNet(id) }
+                .doOnNext { dataManager.saveFromServer(it) }
                 .ignoreElements()
                 .ioToMain()
     }

@@ -2,7 +2,6 @@ package io.github.vladimirmi.photon.flow
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.annotation.CheckResult
 import android.view.View
 
 
@@ -47,10 +46,8 @@ object FlowLifecycleProvider {
         }
     }
 
-    @CheckResult
-    fun onBackPressed(view: View?): Boolean {
-        return view is FlowLifecycles.BackPressListener && view.onBackPressed()
-    }
+    fun onBackPressed(view: View?): Boolean =
+            view is FlowLifecycles.BackPressListener && view.onBackPressed()
 
     fun onActivityResult(view: View?, requestCode: Int, resultCode: Int, data: Intent?) {
         if (view is FlowLifecycles.ActivityResultListener) {

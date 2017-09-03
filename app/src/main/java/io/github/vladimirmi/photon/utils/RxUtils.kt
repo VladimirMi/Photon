@@ -27,16 +27,12 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by Vladimir Mikhalev 28.06.2017.
  */
-fun <T> Observable<T>.observeOnMainThread(): Observable<T> = observeOn(AndroidSchedulers.mainThread())
 
 fun <T> Observable<T>.ioToMain(): Observable<T> = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
 
 fun Completable.ioToMain(): Completable = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-
-fun <T> Observable<T>.mainToIo(): Observable<T> = subscribeOn(AndroidSchedulers.mainThread())
-        .observeOn(Schedulers.io())
 
 fun <T> Single<T>.ioToMain(): Single<T> = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
@@ -46,34 +42,33 @@ fun <T> Observable<T>.unit(): Observable<Unit> = map {}
 fun <T> justOrEmpty(it: T?): Observable<T> =
         if (it == null) Observable.empty() else Observable.just(it)
 
-fun <T> Observable<T?>.notNull(): Observable<T> = filter { it != null }
-        .map { it!! }
 
-fun <T> Observable<Response<T>>.body(): Observable<T> = map { it.body()!! }
-
-fun <T> Observable<Response<T>>.statusCode(): Observable<Int> = map { it.code() }
-
-fun <T> Observable<Response<T>>.parseStatusCode(): Observable<Response<T>> {
-    return flatMap {
+@Suppress("DEPRECATION")
+fun <T> Single<Response<T>>.parseGetResponse(saveUpdated: ((String) -> Unit)? = null)
+        : Observable<T> {
+    return flatMapObservable {
         when (it.code()) {
-            in 200..299 -> Observable.just(it)
+            in 200..299 -> Observable.just(it.body()!!)
             in 300..399 -> Observable.empty()
             else -> Observable.error(ApiError(it.message(), it.code(), it.errorBody()))
         }
     }
+            .doOnNext { if (saveUpdated != null) saveUpdated(Date().toString()) }
 }
 
-@Suppress("DEPRECATION")
-fun <T> Observable<Response<T>>.parseResponse(saveUpdated: ((String) -> Unit)? = null)
-        : Observable<T> {
-    return parseStatusCode()
-            .map {
-                if (saveUpdated != null) {
-                    saveUpdated(Date().toString())
-                }
-                it.body()!!
-            }
+fun <T> Single<Response<T>>.parseStatusCode(): Single<Response<T>> {
+    return flatMap {
+        when (it.code()) {
+            in 200..299 -> Single.just(it)
+            else -> Single.error(ApiError(it.message(), it.code(), it.errorBody()))
+        }
+    }
 }
+
+fun <T> Single<Response<T>>.body(): Single<T> = map { it.body()!! }
+
+fun <T> Single<Response<T>>.statusCode(): Single<Int> = map { it.code() }
+
 
 class ErrorOnAttempt(val throwable: Throwable, val attempt: Int)
 
@@ -107,7 +102,7 @@ open class ErrorObserver<T>(private val view: BaseView<*, *>? = null) : Disposab
 }
 
 open class ErrorSingleObserver<T>(private val view: BaseView<*, *>? = null) : DisposableSingleObserver<T>() {
-    override fun onSuccess(t: T) {}
+    override fun onSuccess(it: T) {}
 
     override fun onError(e: Throwable) {
         if (view != null && e is ApiError) view.showError(e.errorResId)

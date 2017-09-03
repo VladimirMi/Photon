@@ -76,8 +76,8 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
     private fun chooseCanOpen() {
         compDisp.add(model.dbIsNotEmpty()
                 .subscribeWith(object : ErrorSingleObserver<Boolean>() {
-                    override fun onSuccess(notEmpty: Boolean) {
-                        if (notEmpty) openMainScreen()
+                    override fun onSuccess(it: Boolean) {
+                        if (it) openMainScreen()
                     }
                 }))
     }

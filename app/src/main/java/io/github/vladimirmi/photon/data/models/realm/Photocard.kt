@@ -31,6 +31,34 @@ open class Photocard(
     fun generateId() {
         filters.generateId()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Photocard
+
+        if (owner != other.owner) return false
+        if (title != other.title) return false
+        if (photo != other.photo) return false
+        if (filters != other.filters) return false
+        if (tags != other.tags) return false
+        if (album != other.album) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = owner.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + photo.hashCode()
+        result = 31 * result + filters.hashCode()
+        result = 31 * result + tags.hashCode()
+        result = 31 * result + album.hashCode()
+        return result
+    }
+
+
 }
 
 open class Filter(
@@ -81,4 +109,19 @@ open class Filter(
 
 }
 
-open class Tag(@PrimaryKey var value: String = "") : RealmObject()
+open class Tag(@PrimaryKey var value: String = "") : RealmObject() {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Tag
+
+        if (value != other.value) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return value.hashCode()
+    }
+}

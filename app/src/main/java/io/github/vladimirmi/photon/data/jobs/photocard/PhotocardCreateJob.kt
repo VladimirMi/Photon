@@ -3,13 +3,12 @@ package io.github.vladimirmi.photon.data.jobs.photocard
 import android.net.Uri
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
-import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
+import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
+import io.github.vladimirmi.photon.data.managers.extensions.getPhotocard
+import io.github.vladimirmi.photon.data.managers.extensions.logCancel
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.JobGroup
-import io.github.vladimirmi.photon.utils.JobPriority
-import io.github.vladimirmi.photon.utils.cancelOrWaitConnection
-import io.github.vladimirmi.photon.utils.logCancel
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -20,45 +19,36 @@ import okhttp3.RequestBody
 
 class PhotocardCreateJob(private val photocardId: String)
     : Job(Params(JobPriority.HIGH)
-        .groupBy(JobGroup.PHOTOCARD)
-        .addTags(TAG)
-        .requireNetwork()
-        .persist()) {
+        .addTags(TAG + photocardId)
+        .requireNetwork()) {
 
     companion object {
         val TAG = "PhotocardCreateJob"
     }
 
+    private val dataManager = DaggerService.appComponent.dataManager()
+    private val cache = DaggerService.appComponent.cache()
+
     override fun onAdded() {}
 
-    @Throws(Throwable::class)
     override fun onRun() {
-        var error: Throwable? = null
-        val dataManager = DaggerService.appComponent.dataManager()
-        val photocard = dataManager.getDetachedObjFromDb(Photocard::class.java, photocardId)!!
+        val photocard = dataManager.getPhotocard(photocardId)
 
         val data = getByteArrayFromContent(photocard.photo)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
         val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(photocard.photo).lastPathSegment, body)
 
-        dataManager.uploadPhoto(bodyPart)
+        val photocardRes = dataManager.uploadPhoto(bodyPart)
                 .flatMap { imageUrlRes ->
                     photocard.photo = imageUrlRes.image
                     dataManager.createPhotocard(photocard)
-                }
-                .doOnNext {
-                    if (photocard.views > 0) {
-                        it.views = photocard.views
-                        it.sync = false
-                    }
-                    val album = dataManager.getDetachedObjFromDb(Album::class.java, photocard.album)!!
-                    album.photocards.add(it)
-                    dataManager.save(album)
-                    removeTempPhotocard()
-                }
-                .blockingSubscribe({}, { error = it })
+                }.blockingGet()
 
-        error?.let { throw it }
+
+        dataManager.removeFromDb(Photocard::class.java, photocardId)
+        cache.removePhoto(photocardId)
+        photocard.id = photocardRes.id
+        dataManager.save(photocard)
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {
@@ -70,11 +60,6 @@ class PhotocardCreateJob(private val photocardId: String)
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
-    }
-
-    private fun removeTempPhotocard() {
-        DaggerService.appComponent.dataManager().removeFromDb(Photocard::class.java, photocardId)
-        DaggerService.appComponent.cache().removePhoto(photocardId)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =

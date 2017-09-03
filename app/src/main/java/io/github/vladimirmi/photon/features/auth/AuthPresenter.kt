@@ -12,7 +12,7 @@ import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.profile.ProfileScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory
-import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.ErrorSingleObserver
 
 /**
  * Created by Vladimir Mikhalev 25.06.2017.
@@ -37,8 +37,8 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
     fun register(req: SignUpReq) {
         compDisp.add(rootPresenter.register(req)
                 .doOnSubscribe { view.closeRegistrationDialog() }
-                .subscribeWith(object : ErrorObserver<Unit>() {
-                    override fun onComplete() {
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onSuccess(t: Unit) {
                         nextScreen()
                     }
 
@@ -57,8 +57,8 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
     fun login(req: SignInReq) {
         compDisp.add(rootPresenter.login(req)
                 .doOnSubscribe { view.closeLoginDialog() }
-                .subscribeWith(object : ErrorObserver<Unit>() {
-                    override fun onComplete() {
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onSuccess(t: Unit) {
                         nextScreen()
                     }
 

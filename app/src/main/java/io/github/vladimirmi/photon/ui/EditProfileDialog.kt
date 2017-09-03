@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.ui
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.dto.UserDto
+import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
@@ -13,7 +14,7 @@ import kotlinx.android.synthetic.main.dialog_edit_profile.view.*
  */
 
 class EditProfileDialog(viewGroup: ViewGroup,
-                        private val editProfileAction: (UserDto) -> Unit,
+                        private val editProfileAction: (ProfileEditReq) -> Unit,
                         private val userDto: UserDto)
     : ValidationDialog(R.layout.dialog_edit_profile, viewGroup) {
 
@@ -29,19 +30,18 @@ class EditProfileDialog(viewGroup: ViewGroup,
         nameField.setSelection(userDto.name.length)
         cancel.setOnClickListener { hide() }
         ok.setOnClickListener {
-            kotlin.run {
-                val request = UserDto(
-                        login = loginField.text.toString(),
-                        name = nameField.text.toString(),
-                        avatar = userDto.avatar
-                )
-                editProfileAction(request)
-            }
+            val request = ProfileEditReq(
+                    login = loginField.text.toString(),
+                    name = nameField.text.toString(),
+                    avatar = userDto.avatar
+            )
+            editProfileAction(request)
         }
     }
 
     fun subscribe() = compDisp.add(listenFields())
 
+    //todo добавить в хайд
     fun unsubscribe() = compDisp.clear()
 
     private fun listenFields(): Disposable {

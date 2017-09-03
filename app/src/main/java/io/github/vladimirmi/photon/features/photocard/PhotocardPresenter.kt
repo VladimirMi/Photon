@@ -137,7 +137,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         return Intent.createChooser(shareIntent, view.resources.getText(R.string.send_to))
     }
 
-    fun createShareLinkIntent(): Intent {
+    private fun createShareLinkIntent(): Intent {
         val shareIntent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, photocard.photo)

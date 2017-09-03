@@ -13,7 +13,8 @@ interface Synchronizable {
     var active: Boolean
     var updated: Date
 
-    fun isTemp() = id.startsWith(TEMP)
+    val isTemp: Boolean
+        get() = id.startsWith(TEMP)
 
     companion object {
         const val TEMP = "TEMP"

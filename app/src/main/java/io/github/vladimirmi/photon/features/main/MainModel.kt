@@ -3,10 +3,10 @@ package io.github.vladimirmi.photon.features.main
 import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.features.search.SearchView
-import io.github.vladimirmi.photon.utils.JobStatus
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Completable
@@ -28,9 +28,9 @@ class MainModel(private val dataManager: DataManager,
 
 
     override fun makeQuery() {
-        when (queryPage) {
-            SearchView.Page.TAGS -> query = tagsQuery
-            SearchView.Page.FILTERS -> query = filtersQuery
+        query = when (queryPage) {
+            SearchView.Page.TAGS -> tagsQuery
+            SearchView.Page.FILTERS -> filtersQuery
         }
     }
 
@@ -59,7 +59,7 @@ class MainModel(private val dataManager: DataManager,
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getPhotocardsFromNet(offset, limit) }
-                .doOnNext { dataManager.saveFromNet(it) }
+                .doOnNext { dataManager.saveFromServer(it) }
                 .ignoreElements()
                 .ioToMain()
     }

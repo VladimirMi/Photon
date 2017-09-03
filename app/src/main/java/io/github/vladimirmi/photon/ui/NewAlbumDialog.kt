@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.ui
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.models.dto.AlbumDto
+import io.github.vladimirmi.photon.data.models.realm.Album
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.dialog_new_album.view.*
  * Created by Vladimir Mikhalev 23.06.2017.
  */
 
-class NewAlbumDialog(viewGroup: ViewGroup, newAlbumAction: (AlbumDto) -> Unit)
+class NewAlbumDialog(viewGroup: ViewGroup, newAlbumAction: (Album) -> Unit)
     : ValidationDialog(R.layout.dialog_new_album, viewGroup) {
 
     private val name = view.name
@@ -23,7 +23,7 @@ class NewAlbumDialog(viewGroup: ViewGroup, newAlbumAction: (AlbumDto) -> Unit)
     init {
         cancel.setOnClickListener { hide() }
         ok.setOnClickListener {
-            val request = AlbumDto(title = name.text.toString(),
+            val request = Album(title = name.text.toString(),
                     description = description.text.toString()
             )
             newAlbumAction(request)

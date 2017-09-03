@@ -13,8 +13,8 @@ import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.Single
+import io.reactivex.disposables.Disposable
 import mortar.MortarScope
 import mortar.Presenter
 import mortar.bundler.BundleService
@@ -29,19 +29,21 @@ class RootPresenter(val model: IRootModel) :
         Presenter<IRootView>() {
 
     val bottomHistory = BottomNavHistory()
-    private val comDisp = CompositeDisposable()
+    private var syncDB: Disposable? = null
 
     override fun extractBundleService(view: IRootView?): BundleService =
             BundleService.getBundleService(view as Context)
 
-    //todo сервис синхронизирующий бд
-
     override fun onEnterScope(scope: MortarScope?) {
-        comDisp.add(model.syncDB().subscribeWith(ErrorCompletableObserver()))
+        if (isUserAuth()) syncDB()
     }
 
     override fun onExitScope() {
-        comDisp.dispose()
+        syncDB?.dispose()
+    }
+
+    private fun syncDB() {
+        syncDB = model.syncProfile().subscribeWith(ErrorCompletableObserver())
     }
 
     fun hasActiveView() = hasView()
@@ -54,19 +56,24 @@ class RootPresenter(val model: IRootModel) :
 
     fun hideLoading() = view.hideLoading()
 
-    fun register(req: SignUpReq): Observable<Unit> {
+    fun register(req: SignUpReq): Single<Unit> {
         return model.register(req)
+                .doOnSuccess { syncDB() }
                 .doOnSubscribe { showLoading() }
                 .doAfterTerminate { hideLoading() }
     }
 
-    fun login(req: SignInReq): Observable<Unit> {
+    fun login(req: SignInReq): Single<Unit> {
         return model.login(req)
+                .doOnSuccess { syncDB() }
                 .doOnSubscribe { showLoading() }
                 .doAfterTerminate { hideLoading() }
     }
 
-    fun logout() = model.logout()
+    fun logout() {
+        syncDB?.dispose()
+        model.logout()
+    }
 
 
     fun checkAndRequestPermissions(permissions: Array<String>, requestCode: Int): Boolean {

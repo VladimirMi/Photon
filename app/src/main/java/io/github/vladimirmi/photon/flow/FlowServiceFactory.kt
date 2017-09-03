@@ -6,6 +6,7 @@ import flow.TreeKey
 import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.di.DaggerService
 import mortar.MortarScope
+import timber.log.Timber
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
@@ -34,7 +35,7 @@ class FlowServiceFactory : ServicesFactory() {
                 parentScope.buildChild()
                         .withService(DaggerService.SERVICE_NAME, screenComponent)
                         .build(screen.scopeName)
-//        Timber.e("Build new scope with name ${newScope.name}")
+        Timber.e("Build new scope with name ${newScope.name}")
 
         services.bind(newScope.name, newScope)
     }
@@ -43,7 +44,7 @@ class FlowServiceFactory : ServicesFactory() {
         val scopeName = services.getKey<BaseScreen<*>>().scopeName
         services.getService<MortarScope>(scopeName)?.let {
             it.destroy()
-//            Timber.e("Destroy scope with name ${it.name}")
+            Timber.e("Destroy scope with name ${it.name}")
         }
         super.tearDownServices(services)
     }

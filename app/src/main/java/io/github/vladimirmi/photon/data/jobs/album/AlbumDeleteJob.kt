@@ -1,12 +1,13 @@
 package io.github.vladimirmi.photon.data.jobs.album
 
-import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
+import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
+import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
+import io.github.vladimirmi.photon.data.managers.extensions.getAlbum
+import io.github.vladimirmi.photon.data.managers.extensions.logCancel
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.*
-import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by Vladimir Mikhalev 18.07.2017.
@@ -15,45 +16,35 @@ import io.reactivex.schedulers.Schedulers
 
 class AlbumDeleteJob(private val albumId: String)
     : Job(Params(JobPriority.HIGH)
-        .setGroupId(JobGroup.ALBUM)
-        .addTags(TAG)
-        .setSingleId(albumId)
-        .requireNetwork()
-        .persist()) {
+        .addTags(TAG + albumId)
+        .requireNetwork()) {
 
     companion object {
         const val TAG = "AlbumDeleteJob"
     }
 
+    private val dataManager = DaggerService.appComponent.dataManager()
+    private val cache = DaggerService.appComponent.cache()
+
     override fun onAdded() {}
 
     override fun onRun() {
-        var error: Throwable? = null
-        val dataManager = DaggerService.appComponent.dataManager()
-
-        dataManager.deleteAlbum(albumId)
-                .doOnNext { dataManager.removeFromDb(Album::class.java, albumId) }
-                .blockingSubscribe({}, { error = it })
-
-        error?.let { throw it }
+        dataManager.deleteAlbum(albumId).blockingGet()
+        dataManager.removeFromDb(Album::class.java, albumId)
+        cache.removeAlbum(albumId)
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
-        if (cancelReason == CancelReason.CANCELLED_VIA_SHOULD_RE_RUN) {
-            updateAlbum()
-        }
+        rollback()
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
             cancelOrWaitConnection(throwable, runCount)
 
-    private fun updateAlbum() {
-        val dataManager = DaggerService.appComponent.dataManager()
-
-        dataManager.getAlbumFromNet(albumId, "0")
-                .doOnNext { dataManager.saveFromNet(it) }
-                .subscribeOn(Schedulers.io())
-                .subscribeWith(ErrorObserver())
+    private fun rollback() {
+        val album = dataManager.getAlbum(albumId)
+        album.active = true
+        dataManager.save(album)
     }
 }

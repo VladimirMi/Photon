@@ -60,13 +60,12 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
         }
     }
 
-    private fun getDirection(from: BottomItem, to: BottomItem): Direction {
-        return when (from) {
-            MAIN -> Direction.FORWARD
-            PROFILE -> if (to == MAIN) Direction.BACKWARD else Direction.FORWARD
-            LOAD -> Direction.BACKWARD
-        }
-    }
+    private fun getDirection(from: BottomItem, to: BottomItem): Direction =
+            when (from) {
+                MAIN -> Direction.FORWARD
+                PROFILE -> if (to == MAIN) Direction.BACKWARD else Direction.FORWARD
+                LOAD -> Direction.BACKWARD
+            }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         dispatch(from = currentItem, to = Companion.fromId(item.itemId)!!)

@@ -23,4 +23,5 @@ open class User(
         override var active: Boolean = true,
         override var sync: Boolean = true,
         @Ignore var token: String = ""
+
 ) : RealmObject(), Synchronizable

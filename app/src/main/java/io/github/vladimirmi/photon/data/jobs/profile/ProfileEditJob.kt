@@ -1,14 +1,17 @@
 package io.github.vladimirmi.photon.data.jobs.profile
 
 import android.net.Uri
-import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
-import io.github.vladimirmi.photon.data.models.realm.User
+import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
+import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
+import io.github.vladimirmi.photon.data.managers.extensions.getProfile
+import io.github.vladimirmi.photon.data.managers.extensions.logCancel
+import io.github.vladimirmi.photon.data.models.realm.extensions.edit
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.*
-import io.reactivex.schedulers.Schedulers
+import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.reactivex.schedulers.Schedulers.io
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -17,70 +20,52 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class ProfileEditJob
+class ProfileEditJob(private val userId: String)
     : Job(Params(JobPriority.HIGH)
-        .setGroupId(JobGroup.PROFILE)
-        .addTags(TAG)
-        .requireNetwork()
-        .persist()) {
+        .addTags(TAG + userId)
+        .requireNetwork()) {
 
     companion object {
         const val TAG = "ProfileEditJob"
     }
 
+    private val dataManager = DaggerService.appComponent.dataManager()
+    private val profile = dataManager.getProfile()
+
     override fun onAdded() {}
 
     override fun onRun() {
-        val dataManager = DaggerService.appComponent.dataManager()
-
-        val profile = dataManager.getDetachedObjFromDb(User::class.java, dataManager.getProfileId())!!
-        val request = ProfileEditReq.fromProfile(profile)
-
-        val editProfileObs = dataManager.editProfile(request)
-
-        val observable = if (request.avatarChanged) {
-            val data = getByteArrayFromContent(request.avatar)
+        if (!profile.avatar.startsWith("http")) {
+            val data = getByteArrayFromContent(profile.avatar)
             val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
-            val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(request.avatar).lastPathSegment, body)
-
-            dataManager.uploadPhoto(bodyPart)
-                    .doOnNext { request.avatar = it.image }
-                    .flatMap { editProfileObs }
-        } else {
-            editProfileObs
+            val bodyPart = MultipartBody.Part
+                    .createFormData("image", Uri.parse(profile.avatar).lastPathSegment, body)
+            val imageRes = dataManager.uploadPhoto(bodyPart).blockingGet()
+            profile.avatar = imageRes.image
+            dataManager.save(profile)
         }
 
-        var error: Throwable? = null
-        observable.doOnNext { dataManager.saveFromNet(it) }
-                .blockingSubscribe({}, { error = it })
-
-        error?.let { throw it }
-    }
-
-    private fun getByteArrayFromContent(contentUri: String): ByteArray {
-        DaggerService.appComponent.context().contentResolver
-                .openInputStream(Uri.parse(contentUri)).use {
-            return it.readBytes()
-        }
+        dataManager.editProfile(ProfileEditReq.from(profile)).blockingGet()
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
-        if (cancelReason == CancelReason.CANCELLED_VIA_SHOULD_RE_RUN) {
-            updateProfile()
-        }
+        rollbackProfile()
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
             cancelOrWaitConnection(throwable, runCount)
 
-    private fun updateProfile() {
-        val dataManager = DaggerService.appComponent.dataManager()
 
-        dataManager.getUserFromNet(dataManager.getProfileId(), "0")
-                .doOnNext { dataManager.saveFromNet(it) }
-                .subscribeOn(Schedulers.io())
-                .subscribeWith(ErrorObserver())
+    private fun getByteArrayFromContent(contentUri: String): ByteArray {
+        DaggerService.appComponent.context().contentResolver.openInputStream(Uri.parse(contentUri))
+                .use { return it.readBytes() }
     }
 
+    private fun rollbackProfile() {
+        dataManager.getUserFromNet(userId, force = true)
+                .doOnNext { profile.edit(ProfileEditReq.from(it)) }
+                .subscribeOn(io())
+                .subscribeWith(ErrorObserver())
+    }
 }

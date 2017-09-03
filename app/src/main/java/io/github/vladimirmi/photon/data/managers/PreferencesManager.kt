@@ -26,9 +26,8 @@ class PreferencesManager(context: Context) {
         editor = sharedPreferences.edit()
     }
 
-    fun getLastUpdate(name: String): String {
-        return sharedPreferences.getString(KEY_LAST_UPDATE_PREFIX + name, Date(0).toString())
-    }
+    fun getLastUpdate(name: String): String =
+            sharedPreferences.getString(KEY_LAST_UPDATE_PREFIX + name, Date(0).toString())
 
     fun saveLastUpdate(name: String, lastModified: String) {
         editor.putString(KEY_LAST_UPDATE_PREFIX + name, lastModified)
@@ -50,17 +49,11 @@ class PreferencesManager(context: Context) {
         editor.commit()
     }
 
-    fun getUserId(): String {
-        return sharedPreferences.getString(KEY_USER_ID, "")
-    }
+    fun getUserId(): String = sharedPreferences.getString(KEY_USER_ID, "")
 
-    fun getUserToken(): String {
-        return sharedPreferences.getString(KEY_USER_TOKEN, "")
-    }
+    fun getUserToken(): String = sharedPreferences.getString(KEY_USER_TOKEN, "")
 
-    fun getUserFavAlbumId(): String {
-        return sharedPreferences.getString(KEY_FAV_ALBUM, "")
-    }
+    fun getUserFavAlbumId(): String = sharedPreferences.getString(KEY_FAV_ALBUM, "")
 
     fun clearUser() {
         editor.remove(KEY_USER_ID)

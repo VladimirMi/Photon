@@ -31,14 +31,14 @@ class SplashModel(val dataManager: DataManager) : ISplashModel {
 
     private fun updatePhotocards(limit: Int): Observable<Unit> {
         return dataManager.getPhotocardsFromNet(0, limit)
-                .doOnNext { dataManager.saveFromNet(it) }
+                .doOnNext { dataManager.saveFromServer(it) }
                 .unit()
     }
 
     private fun updateProfile(): Observable<Unit> {
         return if (dataManager.getProfileId().isNotEmpty()) {
             dataManager.getUserFromNet(dataManager.getProfileId())
-                    .doOnNext { dataManager.saveFromNet(it) }
+                    .doOnNext { dataManager.saveFromServer(it) }
                     .unit()
         } else {
             Observable.empty()

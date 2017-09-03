@@ -58,11 +58,9 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
 
     override fun isFiltered() = mainModel.isFiltered()
 
-    override fun getQuery(): ArrayList<Query> {
-        return when (queryPage) {
-            SearchView.Page.TAGS -> tagsQuery
-            SearchView.Page.FILTERS -> filtersQuery
-        }
+    override fun getQuery(): ArrayList<Query> = when (queryPage) {
+        SearchView.Page.TAGS -> tagsQuery
+        SearchView.Page.FILTERS -> filtersQuery
     }
 
     override fun addQuery(pair: Pair<String, String>) {

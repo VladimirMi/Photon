@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.ui
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
+import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
@@ -14,7 +15,7 @@ import kotlinx.android.synthetic.main.dialog_new_album.view.*
 
 class EditAlbumDialog(
         viewGroup: ViewGroup,
-        editAlbumAction: (AlbumDto) -> Unit,
+        editAlbumAction: (AlbumEditReq) -> Unit,
         albumDto: AlbumDto)
     : ValidationDialog(R.layout.dialog_edit_album, viewGroup) {
 
@@ -30,7 +31,7 @@ class EditAlbumDialog(
         descriptionField.setSelection(albumDto.description.length)
         cancel.setOnClickListener { hide() }
         ok.setOnClickListener {
-            val request = AlbumDto(
+            val request = AlbumEditReq(
                     id = albumDto.id,
                     title = nameField.text.toString(),
                     description = descriptionField.text.toString()

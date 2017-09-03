@@ -4,11 +4,11 @@ import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
-import io.github.vladimirmi.photon.utils.JobStatus
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
 import io.github.vladimirmi.photon.utils.ioToMain

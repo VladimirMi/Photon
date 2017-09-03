@@ -2,10 +2,11 @@ package io.github.vladimirmi.photon.features.album
 
 import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.utils.JobStatus
+import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -26,14 +27,14 @@ class AlbumModel(private val dataManager: DataManager,
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getAlbumFromNet(id) }
-                .doOnNext { dataManager.saveFromNet(it) }
+                .doOnNext { dataManager.saveFromServer(it) }
                 .ignoreElements()
                 .ioToMain()
     }
 
     override fun getProfileId() = dataManager.getProfileId()
 
-    override fun editAlbum(request: AlbumDto): Observable<JobStatus> =
+    override fun editAlbum(request: AlbumEditReq): Observable<JobStatus> =
             jobs.albumEdit(request).ioToMain()
 
     override fun deleteAlbum(id: String): Observable<JobStatus> =

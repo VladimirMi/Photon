@@ -9,7 +9,7 @@ import okhttp3.ResponseBody
 
 class ApiError(message: String, val statusCode: Int, body: ResponseBody?) : Exception(message) {
 
-    val defaultErr = R.string.message_api_err_unknown
+    private val defaultErr = R.string.message_api_err_unknown
     var readableError: String? = null
     var errorResId = defaultErr
 
@@ -23,7 +23,7 @@ class ApiError(message: String, val statusCode: Int, body: ResponseBody?) : Exce
 
     }
 
-    fun parse(body: ResponseBody) {
+    private fun parse(body: ResponseBody) {
         val result = body.charStream().use {
             it.readText()
                     .substringBefore("_1 dup key")

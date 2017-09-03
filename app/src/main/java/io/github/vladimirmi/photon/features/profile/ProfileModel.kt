@@ -3,11 +3,12 @@ package io.github.vladimirmi.photon.features.profile
 import io.github.vladimirmi.photon.data.jobs.Jobs
 import io.github.vladimirmi.photon.data.managers.Cache
 import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.utils.JobStatus
+import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.RealmOperator
 import io.github.vladimirmi.photon.utils.ioToMain
@@ -37,15 +38,15 @@ class ProfileModel(private val dataManager: DataManager,
         return dataManager.isNetworkAvailable()
                 .filter { it }
                 .flatMap { dataManager.getUserFromNet(dataManager.getProfileId()) }
-                .doOnNext { dataManager.saveFromNet(it) }
+                .doOnNext { dataManager.saveFromServer(it) }
                 .ignoreElements()
                 .ioToMain()
     }
 
-    override fun createAlbum(albumDto: AlbumDto): Observable<JobStatus> =
-            jobs.albumCreate(albumDto).ioToMain()
+    override fun createAlbum(album: Album): Observable<JobStatus> =
+            jobs.albumCreate(album).ioToMain()
 
-    override fun editProfile(userDto: UserDto): Observable<JobStatus> =
-            jobs.profileEdit(userDto).ioToMain()
+    override fun editProfile(request: ProfileEditReq): Observable<JobStatus> =
+            jobs.profileEdit(request).ioToMain()
 
 }

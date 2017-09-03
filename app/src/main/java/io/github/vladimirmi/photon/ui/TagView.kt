@@ -14,9 +14,7 @@ class TagView(context: Context, tag: String, val action: ((TagView) -> Unit)?) :
     var picked = false
         private set
 
-    override fun getText(): CharSequence {
-        return super.getText().removePrefix("#")
-    }
+    override fun getText() = super.getText().removePrefix("#")
 
     init {
         if (action != null) {

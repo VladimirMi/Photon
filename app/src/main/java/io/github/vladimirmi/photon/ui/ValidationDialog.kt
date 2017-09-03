@@ -25,11 +25,11 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
     private val colorError = ContextCompat.getColor(viewGroup.context, R.color.error)
     private val colorText = ContextCompat.getColor(viewGroup.context, R.color.text_color)
 
-    protected val LOGIN_PATTERN = Pattern.compile("[a-zA-Z0-9_]{3,20}")
-    protected val EMAIL_PATTERN = Patterns.EMAIL_ADDRESS
-    protected val NAME_PATTERN = Pattern.compile(".{3,20}")
-    protected val PASSWORD_PATTERN = Pattern.compile("[a-zA-Z0-9_]{8,}")
-    protected val DESCRIPTION_PATTERN = Pattern.compile(".{3,400}", Pattern.DOTALL)
+    protected val LOGIN_PATTERN: Pattern = Pattern.compile("[a-zA-Z0-9_]{3,20}")
+    protected val EMAIL_PATTERN: Pattern = Patterns.EMAIL_ADDRESS
+    protected val NAME_PATTERN: Pattern = Pattern.compile(".{3,20}")
+    protected val PASSWORD_PATTERN: Pattern = Pattern.compile("[a-zA-Z0-9_]{8,}")
+    protected val DESCRIPTION_PATTERN: Pattern = Pattern.compile(".{3,400}", Pattern.DOTALL)
 
     protected val compDisp = CompositeDisposable()
 
@@ -53,7 +53,6 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
 
     protected fun getNetObs(errorMsg: String): Observable<Boolean> {
         return DaggerService.appComponent.dataManager().isNetworkAvailable()
-//                .doOnNext { if (!it) Snackbar.make(viewGroup, errorMsg, Snackbar.LENGTH_LONG).show() }
                 .observeOn(AndroidSchedulers.mainThread())
     }
 }

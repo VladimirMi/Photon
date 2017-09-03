@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.data.network
 
 import com.squareup.moshi.*
+import com.squareup.moshi.JsonAdapter.Factory
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.realm.RealmList
 import io.realm.RealmModel
@@ -50,19 +51,16 @@ class RealmListJsonAdapter<T : RealmModel>
 }
 
 class TagJsonAdapter {
-    @FromJson fun fromJson(body: String): Tag {
-        return Tag(body.removePrefix("#").toLowerCase())
-    }
+    @FromJson
+    fun fromJson(body: String) = Tag(body.removePrefix("#").toLowerCase())
 
-    @ToJson fun toJson(tag: Tag): String {
-        return tag.value
-    }
+    @ToJson
+    fun toJson(tag: Tag) = tag.value
 }
 
 class ISO8601DateJsonAdapter {
-    @FromJson fun fromJson(body: String): Date {
-        return ISO8601Utils.parse(body, ParsePosition(0))
-    }
+    @FromJson
+    fun fromJson(body: String) = ISO8601Utils.parse(body, ParsePosition(0))
 
     @ToJson fun toJson(date: Date): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)

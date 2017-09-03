@@ -12,10 +12,7 @@ import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
-import io.github.vladimirmi.photon.utils.AppConfig
-import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
-import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.github.vladimirmi.photon.utils.afterNetCheck
+import io.github.vladimirmi.photon.utils.*
 import io.reactivex.disposables.Disposable
 
 /**
@@ -102,8 +99,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun register(req: SignUpReq) {
         compDisp.add(rootPresenter.register(req)
                 .doOnSubscribe { view.closeRegistrationDialog() }
-                .subscribeWith(object : ErrorObserver<Unit>() {
-                    override fun onComplete() {
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onSuccess(t: Unit) {
                         initToolbar()
                     }
 
@@ -122,8 +119,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun login(req: SignInReq) {
         compDisp.add(rootPresenter.login(req)
                 .doOnSubscribe { view.closeLoginDialog() }
-                .subscribeWith(object : ErrorObserver<Unit>() {
-                    override fun onComplete() {
+                .subscribeWith(object : ErrorSingleObserver<Unit>() {
+                    override fun onSuccess(t: Unit) {
                         initToolbar()
                     }
 
@@ -143,7 +140,7 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
                 }))
     }
 
-    fun logout() {
+    private fun logout() {
         rootPresenter.logout()
         initToolbar()
     }

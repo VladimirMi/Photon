@@ -2,43 +2,48 @@ package io.github.vladimirmi.photon.data.jobs.photocard
 
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
+import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
+import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
+import io.github.vladimirmi.photon.data.managers.extensions.getPhotocard
+import io.github.vladimirmi.photon.data.managers.extensions.logCancel
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.JobGroup
-import io.github.vladimirmi.photon.utils.JobPriority
-import io.github.vladimirmi.photon.utils.cancelOrWaitConnection
-import io.github.vladimirmi.photon.utils.logCancel
 
 /**
  * Created by Vladimir Mikhalev 21.07.2017.
  */
 
 class PhotocardAddViewJob(private val photocardId: String) :
-        Job(Params(JobPriority.LOW)
-                .setGroupId(JobGroup.PHOTOCARD)
-                .addTags(TAG)
-                .requireNetwork()
-                .persist()) {
+        Job(Params(JobPriority.HIGH)
+                .addTags(TAG + photocardId)
+                .requireNetwork()) {
 
     companion object {
         const val TAG = "PhotocardAddViewJob"
     }
 
+    private val dataManager = DaggerService.appComponent.dataManager()
+
     override fun onAdded() {}
 
     override fun onRun() {
-        val dataManager = DaggerService.appComponent.dataManager()
-        var error: Throwable? = null
+//        var error: Throwable? = null
 
-        dataManager.addView(photocardId)
-                .blockingSubscribe({}, { error = it })
+        dataManager.addView(photocardId).blockingGet()
 
-        error?.let { throw it }
+//        error?.let { throw it }
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
+        rollback()
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
             cancelOrWaitConnection(throwable, runCount)
+
+    private fun rollback() {
+        val photocard = dataManager.getPhotocard(photocardId)
+        photocard.views--
+        dataManager.save(photocard)
+    }
 }

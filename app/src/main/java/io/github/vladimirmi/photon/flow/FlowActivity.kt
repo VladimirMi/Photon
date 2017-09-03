@@ -42,10 +42,10 @@ abstract class FlowActivity : AppCompatActivity(), IView {
 
     override fun getSystemService(name: String): Any {
         val rootActivityScope = DaggerService.rootActivityScope
-        if (rootActivityScope.hasService(name)) {
-            return rootActivityScope.getService<Any>(name)
+        return if (rootActivityScope.hasService(name)) {
+            rootActivityScope.getService<Any>(name)
         } else {
-            return super.getSystemService(name)
+            super.getSystemService(name)
         }
     }
 
@@ -82,11 +82,11 @@ abstract class FlowActivity : AppCompatActivity(), IView {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
+        return if (item?.itemId == android.R.id.home) {
             Flow.get(this).goBack()
-            return true
+            true
         } else {
-            return super.onOptionsItemSelected(item)
+            super.onOptionsItemSelected(item)
         }
     }
 

@@ -1,29 +1,26 @@
-package io.github.vladimirmi.photon.utils
+package io.github.vladimirmi.photon.data.managers.extensions
 
-import com.birbit.android.jobqueue.*
+import com.birbit.android.jobqueue.CancelReason
+import com.birbit.android.jobqueue.Job
+import com.birbit.android.jobqueue.JobManager
+import com.birbit.android.jobqueue.RetryConstraint
 import com.birbit.android.jobqueue.callback.JobManagerCallback
 import com.crashlytics.android.Crashlytics
-import io.github.vladimirmi.photon.utils.JobStatus.Status.*
+import io.github.vladimirmi.photon.data.managers.extensions.JobStatus.Status.*
+import io.github.vladimirmi.photon.utils.AppConfig
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.disposables.Disposables
 import timber.log.Timber
 import java.net.SocketTimeoutException
 
 /**
- * Created by Vladimir Mikhalev 25.06.2017.
+ * Created by Vladimir Mikhalev 03.09.2017.
  */
 
 object JobPriority {
     const val LOW = 0
     const val MID = 500
     const val HIGH = 1000
-}
-
-object JobGroup {
-    const val PHOTOCARD = "PHOTOCARD"
-    const val ALBUM = "ALBUM"
-    const val PROFILE = "PROFILE"
 }
 
 open class EmptyJobCallback : JobManagerCallback {
@@ -61,68 +58,10 @@ fun cancelOrWaitConnection(throwable: Throwable, runCount: Int): RetryConstraint
     }
 }
 
-fun <T : Job> JobManager.singleResultFor(localJob: T): Single<Unit> {
-    return Single.create { e ->
-        val callback = object : EmptyJobCallback() {
-            override fun onDone(job: Job) {
-                if (!e.isDisposed && localJob.id == job.id) e.onSuccess(Unit)
-            }
-
-            override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
-                Timber.e("onJobCancelled byCancelRequest $byCancelRequest ")
-                Timber.e(throwable, throwable?.localizedMessage)
-                if (!e.isDisposed && localJob.id == job.id) {
-                    if (throwable != null) e.onError(throwable) else e.onSuccess(Unit)
-                }
-            }
-        }
-
-        addCallback(callback)
-        e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
-    }
-}
-
 class JobStatus(val job: Job?, val status: Status) {
     enum class Status {ADDED, RUN, AFTER_RUN, DONE, QUEUED }
 
     fun isDone() = status == DONE
-}
-
-fun <T : Job> JobManager.addAndObserve(localJob: T): Observable<JobStatus> {
-    return Observable.create { e ->
-        val callback = object : EmptyJobCallback() {
-            override fun onDone(job: Job) {
-                if (!e.isDisposed && localJob.id == job.id) {
-                    e.onNext(JobStatus(job, DONE))
-                    e.onComplete()
-                }
-            }
-
-            override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
-                Timber.e(throwable, throwable?.localizedMessage)
-                if (!e.isDisposed && localJob.id == job.id) {
-                    if (throwable != null) e.onError(throwable)
-                }
-            }
-
-            override fun onAfterJobRun(job: Job, resultCode: Int) {
-                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus(job, AFTER_RUN))
-            }
-
-            override fun onJobAdded(job: Job) {
-                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus(job, ADDED))
-            }
-
-            override fun onJobRun(job: Job, resultCode: Int) {
-                if (!e.isDisposed && localJob.id == job.id) e.onNext(JobStatus(job, RUN))
-            }
-        }
-
-        addCallback(callback)
-        addJobInBackground(localJob)
-        e.onNext(JobStatus(localJob, QUEUED))
-        e.setDisposable(Disposables.fromRunnable { removeCallback(callback) })
-    }
 }
 
 fun JobManager.observe(tag: String): Observable<JobStatus> {
@@ -161,13 +100,5 @@ fun JobManager.observe(tag: String): Observable<JobStatus> {
     }
 }
 
-
-fun JobManager.singleCancelJobs(constraint: TagConstraint, vararg tags: String)
-        : Single<CancelResult> {
-
-    return Single.create { e ->
-        cancelJobsInBackground(CancelResult.AsyncCancelCallback {
-            if (!e.isDisposed) e.onSuccess(it)
-        }, constraint, *tags)
-    }
-}
+fun JobManager.jobStatusObservable(tag: String, action: () -> Unit): Observable<JobStatus> =
+        Observable.fromCallable(action).flatMap { observe(tag) }
