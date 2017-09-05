@@ -27,8 +27,8 @@ interface RestService {
     fun signUp(@Body req: SignUpReq): Single<Response<User>>
 
     @GET("photocard/list")
-    fun getPhotocards(@Query("limit") limit: Int,
-                      @Query("offset") offset: Int,
+    fun getPhotocards(@Query("offset") offset: Int,
+                      @Query("limit") limit: Int,
                       @Header(HEADER_IF_MODIFIED_SINCE) lastModified: String)
             : Single<Response<List<Photocard>>>
 

@@ -5,9 +5,8 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
 import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.getPhotocard
 import io.github.vladimirmi.photon.data.managers.extensions.logCancel
-import io.github.vladimirmi.photon.data.models.realm.Photocard
+import io.github.vladimirmi.photon.data.repository.photocard.PhotocardJobRepository
 import io.github.vladimirmi.photon.di.DaggerService
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -17,7 +16,8 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class PhotocardCreateJob(private val photocardId: String)
+class PhotocardCreateJob(private val photocardId: String,
+                         private val repository: PhotocardJobRepository)
     : Job(Params(JobPriority.HIGH)
         .addTags(TAG + photocardId)
         .requireNetwork()) {
@@ -26,29 +26,23 @@ class PhotocardCreateJob(private val photocardId: String)
         val TAG = "PhotocardCreateJob"
     }
 
-    private val dataManager = DaggerService.appComponent.dataManager()
-    private val cache = DaggerService.appComponent.cache()
-
     override fun onAdded() {}
 
     override fun onRun() {
-        val photocard = dataManager.getPhotocard(photocardId)
+        val photocard = repository.getPhotocard(photocardId)
 
         val data = getByteArrayFromContent(photocard.photo)
         val body = RequestBody.create(MediaType.parse("multipart/form-data"), data)
         val bodyPart = MultipartBody.Part.createFormData("image", Uri.parse(photocard.photo).lastPathSegment, body)
 
-        val photocardRes = dataManager.uploadPhoto(bodyPart)
+        val photocardRes = repository.uploadPhoto(bodyPart)
                 .flatMap { imageUrlRes ->
                     photocard.photo = imageUrlRes.image
-                    dataManager.createPhotocard(photocard)
+                    repository.create(photocard)
                 }.blockingGet()
 
-
-        dataManager.removeFromDb(Photocard::class.java, photocardId)
-        cache.removePhoto(photocardId)
         photocard.id = photocardRes.id
-        dataManager.save(photocard)
+        repository.save(photocard)
     }
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {

@@ -7,7 +7,6 @@ import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
 
@@ -24,7 +23,6 @@ class AuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter)
     override fun initView(view: AuthorView) {
         val userId = Flow.getKey<AuthorScreen>(view)!!.userId
         compDisp.add(subscribeOnUser(userId))
-        compDisp.add(subscribeOnUpdateUser(userId))
         compDisp.add(subscribeOnAlbums(userId))
     }
 
@@ -35,11 +33,6 @@ class AuthorPresenter(model: IAuthorModel, rootPresenter: RootPresenter)
                         view.setUser(it)
                     }
                 })
-    }
-
-    private fun subscribeOnUpdateUser(userId: String): Disposable {
-        return model.updateUser(userId)
-                .subscribeWith(ErrorCompletableObserver())
     }
 
     private fun subscribeOnAlbums(userId: String): Disposable {

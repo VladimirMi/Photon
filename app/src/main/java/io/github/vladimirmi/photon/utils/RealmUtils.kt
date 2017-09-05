@@ -8,50 +8,53 @@ import io.github.vladimirmi.photon.data.models.realm.User
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.realm.*
+import io.realm.Realm
+import io.realm.RealmObject
+import io.realm.RealmQuery
+import io.realm.RealmResults
 
 
 /**
  * Created by Vladimir Mikhalev 09.07.2017.
  */
 
-enum class RealmOperator {CONTAINS, EQUALTO }
+//todo infix call
+data class Query(val fieldName: String, val operator: Operator, val value: Any) {
 
-data class Query(val fieldName: String, val operator: RealmOperator, val value: Any) {
+    enum class Operator {CONTAINS, EQUAL }
 
-    fun <T : RealmModel> applyTo(realmQuery: RealmQuery<T>): RealmQuery<T> {
+    fun <T : RealmObject> applyTo(realmQuery: RealmQuery<T>): RealmQuery<T> {
         when (value) {
             is String -> when (operator) {
-                RealmOperator.CONTAINS -> realmQuery.contains(fieldName, value, Case.INSENSITIVE)
-                RealmOperator.EQUALTO -> realmQuery.equalTo(fieldName, value)
+                Operator.CONTAINS -> realmQuery.contains(fieldName, value)
+                Operator.EQUAL -> realmQuery.equalTo(fieldName, value)
             }
             is Boolean -> when (operator) {
-                RealmOperator.EQUALTO -> realmQuery.equalTo(fieldName, value)
+                Operator.EQUAL -> realmQuery.equalTo(fieldName, value)
                 else -> throw IllegalArgumentException("Not supported operator for boolean value")
             }
         }
         return realmQuery
     }
-
-    override fun toString() = "($fieldName $operator $value)"
 }
 
 
-fun <T : RealmObject> RealmQuery<T>.prepareQuery(query: List<Query>?)
+fun <T : RealmObject> RealmQuery<T>.apply(queryList: List<Query>?)
         : RealmQuery<T> {
 
-    query?.groupBy { it.fieldName }?.forEach { (_, list) ->
-        beginGroup()
-        list.forEachIndexed { idx, qry ->
-            qry.applyTo(this)
-            if (idx < list.size - 1) or()
-        }
-        endGroup()
-    }
+    queryList?.groupBy { if (it.fieldName == "nuances") it.value else it.fieldName }
+            ?.forEach { (_, list) ->
+                beginGroup()
+                list.forEachIndexed { index, query ->
+                    query.applyTo(this)
+                    if (index < list.size - 1) or()
+                }
+                endGroup()
+            }
     return this
 }
 
-inline fun <T : RealmObject> asFlowable(detach: Boolean, crossinline query: (Realm) -> RealmResults<T>)
+inline fun <T : RealmObject> asFlowable(managed: Boolean, crossinline query: (Realm) -> RealmResults<T>)
         : Flowable<List<T>> {
     val handler = HandlerThread("RealmQueryThread", THREAD_PRIORITY_BACKGROUND).apply { start() }
     val scheduler = AndroidSchedulers.from(handler.looper)
@@ -60,12 +63,12 @@ inline fun <T : RealmObject> asFlowable(detach: Boolean, crossinline query: (Rea
         val realm = Realm.getDefaultInstance()
         val listener = { result: RealmResults<T> ->
             if (!emitter.isCancelled && result.isLoaded && result.isValid) {
-                emitter.onNext(if (detach) realm.copyFromRealm(result) else result)
+                emitter.onNext(if (managed) result else realm.copyFromRealm(result))
             }
         }
         val result = query(realm)
         if (!emitter.isCancelled && result.isLoaded && result.isValid) {
-            emitter.onNext(if (detach) realm.copyFromRealm(result) else result)
+            emitter.onNext(if (managed) result else realm.copyFromRealm(result))
         }
 
         result.addChangeListener(listener)
@@ -81,10 +84,7 @@ inline fun <T : RealmObject> asFlowable(detach: Boolean, crossinline query: (Rea
 
 fun setupObject(realmObject: RealmObject): RealmObject? {
     fun setupPhotocard(photocard: Photocard) = if (photocard.active && photocard.sync)
-        photocard.apply {
-            searchTag = title.toLowerCase()
-            if (filters.id.isEmpty()) generateId()
-        }
+        photocard.transform()
     else null
 
     fun setupAlbum(album: Album) = if (album.active && album.sync)

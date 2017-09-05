@@ -4,7 +4,6 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -29,7 +28,7 @@ class AuthScreen : BaseScreen<RootActivityComponent>() {
     class Module {
         @Provides
         @DaggerScope(AuthScreen::class)
-        fun provideAuthModel(dataManager: DataManager): IAuthModel = AuthModel(dataManager)
+        fun provideAuthModel(): IAuthModel = AuthModel()
 
         @Provides
         @DaggerScope(AuthScreen::class)
@@ -51,11 +50,7 @@ class AuthScreen : BaseScreen<RootActivityComponent>() {
 
     //endregion
 
-    override fun equals(other: Any?): Boolean {
-        return this === other
-    }
+    override fun equals(other: Any?) = this === other
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode() = super.hashCode()
 }

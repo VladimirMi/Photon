@@ -13,7 +13,7 @@ open class Photocard(
         @PrimaryKey
         override var id: String = Synchronizable.tempId(),
         var owner: String = "",
-        var searchTag: String = "",
+        var searchName: String = "",
         var title: String = "",
         var photo: String = "",
         var views: Int = 0,
@@ -25,12 +25,6 @@ open class Photocard(
         override var sync: Boolean = true,
         var album: String = Synchronizable.tempId()
 ) : RealmObject(), Synchronizable {
-
-    fun canCreate() = !album.startsWith(Synchronizable.TEMP)
-
-    fun generateId() {
-        filters.generateId()
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -58,7 +52,12 @@ open class Photocard(
         return result
     }
 
-
+    override fun transform(): Photocard? =
+            if (active) {
+                searchName = title.toLowerCase()
+                filters.generateId()
+                this
+            } else null
 }
 
 open class Filter(

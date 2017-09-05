@@ -8,11 +8,12 @@ import com.uphyca.stetho_realm.RealmInspectorModulesProvider
 import dagger.Module
 import dagger.Provides
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.jobs.Jobs
-import io.github.vladimirmi.photon.data.managers.Cache
-import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
+import io.github.vladimirmi.photon.data.mappers.AlbumCachingMapper
+import io.github.vladimirmi.photon.data.mappers.PhotocardCachingMapper
+import io.github.vladimirmi.photon.data.mappers.UserCachingMapper
+import io.github.vladimirmi.photon.data.network.NetworkChecker
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.utils.AppConfig
 
@@ -29,25 +30,21 @@ class LocaleModule(val context: Context) {
 
     @Provides
     @DaggerScope(App::class)
-    fun providePreferencesManager(context: Context) = PreferencesManager(context)
+    fun providePreferencesManager() = PreferencesManager(context)
 
     @Provides
     @DaggerScope(App::class)
-    fun provideCacheManager() = Cache()
-
-    @Provides
-    @DaggerScope(App::class)
-    fun provideRealmManager(context: Context, cache: Cache): RealmManager {
+    fun provideRealmManager(): RealmManager {
         Stetho.initialize(Stetho.newInitializerBuilder(context)
                 .enableDumpapp(Stetho.defaultDumperPluginsProvider(context))
                 .enableWebKitInspector(RealmInspectorModulesProvider.builder(context).build())
                 .build())
-        return RealmManager(cache)
+        return RealmManager()
     }
 
     @Provides
     @DaggerScope(App::class)
-    fun provideJobManager(context: Context): JobManager {
+    fun provideJobManager(): JobManager {
         val configuration = Configuration.Builder(context)
                 .minConsumerCount(AppConfig.MIN_CONSUMER_COUNT)
                 .maxConsumerCount(AppConfig.MAX_CONSUMER_COUNT)
@@ -60,10 +57,21 @@ class LocaleModule(val context: Context) {
 
     @Provides
     @DaggerScope(App::class)
-    fun provideJobs(dataManager: DataManager, jobManager: JobManager) =
-            Jobs(dataManager, jobManager)
+    fun provideRefWatcher() = App.getRefWatcher(context)
 
     @Provides
     @DaggerScope(App::class)
-    fun provideRefWatcher(context: Context) = App.getRefWatcher(context)
+    fun provideNetworkChecker() = NetworkChecker(context)
+
+    @Provides
+    @DaggerScope(App::class)
+    fun provideUserCachingMapper() = UserCachingMapper()
+
+    @Provides
+    @DaggerScope(App::class)
+    fun provideAlbumCachingMapper() = AlbumCachingMapper()
+
+    @Provides
+    @DaggerScope(App::class)
+    fun providePhotocardCachingMapper() = PhotocardCachingMapper()
 }

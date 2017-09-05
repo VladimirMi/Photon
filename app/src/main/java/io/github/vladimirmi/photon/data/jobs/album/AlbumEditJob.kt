@@ -4,19 +4,18 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
 import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.getAlbum
 import io.github.vladimirmi.photon.data.managers.extensions.logCancel
-import io.github.vladimirmi.photon.data.models.realm.extensions.edit
 import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
-import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.data.repository.album.AlbumJobRepository
+import io.github.vladimirmi.photon.utils.ErrorSingleObserver
 import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by Vladimir Mikhalev 20.07.2017.
  */
 
-class AlbumEditJob(albumId: String)
+class AlbumEditJob(private val albumId: String,
+                   private val repository: AlbumJobRepository)
     : Job(Params(JobPriority.HIGH)
         .addTags(TAG + albumId)
         .requireNetwork()) {
@@ -25,14 +24,12 @@ class AlbumEditJob(albumId: String)
         const val TAG = "AlbumEditJob"
     }
 
-    private val dataManager = DaggerService.appComponent.dataManager()
-    private val album = dataManager.getAlbum(albumId)
 
     override fun onAdded() {}
 
     override fun onRun() {
-        val request = AlbumEditReq.from(album)
-        dataManager.editAlbum(request).blockingGet()
+        val album = repository.getAlbum(albumId)
+        repository.edit(AlbumEditReq.from(album)).blockingGet()
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
@@ -45,9 +42,9 @@ class AlbumEditJob(albumId: String)
 
 
     private fun rollback() {
-        dataManager.getAlbumFromNet(id, force = true)
-                .doOnNext { album.edit(AlbumEditReq.from(it)) }
+        repository.getAlbumFromNet(id)
+                .doOnSuccess { repository.rollbackEdit(AlbumEditReq.from(it)) }
                 .subscribeOn(Schedulers.io())
-                .subscribeWith(ErrorObserver())
+                .subscribeWith(ErrorSingleObserver())
     }
 }

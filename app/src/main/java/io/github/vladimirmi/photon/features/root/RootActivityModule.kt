@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.features.root
 
 import dagger.Module
 import dagger.Provides
-import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 
 /**
@@ -14,8 +14,8 @@ class RootActivityModule {
 
     @Provides
     @DaggerScope(RootActivity::class)
-    fun provideIRootModel(dataManager: DataManager): IRootModel =
-            RootModel(dataManager)
+    fun provideIRootModel(profileRepository: ProfileRepository): IRootModel =
+            RootModel(profileRepository)
 
     @Provides
     @DaggerScope(RootActivity::class)

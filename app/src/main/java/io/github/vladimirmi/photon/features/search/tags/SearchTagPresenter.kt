@@ -18,7 +18,7 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
     override fun initView(view: SearchTagView) {
         compDisp.add(subscribeOnTags())
         compDisp.add(subscribeOnSearch())
-        val searchField = model.getQuery().find { it.fieldName == "searchTag" }?.value as? String
+        val searchField = model.getQuery().find { it.fieldName == "searchName" }?.value as? String
         searchField?.let { view.restoreSearchField(it) }
         checkEnableSubmit()
     }
@@ -35,9 +35,9 @@ class SearchTagPresenter(model: ISearchModel, rootPresenter: RootPresenter) :
                 .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .map { it.toString().toLowerCase() }
                 .doOnNext {
-                    model.removeQuery("searchTag")
+                    model.removeQuery("searchName")
                     if (it.isNotBlank()) {
-                        addQuery(Pair("searchTag", it))
+                        addQuery(Pair("searchName", it))
                     }
                 }
                 .flatMap { model.searchRecents(it) }

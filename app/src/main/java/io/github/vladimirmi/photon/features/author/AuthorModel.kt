@@ -1,37 +1,28 @@
 package io.github.vladimirmi.photon.features.author
 
-import io.github.vladimirmi.photon.data.managers.Cache
-import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.mappers.AlbumCachingMapper
+import io.github.vladimirmi.photon.data.mappers.UserCachingMapper
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.RealmOperator
+import io.github.vladimirmi.photon.data.repository.user.UserRepository
 import io.github.vladimirmi.photon.utils.ioToMain
-import io.reactivex.Completable
+import io.github.vladimirmi.photon.utils.justOrEmpty
 import io.reactivex.Observable
 
-class AuthorModel(val dataManager: DataManager, val cache: Cache) : IAuthorModel {
+class AuthorModel(private val userRepository: UserRepository,
+                  private val userMapper: UserCachingMapper,
+                  private val albumsMapper: AlbumCachingMapper) : IAuthorModel {
 
     override fun getUser(id: String): Observable<UserDto> {
-        return dataManager.getCached<User, UserDto>(id)
+        return Observable.merge(
+                userRepository.updateUser(id).ignoreElement().toObservable(),
+                userRepository.getUser(id).map { userMapper.map(it) },
+                justOrEmpty(userMapper.get(id)))
                 .ioToMain()
     }
 
-    override fun updateUser(id: String): Completable {
-        return dataManager.isNetworkAvailable()
-                .filter { it }
-                .flatMap { dataManager.getUserFromNet(id) }
-                .doOnNext { dataManager.saveFromServer(it) }
-                .ignoreElements()
-                .ioToMain()
-    }
-
-    override fun getAlbums(ownerId: String): Observable<List<AlbumDto>> {
-        val query = listOf(Query("owner", RealmOperator.EQUALTO, ownerId))
-        return dataManager.search(Album::class.java, query)
-                .map { cache.cacheAlbums(it) }
-                .ioToMain()
-    }
+    override fun getAlbums(ownerId: String): Observable<List<AlbumDto>> =
+            userRepository.getAlbums(ownerId)
+                    .map { albumsMapper.map(it) }
+                    .ioToMain()
 }

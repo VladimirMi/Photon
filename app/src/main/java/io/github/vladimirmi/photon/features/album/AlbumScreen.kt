@@ -4,8 +4,10 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.data.jobs.Jobs
-import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.mappers.AlbumCachingMapper
+import io.github.vladimirmi.photon.data.repository.album.AlbumRepository
+import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
+import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -31,8 +33,11 @@ data class AlbumScreen(val albumId: String) : BaseScreen<RootActivityComponent>(
     class Module {
         @Provides
         @DaggerScope(AlbumScreen::class)
-        fun provideAlbumModel(dataManager: DataManager, jobs: Jobs): IAlbumModel =
-                AlbumModel(dataManager, jobs)
+        fun provideAlbumModel(profileRepository: ProfileRepository,
+                              photocardRepository: PhotocardRepository,
+                              albumRepository: AlbumRepository,
+                              albumMapper: AlbumCachingMapper): IAlbumModel =
+                AlbumModel(profileRepository, photocardRepository, albumRepository, albumMapper)
 
         @Provides
         @DaggerScope(AlbumScreen::class)

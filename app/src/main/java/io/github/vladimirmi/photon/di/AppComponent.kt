@@ -1,11 +1,9 @@
 package io.github.vladimirmi.photon.di
 
 import android.content.Context
+import com.squareup.leakcanary.RefWatcher
 import dagger.Component
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.jobs.Jobs
-import io.github.vladimirmi.photon.data.managers.Cache
-import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.di.modules.LocaleModule
 import io.github.vladimirmi.photon.di.modules.NetworkModule
@@ -20,11 +18,8 @@ import io.github.vladimirmi.photon.features.root.RootActivityComponent
 @Component(modules = arrayOf(NetworkModule::class, LocaleModule::class))
 interface AppComponent {
     fun rootActivityComponentBuilder(): RootActivityComponent.Builder
-    fun dataManager(): DataManager
-    fun jobs(): Jobs
     fun context(): Context
-    //    fun watcher(): RefWatcher
-    fun cache(): Cache
+    fun watcher(): RefWatcher
 
     fun realmManager(): RealmManager
 }

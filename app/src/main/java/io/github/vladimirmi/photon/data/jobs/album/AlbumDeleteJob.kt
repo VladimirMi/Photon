@@ -4,17 +4,16 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
 import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.getAlbum
 import io.github.vladimirmi.photon.data.managers.extensions.logCancel
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.data.repository.album.AlbumJobRepository
 
 /**
  * Created by Vladimir Mikhalev 18.07.2017.
  */
 
 
-class AlbumDeleteJob(private val albumId: String)
+class AlbumDeleteJob(private val albumId: String,
+                     private val repository: AlbumJobRepository)
     : Job(Params(JobPriority.HIGH)
         .addTags(TAG + albumId)
         .requireNetwork()) {
@@ -23,28 +22,17 @@ class AlbumDeleteJob(private val albumId: String)
         const val TAG = "AlbumDeleteJob"
     }
 
-    private val dataManager = DaggerService.appComponent.dataManager()
-    private val cache = DaggerService.appComponent.cache()
-
     override fun onAdded() {}
 
     override fun onRun() {
-        dataManager.deleteAlbum(albumId).blockingGet()
-        dataManager.removeFromDb(Album::class.java, albumId)
-        cache.removeAlbum(albumId)
+        repository.delete(albumId).blockingGet()
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
-        rollback()
+        repository.rollbackDelete(albumId)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
             cancelOrWaitConnection(throwable, runCount)
-
-    private fun rollback() {
-        val album = dataManager.getAlbum(albumId)
-        album.active = true
-        dataManager.save(album)
-    }
 }

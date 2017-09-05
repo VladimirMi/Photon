@@ -1,15 +1,10 @@
 package io.github.vladimirmi.photon.features.search
 
-import io.github.vladimirmi.photon.data.managers.Cache
-import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.Search
-import io.github.vladimirmi.photon.data.models.realm.Tag
+import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
 import io.github.vladimirmi.photon.features.main.IMainModel
 import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.RealmOperator
-import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
-import io.realm.Sort
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -17,7 +12,9 @@ import java.util.concurrent.TimeUnit
  * Developer Vladimir Mikhalev, 06.06.2017.
  */
 
-class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val cache: Cache)
+//todo search repository
+class SearchModel(private val mainModel: IMainModel,
+                  private val photocardRepository: PhotocardRepository)
     : ISearchModel {
 
     override var queryPage
@@ -38,19 +35,17 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
 
     override fun getTags(): Observable<List<String>> {
         val pageSize = 20
-        return dataManager.getListFromDb(Tag::class.java, sortBy = "value")
+        return photocardRepository.getTags()
                 .map { it.map { it.value } }
                 .flatMap { list ->
                     Observable.interval(0, 500, TimeUnit.MILLISECONDS)
                             .flatMap { long ->
                                 val from = (pageSize * long).toInt()
                                 val to = (pageSize * (long + 1)).toInt()
-                                if (from > list.size) {
-                                    Observable.empty()
-                                } else if (to > list.size) {
-                                    Observable.just(list.subList(from, list.size))
-                                } else {
-                                    Observable.just(list.subList(from, to))
+                                when {
+                                    from > list.size -> Observable.empty()
+                                    to > list.size -> Observable.just(list.subList(from, list.size))
+                                    else -> Observable.just(list.subList(from, to))
                                 }
                             }
                 }
@@ -81,11 +76,10 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
     }
 
     private fun parseToQuery(pair: Pair<String, String>): Query {
-        val operator: RealmOperator
-        if (pair.first == "filters.nuances" || pair.first == "searchTag") {
-            operator = RealmOperator.CONTAINS
+        val operator = if (pair.first == "filters.nuances" || pair.first == "searchName") {
+            Query.Operator.CONTAINS
         } else {
-            operator = RealmOperator.EQUALTO
+            Query.Operator.EQUAL
         }
         return Query(pair.first, operator, pair.second)
     }
@@ -96,15 +90,16 @@ class SearchModel(val dataManager: DataManager, val mainModel: IMainModel, val c
     }
 
     override fun searchRecents(string: String): Observable<List<String>> {
-        val query = Query("value", RealmOperator.CONTAINS, string)
-        return dataManager.search(Search::class.java, listOf(query),
-                sortBy = "date", order = Sort.DESCENDING)
-                .map { it.map { it.value } }
-                .map { if (it.size > 5) it.subList(0, 5).map { it } else it }
-                .ioToMain()
+//        val query = Query("value", Query.Operator.CONTAINS, string)
+//        return dataManager.search(Search::class.java, listOf(query),
+//                sortBy = "date", order = Sort.DESCENDING)
+//                .map { it.map { it.value } }
+//                .map { if (it.size > 5) it.subList(0, 5).map { it } else it }
+//                .ioToMain()
+        return Observable.empty()
     }
 
     override fun saveSearchField(search: String) {
-        dataManager.save(Search(search))
+        photocardRepository.save(Search(search))
     }
 }

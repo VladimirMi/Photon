@@ -1,25 +1,21 @@
 package io.github.vladimirmi.photon.features.newcard
 
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.jobs.Jobs
-import io.github.vladimirmi.photon.data.managers.Cache
-import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.mappers.AlbumCachingMapper
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
-import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
-import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.RealmOperator
+import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
+import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.realm.RealmList
-import io.realm.Sort
 import timber.log.Timber
 
-class NewCardModel(private val dataManager: DataManager,
-                   private val cache: Cache,
-                   private val jobs: Jobs) : INewCardModel {
+class NewCardModel(private val profileRepository: ProfileRepository,
+                   private val photocardRepository: PhotocardRepository,
+                   private val albumMapper: AlbumCachingMapper) : INewCardModel {
 
     override var screenInfo = NewCardScreenInfo()
 
@@ -49,12 +45,10 @@ class NewCardModel(private val dataManager: DataManager,
         }
     }
 
-    override fun searchTag(tag: String): Observable<List<String>> {
-        val query = Query("value", RealmOperator.CONTAINS, tag)
-        return dataManager.search(Tag::class.java, listOf(query), sortBy = "value")
-                .map { (if (it.size > 3) it.subList(0, 3) else it).map { it.value } }
-                .ioToMain()
-    }
+    override fun searchTag(tag: String): Observable<List<String>> =
+            photocardRepository.searchTag(tag)
+                    .map { (if (it.size > 3) it.subList(0, 3) else it).map { it.value } }
+                    .ioToMain()
 
     override fun addTag(tag: String) {
         if (!screenInfo.tags.contains(tag)) {
@@ -63,12 +57,10 @@ class NewCardModel(private val dataManager: DataManager,
         }
     }
 
-    override fun getAlbums(): Observable<List<AlbumDto>> {
-        val query = Query("owner", RealmOperator.EQUALTO, dataManager.getProfileId())
-        return dataManager.search(Album::class.java, listOf(query), sortBy = "views", order = Sort.DESCENDING)
-                .map { cache.cacheAlbums(it) }
-                .ioToMain()
-    }
+    override fun getAlbums(): Observable<List<AlbumDto>> =
+            profileRepository.getAlbums()
+                    .map { albumMapper.map(it) }
+                    .ioToMain()
 
     override fun getPageError(page: Page) = when (page) {
         Page.INFO -> if (screenInfo.title.isBlank()) R.string.newcard_err_title else null
@@ -83,11 +75,11 @@ class NewCardModel(private val dataManager: DataManager,
                     filters = filter,
                     photo = photo,
                     album = album,
-                    owner = dataManager.getProfileId(),
+                    owner = profileRepository.getProfileId(),
                     tags = RealmList<Tag>().apply { addAll(screenInfo.tags.map { Tag(it) }) }
             )
         }
-        return jobs.photocardCreate(photocard)
+        return photocardRepository.create(photocard)
                 .ioToMain()
     }
 }

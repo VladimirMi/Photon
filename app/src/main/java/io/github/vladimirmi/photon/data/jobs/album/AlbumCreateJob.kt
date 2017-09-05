@@ -4,17 +4,16 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
 import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.getAlbum
 import io.github.vladimirmi.photon.data.managers.extensions.logCancel
-import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.req.AlbumNewReq
-import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.data.repository.album.AlbumJobRepository
 
 /**
  * Created by Vladimir Mikhalev 17.07.2017.
  */
 
-class AlbumCreateJob(private val albumId: String)
+class AlbumCreateJob(private val albumId: String,
+                     private val repository: AlbumJobRepository)
     : Job(Params(JobPriority.HIGH)
         .addTags(TAG + albumId)
         .requireNetwork()) {
@@ -23,21 +22,16 @@ class AlbumCreateJob(private val albumId: String)
         const val TAG = "AlbumCreateJob"
     }
 
-    private val dataManager = DaggerService.appComponent.dataManager()
-    private val cache = DaggerService.appComponent.cache()
-
     override fun onAdded() {}
 
     override fun onRun() {
-        val album = dataManager.getAlbum(albumId)
+        val album = repository.getAlbum(albumId)
         val request = AlbumNewReq.fromAlbum(album)
 
-        val albumRes = dataManager.createAlbum(request).blockingGet()
+        val albumRes = repository.create(request).blockingGet()
 
         album.id = albumRes.id
-        dataManager.save(album)
-        dataManager.removeFromDb(Album::class.java, albumId)
-        cache.removeAlbum(albumId)
+        repository.save(album)
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {

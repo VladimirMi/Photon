@@ -4,15 +4,15 @@ import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.Params
 import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
 import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.getPhotocard
 import io.github.vladimirmi.photon.data.managers.extensions.logCancel
-import io.github.vladimirmi.photon.di.DaggerService
+import io.github.vladimirmi.photon.data.repository.photocard.PhotocardJobRepository
 
 /**
  * Created by Vladimir Mikhalev 21.07.2017.
  */
 
-class PhotocardAddViewJob(private val photocardId: String) :
+class PhotocardAddViewJob(private val photocardId: String,
+                          private val repository: PhotocardJobRepository) :
         Job(Params(JobPriority.HIGH)
                 .addTags(TAG + photocardId)
                 .requireNetwork()) {
@@ -21,29 +21,17 @@ class PhotocardAddViewJob(private val photocardId: String) :
         const val TAG = "PhotocardAddViewJob"
     }
 
-    private val dataManager = DaggerService.appComponent.dataManager()
-
     override fun onAdded() {}
 
     override fun onRun() {
-//        var error: Throwable? = null
-
-        dataManager.addView(photocardId).blockingGet()
-
-//        error?.let { throw it }
+        repository.addView(photocardId).blockingGet()
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
-        rollback()
+        repository.rollbackAddView(photocardId)
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
             cancelOrWaitConnection(throwable, runCount)
-
-    private fun rollback() {
-        val photocard = dataManager.getPhotocard(photocardId)
-        photocard.views--
-        dataManager.save(photocard)
-    }
 }

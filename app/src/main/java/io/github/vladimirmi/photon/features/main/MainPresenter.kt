@@ -12,7 +12,10 @@ import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.features.search.SearchScreen
-import io.github.vladimirmi.photon.utils.*
+import io.github.vladimirmi.photon.utils.AppConfig
+import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
+import io.github.vladimirmi.photon.utils.ErrorObserver
+import io.github.vladimirmi.photon.utils.afterNetCheck
 import io.reactivex.disposables.Disposable
 
 /**
@@ -99,8 +102,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun register(req: SignUpReq) {
         compDisp.add(rootPresenter.register(req)
                 .doOnSubscribe { view.closeRegistrationDialog() }
-                .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                    override fun onSuccess(t: Unit) {
+                .subscribeWith(object : ErrorCompletableObserver() {
+                    override fun onComplete() {
                         initToolbar()
                     }
 
@@ -119,8 +122,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
     fun login(req: SignInReq) {
         compDisp.add(rootPresenter.login(req)
                 .doOnSubscribe { view.closeLoginDialog() }
-                .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                    override fun onSuccess(t: Unit) {
+                .subscribeWith(object : ErrorCompletableObserver() {
+                    override fun onComplete() {
                         initToolbar()
                     }
 

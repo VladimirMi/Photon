@@ -13,7 +13,7 @@ import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavHistory
 import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
-import io.reactivex.Single
+import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import mortar.MortarScope
 import mortar.Presenter
@@ -56,16 +56,16 @@ class RootPresenter(val model: IRootModel) :
 
     fun hideLoading() = view.hideLoading()
 
-    fun register(req: SignUpReq): Single<Unit> {
+    fun register(req: SignUpReq): Completable {
         return model.register(req)
-                .doOnSuccess { syncDB() }
+                .doOnComplete { syncDB() }
                 .doOnSubscribe { showLoading() }
                 .doAfterTerminate { hideLoading() }
     }
 
-    fun login(req: SignInReq): Single<Unit> {
+    fun login(req: SignInReq): Completable {
         return model.login(req)
-                .doOnSuccess { syncDB() }
+                .doOnComplete { syncDB() }
                 .doOnSubscribe { showLoading() }
                 .doAfterTerminate { hideLoading() }
     }

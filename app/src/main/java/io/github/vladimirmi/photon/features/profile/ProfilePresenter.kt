@@ -18,7 +18,6 @@ import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.utils.Constants
-import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
 
@@ -48,7 +47,6 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
 
     override fun initView(view: ProfileView) {
         compDisp.add(subscribeOnProfile())
-        compDisp.add(subscribeOnUpdateProfile())
         compDisp.add(subscribeOnAlbums())
     }
 
@@ -58,11 +56,6 @@ class ProfilePresenter(model: IProfileModel, rootPresenter: RootPresenter)
                     profile = it
                     view.setProfile(it)
                 }
-    }
-
-    private fun subscribeOnUpdateProfile(): Disposable {
-        return model.updateProfile()
-                .subscribeWith(ErrorCompletableObserver())
     }
 
     private fun subscribeOnAlbums(): Disposable {

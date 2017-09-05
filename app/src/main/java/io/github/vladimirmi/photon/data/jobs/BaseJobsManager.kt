@@ -1,15 +1,13 @@
 package io.github.vladimirmi.photon.data.jobs
 
 import com.birbit.android.jobqueue.Job
-import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.Synchronizable
-import io.realm.RealmObject
 
 /**
  * Created by Vladimir Mikhalev 30.08.2017.
  */
 
-abstract class BaseJobsManager<T : Synchronizable>(protected val dataManager: DataManager) {
+abstract class BaseJobsManager<T : Synchronizable> {
 
     private val runningJobs = HashSet<String>()
 
@@ -36,8 +34,5 @@ abstract class BaseJobsManager<T : Synchronizable>(protected val dataManager: Da
 
     protected fun canRun(tag: String): Boolean = runningJobs.add(tag)
 
-    private fun saveSync(obj: Synchronizable) {
-        obj.sync = true
-        dataManager.save(obj as RealmObject)
-    }
+    abstract protected fun saveSync(obj: T)
 }

@@ -9,9 +9,7 @@ import android.widget.TextView
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseDialog
-import io.github.vladimirmi.photon.di.DaggerService
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import java.util.regex.Pattern
 
@@ -52,7 +50,9 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
     }
 
     protected fun getNetObs(errorMsg: String): Observable<Boolean> {
-        return DaggerService.appComponent.dataManager().isNetworkAvailable()
-                .observeOn(AndroidSchedulers.mainThread())
+        return Observable.just(true)
+//        return DaggerService.appComponent.dataManager().isNetworkAvailable()
+//                .observeOn(AndroidSchedulers.mainThread())
+        //todo fix
     }
 }

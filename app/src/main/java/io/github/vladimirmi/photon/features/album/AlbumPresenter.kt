@@ -14,7 +14,6 @@ import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
 import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.LOAD
-import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
 
@@ -45,7 +44,7 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
         if (editMode) builder.addAction(MenuItemHolder("Submit",
                 R.drawable.ic_action_submit, submitAction))
 
-        if (albumSettled && album.owner == model.getProfileId() && !album.isFavorite) {
+        if (albumSettled && model.isOwner(album.owner) && !album.isFavorite) {
             builder.addAction(MenuItemHolder("Actions",
                     iconResId = R.drawable.ic_action_more,
                     actions = moreActions,
@@ -57,7 +56,6 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
 
     override fun initView(view: AlbumView) {
         compDisp.add(subscribeOnAlbum(albumId))
-        compDisp.add(subscribeOnUpdateAlbum(albumId))
     }
 
     private fun subscribeOnAlbum(albumId: String): Disposable {
@@ -70,11 +68,6 @@ class AlbumPresenter(model: IAlbumModel, rootPresenter: RootPresenter)
                         initToolbar()
                     }
                 })
-    }
-
-    private fun subscribeOnUpdateAlbum(albumId: String): Disposable {
-        return model.updateAlbum(albumId)
-                .subscribeWith(ErrorCompletableObserver())
     }
 
     fun showPhotoCard(photocard: PhotocardDto) {

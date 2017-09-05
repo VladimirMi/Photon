@@ -4,8 +4,9 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.data.managers.Cache
-import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.mappers.AlbumCachingMapper
+import io.github.vladimirmi.photon.data.mappers.UserCachingMapper
+import io.github.vladimirmi.photon.data.repository.user.UserRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -31,8 +32,10 @@ class AuthorScreen(val userId: String) : BaseScreen<RootActivityComponent>() {
 
         @Provides
         @DaggerScope(AuthorScreen::class)
-        fun provideAuthorModel(dataManager: DataManager, cache: Cache): IAuthorModel =
-                AuthorModel(dataManager, cache)
+        fun provideAuthorModel(userRepository: UserRepository,
+                               userMapper: UserCachingMapper,
+                               albumsMapper: AlbumCachingMapper): IAuthorModel =
+                AuthorModel(userRepository, userMapper, albumsMapper)
 
         @Provides
         @DaggerScope(AuthorScreen::class)

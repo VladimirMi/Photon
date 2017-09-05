@@ -2,40 +2,48 @@ package io.github.vladimirmi.photon.data.jobs
 
 import com.birbit.android.jobqueue.Job
 import com.birbit.android.jobqueue.JobManager
-import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.managers.extensions.EmptyJobCallback
+import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.managers.extensions.observe
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Synchronizable
 import io.github.vladimirmi.photon.data.models.realm.User
-import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.RealmOperator
+import io.github.vladimirmi.photon.data.repository.album.AlbumJobRepository
+import io.github.vladimirmi.photon.data.repository.photocard.PhotocardJobRepository
+import io.github.vladimirmi.photon.data.repository.profile.ProfileJobRepository
+import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Completable
 import io.reactivex.Observable
 import timber.log.Timber
 import java.util.*
+import javax.inject.Inject
 import kotlin.concurrent.schedule
 
 /**
  * Created by Vladimir Mikhalev 30.08.2017.
  */
 
-class JobsManager(dataManager: DataManager,
-                  private val jobManager: JobManager) {
+@DaggerScope(App::class)
+class JobsManager
+@Inject constructor(private val jobManager: JobManager,
+                    profileJobRepository: ProfileJobRepository,
+                    albumJobRepository: AlbumJobRepository,
+                    photocardJobRepository: PhotocardJobRepository) {
 
+    //todo спрашивать синхронизацию по каждому объекту
     var syncComplete = true
         private set
     private var isRunning = false
 
-    private val profileManager = ProfileJobsManager(dataManager)
-    private val albumManager = AlbumJobsManager(dataManager)
-    private val photocardManager = PhotocardJobsManager(dataManager)
+    private val profileManager = ProfileJobsManager(profileJobRepository)
+    private val albumManager = AlbumJobsManager(albumJobRepository)
+    private val photocardManager = PhotocardJobsManager(photocardJobRepository)
 
-    //todo отдельный метод в realm manager
-    private val query = listOf(Query("sync", RealmOperator.EQUALTO, false))
-    private val profile = dataManager.search(User::class.java, query, detach = true)
-    private val albums = dataManager.search(Album::class.java, query, detach = true)
-    private val photocards = dataManager.search(Photocard::class.java, query, detach = true)
+    private val profile = profileJobRepository.getNotSync()
+    private val albums = albumJobRepository.getNotSync()
+    private val photocards = photocardJobRepository.getNotSync()
 
     fun subscribe(): Completable {
         return Observable.merge(profile, albums, photocards)
@@ -90,4 +98,6 @@ class JobsManager(dataManager: DataManager,
             syncTask = syncTimer.schedule(10000) { syncComplete = true }
         }
     }
+
+    fun observe(tag: String): Observable<JobStatus> = jobManager.observe(tag)
 }

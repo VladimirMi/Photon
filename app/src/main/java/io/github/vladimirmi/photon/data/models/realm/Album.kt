@@ -23,4 +23,11 @@ open class Album(
         override var active: Boolean = true,
         override var sync: Boolean = true
 
-) : RealmObject(), Synchronizable
+) : RealmObject(), Synchronizable {
+
+    override fun transform(): Album? =
+            if (active) {
+                photocards = photocards.mapNotNullTo(RealmList()) { it.transform() }
+                this
+            } else null
+}

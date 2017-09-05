@@ -24,4 +24,11 @@ open class User(
         override var sync: Boolean = true,
         @Ignore var token: String = ""
 
-) : RealmObject(), Synchronizable
+) : RealmObject(), Synchronizable {
+
+    override fun transform(): User? =
+            if (active) {
+                albums = albums.mapNotNullTo(RealmList()) { it.transform() }
+                this
+            } else null
+}

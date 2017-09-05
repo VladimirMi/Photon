@@ -17,11 +17,9 @@ import io.reactivex.observers.DisposableCompletableObserver
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
-import retrofit2.Response
 import timber.log.Timber
 import java.io.File
 import java.net.ConnectException
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -41,33 +39,6 @@ fun <T> Observable<T>.unit(): Observable<Unit> = map {}
 
 fun <T> justOrEmpty(it: T?): Observable<T> =
         if (it == null) Observable.empty() else Observable.just(it)
-
-
-@Suppress("DEPRECATION")
-fun <T> Single<Response<T>>.parseGetResponse(saveUpdated: ((String) -> Unit)? = null)
-        : Observable<T> {
-    return flatMapObservable {
-        when (it.code()) {
-            in 200..299 -> Observable.just(it.body()!!)
-            in 300..399 -> Observable.empty()
-            else -> Observable.error(ApiError(it.message(), it.code(), it.errorBody()))
-        }
-    }
-            .doOnNext { if (saveUpdated != null) saveUpdated(Date().toString()) }
-}
-
-fun <T> Single<Response<T>>.parseStatusCode(): Single<Response<T>> {
-    return flatMap {
-        when (it.code()) {
-            in 200..299 -> Single.just(it)
-            else -> Single.error(ApiError(it.message(), it.code(), it.errorBody()))
-        }
-    }
-}
-
-fun <T> Single<Response<T>>.body(): Single<T> = map { it.body()!! }
-
-fun <T> Single<Response<T>>.statusCode(): Single<Int> = map { it.code() }
 
 
 class ErrorOnAttempt(val throwable: Throwable, val attempt: Int)

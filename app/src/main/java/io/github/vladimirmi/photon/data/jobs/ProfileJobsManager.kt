@@ -2,18 +2,18 @@ package io.github.vladimirmi.photon.data.jobs
 
 import com.birbit.android.jobqueue.Job
 import io.github.vladimirmi.photon.data.jobs.profile.ProfileEditJob
-import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
+import io.github.vladimirmi.photon.data.repository.profile.ProfileJobRepository
 
 /**
  * Created by Vladimir Mikhalev 29.08.2017.
  */
 
-class ProfileJobsManager(dataManager: DataManager) : BaseJobsManager<User>(dataManager) {
+class ProfileJobsManager(private val repository: ProfileJobRepository) : BaseJobsManager<User>() {
 
     override fun getFromServer(id: String): User =
-            dataManager.getUserFromNet(id, force = true).blockingFirst()
+            repository.getProfileFromNet().blockingGet()
 
     override fun getJob(client: User, server: User): Job? = getEditJob(client, server)
 
@@ -23,10 +23,15 @@ class ProfileJobsManager(dataManager: DataManager) : BaseJobsManager<User>(dataM
 
     private fun getEditJob(client: User, server: User): Job? =
             if (isEdited(server, client) && canRun(ProfileEditJob.TAG + client.id)) {
-                ProfileEditJob(client.id)
+                ProfileEditJob(repository)
             } else null
 
     private fun isEdited(client: User, server: User): Boolean =
             ProfileEditReq.from(client) != ProfileEditReq.from(server)
+
+    override fun saveSync(obj: User) {
+        obj.sync = true
+        repository.save(obj)
+    }
 }
 

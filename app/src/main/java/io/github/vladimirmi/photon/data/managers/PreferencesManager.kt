@@ -49,16 +49,17 @@ class PreferencesManager(context: Context) {
         editor.commit()
     }
 
-    fun getUserId(): String = sharedPreferences.getString(KEY_USER_ID, "")
+    fun getProfileId(): String = sharedPreferences.getString(KEY_USER_ID, "")
 
     fun getUserToken(): String = sharedPreferences.getString(KEY_USER_TOKEN, "")
 
-    fun getUserFavAlbumId(): String = sharedPreferences.getString(KEY_FAV_ALBUM, "")
+    fun getFavAlbumId(): String = sharedPreferences.getString(KEY_FAV_ALBUM, "")
 
     fun clearUser() {
         editor.remove(KEY_USER_ID)
         editor.remove(KEY_USER_TOKEN)
         editor.commit()
     }
-    fun isUserAuth() = !getUserId().isEmpty() && !getUserToken().isEmpty()
+
+    fun isUserAuth() = !getProfileId().isEmpty() && !getUserToken().isEmpty()
 }

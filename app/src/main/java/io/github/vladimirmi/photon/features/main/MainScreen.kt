@@ -6,9 +6,8 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.data.jobs.Jobs
-import io.github.vladimirmi.photon.data.managers.Cache
-import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.mappers.PhotocardCachingMapper
+import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.root.RootActivityComponent
 import io.github.vladimirmi.photon.features.root.RootPresenter
@@ -49,8 +48,9 @@ class MainScreen(var updated: Int = 0) : BaseScreen<RootActivityComponent>() {
 
         @Provides
         @DaggerScope(MainScreen::class)
-        fun provideMainModel(dataManager: DataManager, jobs: Jobs, cache: Cache): IMainModel =
-                MainModel(dataManager, jobs, cache)
+        fun provideMainModel(photocardRepository: PhotocardRepository,
+                             photocardMapper: PhotocardCachingMapper): IMainModel =
+                MainModel(photocardRepository, photocardMapper)
 
         @Provides
         @DaggerScope(MainScreen::class)

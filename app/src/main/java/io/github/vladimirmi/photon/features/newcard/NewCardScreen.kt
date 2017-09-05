@@ -6,9 +6,9 @@ import dagger.Provides
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.data.jobs.Jobs
-import io.github.vladimirmi.photon.data.managers.Cache
-import io.github.vladimirmi.photon.data.managers.DataManager
+import io.github.vladimirmi.photon.data.mappers.AlbumCachingMapper
+import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
+import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumPresenter
 import io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumView
@@ -40,8 +40,10 @@ class NewCardScreen(var info: NewCardScreenInfo = NewCardScreenInfo())
     class Module {
         @Provides
         @DaggerScope(NewCardScreen::class)
-        fun provideNewCardModel(dataManager: DataManager, jobs: Jobs, cache: Cache): INewCardModel =
-                NewCardModel(dataManager, cache, jobs)
+        fun provideNewCardModel(profileRepository: ProfileRepository,
+                                photocardRepository: PhotocardRepository,
+                                albumMapper: AlbumCachingMapper): INewCardModel =
+                NewCardModel(profileRepository, photocardRepository, albumMapper)
 
         @Provides
         @DaggerScope(NewCardScreen::class)

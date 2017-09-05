@@ -1,44 +1,41 @@
 package io.github.vladimirmi.photon.features.album
 
-import io.github.vladimirmi.photon.data.jobs.Jobs
-import io.github.vladimirmi.photon.data.managers.DataManager
 import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.mappers.AlbumCachingMapper
 import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
-import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
+import io.github.vladimirmi.photon.data.repository.album.AlbumRepository
+import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
+import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
 import io.github.vladimirmi.photon.utils.ioToMain
-import io.reactivex.Completable
+import io.github.vladimirmi.photon.utils.justOrEmpty
 import io.reactivex.Observable
 
 /**
  * Created by Vladimir Mikhalev 19.06.2017.
  */
 
-class AlbumModel(private val dataManager: DataManager,
-                 private val jobs: Jobs) : IAlbumModel {
+class AlbumModel(private val profileRepository: ProfileRepository,
+                 private val photocardRepository: PhotocardRepository,
+                 private val albumRepository: AlbumRepository,
+                 private val albumMapper: AlbumCachingMapper) : IAlbumModel {
 
     override fun getAlbum(id: String): Observable<AlbumDto> {
-        return dataManager.getCached<Album, AlbumDto>(id)
+        return Observable.merge(
+                albumRepository.updateAlbum(id).ignoreElement().toObservable(),
+                albumRepository.getAlbum(id).map { albumMapper.map(it) },
+                justOrEmpty(albumMapper.get(id)))
                 .ioToMain()
     }
 
-    override fun updateAlbum(id: String): Completable {
-        return dataManager.isNetworkAvailable()
-                .filter { it }
-                .flatMap { dataManager.getAlbumFromNet(id) }
-                .doOnNext { dataManager.saveFromServer(it) }
-                .ignoreElements()
-                .ioToMain()
-    }
-
-    override fun getProfileId() = dataManager.getProfileId()
+    override fun isOwner(owner: String) = profileRepository.getProfileId() == owner
 
     override fun editAlbum(request: AlbumEditReq): Observable<JobStatus> =
-            jobs.albumEdit(request).ioToMain()
+            albumRepository.edit(request).ioToMain()
 
     override fun deleteAlbum(id: String): Observable<JobStatus> =
-            jobs.albumDelete(id).ioToMain()
+            albumRepository.delete(id).ioToMain()
 
     override fun removePhotos(photosForDelete: List<PhotocardDto>, album: AlbumDto): Observable<JobStatus> =
             removePhotosById(photosForDelete.map { it.id }, album.isFavorite).ioToMain()
@@ -52,9 +49,9 @@ class AlbumModel(private val dataManager: DataManager,
             Observable.fromIterable(photosForDelete)
                     .flatMap {
                         if (isFavorite) {
-                            jobs.albumDeleteFavorite(it)
+                            albumRepository.deleteFavorite(it)
                         } else {
-                            jobs.photocardDelete(it)
+                            photocardRepository.delete(it)
                         }
                     }
         }

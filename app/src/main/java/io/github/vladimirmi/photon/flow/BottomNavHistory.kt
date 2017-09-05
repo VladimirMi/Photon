@@ -6,9 +6,6 @@ import flow.Direction
 import flow.Flow
 import flow.History
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.features.auth.AuthScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.profile.ProfileScreen
 import io.github.vladimirmi.photon.features.splash.SplashScreen
@@ -32,14 +29,13 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
     }
 
     lateinit var flow: Flow
-    private val dm = DaggerService.appComponent.dataManager()
     var currentItem = MAIN
 
     val historyMap = hashMapOf(MAIN to History.single(SplashScreen()),
             PROFILE to History.single(ProfileScreen()),
             LOAD to History.single(NewCardScreen()))
 
-    fun dispatch(from: BottomItem, to: BottomItem, saveHistory: Boolean = true) {
+    private fun dispatch(from: BottomItem, to: BottomItem, saveHistory: Boolean = true) {
         currentItem = to
         val direction = getDirection(from, to)
         if (saveHistory) historyMap[from] = flow.history
@@ -49,15 +45,16 @@ class BottomNavHistory : BottomNavigationView.OnNavigationItemSelectedListener {
     }
 
     private fun handleIsAuth(to: BottomItem) {
-        if (dm.isUserAuth()) {
-            val top = historyMap[to]!!.top<BaseScreen<*>>()
-            if (top is AuthScreen) {
-                if (to == PROFILE) historyMap[to] = History.single(ProfileScreen())
-                if (to == LOAD) historyMap[to] = History.single(NewCardScreen())
-            }
-        } else {
-            if (to == PROFILE || to == LOAD) historyMap[to] = History.single(AuthScreen())
-        }
+        //todo fix
+//        if (dm.isUserAuth()) {
+//            val top = historyMap[to]!!.top<BaseScreen<*>>()
+//            if (top is AuthScreen) {
+//                if (to == PROFILE) historyMap[to] = History.single(ProfileScreen())
+//                if (to == LOAD) historyMap[to] = History.single(NewCardScreen())
+//            }
+//        } else {
+//            if (to == PROFILE || to == LOAD) historyMap[to] = History.single(AuthScreen())
+//        }
     }
 
     private fun getDirection(from: BottomItem, to: BottomItem): Direction =

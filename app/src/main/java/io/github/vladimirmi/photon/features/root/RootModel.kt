@@ -1,45 +1,35 @@
 package io.github.vladimirmi.photon.features.root
 
-import io.github.vladimirmi.photon.data.managers.DataManager
-import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
+import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
 import io.github.vladimirmi.photon.utils.ioToMain
-import io.reactivex.Single
+import io.reactivex.Completable
 import java.util.concurrent.TimeUnit
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-class RootModel(private val dataManager: DataManager) : IRootModel {
+class RootModel(private val profileRepository: ProfileRepository) : IRootModel {
 
-    override fun isUserAuth() = dataManager.isUserAuth()
+    override fun isUserAuth() = profileRepository.isUserAuth()
 
-    override fun register(req: SignUpReq): Single<Unit> {
-        return dataManager.signUp(req)
-                .map { saveUser(it) }
+    override fun register(req: SignUpReq): Completable {
+        return profileRepository.signUp(req)
                 .delay(1000, TimeUnit.MILLISECONDS)
                 .ioToMain()
     }
 
-    override fun login(req: SignInReq): Single<Unit> {
-        return dataManager.signIn(req)
-                .map { saveUser(it) }
+    override fun login(req: SignInReq): Completable {
+        return profileRepository.signIn(req)
                 .delay(1000, TimeUnit.MILLISECONDS)
                 .ioToMain()
     }
 
-    override fun logout() = dataManager.logout()
+    override fun logout() = profileRepository.logout()
 
-    override fun isNetAvail() = dataManager.checkNetAvail()
+    override fun isNetAvail() = profileRepository.isNetAvail()
 
-    private fun saveUser(user: User) {
-        dataManager.saveFromServer(user)
-        dataManager.saveUserId(user.id)
-        dataManager.saveUserToken(user.token)
-        dataManager.saveUserFavAlbumId(user.albums.find { it.isFavorite }!!.id)
-    }
-
-    override fun syncProfile() = dataManager.syncProfile()
+    override fun syncProfile() = profileRepository.syncProfile()
 }

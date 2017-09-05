@@ -6,7 +6,6 @@ import io.github.vladimirmi.photon.data.models.dto.AlbumDto
 import io.github.vladimirmi.photon.data.models.dto.UserDto
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
-import io.reactivex.Completable
 import io.reactivex.Observable
 
 interface IProfileModel : IModel {
@@ -15,5 +14,4 @@ interface IProfileModel : IModel {
     fun isUserAuth(): Boolean
     fun createAlbum(album: Album): Observable<JobStatus>
     fun editProfile(request: ProfileEditReq): Observable<JobStatus>
-    fun updateProfile(): Completable
 }

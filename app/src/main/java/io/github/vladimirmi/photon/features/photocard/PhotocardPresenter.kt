@@ -53,9 +53,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         val id = Flow.getKey<PhotocardScreen>(view)?.photocardId!!
         val ownerId = Flow.getKey<PhotocardScreen>(view)?.ownerId!!
         compDisp.add(subscribeOnUser(ownerId))
-        compDisp.add(subscribeOnUpdateUser(ownerId))
         compDisp.add(subscribeOnPhotocard(id))
-        compDisp.add(subscribeOnUpdatePhotocard(id, ownerId))
         compDisp.add(subscribeOnIsFavorite(id))
     }
 
@@ -84,15 +82,6 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
                 .subscribeWith(ErrorObserver())
     }
 
-    private fun subscribeOnUpdateUser(id: String): Disposable {
-        return model.updateUser(id)
-                .subscribeWith(ErrorCompletableObserver())
-    }
-
-    private fun subscribeOnUpdatePhotocard(id: String, ownerId: String): Disposable {
-        return model.updatePhotocard(id, ownerId)
-                .subscribeWith(ErrorCompletableObserver())
-    }
 
     fun showAuthor() {
         view.afterNetCheck<PhotocardView> { Flow.get(view).set(AuthorScreen(photocard.owner)) }
@@ -115,7 +104,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
             tempFile = createTempFile(suffix = ".jpg", directory = view.context.cacheDir)
             photocard.downloadTo(tempFile!!, view.context)
                     .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                        override fun onSuccess(t: Unit) {
+                        override fun onSuccess(it: Unit) {
                             rootPresenter.startActivityForResult(createShareImageIntent(), Constants.REQUEST_SHARE)
                         }
                     })
@@ -158,7 +147,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
         if (file != null) {
             photocard.downloadTo(file, view.context)
                     .subscribeWith(object : ErrorSingleObserver<Unit>() {
-                        override fun onSuccess(t: Unit) {
+                        override fun onSuccess(it: Unit) {
                             view.showLoadSnackbar { showLoadedPhoto(file) }
                         }
                     })

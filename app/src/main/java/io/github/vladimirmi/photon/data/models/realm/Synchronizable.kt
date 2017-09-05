@@ -20,4 +20,6 @@ interface Synchronizable {
         const val TEMP = "TEMP"
         fun tempId() = TEMP + UUID.randomUUID()
     }
+
+    fun transform(): Synchronizable?
 }
