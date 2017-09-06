@@ -22,10 +22,10 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
     private val actions: (MenuItem) -> Unit = {
         when (it.itemId) {
-            R.id.menu_favorite -> view.afterAuthCheck<PhotocardView> { addToFavorite() }
-            R.id.menu_favorite_remove -> view.afterAuthCheck<PhotocardView> { removeFromFavorite() }
+            R.id.menu_favorite -> rootPresenter.afterAuthCheck(view) { addToFavorite() }
+            R.id.menu_favorite_remove -> rootPresenter.afterAuthCheck(view) { removeFromFavorite() }
             R.id.menu_share -> share()
-            R.id.menu_download -> view.afterNetCheck<PhotocardView> { download() }
+            R.id.menu_download -> rootPresenter.afterNetCheck(view) { download() }
         }
     }
     private var isFavorite = false
@@ -84,7 +84,7 @@ class PhotocardPresenter(model: IPhotocardModel, rootPresenter: RootPresenter) :
 
 
     fun showAuthor() {
-        view.afterNetCheck<PhotocardView> { Flow.get(view).set(AuthorScreen(photocard.owner)) }
+        rootPresenter.afterNetCheck(view) { Flow.get(view).set(AuthorScreen(photocard.owner)) }
     }
 
     private fun addToFavorite() {

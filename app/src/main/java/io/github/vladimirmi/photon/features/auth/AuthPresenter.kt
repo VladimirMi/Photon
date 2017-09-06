@@ -11,7 +11,7 @@ import io.github.vladimirmi.photon.features.main.MainScreen
 import io.github.vladimirmi.photon.features.newcard.NewCardScreen
 import io.github.vladimirmi.photon.features.profile.ProfileScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.github.vladimirmi.photon.flow.BottomNavHistory
+import io.github.vladimirmi.photon.flow.BottomNavigationHistory
 import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 
 /**
@@ -27,12 +27,16 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
 
     override fun initView(view: AuthView) {
         when (rootPresenter.bottomHistory.currentItem) {
-            BottomNavHistory.BottomItem.PROFILE -> view.setTitle(R.string.profile_not_auth)
-            BottomNavHistory.BottomItem.LOAD -> view.setTitle(R.string.newcard_not_auth)
+            BottomNavigationHistory.BottomItem.PROFILE -> view.setTitle(R.string.profile_not_auth)
+            BottomNavigationHistory.BottomItem.LOAD -> view.setTitle(R.string.newcard_not_auth)
             else -> {
             }
         }
     }
+
+    fun startLogin() = rootPresenter.afterNetCheck(view) { openLoginDialog() }
+
+    fun startRegistration() = rootPresenter.afterNetCheck(view) { openRegistrationDialog() }
 
     fun register(req: SignUpReq) {
         compDisp.add(rootPresenter.register(req)
@@ -81,9 +85,9 @@ class AuthPresenter(model: IAuthModel, rootPresenter: RootPresenter)
 
     private fun nextScreen() {
         val nextScreen = when (rootPresenter.bottomHistory.currentItem) {
-            BottomNavHistory.BottomItem.PROFILE -> ProfileScreen()
-            BottomNavHistory.BottomItem.LOAD -> NewCardScreen()
-            BottomNavHistory.BottomItem.MAIN -> MainScreen()
+            BottomNavigationHistory.BottomItem.PROFILE -> ProfileScreen()
+            BottomNavigationHistory.BottomItem.LOAD -> NewCardScreen()
+            BottomNavigationHistory.BottomItem.MAIN -> MainScreen()
         }
         Flow.get(view).replaceTop(nextScreen, Direction.REPLACE)
     }

@@ -23,3 +23,5 @@ interface Synchronizable {
 
     fun transform(): Synchronizable?
 }
+
+fun String.isTemp() = startsWith(Synchronizable.TEMP)

@@ -9,6 +9,7 @@ import io.github.vladimirmi.photon.core.BaseScreen
 import io.github.vladimirmi.photon.data.mappers.AlbumCachingMapper
 import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
 import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
+import io.github.vladimirmi.photon.data.repository.recents.RecentsRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumPresenter
 import io.github.vladimirmi.photon.features.newcard.album.NewCardAlbumView
@@ -42,8 +43,9 @@ class NewCardScreen(var info: NewCardScreenInfo = NewCardScreenInfo())
         @DaggerScope(NewCardScreen::class)
         fun provideNewCardModel(profileRepository: ProfileRepository,
                                 photocardRepository: PhotocardRepository,
+                                recentsRepository: RecentsRepository,
                                 albumMapper: AlbumCachingMapper): INewCardModel =
-                NewCardModel(profileRepository, photocardRepository, albumMapper)
+                NewCardModel(profileRepository, photocardRepository, recentsRepository, albumMapper)
 
         @Provides
         @DaggerScope(NewCardScreen::class)

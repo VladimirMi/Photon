@@ -12,7 +12,7 @@ import io.github.vladimirmi.photon.data.network.NetworkChecker
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.data.network.parseGetResponse
 import io.github.vladimirmi.photon.di.DaggerScope
-import io.reactivex.Maybe
+import io.reactivex.Completable
 import io.reactivex.Observable
 import javax.inject.Inject
 
@@ -32,13 +32,14 @@ class AlbumRepository
     fun getAlbum(id: String, managed: Boolean = true): Observable<Album> =
             realmManager.getObject(Album::class.java, id, managed)
 
-    fun updateAlbum(id: String): Maybe<Album> {
-        if (!jobsManager.syncComplete) return Maybe.empty()
+    fun updateAlbum(id: String): Completable {
+        if (!jobsManager.isSync(id)) return Completable.complete()
         val lastModified = realmManager.getLastUpdated(Album::class.java, id)
-        return networkChecker.singleAvailavle()
+        return networkChecker.singleAvailable()
                 .flatMap { restService.getAlbum(id, "any", lastModified) }
                 .parseGetResponse()
                 .doOnSuccess { saveFromNet(it) }
+                .ignoreElement()
     }
 
 
@@ -55,10 +56,10 @@ class AlbumRepository
                     .flatMap { jobsManager.observe(AlbumEditJob.TAG + request.id) }
 
     fun addFavorite(id: String): Observable<JobStatus> =
-            Observable.fromCallable { getAlbum(id).addFavorite(id) }
+            Observable.fromCallable { getAlbum(preferencesManager.getFavAlbumId()).addFavorite(id) }
                     .flatMap { jobsManager.observe(AlbumAddFavoritePhotoJob.TAG + id) }
 
     fun deleteFavorite(id: String): Observable<JobStatus> =
-            Observable.fromCallable { getAlbum(id).deleteFavorite(id) }
+            Observable.fromCallable { getAlbum(preferencesManager.getFavAlbumId()).deleteFavorite(id) }
                     .flatMap { jobsManager.observe(AlbumDeleteFavoritePhotoJob.TAG + id) }
 }

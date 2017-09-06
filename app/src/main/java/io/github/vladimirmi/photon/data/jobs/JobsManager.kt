@@ -16,10 +16,10 @@ import io.github.vladimirmi.photon.data.repository.profile.ProfileJobRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
-import kotlin.concurrent.schedule
 
 /**
  * Created by Vladimir Mikhalev 30.08.2017.
@@ -32,9 +32,6 @@ class JobsManager
                     albumJobRepository: AlbumJobRepository,
                     photocardJobRepository: PhotocardJobRepository) {
 
-    //todo спрашивать синхронизацию по каждому объекту
-    var syncComplete = true
-        private set
     private var isRunning = false
 
     private val profileManager = ProfileJobsManager(profileJobRepository)
@@ -49,24 +46,52 @@ class JobsManager
         return Observable.merge(profile, albums, photocards)
                 .flatMapIterable { it }
                 .cast(Synchronizable::class.java)
-                .doOnNext {
-                    Timber.e("sync = ${it.sync}")
-                    syncing(true)
-                    nextJob(it)
-                }
-                .ignoreElements()
+                .doOnNext { syncQueue.put(it.id, it) }
                 .doOnSubscribe { jobManager.addCallback(jobCallback) }
                 .doFinally { jobManager.removeCallback(jobCallback) }
+                .ignoreElements()
+                .subscribeOn(Schedulers.io())
     }
+
+    fun isSync(id: String) = !syncQueue.contains(id)
+
+    fun syncComplete() = syncQueue.isEmpty()
+
+    fun observe(tag: String): Observable<JobStatus> = jobManager.observe(tag)
 
     private val jobCallback = object : EmptyJobCallback() {
         override fun onDone(job: Job) {
-            job.tags?.firstOrNull()?.let { completeJob(it) }
+            if (job is SyncCompleteJob<*>) {
+                syncQueue.remove(job.tags?.firstOrNull()?.removePrefix(SyncCompleteJob.TAG))
+            }
         }
     }
 
-    private fun nextJob(it: Synchronizable) {
-        if (isRunning) return
+    private val syncQueue = object : HashMap<String, Synchronizable>() {
+        override fun put(key: String, value: Synchronizable): Synchronizable? {
+            val put = super.put(key, value)
+            if (!isRunning) synchronize()
+            return put
+        }
+
+        override fun remove(key: String): Synchronizable? {
+            val remove = super.remove(key)
+            synchronize()
+            return remove
+        }
+    }
+
+    private fun synchronize() {
+        syncQueue.values.forEach {
+            if (runNextJob(it)) {
+                isRunning = true
+                return
+            }
+        }
+        isRunning = false
+    }
+
+    private fun runNextJob(it: Synchronizable): Boolean {
         val job = when (it) {
             is User -> profileManager.nextJob(it)
             is Album -> albumManager.nextJob(it)
@@ -75,29 +100,9 @@ class JobsManager
         }
         job?.let {
             Timber.e("nextJob: $it")
-            isRunning = true
             jobManager.addJobInBackground(it)
+            return true
         }
+        return false
     }
-
-    private fun completeJob(tag: String) {
-        isRunning = false
-        syncing(false)
-        profileManager.completeJob(tag)
-        albumManager.completeJob(tag)
-        photocardManager.completeJob(tag)
-    }
-
-    private val syncTimer = Timer()
-    private var syncTask: TimerTask? = null
-    private fun syncing(syncing: Boolean) {
-        if (syncing) {
-            syncComplete = false
-            syncTask?.cancel()
-        } else {
-            syncTask = syncTimer.schedule(10000) { syncComplete = true }
-        }
-    }
-
-    fun observe(tag: String): Observable<JobStatus> = jobManager.observe(tag)
 }

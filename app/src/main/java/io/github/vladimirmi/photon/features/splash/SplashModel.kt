@@ -27,5 +27,5 @@ class SplashModel(private val profileRepository: ProfileRepository,
             photocardRepository.updatePhotocards(0, limit)
 
     private fun updateProfile(): Completable =
-            profileRepository.updateProfile().ignoreElement()
+            profileRepository.updateProfile()
 }

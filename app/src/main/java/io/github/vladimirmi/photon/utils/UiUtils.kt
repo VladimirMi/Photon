@@ -14,7 +14,6 @@ import com.transitionseverywhere.Slide
 import com.transitionseverywhere.TransitionSet
 import flow.Direction
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.core.IView
 import io.github.vladimirmi.photon.ui.CircleTransformation
 
 
@@ -44,28 +43,14 @@ fun ImageView.setRoundAvatarWithBorder(path: String?, border: Float = 0f) {
             .into(this)
 }
 
-val Context.dp get() = getDisplayMetrics().density //todo to int?
+val Context.dp get() = getDisplayMetrics().density.toInt()
 
-val Context.sp get() = getDisplayMetrics().scaledDensity
+val Context.sp get() = getDisplayMetrics().scaledDensity.toInt()
 
 fun Context.getDisplayMetrics(): DisplayMetrics {
     val displayMetrics = DisplayMetrics()
     (this.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getMetrics(displayMetrics)
     return displayMetrics
-}
-
-//todo fix
-
-@Suppress("UNCHECKED_CAST")
-inline fun <V : IView> IView.afterNetCheck(block: V.() -> Unit) {
-//    val netAvail = DaggerService.appComponent.dataManager().checkNetAvail()
-//    if (netAvail) block(this as V) else showNetError()
-}
-
-@Suppress("UNCHECKED_CAST")
-inline fun <V : IView> IView.afterAuthCheck(block: V.() -> Unit) {
-//    val profileId = DaggerService.appComponent.dataManager().getProfileId()
-//    if (profileId.isNotEmpty()) block(this as V) else showAuthError()
 }
 
 inline fun View.waitForMeasure(crossinline block: () -> Unit) {

@@ -15,7 +15,7 @@ class AuthorModel(private val userRepository: UserRepository,
 
     override fun getUser(id: String): Observable<UserDto> {
         return Observable.merge(
-                userRepository.updateUser(id).ignoreElement().toObservable(),
+                userRepository.updateUser(id).toObservable(),
                 userRepository.getUser(id).map { userMapper.map(it) },
                 justOrEmpty(userMapper.get(id)))
                 .ioToMain()

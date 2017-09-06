@@ -9,14 +9,12 @@ import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
 import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.data.network.NetworkChecker
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.data.network.parseGetResponse
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.utils.Query
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.realm.Sort
 import javax.inject.Inject
@@ -41,10 +39,10 @@ class PhotocardRepository
             realmManager.search(Photocard::class.java, query, sortBy, order, managed)
 
     fun updatePhotocards(offset: Int, limit: Int): Completable {
-        if (!jobsManager.syncComplete) return Completable.complete()
+        if (!jobsManager.syncComplete()) return Completable.complete()
         val tag = Photocard::class.java.simpleName
         val lastModified = preferencesManager.getLastUpdate(tag)
-        return networkChecker.singleAvailavle()
+        return networkChecker.singleAvailable()
                 .flatMap { restService.getPhotocards(offset, limit, lastModified) }
                 .parseGetResponse { preferencesManager.saveLastUpdate(tag, it) }
                 .doOnSuccess { saveFromNet(it) }
@@ -55,21 +53,14 @@ class PhotocardRepository
             realmManager.getObject(Photocard::class.java, id, managed)
 
 
-    fun updatePhotocard(id: String): Maybe<Photocard> {
-        if (!jobsManager.syncComplete) return Maybe.empty()
+    fun updatePhotocard(id: String): Completable {
+        if (!jobsManager.isSync(id)) return Completable.complete()
         val lastModified = realmManager.getLastUpdated(Photocard::class.java, id)
-        return networkChecker.singleAvailavle()
+        return networkChecker.singleAvailable()
                 .flatMap { restService.getPhotocard(id, "any", lastModified) }
                 .parseGetResponse()
                 .doOnSuccess { saveFromNet(it) }
-    }
-
-    fun getTags(): Observable<List<Tag>> =
-            realmManager.search(Tag::class.java, query = null, sortBy = "value")
-
-    fun searchTag(tag: String): Observable<List<Tag>> {
-        val query = Query("value", Query.Operator.CONTAINS, tag)
-        return realmManager.search(Tag::class.java, listOf(query), sortBy = "value")
+                .ignoreElement()
     }
 
     fun create(photocard: Photocard): Observable<JobStatus> =

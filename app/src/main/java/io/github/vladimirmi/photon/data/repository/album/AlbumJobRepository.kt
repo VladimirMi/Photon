@@ -4,7 +4,6 @@ import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.data.models.req.AlbumNewReq
 import io.github.vladimirmi.photon.data.models.res.SuccessRes
@@ -97,6 +96,6 @@ class AlbumJobRepository
 
     private fun removeTemp(id: String) {
         if (!id.startsWith("TEMP")) throw UnsupportedOperationException()
-        realmManager.remove(Photocard::class.java, id)
+        realmManager.remove(Album::class.java, id)
     }
 }

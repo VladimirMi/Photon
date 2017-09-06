@@ -7,11 +7,12 @@ import android.os.Build
 import android.os.Environment
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import io.github.vladimirmi.photon.core.IView
 import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerScope
-import io.github.vladimirmi.photon.flow.BottomNavHistory
+import io.github.vladimirmi.photon.flow.BottomNavigationHistory
 import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
@@ -28,7 +29,7 @@ import java.io.File
 class RootPresenter(val model: IRootModel) :
         Presenter<IRootView>() {
 
-    val bottomHistory = BottomNavHistory()
+    val bottomHistory = BottomNavigationHistory(authMode = !isUserAuth())
     private var syncDB: Disposable? = null
 
     override fun extractBundleService(view: IRootView?): BundleService =
@@ -56,25 +57,27 @@ class RootPresenter(val model: IRootModel) :
 
     fun hideLoading() = view.hideLoading()
 
-    fun register(req: SignUpReq): Completable {
-        return model.register(req)
-                .doOnComplete { syncDB() }
-                .doOnSubscribe { showLoading() }
-                .doAfterTerminate { hideLoading() }
+    fun register(req: SignUpReq): Completable =
+            model.register(req)
+                    .doOnSubscribe { showLoading() }
+                    .doOnComplete { endAuthorization() }
+
+    private fun endAuthorization() {
+        syncDB()
+        hideLoading()
+        bottomHistory.authMode = false
     }
 
-    fun login(req: SignInReq): Completable {
-        return model.login(req)
-                .doOnComplete { syncDB() }
-                .doOnSubscribe { showLoading() }
-                .doAfterTerminate { hideLoading() }
-    }
+    fun login(req: SignInReq): Completable =
+            model.login(req)
+                    .doOnSubscribe { showLoading() }
+                    .doOnComplete { endAuthorization() }
 
     fun logout() {
         syncDB?.dispose()
         model.logout()
+        bottomHistory.authMode = true
     }
-
 
     fun checkAndRequestPermissions(permissions: Array<String>, requestCode: Int): Boolean {
         if (!hasView()) return false
@@ -107,11 +110,17 @@ class RootPresenter(val model: IRootModel) :
 
     fun showPermissionSnackBar() = view.showPermissionSnackBar()
 
-    fun navigateTo(bottomItem: BottomNavHistory.BottomItem) = view.navigateTo(bottomItem)
-
-    fun showMessage(stringId: Int) = view.showMessage(stringId)
-
     fun clearMenu() = view.clearToolbar()
+
+    fun navigateTo(bottomItem: BottomNavigationHistory.BottomItem) = view.navigateTo(bottomItem)
+
+    inline fun <V : IView> afterNetCheck(view: V, block: V.() -> Unit) {
+        if (model.isNetAvail()) block(view) else view.showNetError()
+    }
+
+    inline fun <V : IView> afterAuthCheck(view: V, block: V.() -> Unit) {
+        if (model.isUserAuth()) block(view) else view.showAuthError()
+    }
 
     fun isNetAvailable() = model.isNetAvail()
 }

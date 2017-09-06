@@ -1,9 +1,10 @@
 package io.github.vladimirmi.photon.features.search
 
 import io.github.vladimirmi.photon.data.models.realm.Search
-import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
+import io.github.vladimirmi.photon.data.repository.recents.RecentsRepository
 import io.github.vladimirmi.photon.features.main.IMainModel
 import io.github.vladimirmi.photon.utils.Query
+import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -12,9 +13,8 @@ import java.util.concurrent.TimeUnit
  * Developer Vladimir Mikhalev, 06.06.2017.
  */
 
-//todo search repository
 class SearchModel(private val mainModel: IMainModel,
-                  private val photocardRepository: PhotocardRepository)
+                  private val recentsRepository: RecentsRepository)
     : ISearchModel {
 
     override var queryPage
@@ -35,7 +35,7 @@ class SearchModel(private val mainModel: IMainModel,
 
     override fun getTags(): Observable<List<String>> {
         val pageSize = 20
-        return photocardRepository.getTags()
+        return recentsRepository.getTags()
                 .map { it.map { it.value } }
                 .flatMap { list ->
                     Observable.interval(0, 500, TimeUnit.MILLISECONDS)
@@ -48,7 +48,7 @@ class SearchModel(private val mainModel: IMainModel,
                                     else -> Observable.just(list.subList(from, to))
                                 }
                             }
-                }
+                }.ioToMain()
     }
 
     override fun isFiltered() = mainModel.isFiltered()
@@ -89,17 +89,13 @@ class SearchModel(private val mainModel: IMainModel,
         mainModel.makeQuery()
     }
 
-    override fun searchRecents(string: String): Observable<List<String>> {
-//        val query = Query("value", Query.Operator.CONTAINS, string)
-//        return dataManager.search(Search::class.java, listOf(query),
-//                sortBy = "date", order = Sort.DESCENDING)
-//                .map { it.map { it.value } }
-//                .map { if (it.size > 5) it.subList(0, 5).map { it } else it }
-//                .ioToMain()
-        return Observable.empty()
-    }
+    override fun searchRecents(string: String): Observable<List<String>> =
+            recentsRepository.searchRecents(string)
+                    .map { it.map { it.value } }
+                    .map { if (it.size > 5) it.subList(0, 5).map { it } else it }
+                    .ioToMain()
 
     override fun saveSearchField(search: String) {
-        photocardRepository.save(Search(search))
+        recentsRepository.save(Search(search))
     }
 }

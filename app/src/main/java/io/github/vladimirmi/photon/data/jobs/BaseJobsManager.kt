@@ -2,37 +2,27 @@ package io.github.vladimirmi.photon.data.jobs
 
 import com.birbit.android.jobqueue.Job
 import io.github.vladimirmi.photon.data.models.realm.Synchronizable
+import io.github.vladimirmi.photon.data.repository.BaseEntityRepository
 
 /**
  * Created by Vladimir Mikhalev 30.08.2017.
  */
 
-abstract class BaseJobsManager<T : Synchronizable> {
-
-    private val runningJobs = HashSet<String>()
-
-    fun completeJob(tag: String) {
-        runningJobs.remove(tag)
-    }
-
-    abstract fun getFromServer(id: String): T
+abstract class BaseJobsManager<T : Synchronizable, out R : BaseEntityRepository>
+constructor(protected val repository: R) {
 
     fun nextJob(client: T): Job? {
-        if (!client.active) return getDeleteJob(client.id)
-        if (client.isTemp) return getCreateJob(client.id)
-        val job = getJob(client, getFromServer(client.id))
-        if (job != null) return job
-        saveSync(client)
-        return null
+        if (!client.active) return getDeleteJob(client)
+        if (client.isTemp) return getCreateJob(client)
+        return getJob(client, getFromServer(client.id)) ?:
+                SyncCompleteJob(repository, client)
     }
 
-    abstract fun getJob(client: T, server: T): Job?
+    protected abstract fun getJob(client: T, server: T): Job?
 
-    protected abstract fun getCreateJob(id: String): Job?
+    protected abstract fun getFromServer(id: String): T
 
-    protected abstract fun getDeleteJob(id: String): Job?
+    protected abstract fun getCreateJob(client: T): Job?
 
-    protected fun canRun(tag: String): Boolean = runningJobs.add(tag)
-
-    abstract protected fun saveSync(obj: T)
+    protected abstract fun getDeleteJob(client: T): Job?
 }

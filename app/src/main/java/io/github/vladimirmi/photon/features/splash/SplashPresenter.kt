@@ -32,13 +32,11 @@ class SplashPresenter(model: ISplashModel, rootPresenter: RootPresenter) :
 
     override fun initView(view: SplashView) {
         rootPresenter.showLoading()
-        compDisp.add(updatePhotos())
-        if (!rootPresenter.isNetAvailable()) view.showError(R.string.message_err_net)
+        compDisp.add(updateData())
     }
 
-    private fun updatePhotos(): Disposable {
-        if (!rootPresenter.isNetAvailable()) {
-            view.showNetError()
+    private fun updateData(): Disposable {
+        rootPresenter.afterNetCheck(view) {
             chooseCanOpen()
         }
 

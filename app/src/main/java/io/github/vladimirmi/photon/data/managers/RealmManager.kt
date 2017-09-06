@@ -14,7 +14,7 @@ import java.util.*
  * Created by Vladimir Mikhalev 04.06.2017.
  */
 
-class RealmManager() {
+class RealmManager {
 
     fun save(realmObject: RealmObject) {
         val realm = Realm.getDefaultInstance()
@@ -28,14 +28,6 @@ class RealmManager() {
         realm.close()
     }
 
-//    fun saveFromServer(realmObject: RealmObject) {
-//        setupObject(realmObject)?.let { save(it) }
-//    }
-//
-//    fun <T : RealmObject> saveFromServer(list: List<T>) {
-//        save(list.mapNotNull { setupObject(it) })
-//    }
-
     fun <T : RealmObject> getObject(clazz: Class<T>,
                                     id: String,
                                     managed: Boolean): Observable<T> {
@@ -44,18 +36,6 @@ class RealmManager() {
                 .flatMapIterable { it }
 //                .flatMap { if (it.isEmpty()) Observable.empty() else Observable.just(it.first()) }
     }
-
-//    @Suppress("UNCHECKED_CAST")
-//    fun <T : RealmObject, R : Cached> getCached(clazz: Class<T>, id: String): Observable<R> {
-//        fun cached() = when (clazz) {
-//            Album::class.java -> cache.album(id)
-//            Photocard::class.java -> cache.photocard(id)
-//            User::class.java -> cache.user(id)
-//            else -> throw UnsupportedOperationException()
-//        } as R?
-//        return Observable.merge(justOrEmpty(cached()),
-//                getObject(clazz, id, false).flatMap { justOrEmpty(cache.cache(it) as R?) })
-//    }
 
 
     fun <T : RealmObject> getList(clazz: Class<T>,

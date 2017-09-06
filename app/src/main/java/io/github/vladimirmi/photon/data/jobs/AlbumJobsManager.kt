@@ -10,7 +10,8 @@ import io.github.vladimirmi.photon.data.repository.album.AlbumJobRepository
  * Created by Vladimir Mikhalev 31.08.2017.
  */
 
-class AlbumJobsManager(private val repository: AlbumJobRepository) : BaseJobsManager<Album>() {
+class AlbumJobsManager(repository: AlbumJobRepository)
+    : BaseJobsManager<Album, AlbumJobRepository>(repository) {
 
     override fun getFromServer(id: String): Album =
             repository.getAlbumFromNet(id).blockingGet()
@@ -20,14 +21,12 @@ class AlbumJobsManager(private val repository: AlbumJobRepository) : BaseJobsMan
                     getAddOrDeleteFavoriteJob(client, server)
 
 
-    override fun getCreateJob(id: String): Job? =
-            if (canRun(AlbumCreateJob.TAG + id)) AlbumCreateJob(id, repository) else null
+    override fun getCreateJob(client: Album): Job? = AlbumCreateJob(client.id, repository)
 
-    override fun getDeleteJob(id: String): Job? =
-            if (canRun(AlbumDeleteJob.TAG + id)) AlbumDeleteJob(id, repository) else null
+    override fun getDeleteJob(client: Album): Job? = AlbumDeleteJob(client.id, repository)
 
     private fun getEditJob(client: Album, server: Album): Job? =
-            if (isEdited(server, client) && canRun(AlbumEditJob.TAG + client.id)) {
+            if (isEdited(server, client)) {
                 AlbumEditJob(client.id, repository)
             } else null
 
@@ -37,25 +36,17 @@ class AlbumJobsManager(private val repository: AlbumJobRepository) : BaseJobsMan
         val serverPhotocards = server.photocards.map { it.id }.toMutableList()
         val clientPhotocards = client.photocards.map { it.id }.toMutableList()
 
-        if (server.photocards.size > client.photocards.size) {
+        return if (server.photocards.size > client.photocards.size) {
             serverPhotocards.removeAll(clientPhotocards)
             val deleteId = serverPhotocards.first()
-            if (canRun(AlbumDeleteFavoritePhotoJob.TAG + deleteId))
-                return AlbumDeleteFavoritePhotoJob(deleteId, repository)
+            AlbumDeleteFavoritePhotoJob(deleteId, repository)
         } else {
             clientPhotocards.removeAll(serverPhotocards)
             val addId = clientPhotocards.first()
-            if (canRun(AlbumAddFavoritePhotoJob.TAG + addId))
-                return AlbumAddFavoritePhotoJob(addId, repository)
+            AlbumAddFavoritePhotoJob(addId, repository)
         }
-        return null
     }
 
     private fun isEdited(client: Album, server: Album): Boolean =
             AlbumEditReq.from(client) != AlbumEditReq.from(server)
-
-    override fun saveSync(obj: Album) {
-        obj.sync = true
-        repository.save(obj)
-    }
 }

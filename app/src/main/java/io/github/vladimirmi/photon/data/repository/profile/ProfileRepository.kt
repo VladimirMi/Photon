@@ -18,7 +18,6 @@ import io.github.vladimirmi.photon.data.network.parseStatusCode
 import io.github.vladimirmi.photon.data.repository.user.UserRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import javax.inject.Inject
 
@@ -57,8 +56,9 @@ class ProfileRepository
     fun getProfile(managed: Boolean = true): Observable<User> =
             userRepository.getUser(getProfileId(), managed).share()
 
-    fun updateProfile(): Maybe<User> {
-        if (!isUserAuth()) return Maybe.empty()
+    fun updateProfile(): Completable {
+        if (!isUserAuth()) return Completable.complete()
+        if (!jobsManager.isSync(getProfileId())) return Completable.complete()
         return userRepository.updateUser(getProfileId())
     }
 

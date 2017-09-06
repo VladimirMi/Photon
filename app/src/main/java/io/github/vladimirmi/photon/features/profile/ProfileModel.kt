@@ -23,7 +23,7 @@ class ProfileModel(private val profileRepository: ProfileRepository,
 
     override fun getProfile(): Observable<UserDto> =
             Observable.merge(
-                    profileRepository.updateProfile().ignoreElement().toObservable(),
+                    profileRepository.updateProfile().toObservable(),
                     profileRepository.getProfile().map { userMapper.map(it) },
                     justOrEmpty(userMapper.get(profileRepository.getProfileId())))
                     .ioToMain()

@@ -26,7 +26,7 @@ class PhotocardModel(private val photocardRepository: PhotocardRepository,
 
     override fun getUser(id: String): Observable<UserDto> {
         return Observable.merge(
-                userRepository.updateUser(id).ignoreElement().toObservable(),
+                userRepository.updateUser(id).toObservable(),
                 userRepository.getUser(id).map { userMapper.map(it) },
                 justOrEmpty(userMapper.get(id)))
                 .ioToMain()
@@ -34,7 +34,7 @@ class PhotocardModel(private val photocardRepository: PhotocardRepository,
 
     override fun getPhotocard(id: String): Observable<PhotocardDto> {
         return Observable.merge(
-                photocardRepository.updatePhotocard(id).ignoreElement().toObservable(),
+                photocardRepository.updatePhotocard(id).toObservable(),
                 photocardRepository.getPhotocard(id).map { photocardMapper.map(it) },
                 justOrEmpty(photocardMapper.get(id)))
                 .ioToMain()

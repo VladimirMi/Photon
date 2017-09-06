@@ -15,7 +15,6 @@ import io.github.vladimirmi.photon.features.search.SearchScreen
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.github.vladimirmi.photon.utils.ErrorObserver
-import io.github.vladimirmi.photon.utils.afterNetCheck
 import io.reactivex.disposables.Disposable
 
 /**
@@ -27,8 +26,8 @@ class MainPresenter(model: IMainModel, rootPresenter: RootPresenter) :
 
     private val menuActions: (MenuItem) -> Unit = {
         when (it.itemId) {
-            R.id.menu_signIn -> view.afterNetCheck<MainView> { openLoginDialog() }
-            R.id.menu_signUp -> view.afterNetCheck<MainView> { openRegistrationDialog() }
+            R.id.menu_signIn -> rootPresenter.afterNetCheck(view) { openLoginDialog() }
+            R.id.menu_signUp -> rootPresenter.afterNetCheck(view) { openRegistrationDialog() }
             R.id.menu_logout -> logout()
         }
     }

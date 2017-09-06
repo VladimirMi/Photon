@@ -23,7 +23,7 @@ class AlbumModel(private val profileRepository: ProfileRepository,
 
     override fun getAlbum(id: String): Observable<AlbumDto> {
         return Observable.merge(
-                albumRepository.updateAlbum(id).ignoreElement().toObservable(),
+                albumRepository.updateAlbum(id).toObservable(),
                 albumRepository.getAlbum(id).map { albumMapper.map(it) },
                 justOrEmpty(albumMapper.get(id)))
                 .ioToMain()

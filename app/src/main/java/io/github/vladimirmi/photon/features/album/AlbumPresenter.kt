@@ -13,7 +13,7 @@ import io.github.vladimirmi.photon.features.newcard.NewCardScreenInfo
 import io.github.vladimirmi.photon.features.photocard.PhotocardScreen
 import io.github.vladimirmi.photon.features.root.MenuItemHolder
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.LOAD
+import io.github.vladimirmi.photon.flow.BottomNavigationHistory.BottomItem.LOAD
 import io.github.vladimirmi.photon.utils.ErrorObserver
 import io.reactivex.disposables.Disposable
 

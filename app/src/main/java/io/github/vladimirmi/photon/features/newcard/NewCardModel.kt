@@ -8,6 +8,7 @@ import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
 import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
+import io.github.vladimirmi.photon.data.repository.recents.RecentsRepository
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
 import io.realm.RealmList
@@ -15,6 +16,7 @@ import timber.log.Timber
 
 class NewCardModel(private val profileRepository: ProfileRepository,
                    private val photocardRepository: PhotocardRepository,
+                   private val recentsRepository: RecentsRepository,
                    private val albumMapper: AlbumCachingMapper) : INewCardModel {
 
     override var screenInfo = NewCardScreenInfo()
@@ -46,7 +48,7 @@ class NewCardModel(private val profileRepository: ProfileRepository,
     }
 
     override fun searchTag(tag: String): Observable<List<String>> =
-            photocardRepository.searchTag(tag)
+            recentsRepository.searchTag(tag)
                     .map { (if (it.size > 3) it.subList(0, 3) else it).map { it.value } }
                     .ioToMain()
 

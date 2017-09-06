@@ -13,7 +13,7 @@ import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.features.album.AlbumScreen
 import io.github.vladimirmi.photon.features.root.RootPresenter
-import io.github.vladimirmi.photon.flow.BottomNavHistory.BottomItem.PROFILE
+import io.github.vladimirmi.photon.flow.BottomNavigationHistory.BottomItem.PROFILE
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.github.vladimirmi.photon.utils.Constants
 import io.github.vladimirmi.photon.utils.ErrorObserver

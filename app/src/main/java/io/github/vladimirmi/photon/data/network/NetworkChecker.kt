@@ -3,6 +3,7 @@ package io.github.vladimirmi.photon.data.network
 import android.content.Context
 import android.net.ConnectivityManager
 import io.reactivex.Observable
+import io.reactivex.Single
 import java.util.concurrent.TimeUnit
 
 /**
@@ -15,10 +16,10 @@ class NetworkChecker(context: Context) {
 
     fun isAvailable() = cm.activeNetworkInfo != null && cm.activeNetworkInfo.isConnected
 
+    fun singleAvailable(): Single<Boolean> = available().filter { it }.firstOrError()
+
     fun available(): Observable<Boolean> =
             Observable.interval(0, 2, TimeUnit.SECONDS)
                     .map { isAvailable() }
                     .distinctUntilChanged()
-
-    fun singleAvailavle() = available().filter { it }.firstOrError()
 }
