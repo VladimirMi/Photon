@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.data.repository.profile
 
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.jobs.JobsManager
-import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardAddViewJob
+import io.github.vladimirmi.photon.data.jobs.profile.ProfileEditJob
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
@@ -32,8 +32,9 @@ class ProfileRepository
                     private val preferencesManager: PreferencesManager,
                     private val networkChecker: NetworkChecker,
                     private val jobsManager: JobsManager,
-                    private val userRepository: UserRepository
-) : ProfileEntityRepository(realmManager) {
+                    private val userRepository: UserRepository,
+                    private val profileJobRepository: ProfileJobRepository)
+    : ProfileEntityRepository(realmManager) {
 
     fun signIn(req: SignInReq): Completable {
         return restService.signIn(req)
@@ -79,7 +80,7 @@ class ProfileRepository
 
     fun edit(request: ProfileEditReq): Observable<JobStatus> =
             Observable.fromCallable { getUser(getProfileId()).edit(request) }
-                    .flatMap { jobsManager.observe(PhotocardAddViewJob.TAG + getProfileId()) }
+                    .flatMap { jobsManager.observe(ProfileEditJob(getProfileId(), profileJobRepository)) }
 
     private fun saveUser(user: User) {
         save(user)

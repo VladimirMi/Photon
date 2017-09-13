@@ -1,11 +1,7 @@
 package io.github.vladimirmi.photon.data.jobs.photocard
 
 import android.net.Uri
-import com.birbit.android.jobqueue.Job
-import com.birbit.android.jobqueue.Params
-import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
-import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.logCancel
+import io.github.vladimirmi.photon.data.jobs.ChainJob
 import io.github.vladimirmi.photon.data.repository.photocard.PhotocardJobRepository
 import io.github.vladimirmi.photon.di.DaggerService
 import okhttp3.MediaType
@@ -18,15 +14,11 @@ import okhttp3.RequestBody
 
 class PhotocardCreateJob(private val photocardId: String,
                          private val repository: PhotocardJobRepository)
-    : Job(Params(JobPriority.HIGH)
-        .addTags(TAG + photocardId)
-        .requireNetwork()) {
+    : ChainJob(TAG, photocardId) {
 
     companion object {
         val TAG = "PhotocardCreateJob"
     }
-
-    override fun onAdded() {}
 
     override fun onRun() {
         val photocard = repository.getPhotocard(photocardId)
@@ -51,11 +43,4 @@ class PhotocardCreateJob(private val photocardId: String,
             return it.readBytes()
         }
     }
-
-    override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        logCancel(cancelReason, throwable)
-    }
-
-    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
-            cancelOrWaitConnection(throwable, runCount)
 }

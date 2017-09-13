@@ -26,7 +26,8 @@ class AlbumRepository
                     preferencesManager: PreferencesManager,
                     private val restService: RestService,
                     private val networkChecker: NetworkChecker,
-                    private val jobsManager: JobsManager)
+                    private val jobsManager: JobsManager,
+                    private val albumJobRepository: AlbumJobRepository)
     : AlbumEntityRepository(realmManager, preferencesManager) {
 
     fun getAlbum(id: String, managed: Boolean = true): Observable<Album> =
@@ -45,21 +46,21 @@ class AlbumRepository
 
     fun create(album: Album): Observable<JobStatus> =
             Observable.fromCallable { album.create() }.
-                    flatMap { jobsManager.observe(AlbumCreateJob.TAG + album.id) }
+                    flatMap { jobsManager.observe(AlbumCreateJob(album.id, albumJobRepository)) }
 
     fun delete(id: String): Observable<JobStatus> =
             Observable.fromCallable { getAlbum(id).delete() }
-                    .flatMap { jobsManager.observe(AlbumDeleteJob.TAG + id) }
+                    .flatMap { jobsManager.observe(AlbumDeleteJob(id, albumJobRepository)) }
 
     fun edit(request: AlbumEditReq): Observable<JobStatus> =
             Observable.fromCallable { getAlbum(request.id).edit(request) }
-                    .flatMap { jobsManager.observe(AlbumEditJob.TAG + request.id) }
+                    .flatMap { jobsManager.observe(AlbumEditJob(request.id, albumJobRepository)) }
 
     fun addFavorite(id: String): Observable<JobStatus> =
             Observable.fromCallable { getAlbum(preferencesManager.getFavAlbumId()).addFavorite(id) }
-                    .flatMap { jobsManager.observe(AlbumAddFavoritePhotoJob.TAG + id) }
+                    .flatMap { jobsManager.observe(AlbumAddFavoritePhotoJob(id, albumJobRepository)) }
 
     fun deleteFavorite(id: String): Observable<JobStatus> =
             Observable.fromCallable { getAlbum(preferencesManager.getFavAlbumId()).deleteFavorite(id) }
-                    .flatMap { jobsManager.observe(AlbumDeleteFavoritePhotoJob.TAG + id) }
+                    .flatMap { jobsManager.observe(AlbumDeleteFavoritePhotoJob(id, albumJobRepository)) }
 }

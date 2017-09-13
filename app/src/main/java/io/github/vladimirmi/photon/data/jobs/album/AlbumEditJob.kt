@@ -1,8 +1,6 @@
 package io.github.vladimirmi.photon.data.jobs.album
 
-import com.birbit.android.jobqueue.Job
-import com.birbit.android.jobqueue.Params
-import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
+import io.github.vladimirmi.photon.data.jobs.ChainJob
 import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
 import io.github.vladimirmi.photon.data.managers.extensions.logCancel
 import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
@@ -16,14 +14,14 @@ import io.reactivex.schedulers.Schedulers
 
 class AlbumEditJob(private val albumId: String,
                    private val repository: AlbumJobRepository)
-    : Job(Params(JobPriority.HIGH)
-        .addTags(TAG + albumId)
-        .requireNetwork()) {
+    : ChainJob(TAG, albumId) {
 
     companion object {
         const val TAG = "AlbumEditJob"
     }
 
+    override val needCreate = AlbumCreateJob.TAG + albumId
+    override val needReplace = TAG + albumId
 
     override fun onAdded() {}
 

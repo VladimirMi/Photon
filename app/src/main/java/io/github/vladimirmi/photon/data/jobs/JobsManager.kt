@@ -6,10 +6,7 @@ import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.managers.extensions.EmptyJobCallback
 import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
 import io.github.vladimirmi.photon.data.managers.extensions.observe
-import io.github.vladimirmi.photon.data.models.realm.Album
-import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Synchronizable
-import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.repository.album.AlbumJobRepository
 import io.github.vladimirmi.photon.data.repository.photocard.PhotocardJobRepository
 import io.github.vladimirmi.photon.data.repository.profile.ProfileJobRepository
@@ -17,7 +14,6 @@ import io.github.vladimirmi.photon.di.DaggerScope
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -57,7 +53,10 @@ class JobsManager
 
     fun syncComplete() = syncQueue.isEmpty()
 
-    fun observe(tag: String): Observable<JobStatus> = jobManager.observe(tag)
+    fun observe(job: ChainJob): Observable<JobStatus> {
+        jobManager.addJob(job.getJob(jobManager))
+        return jobManager.observe(job.tag)
+    }
 
     private val jobCallback = object : EmptyJobCallback() {
         override fun onDone(job: Job) {
@@ -92,17 +91,17 @@ class JobsManager
     }
 
     private fun runNextJob(it: Synchronizable): Boolean {
-        val job = when (it) {
-            is User -> profileManager.nextJob(it)
-            is Album -> albumManager.nextJob(it)
-            is Photocard -> photocardManager.nextJob(it)
-            else -> null
-        }
-        job?.let {
-            Timber.e("nextJob: $it")
-            jobManager.addJobInBackground(it)
+//        val job = when (it) {
+//            is User -> profileManager.nextJob(it)
+//            is Album -> albumManager.nextJob(it)
+//            is Photocard -> photocardManager.nextJob(it)
+//            else -> null
+//        }
+//        job?.let {
+//            Timber.e("nextJob: $it")
+//            jobManager.addJobInBackground(it)
             return true
-        }
-        return false
+//        }
+//        return false
     }
 }

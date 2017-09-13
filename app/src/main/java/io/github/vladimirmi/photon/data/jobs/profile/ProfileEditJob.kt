@@ -1,11 +1,7 @@
 package io.github.vladimirmi.photon.data.jobs.profile
 
 import android.net.Uri
-import com.birbit.android.jobqueue.Job
-import com.birbit.android.jobqueue.Params
-import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
-import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.logCancel
+import io.github.vladimirmi.photon.data.jobs.ChainJob
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.github.vladimirmi.photon.data.repository.profile.ProfileJobRepository
 import io.github.vladimirmi.photon.di.DaggerService
@@ -19,16 +15,13 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class ProfileEditJob(private val repository: ProfileJobRepository)
-    : Job(Params(JobPriority.HIGH)
-        .addTags(TAG)
-        .requireNetwork()) {
+class ProfileEditJob(profileId: String,
+                     private val repository: ProfileJobRepository)
+    : ChainJob(TAG, profileId) {
 
     companion object {
         const val TAG = "ProfileEditJob"
     }
-
-    override fun onAdded() {}
 
     override fun onRun() {
         val profile = repository.getProfile()
@@ -47,13 +40,9 @@ class ProfileEditJob(private val repository: ProfileJobRepository)
     }
 
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        logCancel(cancelReason, throwable)
+        super.onCancel(cancelReason, throwable)
         rollback()
     }
-
-    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
-            cancelOrWaitConnection(throwable, runCount)
-
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {
         DaggerService.appComponent.context().contentResolver.openInputStream(Uri.parse(contentUri))

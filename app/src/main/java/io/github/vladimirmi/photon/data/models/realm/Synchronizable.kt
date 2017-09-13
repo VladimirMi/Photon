@@ -14,14 +14,14 @@ interface Synchronizable {
     var updated: Date
 
     val isTemp: Boolean
-        get() = id.startsWith(TEMP)
+        get() = id.contains(TEMP)
 
     companion object {
-        const val TEMP = "TEMP"
+        const val TEMP = "TEMP_ID_"
         fun tempId() = TEMP + UUID.randomUUID()
     }
 
     fun transform(): Synchronizable?
 }
 
-fun String.isTemp() = startsWith(Synchronizable.TEMP)
+fun String.isTemp() = contains(Synchronizable.TEMP)

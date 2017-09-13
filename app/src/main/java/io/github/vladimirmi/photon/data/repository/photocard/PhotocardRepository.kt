@@ -29,7 +29,8 @@ class PhotocardRepository
                     private val restService: RestService,
                     private val preferencesManager: PreferencesManager,
                     private val networkChecker: NetworkChecker,
-                    private val jobsManager: JobsManager)
+                    private val jobsManager: JobsManager,
+                    private val photocardJobRepository: PhotocardJobRepository)
     : PhotocardEntityRepository(realmManager) {
 
     fun getPhotocards(query: List<Query>? = null,
@@ -65,14 +66,14 @@ class PhotocardRepository
 
     fun create(photocard: Photocard): Observable<JobStatus> =
             Observable.fromCallable { photocard.create() }.
-                    flatMap { jobsManager.observe(PhotocardCreateJob.TAG + photocard.id) }
+                    flatMap { jobsManager.observe(PhotocardCreateJob(photocard.id, photocardJobRepository)) }
 
     fun delete(id: String): Observable<JobStatus> =
             Observable.fromCallable { getPhotocard(id).delete() }
-                    .flatMap { jobsManager.observe(PhotocardDeleteJob.TAG + id) }
+                    .flatMap { jobsManager.observe(PhotocardDeleteJob(id,photocardJobRepository)) }
 
     fun addView(id: String): Observable<JobStatus> =
             Observable.fromCallable { getPhotocard(id).addView() }
-                    .flatMap { jobsManager.observe(PhotocardAddViewJob.TAG + id) }
+                    .flatMap { jobsManager.observe(PhotocardAddViewJob(id,photocardJobRepository)) }
 }
 

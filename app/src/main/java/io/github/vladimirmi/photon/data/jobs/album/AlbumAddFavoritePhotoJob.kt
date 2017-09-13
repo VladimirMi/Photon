@@ -1,10 +1,6 @@
 package io.github.vladimirmi.photon.data.jobs.album
 
-import com.birbit.android.jobqueue.Job
-import com.birbit.android.jobqueue.Params
-import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
-import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.logCancel
+import io.github.vladimirmi.photon.data.jobs.ChainJob
 import io.github.vladimirmi.photon.data.repository.album.AlbumJobRepository
 
 /**
@@ -13,25 +9,18 @@ import io.github.vladimirmi.photon.data.repository.album.AlbumJobRepository
 
 class AlbumAddFavoritePhotoJob(private val photocardId: String,
                                private val repository: AlbumJobRepository)
-    : Job(Params(JobPriority.HIGH)
-        .addTags(TAG + photocardId)
-        .requireNetwork()) {
+    : ChainJob(TAG, photocardId) {
 
     companion object {
         const val TAG = "AlbumAddFavoritePhotoJob"
     }
 
-    override fun onAdded() {}
-
     override fun onRun() {
         repository.addToFavorite(photocardId).blockingGet()
     }
 
-    override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
-            cancelOrWaitConnection(throwable, runCount)
-
     override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        logCancel(cancelReason, throwable)
+        super.onCancel(cancelReason, throwable)
         repository.rollbackAddFavorite(photocardId)
     }
 }
