@@ -15,5 +15,4 @@ interface IRootModel : IModel {
     fun login(req: SignInReq): Completable
     fun register(req: SignUpReq): Completable
     fun isNetAvail(): Boolean
-    fun syncProfile(): Completable
 }

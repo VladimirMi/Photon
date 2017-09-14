@@ -13,10 +13,8 @@ import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.flow.BottomNavigationHistory
-import io.github.vladimirmi.photon.utils.ErrorCompletableObserver
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
-import mortar.MortarScope
 import mortar.Presenter
 import mortar.bundler.BundleService
 import java.io.File
@@ -35,18 +33,6 @@ class RootPresenter(val model: IRootModel) :
     override fun extractBundleService(view: IRootView?): BundleService =
             BundleService.getBundleService(view as Context)
 
-    override fun onEnterScope(scope: MortarScope?) {
-        if (isUserAuth()) syncDB()
-    }
-
-    override fun onExitScope() {
-        syncDB?.dispose()
-    }
-
-    private fun syncDB() {
-        syncDB = model.syncProfile().subscribeWith(ErrorCompletableObserver())
-    }
-
     fun hasActiveView() = hasView()
 
     fun getNewToolbarBuilder(): ToolbarBuilder = ToolbarBuilder(view)
@@ -63,7 +49,6 @@ class RootPresenter(val model: IRootModel) :
                     .doOnComplete { endAuthorization() }
 
     private fun endAuthorization() {
-        syncDB()
         hideLoading()
         bottomHistory.authMode = false
     }

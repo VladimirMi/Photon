@@ -2,7 +2,8 @@ package io.github.vladimirmi.photon.data.jobs.photocard
 
 import android.net.Uri
 import io.github.vladimirmi.photon.data.jobs.ChainJob
-import io.github.vladimirmi.photon.data.repository.photocard.PhotocardJobRepository
+import io.github.vladimirmi.photon.data.jobs.album.AlbumCreateJob
+import io.github.vladimirmi.photon.data.managers.extensions.JobGroup
 import io.github.vladimirmi.photon.di.DaggerService
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -12,15 +13,18 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class PhotocardCreateJob(private val photocardId: String,
-                         private val repository: PhotocardJobRepository)
-    : ChainJob(TAG, photocardId) {
+class PhotocardCreateJob(private val photocardId: String)
+    : ChainJob(TAG, JobGroup.PHOTOCARD, photocardId) {
 
     companion object {
         val TAG = "PhotocardCreateJob"
     }
 
-    override fun onRun() {
+    private val albumId = DaggerService.appComponent.photocardJobRepository().getPhotocard(photocardId).album
+    override val needCreate = listOf(AlbumCreateJob.TAG + albumId)
+
+    override fun execute() {
+        val repository = DaggerService.appComponent.photocardJobRepository()
         val photocard = repository.getPhotocard(photocardId)
 
         val data = getByteArrayFromContent(photocard.photo)
@@ -30,10 +34,12 @@ class PhotocardCreateJob(private val photocardId: String,
         val photocardRes = repository.uploadPhoto(bodyPart)
                 .flatMap { imageUrlRes ->
                     photocard.photo = imageUrlRes.image
+                    result?.let { photocard.album = it }
                     repository.create(photocard)
                 }.blockingGet()
 
         photocard.id = photocardRes.id
+        result = photocard.id
         repository.save(photocard)
     }
 
@@ -42,5 +48,9 @@ class PhotocardCreateJob(private val photocardId: String,
                 .openInputStream(Uri.parse(contentUri)).use {
             return it.readBytes()
         }
+    }
+
+    override fun copy() = PhotocardCreateJob(photocardId).apply {
+        queue.addAll(this@PhotocardCreateJob.queue)
     }
 }

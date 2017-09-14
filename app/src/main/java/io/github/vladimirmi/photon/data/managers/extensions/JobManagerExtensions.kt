@@ -6,6 +6,7 @@ import com.birbit.android.jobqueue.JobManager
 import com.birbit.android.jobqueue.RetryConstraint
 import com.birbit.android.jobqueue.callback.JobManagerCallback
 import com.crashlytics.android.Crashlytics
+import io.github.vladimirmi.photon.data.jobs.ChainJob
 import io.github.vladimirmi.photon.data.managers.extensions.JobStatus.Status.*
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.reactivex.Observable
@@ -21,6 +22,12 @@ object JobPriority {
     const val LOW = 0
     const val MID = 500
     const val HIGH = 1000
+}
+
+object JobGroup {
+    const val PROFILE = "PROFILE"
+    const val ALBUM = "ALBUM"
+    const val PHOTOCARD = "PHOTOCARD"
 }
 
 open class EmptyJobCallback : JobManagerCallback {
@@ -100,5 +107,7 @@ fun JobManager.observe(tag: String): Observable<JobStatus> {
     }
 }
 
-fun JobManager.jobStatusObservable(tag: String, action: () -> Unit): Observable<JobStatus> =
-        Observable.fromCallable(action).flatMap { observe(tag) }
+fun JobManager.addAndObserve(job: ChainJob): Observable<JobStatus> {
+    addJob(job.getJob())
+    return observe(job.newTag)
+}

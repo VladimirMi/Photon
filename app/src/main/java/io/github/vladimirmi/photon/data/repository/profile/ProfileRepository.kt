@@ -1,11 +1,12 @@
 package io.github.vladimirmi.photon.data.repository.profile
 
+import com.birbit.android.jobqueue.JobManager
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.jobs.JobsManager
 import io.github.vladimirmi.photon.data.jobs.profile.ProfileEditJob
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.managers.extensions.addAndObserve
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
@@ -31,9 +32,8 @@ class ProfileRepository
                     private val restService: RestService,
                     private val preferencesManager: PreferencesManager,
                     private val networkChecker: NetworkChecker,
-                    private val jobsManager: JobsManager,
-                    private val userRepository: UserRepository,
-                    private val profileJobRepository: ProfileJobRepository)
+                    private val jobManager: JobManager,
+                    private val userRepository: UserRepository)
     : ProfileEntityRepository(realmManager) {
 
     fun signIn(req: SignInReq): Completable {
@@ -59,7 +59,6 @@ class ProfileRepository
 
     fun updateProfile(): Completable {
         if (!isUserAuth()) return Completable.complete()
-        if (!jobsManager.isSync(getProfileId())) return Completable.complete()
         return userRepository.updateUser(getProfileId())
     }
 
@@ -76,11 +75,9 @@ class ProfileRepository
 
     fun isNetAvail() = networkChecker.isAvailable()
 
-    fun syncProfile() = jobsManager.subscribe()
-
     fun edit(request: ProfileEditReq): Observable<JobStatus> =
             Observable.fromCallable { getUser(getProfileId()).edit(request) }
-                    .flatMap { jobsManager.observe(ProfileEditJob(getProfileId(), profileJobRepository)) }
+                    .flatMap { jobManager.addAndObserve(ProfileEditJob(getProfileId())) }
 
     private fun saveUser(user: User) {
         save(user)

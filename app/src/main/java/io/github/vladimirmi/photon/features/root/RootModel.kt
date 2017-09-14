@@ -30,6 +30,4 @@ class RootModel(private val profileRepository: ProfileRepository) : IRootModel {
     override fun logout() = profileRepository.logout()
 
     override fun isNetAvail() = profileRepository.isNetAvail()
-
-    override fun syncProfile() = profileRepository.syncProfile()
 }

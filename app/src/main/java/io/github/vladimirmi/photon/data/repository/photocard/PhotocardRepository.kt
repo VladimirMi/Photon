@@ -1,13 +1,14 @@
 package io.github.vladimirmi.photon.data.repository.photocard
 
+import com.birbit.android.jobqueue.JobManager
 import io.github.vladimirmi.photon.core.App
-import io.github.vladimirmi.photon.data.jobs.JobsManager
 import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardAddViewJob
 import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardCreateJob
 import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardDeleteJob
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.managers.extensions.addAndObserve
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.network.NetworkChecker
 import io.github.vladimirmi.photon.data.network.api.RestService
@@ -29,8 +30,7 @@ class PhotocardRepository
                     private val restService: RestService,
                     private val preferencesManager: PreferencesManager,
                     private val networkChecker: NetworkChecker,
-                    private val jobsManager: JobsManager,
-                    private val photocardJobRepository: PhotocardJobRepository)
+                    private val jobManager: JobManager)
     : PhotocardEntityRepository(realmManager) {
 
     fun getPhotocards(query: List<Query>? = null,
@@ -40,7 +40,6 @@ class PhotocardRepository
             realmManager.search(Photocard::class.java, query, sortBy, order, managed)
 
     fun updatePhotocards(offset: Int, limit: Int): Completable {
-        if (!jobsManager.syncComplete()) return Completable.complete()
         val tag = Photocard::class.java.simpleName
         val lastModified = preferencesManager.getLastUpdate(tag)
         return networkChecker.singleAvailable()
@@ -55,7 +54,6 @@ class PhotocardRepository
 
 
     fun updatePhotocard(id: String): Completable {
-        if (!jobsManager.isSync(id)) return Completable.complete()
         val lastModified = realmManager.getLastUpdated(Photocard::class.java, id)
         return networkChecker.singleAvailable()
                 .flatMap { restService.getPhotocard(id, "any", lastModified) }
@@ -66,14 +64,14 @@ class PhotocardRepository
 
     fun create(photocard: Photocard): Observable<JobStatus> =
             Observable.fromCallable { photocard.create() }.
-                    flatMap { jobsManager.observe(PhotocardCreateJob(photocard.id, photocardJobRepository)) }
+                    flatMap { jobManager.addAndObserve(PhotocardCreateJob(photocard.id)) }
 
     fun delete(id: String): Observable<JobStatus> =
             Observable.fromCallable { getPhotocard(id).delete() }
-                    .flatMap { jobsManager.observe(PhotocardDeleteJob(id,photocardJobRepository)) }
+                    .flatMap { jobManager.addAndObserve(PhotocardDeleteJob(id)) }
 
     fun addView(id: String): Observable<JobStatus> =
             Observable.fromCallable { getPhotocard(id).addView() }
-                    .flatMap { jobsManager.observe(PhotocardAddViewJob(id,photocardJobRepository)) }
+                    .flatMap { jobManager.addAndObserve(PhotocardAddViewJob(id)) }
 }
 

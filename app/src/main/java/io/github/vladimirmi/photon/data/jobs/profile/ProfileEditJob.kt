@@ -2,8 +2,8 @@ package io.github.vladimirmi.photon.data.jobs.profile
 
 import android.net.Uri
 import io.github.vladimirmi.photon.data.jobs.ChainJob
+import io.github.vladimirmi.photon.data.managers.extensions.JobGroup
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
-import io.github.vladimirmi.photon.data.repository.profile.ProfileJobRepository
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.ErrorSingleObserver
 import io.reactivex.schedulers.Schedulers.io
@@ -15,15 +15,15 @@ import okhttp3.RequestBody
  * Created by Vladimir Mikhalev 25.06.2017.
  */
 
-class ProfileEditJob(profileId: String,
-                     private val repository: ProfileJobRepository)
-    : ChainJob(TAG, profileId) {
+class ProfileEditJob(profileId: String)
+    : ChainJob(TAG, JobGroup.PROFILE, profileId) {
 
     companion object {
         const val TAG = "ProfileEditJob"
     }
 
-    override fun onRun() {
+    override fun execute() {
+        val repository = DaggerService.appComponent.profileJobRepository()
         val profile = repository.getProfile()
 
         if (!profile.avatar.startsWith("http")) {
@@ -50,9 +50,12 @@ class ProfileEditJob(profileId: String,
     }
 
     private fun rollback() {
+        val repository = DaggerService.appComponent.profileJobRepository()
         repository.getProfileFromNet()
                 .doOnSuccess { repository.rollbackEdit(ProfileEditReq.from(it)) }
                 .subscribeOn(io())
                 .subscribeWith(ErrorSingleObserver())
     }
+
+    override fun copy() = throw UnsupportedOperationException()
 }
