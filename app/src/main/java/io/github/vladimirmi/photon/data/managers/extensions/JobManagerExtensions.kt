@@ -82,9 +82,9 @@ fun JobManager.observe(tag: String): Observable<JobStatus> {
             }
 
             override fun onJobCancelled(job: Job, byCancelRequest: Boolean, throwable: Throwable?) {
-                Timber.e(throwable, throwable?.localizedMessage)
+                Timber.e("onJobCancelled: wait $tag get ${job.tags}")
                 if (!e.isDisposed && job.tags?.contains(tag) == true) {
-                    if (throwable != null) e.onError(throwable)
+                    if (throwable != null) e.onError(throwable.cause ?: throwable)
                 }
             }
 
@@ -107,7 +107,8 @@ fun JobManager.observe(tag: String): Observable<JobStatus> {
     }
 }
 
-fun JobManager.addAndObserve(job: ChainJob): Observable<JobStatus> {
-    addJob(job.getJob())
-    return observe(job.newTag)
-}
+fun JobManager.addAndObserve(job: ChainJob): Observable<JobStatus> =
+        job.getJob()?.let {
+            addJob(it)
+            observe(job.newTag)
+        } ?: Observable.just(JobStatus(null, QUEUED))

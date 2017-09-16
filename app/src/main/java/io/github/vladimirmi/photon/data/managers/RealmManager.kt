@@ -1,6 +1,6 @@
 package io.github.vladimirmi.photon.data.managers
 
-import io.github.vladimirmi.photon.data.models.realm.Synchronizable
+import io.github.vladimirmi.photon.data.models.realm.Entity
 import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.apply
 import io.github.vladimirmi.photon.utils.asFlowable
@@ -79,7 +79,7 @@ class RealmManager {
 
 
     fun <T : RealmObject> getLastUpdated(clazz: Class<T>, id: String): String {
-        val obj = getUnmanagedObject(clazz, id) as? Synchronizable
+        val obj = getUnmanagedObject(clazz, id) as? Entity
         return (obj?.updated ?: Date(0)).toString()
     }
 

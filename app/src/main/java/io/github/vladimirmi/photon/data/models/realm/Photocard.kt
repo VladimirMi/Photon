@@ -11,7 +11,7 @@ import java.util.*
 
 open class Photocard(
         @PrimaryKey
-        override var id: String = Synchronizable.tempId(),
+        override var id: String = Entity.tempId(),
         var owner: String = "",
         var searchName: String = "",
         var title: String = "",
@@ -22,9 +22,8 @@ open class Photocard(
         var tags: RealmList<Tag> = RealmList(),
         override var updated: Date = Date(),
         override var active: Boolean = true,
-        override var sync: Boolean = true,
-        var album: String = Synchronizable.tempId()
-) : RealmObject(), Synchronizable {
+        var album: String = Entity.tempId())
+    : RealmObject(), Entity {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -109,6 +108,7 @@ open class Filter(
 }
 
 open class Tag(@PrimaryKey var value: String = "") : RealmObject() {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

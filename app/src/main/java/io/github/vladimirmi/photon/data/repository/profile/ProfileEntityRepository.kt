@@ -16,7 +16,6 @@ open class ProfileEntityRepository(realmManager: RealmManager)
         login = request.login
         name = request.name
         avatar = request.avatar
-        sync = false
         save(this)
     }
 }

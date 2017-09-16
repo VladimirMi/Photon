@@ -22,7 +22,9 @@ class ProfileEditJob(profileId: String)
         const val TAG = "ProfileEditJob"
     }
 
-    override fun execute() {
+    override val needReplace = tag
+
+    override fun onStart() {
         val repository = DaggerService.appComponent.profileJobRepository()
         val profile = repository.getProfile()
 
@@ -39,22 +41,17 @@ class ProfileEditJob(profileId: String)
         repository.editProfile(ProfileEditReq.from(profile)).blockingGet()
     }
 
-    override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        super.onCancel(cancelReason, throwable)
-        rollback()
-    }
-
-    private fun getByteArrayFromContent(contentUri: String): ByteArray {
-        DaggerService.appComponent.context().contentResolver.openInputStream(Uri.parse(contentUri))
-                .use { return it.readBytes() }
-    }
-
-    private fun rollback() {
+    override fun onError(throwable: Throwable) {
         val repository = DaggerService.appComponent.profileJobRepository()
         repository.getProfileFromNet()
                 .doOnSuccess { repository.rollbackEdit(ProfileEditReq.from(it)) }
                 .subscribeOn(io())
                 .subscribeWith(ErrorSingleObserver())
+    }
+
+    private fun getByteArrayFromContent(contentUri: String): ByteArray {
+        DaggerService.appComponent.context().contentResolver.openInputStream(Uri.parse(contentUri))
+                .use { return it.readBytes() }
     }
 
     override fun copy() = throw UnsupportedOperationException()

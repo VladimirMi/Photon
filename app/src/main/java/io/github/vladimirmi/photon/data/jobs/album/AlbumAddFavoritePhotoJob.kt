@@ -19,14 +19,12 @@ class AlbumAddFavoritePhotoJob(private val photocardId: String)
     override val needCreate = listOf(PhotocardCreateJob.TAG + photocardId)
     override val needCancel = AlbumDeleteFavoritePhotoJob.TAG + photocardId
 
-    override fun execute() {
+    override fun onStart() {
         val repository = DaggerService.appComponent.albumJobRepository()
         repository.addToFavorite(result ?: photocardId).blockingGet()
     }
 
-    override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        super.onCancel(cancelReason, throwable)
-
+    override fun onError(throwable: Throwable) {
         val repository = DaggerService.appComponent.albumJobRepository()
         repository.rollbackAddFavorite(photocardId)
     }

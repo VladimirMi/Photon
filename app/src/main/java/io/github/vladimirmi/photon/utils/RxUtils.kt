@@ -7,8 +7,8 @@ import com.bumptech.glide.request.animation.GlideAnimation
 import com.bumptech.glide.request.target.SimpleTarget
 import com.crashlytics.android.Crashlytics
 import io.github.vladimirmi.photon.core.BaseView
-import io.github.vladimirmi.photon.data.models.dto.PhotocardDto
 import io.github.vladimirmi.photon.data.network.ApiError
+import io.github.vladimirmi.photon.domain.models.PhotocardDto
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single

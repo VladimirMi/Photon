@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.core
 
 import android.os.Bundle
-import io.github.vladimirmi.photon.features.root.RootPresenter
+import io.github.vladimirmi.photon.presentation.root.RootPresenter
 import io.reactivex.disposables.CompositeDisposable
 import mortar.MortarScope
 import mortar.ViewPresenter
@@ -11,7 +11,7 @@ import timber.log.Timber
  * Developer Vladimir Mikhalev, 30.05.2017
  */
 
-abstract class BasePresenter<V : BaseView<*, V>, out M : IModel>
+abstract class BasePresenter<V : BaseView<*, V>, out M : Interactor>
 (protected val model: M, protected val rootPresenter: RootPresenter)
     : ViewPresenter<V>() {
 

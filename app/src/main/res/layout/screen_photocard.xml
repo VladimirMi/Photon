@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<io.github.vladimirmi.photon.features.photocard.PhotocardView
+<io.github.vladimirmi.photon.presentation.photocard.PhotocardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -168,4 +168,4 @@
 
     </io.github.vladimirmi.photon.ui.PullToZoomWrapper>
 
-</io.github.vladimirmi.photon.features.photocard.PhotocardView>
+</io.github.vladimirmi.photon.presentation.photocard.PhotocardView>

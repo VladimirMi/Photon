@@ -10,11 +10,11 @@ import dagger.Provides
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
-import io.github.vladimirmi.photon.data.mappers.AlbumCachingMapper
-import io.github.vladimirmi.photon.data.mappers.PhotocardCachingMapper
-import io.github.vladimirmi.photon.data.mappers.UserCachingMapper
 import io.github.vladimirmi.photon.data.network.NetworkChecker
 import io.github.vladimirmi.photon.di.DaggerScope
+import io.github.vladimirmi.photon.domain.mappers.AlbumCachingMapper
+import io.github.vladimirmi.photon.domain.mappers.PhotocardCachingMapper
+import io.github.vladimirmi.photon.domain.mappers.UserCachingMapper
 import io.github.vladimirmi.photon.utils.AppConfig
 
 /**

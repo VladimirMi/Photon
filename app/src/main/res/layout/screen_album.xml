@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.github.vladimirmi.photon.features.album.AlbumView
+<io.github.vladimirmi.photon.presentation.album.AlbumView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -67,5 +67,5 @@
             android:clickable="true"
             />
     </LinearLayout>
-</io.github.vladimirmi.photon.features.album.AlbumView>
+</io.github.vladimirmi.photon.presentation.album.AlbumView>
 

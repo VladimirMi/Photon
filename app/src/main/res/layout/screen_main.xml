@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.github.vladimirmi.photon.features.main.MainView
+<io.github.vladimirmi.photon.presentation.main.MainView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -14,4 +14,4 @@
         tools:listitem="@layout/item_photocard"
         />
 
-</io.github.vladimirmi.photon.features.main.MainView>
+</io.github.vladimirmi.photon.presentation.main.MainView>

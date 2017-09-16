@@ -2,8 +2,8 @@ package io.github.vladimirmi.photon.data.repository
 
 import io.github.vladimirmi.photon.data.managers.RealmManager
 import io.github.vladimirmi.photon.data.models.realm.Album
+import io.github.vladimirmi.photon.data.models.realm.Entity
 import io.github.vladimirmi.photon.data.models.realm.Photocard
-import io.github.vladimirmi.photon.data.models.realm.Synchronizable
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.realm.RealmObject
 
@@ -22,11 +22,11 @@ open class BaseEntityRepository(protected val realmManager: RealmManager) {
     protected open fun getUser(id: String): User =
             realmManager.getUnmanagedObject(User::class.java, id) ?: throw NoSuchElementException()
 
-    protected fun saveFromNet(it: Synchronizable) {
+    protected fun saveFromNet(it: Entity) {
         it.transform()?.let { save(it as RealmObject) }
     }
 
-    protected fun saveFromNet(list: List<Synchronizable>) {
+    protected fun saveFromNet(list: List<Entity>) {
         save(list.mapNotNull { it.transform() as? RealmObject })
     }
 

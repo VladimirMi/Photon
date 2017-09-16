@@ -23,7 +23,7 @@ class PhotocardCreateJob(private val photocardId: String)
     private val albumId = DaggerService.appComponent.photocardJobRepository().getPhotocard(photocardId).album
     override val needCreate = listOf(AlbumCreateJob.TAG + albumId)
 
-    override fun execute() {
+    override fun onStart() {
         val repository = DaggerService.appComponent.photocardJobRepository()
         val photocard = repository.getPhotocard(photocardId)
 
@@ -42,6 +42,8 @@ class PhotocardCreateJob(private val photocardId: String)
         result = photocard.id
         repository.save(photocard)
     }
+
+    override fun onError(throwable: Throwable) {}
 
     private fun getByteArrayFromContent(contentUri: String): ByteArray {
         DaggerService.appComponent.context().contentResolver

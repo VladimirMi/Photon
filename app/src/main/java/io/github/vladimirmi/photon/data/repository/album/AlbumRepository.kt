@@ -21,6 +21,8 @@ import javax.inject.Inject
  * Created by Vladimir Mikhalev 05.09.2017.
  */
 
+//todo закрыть репозитории интерфейсами
+
 @DaggerScope(App::class)
 class AlbumRepository
 @Inject constructor(realmManager: RealmManager,

@@ -7,11 +7,11 @@ import flow.Flow
 import flow.History
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
-import io.github.vladimirmi.photon.features.auth.AuthScreen
-import io.github.vladimirmi.photon.features.newcard.NewCardScreen
-import io.github.vladimirmi.photon.features.profile.ProfileScreen
-import io.github.vladimirmi.photon.features.splash.SplashScreen
 import io.github.vladimirmi.photon.flow.BottomNavigationHistory.BottomItem.*
+import io.github.vladimirmi.photon.presentation.auth.AuthScreen
+import io.github.vladimirmi.photon.presentation.newcard.NewCardScreen
+import io.github.vladimirmi.photon.presentation.profile.ProfileScreen
+import io.github.vladimirmi.photon.presentation.splash.SplashScreen
 
 /**
  * Created by Vladimir Mikhalev 15.06.2017.

@@ -1,9 +1,6 @@
 package io.github.vladimirmi.photon.data.jobs
 
-import com.birbit.android.jobqueue.Job
-import com.birbit.android.jobqueue.JobManager
-import com.birbit.android.jobqueue.Params
-import com.birbit.android.jobqueue.TagConstraint
+import com.birbit.android.jobqueue.*
 import io.github.vladimirmi.photon.data.jobs.album.*
 import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardAddViewJob
 import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardCreateJob
@@ -14,6 +11,7 @@ import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnecti
 import io.github.vladimirmi.photon.data.managers.extensions.logCancel
 import io.github.vladimirmi.photon.data.models.realm.isTemp
 import io.github.vladimirmi.photon.di.DaggerService
+import timber.log.Timber
 
 /**
  * Created by Vladimir Mikhalev 10.09.2017.
@@ -44,45 +42,27 @@ abstract class ChainJob(private val jobTag: String,
         val parent = getParent(needCreate, jobManager)
         if (parent != null) {
             if (parent.tag == needCancel) {
-                jobManager.cancelJobs(TagConstraint.ANY, needCancel)
+                jobManager.cancel(needCancel)
                 return null
             } else {
-                parent.cancel(needCancel)
+                parent.queue.cancel(needCancel)
             }
-            parent.replace(needReplace, QueueJobHolder(jobTag, group, entityId))
+            val jobHolder = QueueJobHolder(jobTag, group, entityId)
+            parent.queue.replace(needReplace, jobHolder)
+            parent.queue.add(needCreate.first(), jobHolder)
+            Timber.e("${parent.queue}")
             return parent.copy()
         }
-        val canceled = jobManager.cancelJobs(TagConstraint.ANY, needCancel)
-        if (canceled.cancelledJobs.isNotEmpty()) return null
-        jobManager.cancelJobs(TagConstraint.ANY, needReplace)
+        if (jobManager.cancel(needCancel)?.cancelledJobs?.isNotEmpty() == true) return null
+        jobManager.cancel(needReplace)
         return this
-    }
-
-    private fun ChainJob.replace(replace: String?, jobHolder: QueueJobHolder) {
-        replace?.let { queue.removeFromQueue(it) }
-        val parentQueue = queue.findRecurs { it.tag == replace }
-        parentQueue?.add(jobHolder)
-    }
-
-    private fun ChainJob.cancel(cancel: String?) {
-        cancel?.let { queue.removeFromQueue(it) }
     }
 
     abstract fun copy(): Job
 
-    private fun getParent(needCreate: List<String>, jobManager: JobManager): ChainJob? {
-        needCreate.forEach {
-            if (!it.isTemp()) return null
-            val cancelResult = jobManager.cancelJobs(TagConstraint.ANY, it)
-            val parent = cancelResult.cancelledJobs.firstOrNull()
-            parent?.let { return it as ChainJob }
-        }
-        return null
-    }
-
     override final fun onRun() {
         if (isChain && result.isNullOrEmpty()) throw IllegalStateException()
-        execute()
+        onStart()
         if (queue.isNotEmpty() && result.isNullOrEmpty()) throw IllegalStateException()
 
         queue.forEach {
@@ -91,29 +71,42 @@ abstract class ChainJob(private val jobTag: String,
         }
     }
 
-    abstract fun execute()
+    abstract fun onStart()
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
             cancelOrWaitConnection(throwable, runCount)
 
     override fun onAdded() {}
 
-    override fun onCancel(cancelReason: Int, throwable: Throwable?) {
+    override final fun onCancel(cancelReason: Int, throwable: Throwable?) {
         logCancel(cancelReason, throwable)
+        throwable?.let { onError(it) }
     }
 
-    private fun nextJob(queueJobHolder: QueueJobHolder) {
+    abstract fun onError(throwable: Throwable)
+
+    private fun getParent(tags: List<String>, jobManager: JobManager): ChainJob? {
+        tags.forEach {
+            if (!it.isTemp()) return null
+            val cancelResult = jobManager.cancelJobs(TagConstraint.ANY, it)
+            val parent = cancelResult.cancelledJobs.firstOrNull()
+            parent?.let { return it as ChainJob }
+        }
+        return null
+    }
+
+    private fun nextJob(jobHolder: QueueJobHolder) {
         val jobManager = DaggerService.appComponent.jobManager()
-        val job = when (queueJobHolder.jobTag) {
-            ProfileEditJob.TAG -> ProfileEditJob(queueJobHolder.entityId).apply { setupJob(queueJobHolder) }
-            AlbumAddFavoritePhotoJob.TAG -> AlbumAddFavoritePhotoJob(queueJobHolder.entityId).apply { setupJob(queueJobHolder) }
-            AlbumCreateJob.TAG -> AlbumCreateJob(queueJobHolder.entityId).apply { setupJob(queueJobHolder) }
-            AlbumDeleteFavoritePhotoJob.TAG -> AlbumDeleteFavoritePhotoJob(queueJobHolder.entityId).apply { setupJob(queueJobHolder) }
-            AlbumDeleteJob.TAG -> AlbumDeleteJob(queueJobHolder.entityId).apply { setupJob(queueJobHolder) }
-            AlbumEditJob.TAG -> AlbumEditJob(queueJobHolder.entityId).apply { setupJob(queueJobHolder) }
-            PhotocardAddViewJob.TAG -> PhotocardAddViewJob(queueJobHolder.entityId).apply { setupJob(queueJobHolder) }
-            PhotocardCreateJob.TAG -> PhotocardCreateJob(queueJobHolder.entityId).apply { setupJob(queueJobHolder) }
-            PhotocardDeleteJob.TAG -> PhotocardDeleteJob(queueJobHolder.entityId).apply { setupJob(queueJobHolder) }
+        val job = when (jobHolder.jobTag) {
+            ProfileEditJob.TAG -> ProfileEditJob(jobHolder.entityId).setupJob(jobHolder)
+            AlbumAddFavoritePhotoJob.TAG -> AlbumAddFavoritePhotoJob(jobHolder.entityId).setupJob(jobHolder)
+            AlbumCreateJob.TAG -> AlbumCreateJob(jobHolder.entityId).setupJob(jobHolder)
+            AlbumDeleteFavoritePhotoJob.TAG -> AlbumDeleteFavoritePhotoJob(jobHolder.entityId).setupJob(jobHolder)
+            AlbumDeleteJob.TAG -> AlbumDeleteJob(jobHolder.entityId).setupJob(jobHolder)
+            AlbumEditJob.TAG -> AlbumEditJob(jobHolder.entityId).setupJob(jobHolder)
+            PhotocardAddViewJob.TAG -> PhotocardAddViewJob(jobHolder.entityId).setupJob(jobHolder)
+            PhotocardCreateJob.TAG -> PhotocardCreateJob(jobHolder.entityId).setupJob(jobHolder)
+            PhotocardDeleteJob.TAG -> PhotocardDeleteJob(jobHolder.entityId).setupJob(jobHolder)
             else -> throw IllegalStateException()
         }
         jobManager.addJob(job)
@@ -125,4 +118,7 @@ abstract class ChainJob(private val jobTag: String,
         isChain = true
         return this
     }
+
+    private fun JobManager.cancel(tag: String?): CancelResult? =
+            tag?.let { cancelJobs(TagConstraint.ANY, tag) }
 }

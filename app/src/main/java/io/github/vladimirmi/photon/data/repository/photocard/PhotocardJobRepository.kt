@@ -9,9 +9,7 @@ import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.data.network.body
 import io.github.vladimirmi.photon.data.network.parseStatusCode
 import io.github.vladimirmi.photon.di.DaggerScope
-import io.github.vladimirmi.photon.utils.Query
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -31,9 +29,6 @@ class PhotocardJobRepository
 
     fun getPhotocardFromNet(id: String): Single<Photocard> =
             restService.getPhotocard(id, "any", "0").body()
-
-    fun getNotSync(): Observable<List<Photocard>> = realmManager.search(Photocard::class.java,
-            listOf(Query("sync", Query.Operator.EQUAL, false)), managed = false)
 
     fun create(photocard: Photocard): Single<Photocard> {
         return restService.createPhotocard(preferencesManager.getProfileId(),

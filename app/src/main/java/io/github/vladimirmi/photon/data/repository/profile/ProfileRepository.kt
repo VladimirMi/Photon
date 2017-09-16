@@ -52,7 +52,10 @@ class ProfileRepository
                 .toCompletable()
     }
 
-    fun logout() = preferencesManager.clearUser() //todo remove from db
+    fun logout() {
+        realmManager.remove(User::class.java, getProfileId())
+        preferencesManager.clearUser()
+    }
 
     fun getProfile(managed: Boolean = true): Observable<User> =
             userRepository.getUser(getProfileId(), managed).share()

@@ -9,7 +9,7 @@ import io.github.vladimirmi.photon.data.repository.photocard.PhotocardJobReposit
 import io.github.vladimirmi.photon.data.repository.profile.ProfileJobRepository
 import io.github.vladimirmi.photon.di.modules.LocaleModule
 import io.github.vladimirmi.photon.di.modules.NetworkModule
-import io.github.vladimirmi.photon.features.root.RootActivityComponent
+import io.github.vladimirmi.photon.presentation.root.RootActivityComponent
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017

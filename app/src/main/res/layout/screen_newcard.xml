@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.github.vladimirmi.photon.features.newcard.NewCardView
+<io.github.vladimirmi.photon.presentation.newcard.NewCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,4 +10,4 @@
     <include layout="@layout/view_newcard"/>
 
 
-</io.github.vladimirmi.photon.features.newcard.NewCardView>
+</io.github.vladimirmi.photon.presentation.newcard.NewCardView>

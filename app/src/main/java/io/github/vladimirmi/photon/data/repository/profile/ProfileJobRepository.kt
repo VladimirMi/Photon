@@ -10,8 +10,6 @@ import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.data.network.body
 import io.github.vladimirmi.photon.data.network.parseStatusCode
 import io.github.vladimirmi.photon.di.DaggerScope
-import io.github.vladimirmi.photon.utils.Query
-import io.reactivex.Observable
 import io.reactivex.Single
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -33,9 +31,6 @@ class ProfileJobRepository
         return restService.getUser(preferencesManager.getProfileId(), "0")
                 .body()
     }
-
-    fun getNotSync(): Observable<List<User>> = realmManager.search(User::class.java,
-            listOf(Query("sync", Query.Operator.EQUAL, false)), managed = false)
 
     fun uploadPhoto(bodyPart: MultipartBody.Part): Single<ImageUrlRes> {
         return restService.uploadPhoto(preferencesManager.getProfileId(),

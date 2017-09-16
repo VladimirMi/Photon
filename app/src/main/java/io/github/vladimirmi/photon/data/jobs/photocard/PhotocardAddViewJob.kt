@@ -20,13 +20,12 @@ class PhotocardAddViewJob(private val photocardId: String)
     override val needCreate = listOf(PhotocardCreateJob.TAG + photocardId,
             AlbumCreateJob.TAG + albumId)
 
-    override fun execute() {
+    override fun onStart() {
         val repository = DaggerService.appComponent.photocardJobRepository()
         repository.addView(result ?: photocardId).blockingGet()
     }
 
-    override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        super.onCancel(cancelReason, throwable)
+    override fun onError(throwable: Throwable) {
         val repository = DaggerService.appComponent.photocardJobRepository()
         repository.rollbackAddView(photocardId)
     }

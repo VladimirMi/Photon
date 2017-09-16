@@ -11,7 +11,7 @@ import java.util.*
 
 open class Album(
         @PrimaryKey
-        override var id: String = Synchronizable.tempId(),
+        override var id: String = Entity.tempId(),
         var owner: String = "",
         var title: String = "",
         var description: String = "",
@@ -20,14 +20,15 @@ open class Album(
         var isFavorite: Boolean = false,
         var photocards: RealmList<Photocard> = RealmList(),
         override var updated: Date = Date(),
-        override var active: Boolean = true,
-        override var sync: Boolean = true
-
-) : RealmObject(), Synchronizable {
+        override var active: Boolean = true)
+    : RealmObject(), Entity {
 
     override fun transform(): Album? =
             if (active) {
-                photocards = photocards.mapNotNullTo(RealmList()) { it.transform() }
+                photocards = photocards.mapNotNullTo(RealmList()) {
+                    it.album = id
+                    it.transform()
+                }
                 this
             } else null
 }

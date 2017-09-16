@@ -3,7 +3,6 @@ package io.github.vladimirmi.photon.data.jobs.album
 import io.github.vladimirmi.photon.data.jobs.ChainJob
 import io.github.vladimirmi.photon.data.managers.extensions.JobGroup
 import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.logCancel
 import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.ErrorSingleObserver
@@ -25,15 +24,18 @@ class AlbumEditJob(private val albumId: String)
 
     override fun onAdded() {}
 
-    override fun execute() {
+    override fun onStart() {
         val repository = DaggerService.appComponent.albumJobRepository()
         val album = repository.getAlbum(result ?: albumId)
         repository.edit(AlbumEditReq.from(album)).blockingGet()
     }
 
-    override fun onCancel(cancelReason: Int, throwable: Throwable?) {
-        logCancel(cancelReason, throwable)
-        rollback()
+    override fun onError(throwable: Throwable) {
+        val repository = DaggerService.appComponent.albumJobRepository()
+        repository.getAlbumFromNet(id)
+                .doOnSuccess { repository.rollbackEdit(AlbumEditReq.from(it)) }
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(ErrorSingleObserver())
     }
 
     override fun shouldReRunOnThrowable(throwable: Throwable, runCount: Int, maxRunCount: Int) =
@@ -41,11 +43,7 @@ class AlbumEditJob(private val albumId: String)
 
 
     private fun rollback() {
-        val repository = DaggerService.appComponent.albumJobRepository()
-        repository.getAlbumFromNet(id)
-                .doOnSuccess { repository.rollbackEdit(AlbumEditReq.from(it)) }
-                .subscribeOn(Schedulers.io())
-                .subscribeWith(ErrorSingleObserver())
+
     }
 
     override fun copy() = throw UnsupportedOperationException()

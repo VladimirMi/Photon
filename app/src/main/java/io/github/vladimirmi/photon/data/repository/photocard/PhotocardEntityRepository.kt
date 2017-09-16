@@ -12,7 +12,6 @@ open class PhotocardEntityRepository(realmManager: RealmManager)
     : BaseEntityRepository(realmManager) {
 
     fun Photocard.create() {
-        sync = false
         val album = getAlbum(album)
         album.photocards.add(this)
         save(album)
@@ -20,13 +19,11 @@ open class PhotocardEntityRepository(realmManager: RealmManager)
 
     fun Photocard.delete() {
         active = false
-        sync = false
         save(this)
     }
 
     fun Photocard.addView() {
         views++
-        sync = false
         save(this)
     }
 }

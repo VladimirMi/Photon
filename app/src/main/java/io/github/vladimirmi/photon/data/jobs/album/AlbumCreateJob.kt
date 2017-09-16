@@ -16,7 +16,7 @@ class AlbumCreateJob(private val albumId: String)
         const val TAG = "AlbumCreateJob"
     }
 
-    override fun execute() {
+    override fun onStart() {
         val repository = DaggerService.appComponent.albumJobRepository()
         val album = repository.getAlbum(albumId)
         val request = AlbumNewReq.fromAlbum(album)
@@ -27,6 +27,8 @@ class AlbumCreateJob(private val albumId: String)
         result = album.id
         repository.save(album)
     }
+
+    override fun onError(throwable: Throwable) {}
 
     override fun copy() = AlbumCreateJob(albumId).apply {
         queue.addAll(this@AlbumCreateJob.queue)
