@@ -7,14 +7,14 @@ import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardCreateJob
 import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardDeleteJob
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
-import io.github.vladimirmi.photon.data.managers.extensions.addAndObserve
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.Query
+import io.github.vladimirmi.photon.data.managers.utils.addAndObserve
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.network.NetworkChecker
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.data.network.parseGetResponse
 import io.github.vladimirmi.photon.di.DaggerScope
-import io.github.vladimirmi.photon.utils.Query
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.realm.Sort

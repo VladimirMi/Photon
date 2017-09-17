@@ -5,8 +5,8 @@ import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.jobs.album.*
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
-import io.github.vladimirmi.photon.data.managers.extensions.addAndObserve
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.addAndObserve
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.data.network.NetworkChecker

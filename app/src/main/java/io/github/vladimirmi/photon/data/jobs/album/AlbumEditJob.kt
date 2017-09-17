@@ -1,8 +1,8 @@
 package io.github.vladimirmi.photon.data.jobs.album
 
 import io.github.vladimirmi.photon.data.jobs.ChainJob
-import io.github.vladimirmi.photon.data.managers.extensions.JobGroup
-import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
+import io.github.vladimirmi.photon.data.managers.utils.JobGroup
+import io.github.vladimirmi.photon.data.managers.utils.cancelOrWaitConnection
 import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.ErrorSingleObserver

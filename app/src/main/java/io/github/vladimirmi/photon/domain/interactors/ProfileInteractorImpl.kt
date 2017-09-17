@@ -1,6 +1,6 @@
 package io.github.vladimirmi.photon.domain.interactors
 
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.github.vladimirmi.photon.data.repository.album.AlbumRepository
@@ -24,8 +24,6 @@ class ProfileInteractorImpl
                     private val userMapper: UserCachingMapper,
                     private val albumMapper: AlbumCachingMapper)
     : ProfileInteractor {
-
-    override fun isUserAuth() = profileRepository.isUserAuth()
 
     override fun getProfile(): Observable<UserDto> =
             Observable.merge(

@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.domain.interactors
 
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus
 import io.github.vladimirmi.photon.data.models.realm.Photocard
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository

@@ -1,6 +1,6 @@
 package io.github.vladimirmi.photon.domain.interactors
 
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus
 import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.data.repository.album.AlbumRepository
 import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository

@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.presentation.photocard
 
 import io.github.vladimirmi.photon.core.Interactor
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus
 import io.github.vladimirmi.photon.domain.models.PhotocardDto
 import io.github.vladimirmi.photon.domain.models.UserDto
 import io.reactivex.Observable

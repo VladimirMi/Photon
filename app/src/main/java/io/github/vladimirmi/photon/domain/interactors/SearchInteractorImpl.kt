@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.domain.interactors
 
+import io.github.vladimirmi.photon.data.managers.utils.Query
 import io.github.vladimirmi.photon.data.models.realm.Search
 import io.github.vladimirmi.photon.data.repository.recents.RecentsRepository
 import io.github.vladimirmi.photon.di.DaggerScope
@@ -7,10 +8,8 @@ import io.github.vladimirmi.photon.presentation.main.MainInteractor
 import io.github.vladimirmi.photon.presentation.search.SearchInteractor
 import io.github.vladimirmi.photon.presentation.search.SearchScreen
 import io.github.vladimirmi.photon.presentation.search.SearchView
-import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Observable
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -20,24 +19,24 @@ import javax.inject.Inject
 
 @DaggerScope(SearchScreen::class)
 class SearchInteractorImpl
-@Inject constructor(private val mainModel: MainInteractor,
+@Inject constructor(private val mainInteractor: MainInteractor,
                     private val recentsRepository: RecentsRepository)
     : SearchInteractor {
 
     override var queryPage
-        get() = mainModel.queryPage
+        get() = mainInteractor.queryPage
         set(value) {
-            mainModel.queryPage = value
+            mainInteractor.queryPage = value
         }
     override var tagsQuery
-        get() = mainModel.tagsQuery
+        get() = mainInteractor.tagsQuery
         set(value) {
-            mainModel.tagsQuery = value
+            mainInteractor.tagsQuery = value
         }
     override var filtersQuery
-        get() = mainModel.filtersQuery
+        get() = mainInteractor.filtersQuery
         set(value) {
-            mainModel.filtersQuery = value
+            mainInteractor.filtersQuery = value
         }
 
     override fun getTags(): Observable<List<String>> {
@@ -58,7 +57,7 @@ class SearchInteractorImpl
                 }.ioToMain()
     }
 
-    override fun isFiltered() = mainModel.isFiltered()
+    override fun isFiltered() = mainInteractor.isFiltered()
 
     override fun getQuery(): ArrayList<Query> = when (queryPage) {
         SearchView.Page.TAGS -> tagsQuery
@@ -66,7 +65,6 @@ class SearchInteractorImpl
     }
 
     override fun addQuery(pair: Pair<String, String>) {
-        Timber.e("addQuery: $pair")
         getQuery().add(parseToQuery(pair))
     }
 
@@ -86,14 +84,13 @@ class SearchInteractorImpl
         val operator = if (pair.first == "filters.nuances" || pair.first == "searchName") {
             Query.Operator.CONTAINS
         } else {
-            Query.Operator.EQUAL
+            Query.Operator.EQUAL_TO
         }
         return Query(pair.first, operator, pair.second)
     }
 
     override fun makeQuery() {
-        Timber.e("makeQuery: ")
-        mainModel.makeQuery()
+        mainInteractor.makeQuery()
     }
 
     override fun searchRecents(string: String): Observable<List<String>> =

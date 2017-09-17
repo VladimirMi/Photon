@@ -203,7 +203,7 @@ class RootActivity : FlowActivity(), IRootView {
             true
         }
         val menuHelper = MenuPopupHelper(this, popup.menu as MenuBuilder, actionView)
-        (0..popup.menu.size() - 1)
+        (0 until popup.menu.size())
                 .filter { popup.menu.getItem(it).icon != null }
                 .forEach { menuHelper.setForceShowIcon(true); return@forEach }
         actionView.setOnClickListener {

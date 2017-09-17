@@ -6,9 +6,9 @@ import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardAddViewJob
 import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardCreateJob
 import io.github.vladimirmi.photon.data.jobs.photocard.PhotocardDeleteJob
 import io.github.vladimirmi.photon.data.jobs.profile.ProfileEditJob
-import io.github.vladimirmi.photon.data.managers.extensions.JobPriority
-import io.github.vladimirmi.photon.data.managers.extensions.cancelOrWaitConnection
-import io.github.vladimirmi.photon.data.managers.extensions.logCancel
+import io.github.vladimirmi.photon.data.managers.utils.JobPriority
+import io.github.vladimirmi.photon.data.managers.utils.cancelOrWaitConnection
+import io.github.vladimirmi.photon.data.managers.utils.logCancel
 import io.github.vladimirmi.photon.data.models.realm.isTemp
 import io.github.vladimirmi.photon.di.DaggerService
 import timber.log.Timber

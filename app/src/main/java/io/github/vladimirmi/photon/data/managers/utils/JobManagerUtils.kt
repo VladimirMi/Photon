@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.data.managers.extensions
+package io.github.vladimirmi.photon.data.managers.utils
 
 import com.birbit.android.jobqueue.CancelReason
 import com.birbit.android.jobqueue.Job
@@ -7,7 +7,7 @@ import com.birbit.android.jobqueue.RetryConstraint
 import com.birbit.android.jobqueue.callback.JobManagerCallback
 import com.crashlytics.android.Crashlytics
 import io.github.vladimirmi.photon.data.jobs.ChainJob
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus.Status.*
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus.Status.*
 import io.github.vladimirmi.photon.utils.AppConfig
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables

@@ -9,7 +9,7 @@ import android.provider.OpenableColumns
 import flow.Flow
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BasePresenter
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.flow.BottomNavigationHistory.BottomItem.PROFILE

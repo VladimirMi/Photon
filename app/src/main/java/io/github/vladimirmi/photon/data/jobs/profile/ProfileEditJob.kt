@@ -2,7 +2,7 @@ package io.github.vladimirmi.photon.data.jobs.profile
 
 import android.net.Uri
 import io.github.vladimirmi.photon.data.jobs.ChainJob
-import io.github.vladimirmi.photon.data.managers.extensions.JobGroup
+import io.github.vladimirmi.photon.data.managers.utils.JobGroup
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.utils.ErrorSingleObserver

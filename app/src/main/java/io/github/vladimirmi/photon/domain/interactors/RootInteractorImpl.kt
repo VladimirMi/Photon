@@ -3,16 +3,21 @@ package io.github.vladimirmi.photon.domain.interactors
 import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
+import io.github.vladimirmi.photon.di.DaggerScope
+import io.github.vladimirmi.photon.presentation.root.RootActivity
 import io.github.vladimirmi.photon.presentation.root.RootInteractor
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Completable
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
-class RootInteractorImpl(private val profileRepository: ProfileRepository) : RootInteractor {
+@DaggerScope(RootActivity::class)
+class RootInteractorImpl
+@Inject constructor(private val profileRepository: ProfileRepository) : RootInteractor {
 
     override fun isUserAuth() = profileRepository.isUserAuth()
 

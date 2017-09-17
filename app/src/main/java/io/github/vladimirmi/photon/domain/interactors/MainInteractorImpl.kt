@@ -1,6 +1,7 @@
 package io.github.vladimirmi.photon.domain.interactors
 
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.Query
 import io.github.vladimirmi.photon.data.repository.photocard.PhotocardRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.domain.mappers.PhotocardCachingMapper
@@ -8,7 +9,6 @@ import io.github.vladimirmi.photon.domain.models.PhotocardDto
 import io.github.vladimirmi.photon.presentation.main.MainInteractor
 import io.github.vladimirmi.photon.presentation.main.MainScreen
 import io.github.vladimirmi.photon.presentation.search.SearchView
-import io.github.vladimirmi.photon.utils.Query
 import io.github.vladimirmi.photon.utils.ioToMain
 import io.reactivex.Completable
 import io.reactivex.Observable

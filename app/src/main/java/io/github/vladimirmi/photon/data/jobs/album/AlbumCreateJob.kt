@@ -1,7 +1,7 @@
 package io.github.vladimirmi.photon.data.jobs.album
 
 import io.github.vladimirmi.photon.data.jobs.ChainJob
-import io.github.vladimirmi.photon.data.managers.extensions.JobGroup
+import io.github.vladimirmi.photon.data.managers.utils.JobGroup
 import io.github.vladimirmi.photon.data.models.req.AlbumNewReq
 import io.github.vladimirmi.photon.di.DaggerService
 

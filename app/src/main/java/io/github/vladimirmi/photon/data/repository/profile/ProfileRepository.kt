@@ -5,8 +5,8 @@ import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.jobs.profile.ProfileEditJob
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
-import io.github.vladimirmi.photon.data.managers.extensions.JobStatus
-import io.github.vladimirmi.photon.data.managers.extensions.addAndObserve
+import io.github.vladimirmi.photon.data.managers.utils.JobStatus
+import io.github.vladimirmi.photon.data.managers.utils.addAndObserve
 import io.github.vladimirmi.photon.data.models.realm.Album
 import io.github.vladimirmi.photon.data.models.realm.User
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
@@ -83,7 +83,7 @@ class ProfileRepository
                     .flatMap { jobManager.addAndObserve(ProfileEditJob(getProfileId())) }
 
     private fun saveUser(user: User) {
-        save(user)
+        saveFromNet(user)
         preferencesManager.saveUserId(user.id)
         preferencesManager.saveUserToken(user.token)
         preferencesManager.saveFavAlbumId(user.albums.find { it.isFavorite }!!.id)

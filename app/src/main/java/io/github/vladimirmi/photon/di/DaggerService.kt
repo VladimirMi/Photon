@@ -5,7 +5,6 @@ import io.github.vladimirmi.photon.di.modules.LocaleModule
 import io.github.vladimirmi.photon.di.modules.NetworkModule
 import io.github.vladimirmi.photon.presentation.root.RootActivity
 import io.github.vladimirmi.photon.presentation.root.RootActivityComponent
-import io.github.vladimirmi.photon.presentation.root.RootActivityModule
 import mortar.MortarScope
 import mortar.bundler.BundleServiceRunner
 
@@ -31,11 +30,8 @@ object DaggerService {
                 .build()
     }
 
-    private fun createRootActivityComponent(): RootActivityComponent {
-        return appComponent.rootActivityComponentBuilder()
-                .module(RootActivityModule())
-                .build()
-    }
+    private fun createRootActivityComponent(): RootActivityComponent =
+            appComponent.rootActivityComponentBuilder().build()
 
     @Suppress("UNCHECKED_CAST")
     fun <T> getComponent(context: Context) = context.getSystemService(SERVICE_NAME) as T

@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.utils
+package io.github.vladimirmi.photon.data.managers.utils
 
 import android.os.HandlerThread
 import android.os.Process.THREAD_PRIORITY_BACKGROUND
@@ -15,19 +15,19 @@ import io.realm.RealmResults
  * Created by Vladimir Mikhalev 09.07.2017.
  */
 
-//todo infix call
+
 data class Query(val fieldName: String, val operator: Operator, val value: Any) {
 
-    enum class Operator {CONTAINS, EQUAL }
+    enum class Operator {CONTAINS, EQUAL_TO }
 
     fun <T : RealmObject> applyTo(realmQuery: RealmQuery<T>): RealmQuery<T> {
         when (value) {
             is String -> when (operator) {
                 Operator.CONTAINS -> realmQuery.contains(fieldName, value)
-                Operator.EQUAL -> realmQuery.equalTo(fieldName, value)
+                Operator.EQUAL_TO -> realmQuery.equalTo(fieldName, value)
             }
             is Boolean -> when (operator) {
-                Operator.EQUAL -> realmQuery.equalTo(fieldName, value)
+                Operator.EQUAL_TO -> realmQuery.equalTo(fieldName, value)
                 else -> throw IllegalArgumentException("Not supported operator for boolean value")
             }
         }

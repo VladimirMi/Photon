@@ -3,7 +3,7 @@ package io.github.vladimirmi.photon.data.jobs.photocard
 import android.net.Uri
 import io.github.vladimirmi.photon.data.jobs.ChainJob
 import io.github.vladimirmi.photon.data.jobs.album.AlbumCreateJob
-import io.github.vladimirmi.photon.data.managers.extensions.JobGroup
+import io.github.vladimirmi.photon.data.managers.utils.JobGroup
 import io.github.vladimirmi.photon.di.DaggerService
 import okhttp3.MediaType
 import okhttp3.MultipartBody

@@ -21,7 +21,6 @@ interface RootActivityComponent {
 
     @Subcomponent.Builder
     interface Builder {
-        fun module(module: RootActivityModule): RootActivityComponent.Builder
         fun build(): RootActivityComponent
     }
 

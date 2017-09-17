@@ -3,12 +3,12 @@ package io.github.vladimirmi.photon.data.repository.recents
 import io.github.vladimirmi.photon.core.App
 import io.github.vladimirmi.photon.data.managers.PreferencesManager
 import io.github.vladimirmi.photon.data.managers.RealmManager
+import io.github.vladimirmi.photon.data.managers.utils.Query
 import io.github.vladimirmi.photon.data.models.realm.Search
 import io.github.vladimirmi.photon.data.models.realm.Tag
 import io.github.vladimirmi.photon.data.network.api.RestService
 import io.github.vladimirmi.photon.data.network.parseGetResponse
 import io.github.vladimirmi.photon.di.DaggerScope
-import io.github.vladimirmi.photon.utils.Query
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.realm.RealmObject

@@ -18,14 +18,16 @@ import io.reactivex.disposables.Disposable
 import mortar.Presenter
 import mortar.bundler.BundleService
 import java.io.File
+import javax.inject.Inject
 
 /**
  * Developer Vladimir Mikhalev 30.05.2017
  */
 
 @DaggerScope(RootActivity::class)
-class RootPresenter(val model: RootInteractor) :
-        Presenter<IRootView>() {
+class RootPresenter
+@Inject constructor(val model: RootInteractor)
+    : Presenter<IRootView>() {
 
     val bottomHistory = BottomNavigationHistory(authMode = !isUserAuth())
     private var syncDB: Disposable? = null

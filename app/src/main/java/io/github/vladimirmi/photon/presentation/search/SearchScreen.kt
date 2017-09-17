@@ -1,15 +1,16 @@
 package io.github.vladimirmi.photon.presentation.search
 
+import dagger.Binds
 import dagger.Subcomponent
 import flow.TreeKey
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.managers.utils.Query
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.domain.interactors.SearchInteractorImpl
 import io.github.vladimirmi.photon.presentation.main.MainScreen
 import io.github.vladimirmi.photon.presentation.search.filters.SearchFilterView
 import io.github.vladimirmi.photon.presentation.search.tags.SearchTagView
-import io.github.vladimirmi.photon.utils.Query
 import java.util.*
 
 /**
@@ -32,6 +33,8 @@ class SearchScreen : BaseScreen<MainScreen.Component>(), TreeKey {
 
     @dagger.Module
     interface Module {
+        @Binds
+        @DaggerScope(SearchScreen::class)
         fun searchInteractor(searchInteractor: SearchInteractorImpl): SearchInteractor
     }
 

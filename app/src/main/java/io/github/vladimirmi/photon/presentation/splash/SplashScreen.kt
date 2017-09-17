@@ -1,5 +1,6 @@
 package io.github.vladimirmi.photon.presentation.splash
 
+import dagger.Binds
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
@@ -23,6 +24,8 @@ class SplashScreen : BaseScreen<RootActivityComponent>() {
 
     @dagger.Module
     interface Module {
+        @Binds
+        @DaggerScope(SplashScreen::class)
         fun splashInteractor(splashInteractor: SplashInteractorImpl): SplashInteractor
     }
 

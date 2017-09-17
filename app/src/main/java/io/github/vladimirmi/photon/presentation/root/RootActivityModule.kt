@@ -1,8 +1,7 @@
 package io.github.vladimirmi.photon.presentation.root
 
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import io.github.vladimirmi.photon.data.repository.profile.ProfileRepository
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.domain.interactors.RootInteractorImpl
 
@@ -11,14 +10,8 @@ import io.github.vladimirmi.photon.domain.interactors.RootInteractorImpl
  */
 
 @Module
-class RootActivityModule {
-    //todo binds
-    @Provides
+interface RootActivityModule {
+    @Binds
     @DaggerScope(RootActivity::class)
-    fun provideIRootModel(profileRepository: ProfileRepository): RootInteractor =
-            RootInteractorImpl(profileRepository)
-
-    @Provides
-    @DaggerScope(RootActivity::class)
-    fun provideRootPresenter(model: RootInteractor) = RootPresenter(model)
+    fun rootInteractor(rootInteractor: RootInteractorImpl): RootInteractor
 }

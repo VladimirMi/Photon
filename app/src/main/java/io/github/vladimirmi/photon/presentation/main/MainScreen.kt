@@ -6,12 +6,12 @@ import dagger.Binds
 import dagger.Subcomponent
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.core.BaseScreen
+import io.github.vladimirmi.photon.data.managers.utils.Query
 import io.github.vladimirmi.photon.di.DaggerScope
 import io.github.vladimirmi.photon.domain.interactors.MainInteractorImpl
 import io.github.vladimirmi.photon.presentation.root.RootActivityComponent
 import io.github.vladimirmi.photon.presentation.search.SearchScreen
 import io.github.vladimirmi.photon.presentation.search.SearchView
-import io.github.vladimirmi.photon.utils.Query
 import java.util.*
 
 /**

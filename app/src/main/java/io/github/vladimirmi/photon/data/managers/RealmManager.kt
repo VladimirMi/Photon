@@ -1,9 +1,9 @@
 package io.github.vladimirmi.photon.data.managers
 
+import io.github.vladimirmi.photon.data.managers.utils.Query
+import io.github.vladimirmi.photon.data.managers.utils.apply
+import io.github.vladimirmi.photon.data.managers.utils.asFlowable
 import io.github.vladimirmi.photon.data.models.realm.Entity
-import io.github.vladimirmi.photon.utils.Query
-import io.github.vladimirmi.photon.utils.apply
-import io.github.vladimirmi.photon.utils.asFlowable
 import io.reactivex.Observable
 import io.realm.Realm
 import io.realm.RealmObject
@@ -31,9 +31,8 @@ class RealmManager {
     fun <T : RealmObject> getObject(clazz: Class<T>,
                                     id: String,
                                     managed: Boolean): Observable<T> {
-        val query = listOf(Query("id", Query.Operator.EQUAL, id))
-        return search(clazz, query, null, Sort.ASCENDING, managed)
-                .flatMapIterable { it }
+        val query = listOf(Query("id", Query.Operator.EQUAL_TO, id))
+        return search(clazz, query, null, Sort.ASCENDING, managed).flatMapIterable { it }
 //                .flatMap { if (it.isEmpty()) Observable.empty() else Observable.just(it.first()) }
     }
 
