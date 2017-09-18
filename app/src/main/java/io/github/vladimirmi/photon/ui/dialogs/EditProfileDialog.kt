@@ -1,12 +1,10 @@
-package io.github.vladimirmi.photon.ui
+package io.github.vladimirmi.photon.ui.dialogs
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.req.ProfileEditReq
 import io.github.vladimirmi.photon.domain.models.UserDto
-import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.dialog_edit_profile.view.*
 
 /**
@@ -14,14 +12,14 @@ import kotlinx.android.synthetic.main.dialog_edit_profile.view.*
  */
 
 class EditProfileDialog(viewGroup: ViewGroup,
-                        private val editProfileAction: (ProfileEditReq) -> Unit,
-                        private val userDto: UserDto)
+                        editProfileAction: (ProfileEditReq) -> Unit,
+                        userDto: UserDto)
     : ValidationDialog(R.layout.dialog_edit_profile, viewGroup) {
 
-    private val loginField = view.login
-    private val nameField = view.name
-    private val ok = view.ok
-    private val cancel = view.cancel
+    private val loginField = dialogView.login
+    private val nameField = dialogView.name
+    private val ok = dialogView.ok
+    private val cancel = dialogView.cancel
 
     init {
         loginField.setText(userDto.login)
@@ -39,17 +37,13 @@ class EditProfileDialog(viewGroup: ViewGroup,
         }
     }
 
-    fun subscribe() = compDisp.add(listenFields())
+    override fun listenFields(): Disposable {
+        val loginObs = loginField.validate(LOGIN_PATTERN, dialogView.login_error,
+                dialogView.context.getString(R.string.message_err_login))
+        val nameObs = nameField.validate(NAME_PATTERN, dialogView.name_error,
+                dialogView.context.getString(R.string.message_err_name))
 
-    //todo добавить в хайд
-    fun unsubscribe() = compDisp.clear()
-
-    private fun listenFields(): Disposable {
-        val loginObs = getValidObs(loginField, LOGIN_PATTERN, view.login_error, view.context.getString(R.string.message_err_login))
-        val nameObs = getValidObs(nameField, NAME_PATTERN, view.name_error, view.context.getString(R.string.message_err_name))
-
-        return Observable.combineLatest(loginObs, nameObs,
-                BiFunction { t1: Boolean, t2: Boolean -> t1 && t2 })
+        return validateForm(listOf(loginObs, nameObs))
                 .subscribe { ok.isEnabled = it }
     }
 }

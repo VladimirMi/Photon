@@ -1,12 +1,10 @@
-package io.github.vladimirmi.photon.ui
+package io.github.vladimirmi.photon.ui.dialogs
 
 import android.view.ViewGroup
 import io.github.vladimirmi.photon.R
 import io.github.vladimirmi.photon.data.models.req.AlbumEditReq
 import io.github.vladimirmi.photon.domain.models.AlbumDto
-import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.dialog_new_album.view.*
 
 /**
@@ -19,10 +17,10 @@ class EditAlbumDialog(
         albumDto: AlbumDto)
     : ValidationDialog(R.layout.dialog_edit_album, viewGroup) {
 
-    private val nameField = view.name
-    private val descriptionField = view.description
-    private val ok = view.ok
-    private val cancel = view.cancel
+    private val nameField = dialogView.name
+    private val descriptionField = dialogView.description
+    private val ok = dialogView.ok
+    private val cancel = dialogView.cancel
 
     init {
         nameField.setText(albumDto.title)
@@ -40,16 +38,13 @@ class EditAlbumDialog(
         }
     }
 
-    fun subscribe() = compDisp.add(listenFields())
+    override fun listenFields(): Disposable {
+        val nameObs = nameField.validate(NAME_PATTERN, dialogView.name_error,
+                dialogView.context.getString(R.string.message_err_name))
+        val descriptionObs = descriptionField.validate(DESCRIPTION_PATTERN, dialogView.description_error,
+                dialogView.context.getString(R.string.message_err_description))
 
-    fun unsubscribe() = compDisp.clear()
-
-    private fun listenFields(): Disposable {
-        val nameObs = getValidObs(nameField, NAME_PATTERN, view.name_error, view.context.getString(R.string.message_err_name))
-        val descriptionObs = getValidObs(descriptionField, DESCRIPTION_PATTERN, view.description_error, view.context.getString(R.string.message_err_description))
-
-        return Observable.combineLatest(nameObs, descriptionObs,
-                BiFunction { t1: Boolean, t2: Boolean -> t1 && t2 })
+        return validateForm(listOf(nameObs, descriptionObs))
                 .subscribe { ok.isEnabled = it }
     }
 }

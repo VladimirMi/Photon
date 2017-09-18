@@ -29,7 +29,7 @@ class SearchPagerAdapter(private val tabTitles: Array<String>) : PagerAdapter() 
         val view = when (position) {
             0 -> LayoutInflater.from(container.context).inflate(R.layout.view_search, container, false)
             1 -> LayoutInflater.from(container.context).inflate(R.layout.view_filters, container, false)
-            else -> throw IllegalStateException("No view for given position found")
+            else -> throw IllegalStateException("No dialogView for given position found")
         }
         container.addView(view)
         (view as BaseView<*, *>).onViewRestored()

@@ -13,8 +13,8 @@ import io.github.vladimirmi.photon.domain.models.AlbumDto
 import io.github.vladimirmi.photon.domain.models.UserDto
 import io.github.vladimirmi.photon.flow.FlowLifecycles
 import io.github.vladimirmi.photon.presentation.main.AlbumAdapter
-import io.github.vladimirmi.photon.ui.EditProfileDialog
-import io.github.vladimirmi.photon.ui.NewAlbumDialog
+import io.github.vladimirmi.photon.ui.dialogs.EditProfileDialog
+import io.github.vladimirmi.photon.ui.dialogs.NewAlbumDialog
 import io.github.vladimirmi.photon.utils.setRoundAvatarWithBorder
 import kotlinx.android.synthetic.main.view_profile.view.*
 
@@ -70,25 +70,10 @@ class ProfileView(context: Context, attrs: AttributeSet)
 
     private fun showAlbum(album: AlbumDto) = presenter.showAlbum(album)
 
-    fun openNewAlbumDialog() {
-        newAlbumDialog.show()
-        newAlbumDialog.subscribe()
-    }
-
-    fun closeNewAlbumDialog() {
-        newAlbumDialog.hide()
-        newAlbumDialog.unsubscribe()
-    }
-
-    fun openEditProfileDialog() {
-        editProfileDialog.show()
-        editProfileDialog.subscribe()
-    }
-
-    fun closeEditProfileDialog() {
-        editProfileDialog.hide()
-        editProfileDialog.unsubscribe()
-    }
+    fun openNewAlbumDialog() = newAlbumDialog.show()
+    fun closeNewAlbumDialog() = newAlbumDialog.hide()
+    fun openEditProfileDialog() = editProfileDialog.show()
+    fun closeEditProfileDialog() = editProfileDialog.hide()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         presenter.onActivityResult(requestCode, resultCode, data)

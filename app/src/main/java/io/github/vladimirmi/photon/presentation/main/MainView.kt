@@ -16,8 +16,8 @@ import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerService
 import io.github.vladimirmi.photon.domain.models.PhotocardDto
 import io.github.vladimirmi.photon.ui.EndlessRecyclerViewScrollListener
-import io.github.vladimirmi.photon.ui.LoginDialog
-import io.github.vladimirmi.photon.ui.RegistrationDialog
+import io.github.vladimirmi.photon.ui.dialogs.LoginDialog
+import io.github.vladimirmi.photon.ui.dialogs.RegistrationDialog
 import kotlinx.android.synthetic.main.screen_main.view.*
 
 /**
@@ -64,11 +64,8 @@ class MainView(context: Context, attrs: AttributeSet) :
     }
 
     fun openRegistrationDialog() = registrationDialog.show()
-
     fun openLoginDialog() = loginDialog.show()
-
     fun closeRegistrationDialog() = registrationDialog.hide()
-
     fun closeLoginDialog() = loginDialog.hide()
 
     private fun register(req: SignUpReq) = presenter.register(req)
@@ -78,15 +75,11 @@ class MainView(context: Context, attrs: AttributeSet) :
     override fun onViewRestored() {
         super.onViewRestored()
         restoreHierarchyState(state)
-        loginDialog.subscribe()
-        registrationDialog.subscribe()
     }
 
     override fun onViewDestroyed(removedByFlow: Boolean) {
         super.onViewDestroyed(removedByFlow)
         saveHierarchyState(state)
-        loginDialog.unsubscribe()
-        registrationDialog.unsubscribe()
     }
 
     override fun onSaveInstanceState(): Parcelable {

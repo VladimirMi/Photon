@@ -6,8 +6,8 @@ import io.github.vladimirmi.photon.core.BaseView
 import io.github.vladimirmi.photon.data.models.req.SignInReq
 import io.github.vladimirmi.photon.data.models.req.SignUpReq
 import io.github.vladimirmi.photon.di.DaggerService
-import io.github.vladimirmi.photon.ui.LoginDialog
-import io.github.vladimirmi.photon.ui.RegistrationDialog
+import io.github.vladimirmi.photon.ui.dialogs.LoginDialog
+import io.github.vladimirmi.photon.ui.dialogs.RegistrationDialog
 import kotlinx.android.synthetic.main.screen_auth.view.*
 
 /**
@@ -36,18 +36,6 @@ class AuthView(context: Context, attrs: AttributeSet)
     fun closeRegistrationDialog() = registrationDialog.hide()
     fun openLoginDialog() = loginDialog.show()
     fun closeLoginDialog() = loginDialog.hide()
-
-    override fun onViewRestored() {
-        super.onViewRestored()
-        registrationDialog.subscribe()
-        loginDialog.subscribe()
-    }
-
-    override fun onViewDestroyed(removedByFlow: Boolean) {
-        super.onViewDestroyed(removedByFlow)
-        registrationDialog.unsubscribe()
-        loginDialog.unsubscribe()
-    }
 
     fun setTitle(stringId: Int) = title.setText(stringId)
 }

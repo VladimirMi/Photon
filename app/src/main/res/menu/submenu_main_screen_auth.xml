@@ -6,4 +6,8 @@
         android:icon="@drawable/ic_action_logout"
         android:title="@string/menu_main_exit"/>
 
+    <item
+        android:id="@+id/menu_feedback"
+        android:icon="@drawable/ic_action_feedback"
+        android:title="@string/menu_main_feedback"/>
 </menu>

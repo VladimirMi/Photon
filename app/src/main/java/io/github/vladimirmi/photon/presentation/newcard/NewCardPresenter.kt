@@ -120,7 +120,7 @@ class NewCardPresenter
     fun clearPhotocard() {
         Flow.getKey<NewCardScreen>(view)?.info = NewCardScreenInfo()
         initView(view)
-//        view.clearView()
+//        dialogView.clearView()
     }
 
     fun choosePhoto() {

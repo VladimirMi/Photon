@@ -33,6 +33,7 @@ class MainPresenter
             R.id.menu_signIn -> rootPresenter.afterNetCheck(view) { openLoginDialog() }
             R.id.menu_signUp -> rootPresenter.afterNetCheck(view) { openRegistrationDialog() }
             R.id.menu_logout -> logout()
+            R.id.menu_feedback -> feedback()
         }
     }
 
@@ -149,6 +150,10 @@ class MainPresenter
     private fun logout() {
         rootPresenter.logout()
         initToolbar()
+    }
+
+    private fun feedback() {
+        //todo implement
     }
 
     fun resetFilter() {

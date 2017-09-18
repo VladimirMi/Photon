@@ -13,6 +13,7 @@
     <string name="menu_main_exit">Выйти</string>
     <string name="menu_main_enter">Войти</string>
     <string name="menu_main_registration">Зарегистрироваться</string>
+    <string name="menu_main_feedback">Связаться с разработчиками</string>
 
     <string name="menu_profile_new_album">Новый альбом</string>
     <string name="menu_profile_edit_info">Редактрировать информацию</string>

@@ -1,4 +1,4 @@
-package io.github.vladimirmi.photon.ui
+package io.github.vladimirmi.photon.ui.dialogs
 
 import android.graphics.drawable.GradientDrawable
 import android.support.v4.content.ContextCompat
@@ -8,16 +8,16 @@ import android.widget.EditText
 import android.widget.TextView
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
 import io.github.vladimirmi.photon.R
-import io.github.vladimirmi.photon.core.BaseDialog
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import java.util.regex.Pattern
 
 /**
  * Created by Vladimir Mikhalev 15.06.2017.
  */
 
-open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
+abstract class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
     : BaseDialog(layoutId, viewGroup) {
     private val colorNormal = ContextCompat.getColor(viewGroup.context, R.color.grey_light)
     private val colorError = ContextCompat.getColor(viewGroup.context, R.color.error)
@@ -31,28 +31,39 @@ open class ValidationDialog(layoutId: Int, viewGroup: ViewGroup)
 
     protected val compDisp = CompositeDisposable()
 
-    protected fun getValidObs(field: EditText, pattern: Pattern, errorField: TextView, error: String): Observable<Boolean> {
-        return field.afterTextChangeEvents()
+    protected fun EditText.validate(pattern: Pattern, errorField: TextView, error: String)
+            : Observable<Boolean> {
+        val drawable = background as GradientDrawable
+        return afterTextChangeEvents()
                 .skipInitialValue()
                 .map { pattern.matcher(it.editable().toString()).matches() }
                 .doOnNext { matches ->
-                    val drawable = field.background as GradientDrawable
                     if (matches) {
                         drawable.setStroke(3, colorNormal)
-                        field.setTextColor(colorText)
+                        setTextColor(colorText)
                         errorField.text = ""
                     } else {
                         drawable.setStroke(3, colorError)
-                        field.setTextColor(colorError)
+                        setTextColor(colorError)
                         errorField.text = error
                     }
                 }
     }
 
-    protected fun getNetObs(errorMsg: String): Observable<Boolean> {
-        return Observable.just(true)
-//        return DaggerService.appComponent.dataManager().isNetworkAvailable()
-//                .observeOn(AndroidSchedulers.mainThread())
-        //todo fix
+    protected fun validateForm(observables: List<Observable<Boolean>>): Observable<Boolean> {
+        return Observable.combineLatest(observables, { it.all { it as Boolean } })
+                .startWith(false)
     }
+
+    override fun hide() {
+        super.hide()
+        compDisp.clear()
+    }
+
+    override fun show() {
+        super.show()
+        compDisp.add(listenFields())
+    }
+
+    abstract fun listenFields(): Disposable
 }

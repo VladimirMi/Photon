@@ -11,8 +11,8 @@ import io.github.vladimirmi.photon.domain.models.AlbumDto
 import io.github.vladimirmi.photon.domain.models.PhotocardDto
 import io.github.vladimirmi.photon.presentation.main.CardAdapter
 import io.github.vladimirmi.photon.presentation.main.CardViewHolder
-import io.github.vladimirmi.photon.ui.EditAlbumDialog
-import io.github.vladimirmi.photon.ui.SimpleDialog
+import io.github.vladimirmi.photon.ui.dialogs.EditAlbumDialog
+import io.github.vladimirmi.photon.ui.dialogs.SimpleDialog
 import kotlinx.android.synthetic.main.screen_album.view.*
 
 
@@ -65,23 +65,10 @@ class AlbumView(context: Context, attrs: AttributeSet)
 
     }
 
-    fun showDeleteDialog() {
-        deleteDialog.show()
-    }
-
-    fun closeDeleteDialog() {
-        deleteDialog.hide()
-    }
-
-    fun showEditDialog() {
-        editDialog.show()
-        editDialog.subscribe()
-    }
-
-    fun closeEditDialog() {
-        editDialog.hide()
-        editDialog.unsubscribe()
-    }
+    fun showDeleteDialog() = deleteDialog.show()
+    fun closeDeleteDialog() = deleteDialog.hide()
+    fun showEditDialog() = editDialog.show()
+    fun closeEditDialog() = editDialog.hide()
 
     fun deletePhotocard(photocard: PhotocardDto) {
         adapter.deletePhotocard(photocard)
